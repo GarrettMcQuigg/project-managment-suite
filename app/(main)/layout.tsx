@@ -4,7 +4,8 @@
 // import { Unauth } from './_src/unauth';
 // import { checkInternalAccess } from '@/lib/helpers/check-internal-access';
 
-export default async function BMSLayout({ children }: { children: React.ReactNode }) {
+// export default async function BMSLayout({ children }: { children: React.ReactNode }) {
+export default async function BMSLayout() {
   // const currentUser = await getCurrentUser();
   // const currentEmployee = await getCurrentEmployee();
 

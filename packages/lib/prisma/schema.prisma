@@ -9,8 +9,8 @@ generator client {
 
 model user {
   id          String  @id @default(uuid())
-  firstName   String
-  lastName    String
+  firstname   String
+  lastname    String
   phone       String
   email       String  @unique
   profileImg  String?

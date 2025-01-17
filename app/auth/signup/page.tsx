@@ -1,20 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
-
-// Types
-interface SignupRequestBody {
-  firstname: string;
-  lastname: string;
-  email: string;
-  phone: string;
-  password: string;
-  emailMFACode: string;
-  smsMFACode: string;
-}
+import { SignupRequestBody } from '@/app/api/auth/signup/types';
 
 // Constants
 const API_AUTH_SIGNUP_ROUTE = '/api/auth/signup';
@@ -52,8 +41,8 @@ export default function SignUp() {
       email,
       phone,
       password,
-      emailMFACode: '000000', // Hardcoded as requested
-      smsMFACode: '000000' // Hardcoded as requested
+      emailMFACode: '000000',
+      smsMFACode: '000000'
     };
 
     console.log('Signup Request Body:', requestBody);

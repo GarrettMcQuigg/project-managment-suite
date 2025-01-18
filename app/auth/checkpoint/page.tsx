@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { API_AUTH_CHECKPOINT_ROUTE, AUTH_SIGNIN_ROUTE, AUTH_SIGNUP_ROUTE, DASHBOARD_ROUTE } from '@/packages/lib/routes';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { Button } from '@/packages/lib/components/button';
 import { AuthCheckpointRequestBody } from '@/app/api/auth/checkpoint/types';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function SignIn() {
   const router = useRouter();
@@ -16,6 +16,13 @@ export default function SignIn() {
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem('email');
+    if (storedEmail) {
+      localStorage.removeItem('email');
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,15 +48,11 @@ export default function SignIn() {
       requestBody
     });
 
-    console.log(response);
-
-    console.log('SIGNUP ROUTE', response.content.redirect === AUTH_SIGNUP_ROUTE);
-    console.log('SIGNIN ROUTE', response.content.redirect === AUTH_SIGNIN_ROUTE);
-
     if (response.err) {
       toast.error(response.message);
       setLoading(false);
     } else {
+      localStorage.setItem('email', email);
       router.push(response.content.redirect);
     }
   };

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { SignupRequestBody } from '@/app/api/auth/signup/types';
@@ -39,6 +39,13 @@ export default function SignUp() {
       password: ''
     }
   });
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem('email');
+    if (storedEmail) {
+      form.setValue('email', storedEmail);
+    }
+  }, []);
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
@@ -81,6 +88,20 @@ export default function SignUp() {
             <div className="rounded-md shadow-sm space-y-4">
               <FormField
                 control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="Enter your email" disabled {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="firstname"
                 render={({ field }) => (
                   <FormItem>
@@ -101,20 +122,6 @@ export default function SignUp() {
                     <FormLabel>Last Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter your last name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="Enter your email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

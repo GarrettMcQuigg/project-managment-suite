@@ -1,11 +1,12 @@
 'use client';
 
-import { AUTH_SIGNUP_ROUTE } from '@/packages/lib/routes';
+import { AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
 import { MoonIcon, Rocket, SunIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
+import { user } from '@prisma/client';
 
-export default function LandingHeader() {
+export default function LandingHeader({ currentUser }: { currentUser: user | null }) {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -28,8 +29,8 @@ export default function LandingHeader() {
         </a>
       </nav>
       <div className="flex items-center space-x-8">
-        <Link className="flex items-center gap-2 bg-foreground text-background text-sm px-4 py-2 rounded-3xl" href={AUTH_SIGNUP_ROUTE}>
-          Launch App <Rocket className="h-4 w-4" />
+        <Link className="flex items-center gap-2 bg-foreground text-background text-sm px-4 py-2 rounded-3xl" href={AUTH_CHECKPOINT_ROUTE}>
+          <span>{currentUser ? 'Launch App' : 'Sign In'}</span> <Rocket className="h-4 w-4" />
         </Link>
 
         {/* Theme */}

@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
   requestBody.email = requestBody.email.toLowerCase();
 
-  const { error } = SignupRequestBodySchema.validate(requestBody);
+  let { error } = SignupRequestBodySchema.validate(requestBody);
   if (error) {
     return handleBadRequest({ message: error.message, err: error });
   }
@@ -41,11 +41,11 @@ export async function POST(request: Request) {
     //   }
     // });
 
-    const emailAvailabilityError = await CheckEmailAvailability(requestBody.email);
-    if (emailAvailabilityError) {
+    const emailIsAvailable = await CheckEmailAvailability(requestBody.email);
+    if (!emailIsAvailable) {
       return handleConflict({
-        message: emailAvailabilityError.message,
-        err: emailAvailabilityError
+        message: 'Email is already in use',
+        err: new Error('Email is already in use')
       });
     }
 

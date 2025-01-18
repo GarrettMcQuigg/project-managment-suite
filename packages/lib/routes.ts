@@ -3,6 +3,7 @@ export const ROUTE_SEPARATOR = '/';
 
 // Auth pages
 export const AUTH_ROUTE = '/auth';
+export const AUTH_CHECKPOINT_ROUTE = '/auth/checkpoint';
 export const AUTH_SIGNUP_ROUTE = `${AUTH_ROUTE}/signup`;
 export const AUTH_SIGNIN_ROUTE = `${AUTH_ROUTE}/signin`;
 export const AUTH_RESET_PASSWORD_ROUTE = `${AUTH_ROUTE}/reset-password`;
@@ -35,6 +36,7 @@ export const API_NEWSLETTER_SUBSCRIBE_ROUTE = `${API_NEWSLETTER_ROUTE}/subscribe
 export const API_NEWSLETTER_UNSUBSCRIBE_ROUTE = `${API_NEWSLETTER_ROUTE}/unsubscribe`;
 
 export const API_AUTH_ROUTE = `${API_ROUTE}/auth`;
+export const API_AUTH_CHECKPOINT_ROUTE = `${API_ROUTE}/auth/checkpoint`;
 export const API_AUTH_SIGNUP_ROUTE = `${API_AUTH_ROUTE}/signup`;
 export const API_AUTH_SIGNUP_AVAILABILITY_ROUTE = `${API_AUTH_SIGNUP_ROUTE}/availability`;
 export const API_AUTH_SIGNUP_AVAILABILITY_EMAIL_ROUTE = `${API_AUTH_SIGNUP_AVAILABILITY_ROUTE}/email`;

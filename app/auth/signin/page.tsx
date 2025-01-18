@@ -4,13 +4,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { API_AUTH_SIGNIN_PART_TWO_ROUTE, DASHBOARD_ROUTE } from '@/packages/lib/routes';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
-
-// Types
-interface SigninRequestBody {
-  email: string;
-  password: string;
-  smsMFACode?: string;
-}
+import { SigninRequestBody } from '@/app/api/auth/signin/types';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({

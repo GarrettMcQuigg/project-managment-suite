@@ -4,166 +4,164 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { SignupRequestBody } from '@/app/api/auth/signup/types';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
+import { Input } from '@/packages/lib/components/input';
 
 // Constants
 const API_AUTH_SIGNUP_ROUTE = '/api/auth/signup';
 const DASHBOARD_ROUTE = '/dashboard';
 
+// Form Schema
+const signUpSchema = z.object({
+  firstname: z.string().min(2, 'First name must be at least 2 characters'),
+  lastname: z.string().min(2, 'Last name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+});
+
+type FormValues = z.infer<typeof signUpSchema>;
+
 export default function SignUp() {
-  const [formData, setFormData] = useState({
-    firstname: '',
-    lastname: '',
-    email: '',
-    phone: '',
-    password: ''
-  });
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-    if (error) setError('');
-  };
+  const form = useForm<FormValues>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      firstname: '',
+      lastname: '',
+      email: '',
+      phone: '',
+      password: ''
+    }
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: FormValues) => {
     setLoading(true);
 
-    const { firstname, lastname, email, phone, password } = formData;
-
     const requestBody: SignupRequestBody = {
-      firstname,
-      lastname,
-      email,
-      phone,
-      password,
+      ...data,
       emailMFACode: '000000',
       smsMFACode: '000000'
     };
 
-    console.log('Signup Request Body:', requestBody);
+    try {
+      const response = await fetcher({
+        url: API_AUTH_SIGNUP_ROUTE,
+        requestBody
+      });
 
-    const response = await fetcher({
-      url: API_AUTH_SIGNUP_ROUTE,
-      requestBody
-    });
-
-    if (response.err) {
-      toast.error(response.message);
+      if (response.err) {
+        toast.error(response.message);
+      } else {
+        localStorage.clear();
+        window.location.href = DASHBOARD_ROUTE;
+      }
+    } catch (error) {
+      toast.error('An error occurred during signup');
+    } finally {
       setLoading(false);
-    } else {
-      localStorage.clear();
-      window.location.href = DASHBOARD_ROUTE;
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">Create your account</h2>
+          <h2 className="mt-6 text-center text-3xl font-bold">Create your account</h2>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="firstname" className="block text-sm font-medium text-gray-700">
-                First Name
-              </label>
-              <input
-                id="firstname"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-6">
+            <div className="rounded-md shadow-sm space-y-4">
+              <FormField
+                control={form.control}
                 name="firstname"
-                type="text"
-                required
-                value={formData.firstname}
-                onChange={handleChange}
-                className="mt-1  relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                placeholder="Enter your first name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your first name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div>
-              <label htmlFor="lastname" className="block text-sm font-medium text-gray-700">
-                Last Name
-              </label>
-              <input
-                id="lastname"
+              <FormField
+                control={form.control}
                 name="lastname"
-                type="text"
-                required
-                value={formData.lastname}
-                onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                placeholder="Enter your last name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your last name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                id="email"
+              <FormField
+                control={form.control}
                 name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                placeholder="Enter your email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="Enter your email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                Phone Number
-              </label>
-              <input
-                id="phone"
+              <FormField
+                control={form.control}
                 name="phone"
-                type="tel"
-                autoComplete="tel"
-                required
-                value={formData.phone}
-                onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                placeholder="Enter your phone number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input type="tel" placeholder="Enter your phone number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
+              <FormField
+                control={form.control}
                 name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                placeholder="Enter your password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter your password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating Account...' : 'Sign Up'}
             </button>
-          </div>
-        </form>
+          </form>
+        </Form>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@
 // import { checkInternalAccess } from '@/lib/helpers/check-internal-access';
 
 // export default async function BMSLayout({ children }: { children: React.ReactNode }) {
-export default async function BMSLayout() {
+export default async function MainLayout() {
   // const currentUser = await getCurrentUser();
   // const currentEmployee = await getCurrentEmployee();
 
@@ -15,7 +15,7 @@ export default async function BMSLayout() {
 
   return (
     <div>
-      <div>fuck!</div>
+      <div></div>
     </div>
     // <HUD currentUser={currentUser} currentEmployee={currentEmployee}>
     //   {children}

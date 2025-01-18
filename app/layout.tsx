@@ -22,10 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={cn('min-h-screen bg-background font-sans antialiased', geistSans.variable)}>
-        <Providers>
-          <div className="bg-background">fuck</div>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

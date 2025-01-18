@@ -49,3 +49,17 @@ export const API_AUTH_MFA_SEND_EMAIL_ROUTE = `${API_AUTH_MFA_ROUTE}/send-email`;
 export const API_AUTH_MFA_SEND_SMS_ROUTE = `${API_AUTH_MFA_ROUTE}/send-sms`;
 
 export const API_USER_ROUTE = `${API_ROUTE}/user`;
+
+// Helpers
+export function routeWithPath(route: string, path: string) {
+  return `${route}/${path}`;
+}
+
+export function routeWithParam(route: string, params: { [key: string]: string }) {
+  let resultRoute = route;
+
+  for (const [key, value] of Object.entries(params)) {
+    resultRoute = resultRoute.replace(`:${key}`, value);
+  }
+  return resultRoute;
+}

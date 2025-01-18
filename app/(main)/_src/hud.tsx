@@ -1,0 +1,27 @@
+'use client';
+
+import { useState } from 'react';
+// import CommandPalette from './command-palette';
+import { user } from '@prisma/client';
+import { Header } from './header';
+
+export default function HUD({ children, currentUser }: { children: React.ReactNode; currentUser: user }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
+  return (
+    <>
+      {/* <SidebarLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
+        <Sidebar currentEmployee={currentEmployee} setSidebarOpen={setSidebarOpen} />
+      </SidebarLayout> */}
+
+      <div className="lg:pl-72">
+        <Header currentUser={currentUser} setCommandPaletteOpen={setCommandPaletteOpen} setSidebarOpen={setSidebarOpen} />
+
+        <main className="bg-gray-100/30 dark:bg-gray-700/30 min-h-screen-minus-header">{children}</main>
+      </div>
+
+      {/* <CommandPalette commandPaletteOpen={commandPaletteOpen} setCommandPaletteOpen={setCommandPaletteOpen} /> */}
+    </>
+  );
+}

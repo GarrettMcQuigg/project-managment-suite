@@ -119,6 +119,11 @@ export default function SignIn() {
           </div>
 
           <div>
+            {/* TODO */}
+            Forgot your password? Click <span className="text-blue-400 cursor-pointer">here</span> to reset it.
+          </div>
+
+          <div>
             <button
               type="submit"
               disabled={loading}

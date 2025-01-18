@@ -19,6 +19,12 @@ const config: Config = {
       }
     },
     extend: {
+      minHeight: {
+        'screen-minus-header': 'calc(100vh - 64px)'
+      },
+      height: {
+        header: '64px'
+      },
       fontFamily: {
         sans: ['var(--font-geist-sans)'],
         mono: ['var(--font-geist-mono)']

@@ -10,8 +10,6 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   const currentUser = await getCurrentUser();
   // const currentEmployee = await getCurrentEmployee();
 
-  console.log('currentUser', currentUser);
-
   if (!currentUser) {
     return <Unauth />;
   }

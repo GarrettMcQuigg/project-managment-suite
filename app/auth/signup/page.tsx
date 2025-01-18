@@ -62,6 +62,7 @@ export default function SignUp() {
         window.location.href = DASHBOARD_ROUTE;
       }
     } catch (error) {
+      console.error(error);
       toast.error('An error occurred during signup');
     } finally {
       setLoading(false);

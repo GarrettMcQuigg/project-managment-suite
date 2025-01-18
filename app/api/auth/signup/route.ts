@@ -49,13 +49,13 @@ export async function POST(request: Request) {
       throw new Error('Failed to create a new user.');
     }
 
-    let err = await setAuthCookies(user);
+    const err = await setAuthCookies(user);
     if (err) {
       throw err;
     }
 
     return handleSuccess({ message: 'Registered account successfully!' });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleError({ message: 'Failed to signup.', err });
   }
 }
@@ -116,7 +116,7 @@ async function createNewUser(requestBody: SignupRequestBody): Promise<{ user: us
     });
 
     return { user, error: null };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error: ', err);
     return { user: null, error: new Error('An error occurred while creating a new user.') };
   }

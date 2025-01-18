@@ -29,8 +29,6 @@ export async function getCurrentUser(): Promise<user | null> {
       }
     });
 
-    console.log('user', user);
-
     return user;
   } catch (err: any) {
     return null;

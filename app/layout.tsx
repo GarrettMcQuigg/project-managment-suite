@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/packages/lib/providers/providers';
 import { cn } from '@/packages/lib/utils';

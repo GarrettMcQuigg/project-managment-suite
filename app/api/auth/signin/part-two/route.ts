@@ -41,13 +41,13 @@ export async function POST(request: NextRequest) {
     //   throw err;
     // }
 
-    let err = await setAuthCookies(user);
+    const err = await setAuthCookies(user);
     if (err) {
       throw err;
     }
 
     return handleSuccess({ message: 'Successfully signed in. Welcome home!' });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleError({ message: 'Failed to signin.', err });
   }
 }

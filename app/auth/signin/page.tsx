@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { API_AUTH_SIGNIN_PART_TWO_ROUTE, DASHBOARD_ROUTE } from '@/packages/lib/routes';
 import { fetcher } from '@/packages/lib/helpers/fetcher';

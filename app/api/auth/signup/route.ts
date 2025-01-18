@@ -4,8 +4,9 @@ import * as bcrypt from 'bcrypt';
 // import { codeHasExpired } from '@packages/lib/services/email-service/templates/verify-email';
 // // import TwilioService from '@packages/lib/services/twilio-service/twilio-service';
 import { user } from '@prisma/client';
-import { handleBadRequest, handleError, handleSuccess } from '@packages/lib/helpers/api-response-handlers';
+import { handleBadRequest, handleConflict, handleError, handleSuccess } from '@packages/lib/helpers/api-response-handlers';
 import { setAuthCookies } from '@/packages/lib/helpers/cookies';
+import { CheckEmailAvailability } from '@/packages/lib/helpers/check-email-availability';
 
 // const twilioService = new TwilioService();
 
@@ -40,6 +41,14 @@ export async function POST(request: Request) {
     //   }
     // });
 
+    const emailAvailabilityError = await CheckEmailAvailability(requestBody.email);
+    if (emailAvailabilityError) {
+      return handleConflict({
+        message: emailAvailabilityError.message,
+        err: emailAvailabilityError
+      });
+    }
+
     const { user, error } = await createNewUser(requestBody);
     if (error) {
       throw error;
@@ -56,7 +65,8 @@ export async function POST(request: Request) {
 
     return handleSuccess({ message: 'Registered account successfully!' });
   } catch (err: unknown) {
-    return handleError({ message: 'Failed to signup.', err });
+    const errorMessage = err instanceof Error ? err.message : 'Failed to signup.';
+    return handleError({ message: errorMessage, err });
   }
 }
 

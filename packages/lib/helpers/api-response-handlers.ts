@@ -12,7 +12,9 @@ function createResponseHandler(defaultMessage: string, statusCode: number) {
   return (options?: ResponseOptions) => {
     const { message, content, err } = options || {};
 
-    let response: ResponseOptions = {};
+    let response: ResponseOptions = {
+      message: message || defaultMessage
+    };
     if (message !== undefined) response.message = message;
     if (content !== undefined) response.content = content;
     if (err !== undefined) response.err = err;

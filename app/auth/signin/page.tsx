@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { API_AUTH_SIGNIN_PART_TWO_ROUTE, DASHBOARD_ROUTE } from '@/packages/lib/routes';
+import { fetcher } from '@/packages/lib/helpers/fetcher';
 
 // Types
 interface SigninRequestBody {
@@ -11,44 +13,13 @@ interface SigninRequestBody {
   smsMFACode?: string;
 }
 
-interface FetcherParams {
-  url: string;
-  requestBody: SigninRequestBody;
-}
-
-// Constants
-const API_AUTH_SIGNIN_PART_TWO_ROUTE = '/api/auth/signin/part-two';
-const DASHBOARD_ROUTE = '/dashboard';
-
-// Fetcher utility
-const fetcher = async ({ url, requestBody }: FetcherParams) => {
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return { err: true, message: data.message || 'An error occurred' };
-    }
-
-    return { err: false, data };
-  } catch (error) {
-    return { err: true, message: 'Network error occurred' };
-  }
-};
-
 export default function SignIn() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    smsCode: '' // Added for MFA support
+    smsCode: ''
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -88,16 +59,16 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">Sign in to your account</h2>
+          <h2 className="mt-6 text-center text-3xl font-bold">Sign in to your account</h2>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium">
                 Email
               </label>
               <input
@@ -108,13 +79,13 @@ export default function SignIn() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your email"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium">
                 Password
               </label>
               <input
@@ -125,13 +96,13 @@ export default function SignIn() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your password"
               />
             </div>
 
             <div>
-              <label htmlFor="smsCode" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="smsCode" className="block text-sm font-medium">
                 SMS Code
               </label>
               <input
@@ -141,7 +112,7 @@ export default function SignIn() {
                 autoComplete="one-time-code"
                 value={formData.smsCode}
                 onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter SMS code"
               />
             </div>

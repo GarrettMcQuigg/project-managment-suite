@@ -3,9 +3,9 @@ import { SignupRequestBody, SignupRequestBodySchema } from './types';
 import * as bcrypt from 'bcrypt';
 // import { codeHasExpired } from '@packages/lib/services/email-service/templates/verify-email';
 // // import TwilioService from '@packages/lib/services/twilio-service/twilio-service';
-// import { setAuthCookies } from '@/lib/helpers/cookies';
 import { user } from '@prisma/client';
 import { handleBadRequest, handleError, handleSuccess } from '@packages/lib/helpers/api-response-handlers';
+import { setAuthCookies } from '@/packages/lib/helpers/cookies';
 
 // const twilioService = new TwilioService();
 
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       throw new Error('Failed to create a new user.');
     }
 
-    err = await setAuthCookies(user);
+    let err = await setAuthCookies(user);
     if (err) {
       throw err;
     }

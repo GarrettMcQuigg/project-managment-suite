@@ -1,7 +1,6 @@
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import type { user } from '@prisma/client';
-import { db } from '@packages/lib/prisma/client';
 import { TOKEN_COOKIE_KEY, USER_COOKIE_KEY } from '../constants/cookie-keys';
 import { ROOT_ROUTE } from '../routes';
 
@@ -37,33 +36,5 @@ export async function setAuthCookies(user: user): Promise<Error | null> {
     sameSite: 'strict'
   });
 
-  await setOrgCookie(user);
-
   return null;
-}
-
-export async function setOrgCookie(user: user) {
-  // const org = await db.organization.findFirst({
-  //   where: {
-  //     employees: {
-  //       some: {
-  //         userId: user.id,
-  //         organizationRoles: {
-  //           some: {}
-  //         }
-  //       }
-  //     }
-  //   },
-  //   include: OrganizationWithMetadataInclude
-  // });
-  // if (org) {
-  //   cookies().set(ORGANIZATION_COOKIE_KEY, JSON.stringify(org), {
-  //     httpOnly: false,
-  //     path: ROOT_ROUTE,
-  //     secure: false, // This has to be false otherwise we run into issues with Safari.
-  //     sameSite: 'strict'
-  //   });
-  // } else {
-  //   cookies().delete(ORGANIZATION_COOKIE_KEY);
-  // }
 }

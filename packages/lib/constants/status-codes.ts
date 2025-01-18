@@ -7,5 +7,4 @@ export const StatusCodes = {
   INTERNAL_SERVER_ERROR: 500
 } as const;
 
-// Type for the status codes if needed
 export type StatusCode = (typeof StatusCodes)[keyof typeof StatusCodes];

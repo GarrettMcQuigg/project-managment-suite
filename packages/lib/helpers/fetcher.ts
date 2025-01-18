@@ -1,6 +1,6 @@
 import { HttpMethods } from '../constants/http-methods';
 import { ResponseOptions } from './api-response-handlers';
-import { StatusCodes } from './status-codes';
+import { StatusCodes } from '../constants/status-codes';
 
 type FetcherOptions = {
   url: string;

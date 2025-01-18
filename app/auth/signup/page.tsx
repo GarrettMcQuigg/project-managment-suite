@@ -9,12 +9,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
 import { Input } from '@/packages/lib/components/input';
+import { API_AUTH_SIGNUP_ROUTE, DASHBOARD_ROUTE } from '@/packages/lib/routes';
 
-// Constants
-const API_AUTH_SIGNUP_ROUTE = '/api/auth/signup';
-const DASHBOARD_ROUTE = '/dashboard';
-
-// Form Schema
 const signUpSchema = z.object({
   firstname: z.string().min(2, 'First name must be at least 2 characters'),
   lastname: z.string().min(2, 'Last name must be at least 2 characters'),

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { StatusCodes } from './status-codes';
+import { StatusCodes } from '../constants/status-codes';
 import { cookies } from 'next/headers';
 
 export type ResponseOptions = {

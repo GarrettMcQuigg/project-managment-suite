@@ -49,10 +49,10 @@ export async function POST(request: Request) {
       throw new Error('Failed to create a new user.');
     }
 
-    // err = await setAuthCookies(user);
-    // if (err) {
-    //   throw err;
-    // }
+    err = await setAuthCookies(user);
+    if (err) {
+      throw err;
+    }
 
     return handleSuccess({ message: 'Registered account successfully!' });
   } catch (err: any) {

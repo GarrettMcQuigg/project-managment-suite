@@ -11,7 +11,6 @@ generator client {
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 model User {
-  // Primary Relations
   id                 String               @id @default(uuid())
   firstname          String
   lastname           String
@@ -27,6 +26,7 @@ model User {
   subscriptionStatus SubscriptionStatus
   projects           Project[]
   participants       ProjectParticipant[]
+  clients            Client[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
@@ -59,20 +59,19 @@ enum UserRole {
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 model Project {
-  // Primary Relations
   id           String               @id @default(uuid())
   user         User                 @relation(fields: [userId], references: [id])
   userId       String
+  client       Client               @relation(fields: [clientId], references: [id])
+  clientId     String
   name         String
   description  String
   status       ProjectStatus        @default(ACTIVE)
   budget       Decimal?             @db.Decimal(10, 2)
   phases       Phase[]
   attachments  ProjectAttachment[]
-  client       Client?
   messages     ProjectMessage[]
   participants ProjectParticipant[]
-  // iterations   ProjectIteration[] // TODO : Come back to this idea
 
   startDate DateTime
   endDate   DateTime
@@ -204,12 +203,18 @@ model ProjectMessageAttachment {
 // ==========================================================================================================================================================================
 
 model Client {
-  // Primary Relation
-  id        String   @id @default(uuid())
-  project   Project  @relation(fields: [projectId], references: [id])
-  projectId String   @unique
-  name      String
-  email     String
-  phone     String
-  createdAt DateTime @default(now())
+  id         String    @id @default(uuid())
+  user       User      @relation(fields: [userId], references: [id])
+  userId     String
+  name       String
+  email      String
+  phone      String
+  projects   Project[]
+  isArchived Boolean   @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([userId, email])
 }

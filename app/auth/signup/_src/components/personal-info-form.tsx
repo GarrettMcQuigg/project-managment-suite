@@ -77,7 +77,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loadin
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel>Last Name</FormLabel>
-                      <Input {...field} autoFocus placeholder="Smith" disabled={loading} />
+                      <Input {...field} placeholder="Smith" disabled={loading} />
                       <FormMessage />
                     </FormItem>
                   )}

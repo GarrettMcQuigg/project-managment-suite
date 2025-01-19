@@ -3,7 +3,7 @@ import { SignupRequestBody, SignupRequestBodySchema } from './types';
 import * as bcrypt from 'bcrypt';
 // import { codeHasExpired } from '@packages/lib/services/email-service/templates/verify-email';
 // // import TwilioService from '@packages/lib/services/twilio-service/twilio-service';
-import { user } from '@prisma/client';
+import { User } from '@prisma/client';
 import { handleBadRequest, handleConflict, handleError, handleSuccess } from '@packages/lib/helpers/api-response-handlers';
 import { setAuthCookies } from '@/packages/lib/helpers/cookies';
 import { CheckEmailAvailability } from '@/packages/lib/helpers/check-email-availability';
@@ -112,7 +112,7 @@ export async function POST(request: Request) {
 //   return null;
 // }
 
-async function createNewUser(requestBody: SignupRequestBody): Promise<{ user: user | null; error: Error | null }> {
+async function createNewUser(requestBody: SignupRequestBody): Promise<{ user: User | null; error: Error | null }> {
   try {
     const hashedPassword = await bcrypt.hash(requestBody.password, 10);
     const user = await db.user.create({
@@ -121,7 +121,8 @@ async function createNewUser(requestBody: SignupRequestBody): Promise<{ user: us
         lastname: requestBody.lastname,
         email: requestBody.email,
         phone: requestBody.phone,
-        password: hashedPassword
+        password: hashedPassword,
+        subscriptionStatus: 'NOT_ALLOWED'
       }
     });
 

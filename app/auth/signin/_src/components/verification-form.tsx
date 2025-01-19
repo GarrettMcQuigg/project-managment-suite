@@ -8,6 +8,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from '@/packages/lib/components/input-otp';
 
 export const VerificationFormSchema = z.object({
   smsCode: z.string().min(1, 'SMS code is required')
@@ -44,11 +45,21 @@ const VerificationForm: React.FC<VerificationFormProps> = ({ form, loading, onSu
                 control={form.control}
                 name="smsCode"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Verification Code</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="Enter verification code" autoComplete="one-time-code" {...field} />
-                    </FormControl>
+                  <FormItem className="mx-auto">
+                    <FormLabel>SMS Code</FormLabel>
+                    <InputOTP {...field} autoFocus spellCheck={false} className="mx-auto" maxLength={6} required disabled={loading}>
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                        <InputOTPSlot index={1} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                        <InputOTPSlot index={2} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                      </InputOTPGroup>
+                      <InputOTPSeparator />
+                      <InputOTPGroup>
+                        <InputOTPSlot index={3} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                        <InputOTPSlot index={4} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                        <InputOTPSlot index={5} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                      </InputOTPGroup>
+                    </InputOTP>
                     <FormMessage />
                   </FormItem>
                 )}

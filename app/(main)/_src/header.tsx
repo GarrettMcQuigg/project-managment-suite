@@ -1,9 +1,9 @@
 import { Separator } from '@/packages/lib/components/separator';
-import { user } from '@prisma/client';
+import { User } from '@prisma/client';
 import { Menu, Search } from 'lucide-react';
 import UserDropdown from './user-dropdown';
 
-export function Header({ currentUser }: { currentUser: user }) {
+export function Header({ currentUser }: { currentUser: User }) {
   return (
     <div className="sticky top-0 z-40">
       <div className="flex h-header shrink-0 items-center gap-x-4 border-b bg-background px-4 sm:gap-x-6 sm:px-6 lg:px-8">

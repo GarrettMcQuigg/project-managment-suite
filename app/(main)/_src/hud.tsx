@@ -2,10 +2,10 @@
 
 // import { useState } from 'react';
 // import CommandPalette from './command-palette';
-import { user } from '@prisma/client';
+import { User } from '@prisma/client';
 import { Header } from './header';
 
-export default function HUD({ children, currentUser }: { children: React.ReactNode; currentUser: user }) {
+export default function HUD({ children, currentUser }: { children: React.ReactNode; currentUser: User }) {
   // const [sidebarOpen, setSidebarOpen] = useState(false);
   // const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 

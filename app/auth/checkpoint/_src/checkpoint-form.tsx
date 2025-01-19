@@ -32,6 +32,7 @@ export function CheckpointForm() {
   useEffect(() => {
     const storedEmail = localStorage.getItem('email');
     if (storedEmail) {
+      form.setValue('email', storedEmail);
       localStorage.removeItem('email');
     }
   }, []);

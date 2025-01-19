@@ -1,9 +1,9 @@
 import React from 'react';
-import { user } from '@prisma/client';
+import { User } from '@prisma/client';
 import { cn } from '../utils';
 import { PROFILE_IMG_PLACEHOLDER } from '../constants/misc';
 
-export function UserInfo({ user, responsive, className }: { user: user; responsive?: boolean; className?: string }) {
+export function UserInfo({ user, responsive, className }: { user: User; responsive?: boolean; className?: string }) {
   return (
     <div className={cn('flex items-center', className)}>
       <img alt={user.firstname + 's profile picture'} src={user.profileImg ?? PROFILE_IMG_PLACEHOLDER} className="inline-block h-8 w-8 rounded-full" />

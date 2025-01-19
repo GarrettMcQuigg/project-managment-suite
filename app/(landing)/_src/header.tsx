@@ -4,9 +4,9 @@ import { AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
 import { MoonIcon, Rocket, SunIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import { user } from '@prisma/client';
+import { User } from '@prisma/client';
 
-export default function LandingHeader({ currentUser }: { currentUser: user | null }) {
+export default function LandingHeader({ currentUser }: { currentUser: User | null }) {
   const { theme, setTheme } = useTheme();
 
   return (

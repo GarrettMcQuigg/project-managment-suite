@@ -11,21 +11,20 @@ generator client {
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 model User {
-  id                 String               @id @default(uuid())
+  id                 String             @id @default(uuid())
   firstname          String
   lastname           String
   phone              String
-  email              String               @unique
+  email              String             @unique
   profileImg         String?
   profileImgId       String?
   coverImg           String?
   coverImgId         String?
   dateOfBirth        DateTime?
   password           String
-  role               UserRole             @default(USER)
+  role               UserRole           @default(USER)
   subscriptionStatus SubscriptionStatus
   projects           Project[]
-  participants       ProjectParticipant[]
   clients            Client[]
 
   createdAt DateTime  @default(now())
@@ -38,17 +37,13 @@ enum SubscriptionStatus {
   CREATOR
   INNOVATOR
   VISIONARY
-
-  // Fall back options
-  // ESSENTIAL 
-  // PROFESSIONAL 
-  // ENTERPRISE 
 }
 
 enum UserRole {
   ADMIN
   USER
   GUEST
+  CLIENT
 }
 
 // ==========================================================================================================================================================================
@@ -66,8 +61,9 @@ model Project {
   clientId     String
   name         String
   description  String
-  status       ProjectStatus        @default(ACTIVE)
-  budget       Decimal?             @db.Decimal(10, 2)
+  status       ProjectStatus        @default(DRAFT)
+  payment      ProjectPayment?
+  invoices     Invoice[]
   phases       Phase[]
   attachments  ProjectAttachment[]
   messages     ProjectMessage[]
@@ -78,6 +74,40 @@ model Project {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+}
+
+model ProjectPayment {
+  id              String          @id @default(uuid())
+  project         Project         @relation(fields: [projectId], references: [id])
+  projectId       String          @unique
+  totalAmount     Decimal         @db.Decimal(10, 2) // Total project cost to client
+  amountPaid      Decimal         @default(0) @db.Decimal(10, 2) // Running total of payments
+  depositRequired Decimal?        @db.Decimal(10, 2) // If deposit is greater than 0, it is required. Otherwise, not required
+  depositDueDate  DateTime? // When deposit is due
+  depositPaidAt   DateTime? // When deposit was paid
+  paymentSchedule PaymentSchedule @default(CUSTOM) // How payments are structured
+  paymentTerms    String? // Description of payment terms
+  notes           String? // Any additional payment notes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PaymentSchedule {
+  FULL_UPFRONT
+  DEPOSIT_PLUS_FINAL
+  MILESTONE_BASED
+  INSTALLMENTS
+  CUSTOM
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  CREDIT_CARD
+  PAYPAL
+  CASH
+  CHECK
+  OTHER
 }
 
 model Phase {
@@ -121,37 +151,31 @@ enum ProjectStatus {
 }
 
 model ProjectMessage {
-  // Primary Relations
-  id            String             @id @default(uuid())
-  project       Project            @relation(fields: [projectId], references: [id])
+  id            String                     @id @default(uuid())
+  project       Project                    @relation(fields: [projectId], references: [id])
   projectId     String
-  participant   ProjectParticipant @relation(fields: [participantId], references: [id])
+  participant   ProjectParticipant         @relation(fields: [participantId], references: [id])
   participantId String
-
-  // Data
-  text        String
-  attachments ProjectMessageAttachment[]
-
-  // Dates
-  createdAt   DateTime      @default(now())
-  MessageRead MessageRead[]
+  text          String
+  attachments   ProjectMessageAttachment[]
+  createdAt     DateTime                   @default(now())
+  MessageRead   MessageRead[]
 }
 
 model ProjectParticipant {
   id           String           @id @default(uuid())
   project      Project          @relation(fields: [projectId], references: [id])
   projectId    String
-  user         User             @relation(fields: [userId], references: [id])
-  userId       String
   role         ParticipantRole  @default(VIEWER)
   isActive     Boolean          @default(true)
+  email        String
   messages     ProjectMessage[]
   messageReads MessageRead[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([projectId, userId])
+  @@unique([projectId])
 }
 
 enum ParticipantRole {
@@ -173,7 +197,6 @@ model MessageRead {
 }
 
 model ProjectAttachment {
-  // Primary Relation
   id          String   @id @default(uuid())
   project     Project  @relation(fields: [projectId], references: [id])
   projectId   String
@@ -184,7 +207,6 @@ model ProjectAttachment {
 }
 
 model ProjectMessageAttachment {
-  // Primary Relation
   id          String         @id @default(uuid())
   message     ProjectMessage @relation(fields: [messageId], references: [id])
   messageId   String
@@ -211,10 +233,67 @@ model Client {
   phone      String
   projects   Project[]
   isArchived Boolean   @default(false)
+  // paymentMethods PaymentMethod[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   @@unique([userId, email])
+}
+
+// ==========================================================================================================================================================================
+// ==========================================================================================================================================================================
+// ==========================================================================================================================================================================
+
+// Invoice  Models ===============================================================================================================================================
+// ==========================================================================================================================================================================
+// ==========================================================================================================================================================================
+
+model Invoice {
+  id            String         @id @default(uuid())
+  project       Project        @relation(fields: [projectId], references: [id])
+  projectId     String
+  invoiceNumber String
+  type          PaymentType
+  amount        Decimal        @db.Decimal(10, 2)
+  status        InvoiceStatus  @default(SENT)
+  dueDate       DateTime
+  payments      Payment[] // Track all payments made against this invoice
+  paymentMethod PaymentMethod?
+  notes         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, invoiceNumber])
+}
+
+enum PaymentType {
+  DEPOSIT // Initial payment to start project
+  INSTALLMENT // Regular partial payments
+  MILESTONE // Payments tied to project phases... maybe
+  ADDITIONAL // Extra work/changes/bonuses
+  OTHER
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  invoice       Invoice       @relation(fields: [invoiceId], references: [id])
+  invoiceId     String
+  amount        Decimal       @db.Decimal(10, 2)
+  paymentMethod PaymentMethod
+  paidAt        DateTime      @default(now())
+  notes         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
 }

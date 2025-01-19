@@ -1,5 +1,5 @@
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import Header from './_src/header';
+// import Header from './_src/header';
 // import Footer from './_src/footer';
 
 export default async function HomeLayout({ children }: { children: React.ReactNode }) {
@@ -7,7 +7,7 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
 
   return (
     <>
-      <Header currentUser={currentUser} />
+      {/* <Header currentUser={currentUser} /> */}
       {children}
       {/* <Footer /> */}
     </>

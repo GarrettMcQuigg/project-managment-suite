@@ -7,9 +7,9 @@ import { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import Link from 'next/link';
 import { AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
 import { Button } from '@/packages/lib/components/button';
+import { useRouter } from 'next/navigation';
 
 export const CredentialsFormSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -33,6 +33,7 @@ interface CredentialsFormProps {
 }
 
 const CredentialsForm: React.FC<CredentialsFormProps> = ({ form, loading, onSubmit }) => {
+  const router = useRouter();
   useEffect(() => {
     const storedEmail = localStorage.getItem('email');
     if (storedEmail) {
@@ -57,7 +58,13 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({ form, loading, onSubm
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="Enter your email" disabled {...field} />
+                      <Input
+                        className="backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2  focus:border-violet-500 dark:focus:border-violet-400"
+                        type="email"
+                        placeholder="Enter your email"
+                        disabled={loading}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -71,7 +78,12 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({ form, loading, onSubm
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="Enter your password" {...field} />
+                      <Input
+                        className="backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2  focus:border-violet-500 dark:focus:border-violet-400"
+                        type="password"
+                        placeholder="Enter your password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -86,11 +98,9 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({ form, loading, onSubm
             <Button className="w-full" type="submit" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign in'}
             </Button>
-            <Link className="w-full" href={AUTH_CHECKPOINT_ROUTE}>
-              <Button variant="outline" type="button" className="w-full h-12 mt-6" disabled={loading}>
-                Back
-              </Button>
-            </Link>
+            <Button variant="outline" onClick={() => router.push(AUTH_CHECKPOINT_ROUTE)} type="button" className="w-full mt-6" disabled={loading}>
+              Back
+            </Button>
           </form>
         </Form>
       </div>

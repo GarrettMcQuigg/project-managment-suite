@@ -6,7 +6,6 @@ import { TOKEN_COOKIE_KEY, USER_COOKIE_KEY } from '../constants/cookie-keys';
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    // TODO : Test
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get(TOKEN_COOKIE_KEY);
 

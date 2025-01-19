@@ -9,6 +9,7 @@ import { Input } from '@packages/lib/components/input';
 // import { InputPhone } from '@packages/lib/components/input-phone';
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '@packages/lib/components/form';
 import { AUTH_SIGNIN_ROUTE, AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
+import { useRouter } from 'next/navigation';
 
 export const usePersonalInfoForm = () => {
   return useForm<z.infer<typeof PersonalInfoFormSchema>>({
@@ -30,6 +31,7 @@ interface PersonalInfoFormProps {
 }
 
 export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loading, onSubmit }) => {
+  const router = useRouter();
   useEffect(() => {
     const storedEmail = localStorage.getItem('email');
     if (storedEmail) {
@@ -52,7 +54,12 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loadin
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>Email</FormLabel>
-                    <Input {...field} placeholder="john@example.com" disabled />
+                    <Input
+                      className="backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2  focus:border-violet-500 dark:focus:border-violet-400"
+                      {...field}
+                      placeholder="john@example.com"
+                      disabled={loading}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -65,7 +72,13 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loadin
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel>First Name</FormLabel>
-                      <Input {...field} autoFocus placeholder="John" disabled={loading} />
+                      <Input
+                        className="backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2  focus:border-violet-500 dark:focus:border-violet-400"
+                        {...field}
+                        autoFocus
+                        placeholder="John"
+                        disabled={loading}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -77,7 +90,12 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loadin
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel>Last Name</FormLabel>
-                      <Input {...field} placeholder="Smith" disabled={loading} />
+                      <Input
+                        className="backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2  focus:border-violet-500 dark:focus:border-violet-400"
+                        {...field}
+                        placeholder="Smith"
+                        disabled={loading}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -91,25 +109,29 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loadin
                   <FormItem className="w-full">
                     <FormLabel>Phone #</FormLabel>
                     {/* <InputPhone {...field} placeholder="(913) 555-0123" defaultCountry="US" required disabled={loading} /> */}
-                    <Input {...field} placeholder="(913) 555-0123" required disabled={loading} />
+                    <Input
+                      className="backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2  focus:border-violet-500 dark:focus:border-violet-400"
+                      {...field}
+                      placeholder="(913) 555-0123"
+                      required
+                      disabled={loading}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
             <div className="flex flex-wrap w-full">
-              <Button type="submit" className="w-full h-12 mt-6" loading={loading}>
+              <Button type="submit" className="w-full mt-6" loading={loading}>
                 Next
               </Button>
-              <Link className="w-full" href={AUTH_CHECKPOINT_ROUTE}>
-                <Button variant="outline" type="button" className="w-full h-12 mt-6" disabled={loading}>
-                  Back
-                </Button>
-              </Link>
+              <Button variant="outline" onClick={() => router.push(AUTH_CHECKPOINT_ROUTE)} type="button" className="w-full mt-6" disabled={loading}>
+                Back
+              </Button>
             </div>
             <div className="text-gray-600 dark:text-gray-400 text-center mt-6">
               Already have an account?{' '}
-              <Link href={AUTH_SIGNIN_ROUTE} className="ml-2">
+              <Link href={AUTH_SIGNIN_ROUTE} onClick={() => localStorage.removeItem('email')}>
                 <Button variant="link" type="button" disabled={loading}>
                   Sign in
                 </Button>

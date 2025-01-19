@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from '@/packages/lib/components/input-otp';
+import { Button } from '@/packages/lib/components/button';
 
 export const VerificationFormSchema = z.object({
   smsCode: z.string().min(1, 'SMS code is required')
@@ -39,7 +40,7 @@ const VerificationForm: React.FC<VerificationFormProps> = ({ form, loading, onSu
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-6">
-            <div className="rounded-md shadow-sm space-y-4">
+            <div className="flex justify-center rounded-md shadow-sm space-y-4">
               <FormField
                 control={form.control}
                 name="smsCode"
@@ -48,15 +49,33 @@ const VerificationForm: React.FC<VerificationFormProps> = ({ form, loading, onSu
                     <FormLabel>SMS Code</FormLabel>
                     <InputOTP {...field} autoFocus spellCheck={false} className="mx-auto" maxLength={6} required disabled={loading}>
                       <InputOTPGroup>
-                        <InputOTPSlot index={0} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={1} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={2} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                        <InputOTPSlot
+                          index={0}
+                          className="sm:w-12 sm:h-12 text-2xl backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 focus:border-violet-500 dark:focus:border-violet-400"
+                        />
+                        <InputOTPSlot
+                          index={1}
+                          className="sm:w-12 sm:h-12 text-2xl backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 focus:border-violet-500 dark:focus:border-violet-400"
+                        />
+                        <InputOTPSlot
+                          index={2}
+                          className="sm:w-12 sm:h-12 text-2xl backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 focus:border-violet-500 dark:focus:border-violet-400"
+                        />
                       </InputOTPGroup>
                       <InputOTPSeparator />
                       <InputOTPGroup>
-                        <InputOTPSlot index={3} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={4} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={5} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                        <InputOTPSlot
+                          index={3}
+                          className="sm:w-12 sm:h-12 text-2xl backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 focus:border-violet-500 dark:focus:border-violet-400"
+                        />
+                        <InputOTPSlot
+                          index={4}
+                          className="sm:w-12 sm:h-12 text-2xl backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 focus:border-violet-500 dark:focus:border-violet-400"
+                        />
+                        <InputOTPSlot
+                          index={5}
+                          className="sm:w-12 sm:h-12 text-2xl backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 focus:border-violet-500 dark:focus:border-violet-400"
+                        />
                       </InputOTPGroup>
                     </InputOTP>
                     <FormMessage />
@@ -65,13 +84,9 @@ const VerificationForm: React.FC<VerificationFormProps> = ({ form, loading, onSu
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <Button className="w-full" type="submit" disabled={loading}>
               {loading ? 'Verifying...' : 'Verify'}
-            </button>
+            </Button>
           </form>
         </Form>
       </div>

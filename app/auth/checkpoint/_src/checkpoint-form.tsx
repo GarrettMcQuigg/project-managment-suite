@@ -80,7 +80,13 @@ export function CheckpointForm() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="Enter your email" disabled={loading} {...field} />
+                      <Input
+                        className="backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2  focus:border-violet-500 dark:focus:border-violet-400"
+                        type="email"
+                        placeholder="Enter your email"
+                        disabled={loading}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -88,7 +94,7 @@ export function CheckpointForm() {
               />
             </div>
 
-            <div className="text-sm text-gray-600">By authenticating, you agree to our Terms of Service and Privacy Policy.</div>
+            <div className="text-sm text-gray-400">By authenticating, you agree to our Terms of Service and Privacy Policy.</div>
 
             <div className="flex flex-col space-y-4">
               <Button type="submit" className="w-full" loading={loading}>

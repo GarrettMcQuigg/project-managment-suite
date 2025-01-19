@@ -1,7 +1,7 @@
 'use client';
 
 import { AUTH_CHECKPOINT_ROUTE, DASHBOARD_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
-import { MoonIcon, Rocket, SunIcon } from 'lucide-react';
+import { MoonIcon, Palette, Rocket, SunIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { User } from '@prisma/client';
@@ -9,12 +9,10 @@ import { User } from '@prisma/client';
 export default function LandingHeader({ currentUser }: { currentUser: User | null }) {
   const { theme, setTheme } = useTheme();
 
-  console.log('currentUser', currentUser);
-
   return (
     <header className="flex items-center justify-between w-full max-w-7xl h-header p-4 mx-auto">
-      <Link href={ROOT_ROUTE} className="font-bold text-2xl text-primary">
-        Hot & Sexy CRM for Creatives
+      <Link href={ROOT_ROUTE} className="flex items-center gap-2 font-bold text-2xl text-primary">
+        <Palette className="h-6 w-6" /> CreativeSuite CRM
       </Link>
       <nav className="flex items-center space-x-4">
         <a href="/about-us" className="text-sm text-primary">
@@ -24,11 +22,18 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
           Pricing
         </a>
         <a href="/terms-of-service" className="text-sm text-primary">
+          Features
+        </a>
+        <a href="/privacy-policy" className="text-sm text-primary">
+          Testimonials
+        </a>
+        {/* TODO : Move into footer */}
+        {/* <a href="/terms-of-service" className="text-sm text-primary">
           Terms of Service
         </a>
         <a href="/privacy-policy" className="text-sm text-primary">
           Privacy Policy
-        </a>
+        </a> */}
       </nav>
       <div className="flex items-center space-x-8">
         <Link className="flex items-center gap-2 bg-foreground text-background text-sm px-4 py-2 rounded-3xl" href={currentUser ? DASHBOARD_ROUTE : AUTH_CHECKPOINT_ROUTE}>

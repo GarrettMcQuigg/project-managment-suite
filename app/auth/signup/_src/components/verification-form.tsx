@@ -8,6 +8,9 @@ import { Form, FormField, FormItem, FormLabel, FormMessage } from '@packages/lib
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/packages/lib/components/input-otp';
 // import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
 
+const otpSlotClass =
+  'sm:w-12 sm:h-12 text-2xl backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 focus:border-violet-500 dark:focus:border-violet-400';
+
 export const useVerificationForm = () => {
   return useForm<z.infer<typeof VerificationFormSchema>>({
     resolver: zodResolver(VerificationFormSchema)
@@ -44,15 +47,15 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({ form, loadin
                     <FormLabel>SMS Code</FormLabel>
                     <InputOTP {...field} autoFocus spellCheck={false} className="mx-auto" maxLength={6} required disabled={loading}>
                       <InputOTPGroup>
-                        <InputOTPSlot index={0} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={1} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={2} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                        <InputOTPSlot index={0} className={otpSlotClass} />
+                        <InputOTPSlot index={1} className={otpSlotClass} />
+                        <InputOTPSlot index={2} className={otpSlotClass} />
                       </InputOTPGroup>
                       <InputOTPSeparator />
                       <InputOTPGroup>
-                        <InputOTPSlot index={3} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={4} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={5} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                        <InputOTPSlot index={3} className={otpSlotClass} />
+                        <InputOTPSlot index={4} className={otpSlotClass} />
+                        <InputOTPSlot index={5} className={otpSlotClass} />
                       </InputOTPGroup>
                     </InputOTP>
                     <FormMessage />
@@ -66,18 +69,17 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({ form, loadin
                 render={({ field }) => (
                   <FormItem className="mx-auto">
                     <FormLabel>Email Code</FormLabel>
-                    {/* <InputOTP {...field} spellCheck={false} className="mx-auto" maxLength={6} pattern={REGEXP_ONLY_DIGITS_AND_CHARS} required disabled={loading}> */}
                     <InputOTP {...field} spellCheck={false} className="mx-auto" maxLength={6} required disabled={loading}>
                       <InputOTPGroup>
-                        <InputOTPSlot index={0} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={1} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={2} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                        <InputOTPSlot index={0} className={otpSlotClass} />
+                        <InputOTPSlot index={1} className={otpSlotClass} />
+                        <InputOTPSlot index={2} className={otpSlotClass} />
                       </InputOTPGroup>
                       <InputOTPSeparator />
                       <InputOTPGroup>
-                        <InputOTPSlot index={3} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={4} className="sm:w-12 sm:h-12 text-2xl bg-background" />
-                        <InputOTPSlot index={5} className="sm:w-12 sm:h-12 text-2xl bg-background" />
+                        <InputOTPSlot index={3} className={otpSlotClass} />
+                        <InputOTPSlot index={4} className={otpSlotClass} />
+                        <InputOTPSlot index={5} className={otpSlotClass} />
                       </InputOTPGroup>
                     </InputOTP>
                     <FormMessage />

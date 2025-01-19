@@ -7,6 +7,9 @@ import { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import Link from 'next/link';
+import { AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
+import { Button } from '@/packages/lib/components/button';
 
 export const CredentialsFormSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -87,6 +90,11 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({ form, loading, onSubm
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
+            <Link className="w-full" href={AUTH_CHECKPOINT_ROUTE}>
+              <Button variant="outline" type="button" className="w-full h-12 mt-6" disabled={loading}>
+                Back
+              </Button>
+            </Link>
           </form>
         </Form>
       </div>

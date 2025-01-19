@@ -3,11 +3,11 @@ import { toast } from 'react-toastify';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { SigninRequestBody } from '@/app/api/auth/signin/types';
 import { API_AUTH_SIGNIN_PART_ONE_ROUTE, API_AUTH_SIGNIN_PART_TWO_ROUTE, DASHBOARD_ROUTE } from '@/packages/lib/routes';
-import { useCredentialsForm } from '../credentials-form';
-import { useVerificationForm } from '../verification-form';
+import { useCredentialsForm } from '../components/credentials-form';
+import { useVerificationForm } from '../components/verification-form';
 import { z } from 'zod';
-import { CredentialsFormSchema } from '../credentials-form';
-import { VerificationFormSchema } from '../verification-form';
+import { CredentialsFormSchema } from '../components/credentials-form';
+import { VerificationFormSchema } from '../components/verification-form';
 
 type Steps = 'credentials' | 'verification';
 

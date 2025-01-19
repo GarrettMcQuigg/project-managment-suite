@@ -11,6 +11,7 @@ export const SignupRequestBodySchema = Joi.object({
     .messages({
       'string.pattern.base': '"password" does not meet requirements'
     }),
+  confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
   emailMFACode: Joi.string().min(6).max(6).required(),
   smsMFACode: Joi.string().min(6).max(6).required()
 });
@@ -21,6 +22,7 @@ export type SignupRequestBody = {
   email: string;
   phone: string;
   password: string;
+  confirmPassword: string;
   emailMFACode: string;
   smsMFACode: string;
 };

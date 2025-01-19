@@ -29,7 +29,7 @@ export default function LandingPage({ currentUser }: { currentUser: User | null 
         <TestimonialsSection />
         <NewsletterSection />
       </main>
-      <footer className="relative z-10 flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
+      <footer className="relative z-10 flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t bg-background">
         <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 CreativeSuite CRM. All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link className="text-xs hover:underline underline-offset-4" href="#">
@@ -150,7 +150,7 @@ function TestimonialsSection() {
 
 function NewsletterSection() {
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-purple-50">
+    <section className="w-full py-12 md:py-24 lg:py-32">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="space-y-2">

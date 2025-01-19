@@ -120,6 +120,7 @@ model Phase {
   startDate   DateTime
   endDate     DateTime
   status      PhaseStatus @default(PENDING)
+  invoice     Invoice[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -151,31 +152,29 @@ enum ProjectStatus {
 }
 
 model ProjectMessage {
-  id            String                     @id @default(uuid())
-  project       Project                    @relation(fields: [projectId], references: [id])
-  projectId     String
-  participant   ProjectParticipant         @relation(fields: [participantId], references: [id])
-  participantId String
-  text          String
-  attachments   ProjectMessageAttachment[]
-  createdAt     DateTime                   @default(now())
-  MessageRead   MessageRead[]
+  id               String                     @id @default(uuid())
+  project          Project                    @relation(fields: [projectId], references: [id])
+  projectId        String
+  participantEmail String
+  text             String
+  attachments      ProjectMessageAttachment[]
+  createdAt        DateTime                   @default(now())
+  MessageRead      MessageRead[]
 }
 
 model ProjectParticipant {
-  id           String           @id @default(uuid())
-  project      Project          @relation(fields: [projectId], references: [id])
+  id           String          @id @default(uuid())
+  project      Project         @relation(fields: [projectId], references: [id])
   projectId    String
-  role         ParticipantRole  @default(VIEWER)
-  isActive     Boolean          @default(true)
+  role         ParticipantRole @default(VIEWER)
+  isActive     Boolean         @default(true)
   email        String
-  messages     ProjectMessage[]
   messageReads MessageRead[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([projectId])
+  @@unique([projectId, email])
 }
 
 enum ParticipantRole {
@@ -234,6 +233,7 @@ model Client {
   projects   Project[]
   isArchived Boolean   @default(false)
   // paymentMethods PaymentMethod[]
+  // preferredPaymentMethod PaymentMethod?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -254,6 +254,8 @@ model Invoice {
   id            String         @id @default(uuid())
   project       Project        @relation(fields: [projectId], references: [id])
   projectId     String
+  phase         Phase?         @relation(fields: [phaseId], references: [id]) // Optional relation to Phase
+  phaseId       String?        @unique // Only used for milestone payments
   invoiceNumber String
   type          PaymentType
   amount        Decimal        @db.Decimal(10, 2)

@@ -2,8 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
-import { Input } from '@/packages/lib/components/input';
+import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/packages/lib/components/form';
 import { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

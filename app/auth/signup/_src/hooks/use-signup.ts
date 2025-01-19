@@ -5,14 +5,14 @@ import { usePersonalInfoForm } from '../components/personal-info-form';
 import { usePasswordForm } from '../components/password-form';
 import { useVerificationForm } from '../components/verification-form';
 import {
-  API_AUTH_SIGNUP_AVAILABILITY_EMAIL_ROUTE,
-  API_AUTH_SIGNUP_AVAILABILITY_PHONE_ROUTE,
-  API_AUTH_MFA_SEND_EMAIL_ROUTE,
-  API_AUTH_MFA_SEND_SMS_ROUTE,
+  // API_AUTH_SIGNUP_AVAILABILITY_EMAIL_ROUTE,
+  // API_AUTH_SIGNUP_AVAILABILITY_PHONE_ROUTE,
+  // API_AUTH_MFA_SEND_EMAIL_ROUTE,
+  // API_AUTH_MFA_SEND_SMS_ROUTE,
   API_AUTH_SIGNUP_ROUTE,
   DASHBOARD_ROUTE
 } from '@/packages/lib/routes';
-import { CheckEmailAvailability } from '@/packages/lib/helpers/check-email-availability';
+// import { CheckEmailAvailability } from '@/packages/lib/helpers/check-email-availability';
 
 const STEPS = {
   PERSONAL_INFO: 'personal-info',
@@ -28,13 +28,14 @@ export const useSignup = () => {
   const verificationForm = useVerificationForm();
 
   const checkAvailability = async (email: string, phone: string) => {
+    console.log(phone, email);
     // const emailAvailability = await fetcher({
     //   url: API_AUTH_SIGNUP_AVAILABILITY_EMAIL_ROUTE,
     //   requestBody: { email }
     // });
     // if (emailAvailability.err) throw new Error(emailAvailability.message);
 
-    const emailAvailability = await CheckEmailAvailability(email);
+    // const emailAvailability = await CheckEmailAvailability(email);
 
     // const phoneAvailability = await fetcher({
     //   url: API_AUTH_SIGNUP_AVAILABILITY_PHONE_ROUTE,
@@ -67,8 +68,12 @@ export const useSignup = () => {
       await checkAvailability(email, phone);
 
       setCurrentStep(STEPS.PASSWORD);
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: Error | unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        console.error('An error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -82,12 +87,16 @@ export const useSignup = () => {
         throw new Error('Passwords must match.');
       }
 
-      const { email, phone } = personalInfoForm.getValues();
+      // const { email, phone } = personalInfoForm.getValues();
       // await sendVerificationCodes(email, phone);
 
       setCurrentStep(STEPS.VERIFICATION);
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: Error | unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        console.error('An error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -126,9 +135,13 @@ export const useSignup = () => {
       if (response.err) throw new Error(response.message);
       localStorage.clear();
       window.location.href = DASHBOARD_ROUTE;
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       verificationForm.reset();
-      toast.error(error.message);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        console.error('An error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

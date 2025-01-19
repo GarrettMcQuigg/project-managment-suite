@@ -7,7 +7,5 @@ export async function CheckEmailAvailability(email: string): Promise<boolean> {
     requestBody: { email }
   });
 
-  console.log('isEmailAvailable', isEmailAvailable);
-
   return isEmailAvailable.err ? true : false;
 }

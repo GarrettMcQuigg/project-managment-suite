@@ -35,7 +35,7 @@ export function CheckpointForm() {
       form.setValue('email', storedEmail);
       localStorage.removeItem('email');
     }
-  }, []);
+  }, [form]);
 
   const onSubmit = async (formData: FormData) => {
     setLoading(true);
@@ -55,6 +55,7 @@ export function CheckpointForm() {
         router.push(response.content.redirect);
       }
     } catch (error) {
+      console.error(error);
       toast.error('An error occurred. Please try again.');
     } finally {
       setLoading(false);

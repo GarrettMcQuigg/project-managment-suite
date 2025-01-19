@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { SigninRequestBody } from '@/app/api/auth/signin/types';

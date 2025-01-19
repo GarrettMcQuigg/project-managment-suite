@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
   requestBody.email = requestBody.email.toLowerCase();
 
-  let { error } = SignupRequestBodySchema.validate(requestBody);
+  const { error } = SignupRequestBodySchema.validate(requestBody);
   if (error) {
     return handleBadRequest({ message: error.message, err: error });
   }
@@ -122,7 +122,7 @@ async function createNewUser(requestBody: SignupRequestBody): Promise<{ user: Us
         email: requestBody.email,
         phone: requestBody.phone,
         password: hashedPassword,
-        subscriptionStatus: 'NOT_ALLOWED'
+        subscriptionStatus: 'VISIONARY'
       }
     });
 

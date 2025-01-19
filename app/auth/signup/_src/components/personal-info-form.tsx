@@ -8,7 +8,7 @@ import { Button } from '@packages/lib/components/button';
 import { Input } from '@packages/lib/components/input';
 // import { InputPhone } from '@packages/lib/components/input-phone';
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '@packages/lib/components/form';
-import { ROOT_ROUTE, AUTH_SIGNIN_ROUTE, AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
+import { AUTH_SIGNIN_ROUTE, AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
 
 export const usePersonalInfoForm = () => {
   return useForm<z.infer<typeof PersonalInfoFormSchema>>({

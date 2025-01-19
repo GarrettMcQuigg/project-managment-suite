@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import type { user } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { useLoading } from '@packages/lib/providers/loading';
 import {
   DropdownMenu,
@@ -26,7 +26,7 @@ type Utility = {
   route?: string;
 };
 
-export default function UserDropdown({ currentUser }: { currentUser: user }) {
+export default function UserDropdown({ currentUser }: { currentUser: User }) {
   const { setLoading } = useLoading();
   const { theme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);

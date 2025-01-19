@@ -1,6 +1,6 @@
 'use client';
 
-import { AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
+import { AUTH_CHECKPOINT_ROUTE, DASHBOARD_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
 import { MoonIcon, Rocket, SunIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
@@ -9,11 +9,13 @@ import { User } from '@prisma/client';
 export default function LandingHeader({ currentUser }: { currentUser: User | null }) {
   const { theme, setTheme } = useTheme();
 
+  console.log('currentUser', currentUser);
+
   return (
     <header className="flex items-center justify-between w-full max-w-7xl h-header p-4 mx-auto">
-      <a href="/" className="font-bold text-2xl text-primary">
+      <Link href={ROOT_ROUTE} className="font-bold text-2xl text-primary">
         Hot & Sexy CRM for Creatives
-      </a>
+      </Link>
       <nav className="flex items-center space-x-4">
         <a href="/about-us" className="text-sm text-primary">
           About Us
@@ -29,7 +31,7 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
         </a>
       </nav>
       <div className="flex items-center space-x-8">
-        <Link className="flex items-center gap-2 bg-foreground text-background text-sm px-4 py-2 rounded-3xl" href={AUTH_CHECKPOINT_ROUTE}>
+        <Link className="flex items-center gap-2 bg-foreground text-background text-sm px-4 py-2 rounded-3xl" href={currentUser ? DASHBOARD_ROUTE : AUTH_CHECKPOINT_ROUTE}>
           <span>{currentUser ? 'Launch App' : 'Sign In'}</span> <Rocket className="h-4 w-4" />
         </Link>
 

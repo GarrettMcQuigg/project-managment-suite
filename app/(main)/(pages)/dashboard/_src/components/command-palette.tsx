@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Brush, Camera, Clock, Code, FileText, ImageIcon, Layout, MessageSquare, Music, Palette, PenTool, Users, Video } from 'lucide-react';
+import { Camera, Clock, Code, FileText, ImageIcon, Layout, MessageSquare, PenTool, Users, Video } from 'lucide-react';
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/packages/lib/components/command';
 
 export function CommandPalette() {

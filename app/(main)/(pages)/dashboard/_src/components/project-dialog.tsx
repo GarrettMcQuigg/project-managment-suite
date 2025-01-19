@@ -10,7 +10,12 @@ import { Button } from '@/packages/lib/components/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/packages/lib/components/command';
 import { cn } from '@/packages/lib/utils';
 
-const projectTypes = [
+interface ProjectType {
+  label: string;
+  value: string;
+}
+
+const projectTypes: ProjectType[] = [
   { label: 'Photography', value: 'photography' },
   { label: 'Web Design', value: 'web-design' },
   { label: 'Graphic Design', value: 'graphic-design' },
@@ -20,7 +25,7 @@ const projectTypes = [
 ];
 
 export function ProjectDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const [date, setDate] = useState<Date>();
+  const date = new Date();
   const [projectType, setProjectType] = useState('');
   const [openCombobox, setOpenCombobox] = useState(false);
 
@@ -54,7 +59,7 @@ export function ProjectDialog({ open, onOpenChange }: { open: boolean; onOpenCha
                       <CommandItem
                         key={type.value}
                         value={type.value}
-                        onSelect={(currentValue: any) => {
+                        onSelect={(currentValue) => {
                           setProjectType(currentValue === projectType ? '' : currentValue);
                           setOpenCombobox(false);
                         }}

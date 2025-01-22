@@ -41,7 +41,7 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
         </Link>
 
         {/* Theme */}
-        <div className="bg-background cursor-pointer" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+        <div className="bg-transparent cursor-pointer" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
           <div className="transition-all duration-200 hover:scale-110">
             {theme === 'dark' ? (
               <MoonIcon className="h-5 w-5 text-gray-300 hover:text-gray-100 transition-colors duration-200" aria-hidden="true" />

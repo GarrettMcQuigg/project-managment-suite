@@ -17,8 +17,29 @@ import {
 } from '@/packages/lib/components/sidebar';
 import { Button } from '@/packages/lib/components/button';
 import { ClientDialog, ClientFormValues } from './client-dialog';
+import { fetcher } from '@/packages/lib/helpers/fetcher';
+import { toast } from 'react-toastify';
+
+export type AddProjectRequestBody = {
+  name: string;
+  description: string;
+  type: string;
+  status: string;
+  startDate: Date;
+  endDate: Date;
+};
+
+export type AddClientRequestBody = {
+  name: string;
+  email: string;
+  phone: string;
+};
+
+export const API_PROJECT_ADD_ROUTE = '/api/project/add';
+export const API_CLIENT_ADD_ROUTE = '/api/client/add';
 
 export function AppSidebar() {
+  const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'project' | 'client'>('project');
   const [isOpen, setIsOpen] = useState(false);
   const [projectData, setProjectData] = useState<ProjectFormValues | null>(null);
@@ -29,12 +50,45 @@ export function AppSidebar() {
     setStep('client');
   };
 
-  const handleClientSubmit = (clientData: ClientFormValues) => {
-    // Here you would combine projectData and clientData
-    // and submit everything together
-    console.log({ project: projectData, client: clientData });
-    // setIsOpen(false);
-    // setStep('project'); // Reset for next time
+  const handleClientSubmit = async (clientData: ClientFormValues) => {
+    setLoading(true);
+
+    try {
+      const clientResponse = await fetcher({
+        url: API_CLIENT_ADD_ROUTE,
+        requestBody: {
+          name: clientData.name,
+          email: clientData.email,
+          phone: clientData.phone
+        }
+      });
+
+      if (clientResponse.err) {
+        toast.error('Failed to create client');
+        return;
+      }
+
+      // const projectResponse = await fetcher({
+      //   url: API_PROJECT_ADD_ROUTE,
+      //   requestBody: {
+      //     ...projectData,
+      //     clientId: clientResponse.data.id
+      //   }
+      // });
+
+      // if (projectResponse.err) {
+      //   toast.error('Failed to create project');
+      //   return;
+      // }
+
+      setIsOpen(false);
+      setStep('project');
+      toast.success('Project created successfully');
+    } catch (error) {
+      toast.error('An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

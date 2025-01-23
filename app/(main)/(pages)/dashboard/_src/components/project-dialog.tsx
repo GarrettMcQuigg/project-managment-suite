@@ -123,6 +123,7 @@ export function ProjectDialog({ open, onOpenChange, onNext }: ProjectDialogProps
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
+            {/*  TODO : Add 'Phase' selection to this form */}
             <FormField
               control={form.control}
               name="type"

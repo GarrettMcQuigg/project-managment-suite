@@ -7,7 +7,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { Input } from '@/packages/lib/components/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/packages/lib/components/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/packages/lib/components/select';
-import { Avatar, AvatarFallback, AvatarImage } from '@packages/lib/components/avatar';
+import { Avatar, AvatarFallback } from '@packages/lib/components/avatar';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft } from 'lucide-react';
 import { useForm } from 'react-hook-form';

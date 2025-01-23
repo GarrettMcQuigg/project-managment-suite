@@ -62,7 +62,7 @@ model Project {
   type         ProjectType?
   name         String
   description  String
-  status       ProjectStatus        @default(DRAFT)
+  status       ProjectStatus        @default(PREPARATION)
   payment      ProjectPayment?
   invoices     Invoice[]
   phases       Phase[]
@@ -157,7 +157,7 @@ enum PhaseStatus {
 }
 
 enum ProjectStatus {
-  DRAFT
+  PREPARATION
   ACTIVE
   PAUSED
   COMPLETED

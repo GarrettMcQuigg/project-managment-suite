@@ -2,7 +2,7 @@
 
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { ProjectDialog } from './project-dialog';
+import { ProjectDialog, ProjectFormValues } from './project-dialog';
 import { LayoutDashboard, FolderKanban, Users, BarChart, Clock, MessageSquare, FileText } from 'lucide-react';
 import {
   Sidebar,
@@ -16,15 +16,35 @@ import {
   SidebarMenuItem
 } from '@/packages/lib/components/sidebar';
 import { Button } from '@/packages/lib/components/button';
+import { ClientDialog, ClientFormValues } from './client-dialog';
 
 export function AppSidebar() {
-  const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<'project' | 'client'>('project');
+  const [isOpen, setIsOpen] = useState(false);
+  const [projectData, setProjectData] = useState<ProjectFormValues | null>(null);
+
+  const handleProjectNext = (data: ProjectFormValues) => {
+    console.log('data', data);
+    setProjectData(data);
+    setStep('client');
+  };
+
+  const handleClientSubmit = (clientData: ClientFormValues) => {
+    // Here you would combine projectData and clientData
+    // and submit everything together
+    console.log({ project: projectData, client: clientData });
+    // setIsOpen(false);
+    // setStep('project'); // Reset for next time
+  };
 
   return (
     <>
       <Sidebar className="border-r border-purple-500/20 bg-gradient-to-br from-purple-500/10 via-background to-background">
         <SidebarHeader className="border-b border-purple-500/20 p-4 h-header">
-          <Button onClick={() => setOpen(true)} className="w-full backdrop-blur-sm  border border-white/[0.08] shadow-xl shadow-black/10 transition-all duration-200 group/button">
+          <Button
+            onClick={() => setIsOpen(true)}
+            className="w-full backdrop-blur-sm  border border-white/[0.08] shadow-xl shadow-black/10 transition-all duration-200 group/button"
+          >
             <Plus className="mr-2 h-4 w-4 transition-transform group-hover/button:scale-110 group-hover/button:rotate-90" />
             New Project
           </Button>
@@ -88,7 +108,8 @@ export function AppSidebar() {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <ProjectDialog open={open} onOpenChange={setOpen} />
+      <ProjectDialog open={isOpen && step === 'project'} onOpenChange={setIsOpen} onNext={handleProjectNext} />
+      <ClientDialog open={isOpen && step === 'client'} onOpenChange={setIsOpen} onSubmit={handleClientSubmit} onBack={() => setStep('project')} />
     </>
   );
 }

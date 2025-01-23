@@ -59,6 +59,7 @@ model Project {
   userId       String
   client       Client               @relation(fields: [clientId], references: [id])
   clientId     String
+  type         ProjectType?
   name         String
   description  String
   status       ProjectStatus        @default(DRAFT)
@@ -74,6 +75,19 @@ model Project {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+}
+
+enum ProjectType {
+  BRANDING // Logo design, brand identity, style guides
+  PHOTOGRAPHY // Photo shoots, image editing, photo collections
+  ILLUSTRATION // Custom illustrations, art commissions
+  WEB_DESIGN // Websites, landing pages, digital experiences
+  VIDEO // Video production, editing, animation
+  SOCIAL_MEDIA // Content creation, campaign management
+  PRINT // Physical materials, packaging, editorial
+  EXHIBITION // Art shows, installations, gallery work
+  CAMPAIGN // Multi-channel creative campaigns
+  COLLABORATION // Joint creative projects
 }
 
 model ProjectPayment {
@@ -127,7 +141,7 @@ model Phase {
 }
 
 enum PhaseType {
-  PLANNING
+  PREPARATION
   DESIGN
   DEVELOPMENT
   TESTING

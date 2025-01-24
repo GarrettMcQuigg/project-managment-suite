@@ -15,7 +15,7 @@ import { z } from 'zod';
 import { useState } from 'react';
 
 const clientFormSchema = z.object({
-  existingClientId: z.string().optional(),
+  id: z.string().optional(),
   name: z.string().min(1, 'Client name is required'),
   email: z.string().email('Invalid email address'),
   phone: z.string().min(1, 'Phone number is required')
@@ -87,7 +87,7 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack }: ClientDet
               <TabsContent value="existing">
                 <FormField
                   control={form.control}
-                  name="existingClientId"
+                  name="id"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Select Client</FormLabel>

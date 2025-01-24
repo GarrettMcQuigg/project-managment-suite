@@ -19,6 +19,8 @@ import { Button } from '@/packages/lib/components/button';
 import { ClientDialog, ClientFormValues } from './client-dialog';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
+import { ProjectCreateRequestBody } from '@/app/api/project/add/types';
+import { API_PROJECT_ADD_ROUTE } from '@/packages/lib/routes';
 
 export type AddProjectRequestBody = {
   name: string;
@@ -35,9 +37,6 @@ export type AddClientRequestBody = {
   phone: string;
 };
 
-export const API_PROJECT_ADD_ROUTE = '/api/project/add';
-export const API_CLIENT_ADD_ROUTE = '/api/client/add';
-
 export function AppSidebar() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'project' | 'client'>('project');
@@ -52,34 +51,22 @@ export function AppSidebar() {
 
   const handleClientSubmit = async (clientData: ClientFormValues) => {
     setLoading(true);
-
     try {
-      const clientResponse = await fetcher({
-        url: API_CLIENT_ADD_ROUTE,
-        requestBody: {
-          name: clientData.name,
-          email: clientData.email,
-          phone: clientData.phone
+      const requestBody: ProjectCreateRequestBody = {
+        client: {
+          ...clientData!
+        },
+        project: {
+          ...projectData!
         }
-      });
+      };
 
-      if (clientResponse.err) {
-        toast.error('Failed to create client');
+      const response = await fetcher({ url: API_PROJECT_ADD_ROUTE, requestBody });
+
+      if (response.err) {
+        toast.error('Failed to create project');
         return;
       }
-
-      // const projectResponse = await fetcher({
-      //   url: API_PROJECT_ADD_ROUTE,
-      //   requestBody: {
-      //     ...projectData,
-      //     clientId: clientResponse.data.id
-      //   }
-      // });
-
-      // if (projectResponse.err) {
-      //   toast.error('Failed to create project');
-      //   return;
-      // }
 
       setIsOpen(false);
       setStep('project');

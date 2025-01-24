@@ -1,4 +1,4 @@
-import { ProjectType } from '@prisma/client';
+import { ProjectStatus, ProjectType } from '@prisma/client';
 import Joi from 'joi';
 
 export const ProjectRequestBodySchema = Joi.object({
@@ -12,11 +12,26 @@ export const ProjectRequestBodySchema = Joi.object({
   endDate: Joi.date().required()
 });
 
-export type ProjectRequestBody = {
-  clientId: string;
-  type: ProjectType;
-  name: string;
-  description: string;
-  startDate: Date;
-  endDate: Date;
+export type ProjectCreateRequestBody = {
+  client: {
+    id?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+  };
+  project: {
+    name: string;
+    description: string;
+    type: ProjectType;
+    status: ProjectStatus;
+    startDate: Date;
+    endDate: Date;
+    // phases: {
+    //   type: PhaseType;
+    //   name: string;
+    //   description?: string;
+    //   startDate: Date;
+    //   endDate: Date;
+    // }[];
+  };
 };

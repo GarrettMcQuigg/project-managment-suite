@@ -157,6 +157,7 @@ enum PhaseStatus {
 }
 
 enum ProjectStatus {
+  DRAFT
   PREPARATION
   ACTIVE
   PAUSED

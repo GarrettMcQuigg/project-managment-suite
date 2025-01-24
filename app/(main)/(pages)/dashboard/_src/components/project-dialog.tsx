@@ -7,7 +7,7 @@ import { Input } from '@/packages/lib/components/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/packages/lib/components/popover';
 import { Button } from '@/packages/lib/components/button';
 import { cn } from '@/packages/lib/utils';
-import { ProjectStatus, ProjectType } from '@prisma/client';
+import { PhaseType, ProjectStatus, ProjectType } from '@prisma/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/packages/lib/components/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/packages/lib/components/form';
 import { useForm } from 'react-hook-form';
@@ -22,7 +22,7 @@ const projectFormSchema = z
     type: z.nativeEnum(ProjectType, {
       required_error: 'Please select a project type'
     }),
-    status: z.nativeEnum(ProjectStatus).default(ProjectStatus.DRAFT),
+    status: z.nativeEnum(ProjectStatus).default(ProjectStatus.PREPARATION),
     startDate: z.date({
       required_error: 'Start date is required'
     }),
@@ -31,11 +31,34 @@ const projectFormSchema = z
         required_error: 'End date is required'
       })
       .min(new Date(), 'End date must be in the future')
+    // phases: z
+    //   .array(
+    //     z.object({
+    //       type: z.nativeEnum(PhaseType),
+    //       name: z.string().min(1, 'Phase name is required'),
+    //       description: z.string().optional(),
+    //       startDate: z.date(),
+    //       endDate: z.date()
+    //     })
+    //   )
+    //   .min(1, 'At least one phase is required')
   })
   .refine((data) => data.endDate > data.startDate, {
     message: 'End date must be after start date',
     path: ['endDate']
   });
+// .refine(
+//   (data) => {
+//     return data.phases.every((phase, index) => {
+//       if (index === 0) return phase.startDate >= data.startDate;
+//       return phase.startDate >= data.phases[index - 1].endDate;
+//     });
+//   },
+//   {
+//     message: 'Phase dates must be sequential',
+//     path: ['phases']
+// }
+// );
 
 export type ProjectFormValues = z.infer<typeof projectFormSchema>;
 
@@ -104,11 +127,19 @@ export function ProjectDialog({ open, onOpenChange, onNext }: ProjectDialogProps
     defaultValues: {
       name: '',
       description: '',
-      status: ProjectStatus.DRAFT,
+      status: ProjectStatus.PREPARATION,
       startDate: new Date(),
       endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     }
   });
+
+  // const [phases, setPhases] = useState([{
+  //   type: PhaseType.PREPARATION,
+  //   name: "Project Preparation",
+  //   description: "",
+  //   startDate: new Date(),
+  //   endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  // }]);
 
   function onSubmit(values: ProjectFormValues) {
     onNext(values);
@@ -123,7 +154,6 @@ export function ProjectDialog({ open, onOpenChange, onNext }: ProjectDialogProps
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
-            {/*  TODO : Add 'Phase' selection to this form */}
             <FormField
               control={form.control}
               name="type"

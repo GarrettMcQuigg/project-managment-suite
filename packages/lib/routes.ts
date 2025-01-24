@@ -52,6 +52,9 @@ export const API_AUTH_MFA_SEND_SMS_ROUTE = `${API_AUTH_MFA_ROUTE}/send-sms`;
 
 export const API_USER_ROUTE = `${API_ROUTE}/user`;
 
+export const API_PROJECT_ROUTE = `${API_ROUTE}/project`;
+export const API_PROJECT_ADD_ROUTE = `${API_PROJECT_ROUTE}/add`;
+
 // Helpers
 export function routeWithPath(route: string, path: string) {
   return `${route}/${path}`;

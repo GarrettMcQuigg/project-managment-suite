@@ -2,30 +2,25 @@ import { OverviewCards } from './_src/components/analytics/overview-cards';
 import { ProjectStats } from './_src/components/analytics/project-stats';
 import { ClientEngagement } from './_src/components/client-engagement';
 import { RevenueChart } from './_src/components/analytics/revenue-chart';
-import { AppSidebar } from './_src/components/sidebar';
-import { SidebarProvider } from '@/packages/lib/components/sidebar';
 
 export default function DashboardPage() {
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen-minus-header bg-gradient-to-br from-purple-500/10 via-background to-background">
-        <AppSidebar />
-        <div className="flex min-h-screen-minus-header">
-          <main className="space-y-8 p-8 pt-6">
-            <div className="flex items-center justify-between space-y-2">
-              <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+    <div className="flex min-h-screen-minus-header bg-gradient-to-br from-purple-500/10 via-background to-background">
+      <div className="flex min-h-screen-minus-header">
+        <main className="space-y-8 p-8 pt-6">
+          <div className="flex items-center justify-between space-y-2">
+            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          </div>
+          <div className="space-y-8">
+            <OverviewCards />
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
+              <ProjectStats className="md:col-span-2 lg:col-span-4" />
+              <ClientEngagement className="md:col-span-2 lg:col-span-3" />
             </div>
-            <div className="space-y-8">
-              <OverviewCards />
-              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
-                <ProjectStats className="md:col-span-2 lg:col-span-4" />
-                <ClientEngagement className="md:col-span-2 lg:col-span-3" />
-              </div>
-              <RevenueChart className="md:col-span-2 lg:col-span-7" />
-            </div>
-          </main>
-        </div>
+            <RevenueChart className="md:col-span-2 lg:col-span-7" />
+          </div>
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 }

@@ -2,7 +2,6 @@
 
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { ProjectDialog, ProjectFormValues } from './project-dialog';
 import { LayoutDashboard, FolderKanban, Users, BarChart, Clock, MessageSquare, FileText } from 'lucide-react';
 import {
   Sidebar,
@@ -13,14 +12,17 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  SidebarProvider
 } from '@/packages/lib/components/sidebar';
 import { Button } from '@/packages/lib/components/button';
-import { ClientDialog, ClientFormValues } from './client-dialog';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
 import { ProjectCreateRequestBody } from '@/app/api/project/add/types';
 import { API_PROJECT_ADD_ROUTE } from '@/packages/lib/routes';
+import { ClientDialog, ClientFormValues } from './client-dialog';
+import { ProjectFormValues, ProjectDialog } from './project-dialog';
+import Link from 'next/link';
 
 export type AddProjectRequestBody = {
   name: string;
@@ -79,7 +81,7 @@ export function AppSidebar() {
   };
 
   return (
-    <>
+    <SidebarProvider>
       <Sidebar className="border-r border-purple-500/20 bg-gradient-to-br from-purple-500/10 via-background to-background">
         <SidebarHeader className="border-b border-purple-500/20 p-4 h-header">
           <Button
@@ -95,24 +97,30 @@ export function AppSidebar() {
             <SidebarGroupLabel>MAIN</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
-                    <FolderKanban className="mr-2 h-4 w-4" />
-                    Projects
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
-                    <Users className="mr-2 h-4 w-4" />
-                    Clients
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <Link href="/dashboard">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
+                <Link href="/projects">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
+                      <FolderKanban className="mr-2 h-4 w-4" />
+                      Projects
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
+                <Link href="/clients">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
+                      <Users className="mr-2 h-4 w-4" />
+                      Clients
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -151,6 +159,6 @@ export function AppSidebar() {
       </Sidebar>
       <ProjectDialog open={isOpen && step === 'project'} onOpenChange={setIsOpen} onNext={handleProjectNext} />
       <ClientDialog open={isOpen && step === 'client'} onOpenChange={setIsOpen} onSubmit={handleClientSubmit} onBack={() => setStep('project')} />
-    </>
+    </SidebarProvider>
   );
 }

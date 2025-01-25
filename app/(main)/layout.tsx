@@ -1,14 +1,9 @@
 import { getCurrentUser } from '@packages/lib/helpers/get-current-user';
 import { Unauth } from './_src/unauth';
 import HUD from './_src/hud';
-// import HUD from './_src/hud';
-// import { getCurrentEmployee } from '@/lib/helpers/get-current-employee';
-// import { checkInternalAccess } from '@/lib/helpers/check-internal-access';
 
-// export default async function BMSLayout({ children }: { children: React.ReactNode }) {
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   const currentUser = await getCurrentUser();
-  // const currentEmployee = await getCurrentEmployee();
 
   if (!currentUser) {
     return <Unauth />;
@@ -16,10 +11,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
 
   return (
     <HUD currentUser={currentUser}>
-      <div>{children}</div>
+      <div className="ml-64">{children}</div>
     </HUD>
-    // <HUD currentUser={currentUser} currentEmployee={currentEmployee}>
-    //   {children}
-    // </HUD>
   );
 }

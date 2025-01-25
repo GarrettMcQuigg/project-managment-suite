@@ -21,13 +21,13 @@ export const PRODUCTS_SUPPORT_AI_ROUTE = `${PRODUCTS_ROUTE}/support-ai`;
 
 // Main pages
 export const DASHBOARD_ROUTE = '/dashboard';
-export const EMAIL_ROUTE = '/email';
-export const TASKS_ROUTE = '/tasks';
-export const SECURITY_ROUTE = '/security';
-export const CALENDAR_ROUTE = '/calendar';
-export const MEETINGS_ROUTE = '/meetings';
-export const BILLING_ROUTE = '/billing';
-export const SHOP_ROUTE = '/shop';
+export const PROJECTS_ROUTE = '/projects';
+export const CLIENTS_ROUTE = '/clients';
+
+// Project pages
+
+// Client pages
+export const CLIENTS_DETAILS_ROUTE = `${CLIENTS_ROUTE}/:id`;
 
 // API routes...
 export const API_ROUTE = '/api';
@@ -54,6 +54,10 @@ export const API_USER_ROUTE = `${API_ROUTE}/user`;
 
 export const API_PROJECT_ROUTE = `${API_ROUTE}/project`;
 export const API_PROJECT_ADD_ROUTE = `${API_PROJECT_ROUTE}/add`;
+
+export const API_CLIENT_ROUTE = `${API_ROUTE}/client`;
+export const API_CLIENTS_LIST_ROUTE = `${API_CLIENT_ROUTE}/list`;
+export const API_CLIENT_GET_BY_ID_ROUTE = `${API_CLIENT_ROUTE}/get-by-id?id=`;
 
 // Helpers
 export function routeWithPath(route: string, path: string) {

@@ -19,7 +19,7 @@ import { Button } from '@/packages/lib/components/button';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
 import { ProjectCreateRequestBody } from '@/app/api/project/add/types';
-import { API_PROJECT_ADD_ROUTE } from '@/packages/lib/routes';
+import { API_PROJECT_ADD_ROUTE, CLIENTS_ROUTE, DASHBOARD_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
 import { ClientDialog, ClientFormValues } from './client-dialog';
 import { ProjectFormValues, ProjectDialog } from './project-dialog';
 import Link from 'next/link';
@@ -46,7 +46,6 @@ export function AppSidebar() {
   const [projectData, setProjectData] = useState<ProjectFormValues | null>(null);
 
   const handleProjectNext = (data: ProjectFormValues) => {
-    console.log('data', data);
     setProjectData(data);
     setStep('client');
   };
@@ -97,7 +96,7 @@ export function AppSidebar() {
             <SidebarGroupLabel>MAIN</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <Link href="/dashboard">
+                <Link href={DASHBOARD_ROUTE}>
                   <SidebarMenuItem>
                     <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
@@ -105,7 +104,7 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
-                <Link href="/projects">
+                <Link href={PROJECTS_ROUTE}>
                   <SidebarMenuItem>
                     <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
                       <FolderKanban className="mr-2 h-4 w-4" />
@@ -113,7 +112,7 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
-                <Link href="/clients">
+                <Link href={CLIENTS_ROUTE}>
                   <SidebarMenuItem>
                     <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
                       <Users className="mr-2 h-4 w-4" />

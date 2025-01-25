@@ -11,7 +11,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
 
   return (
     <HUD currentUser={currentUser}>
-      <div className="ml-64">{children}</div>
+      <div className="lg:ml-64">{children}</div>
     </HUD>
   );
 }

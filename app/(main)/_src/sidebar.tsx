@@ -100,7 +100,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 <Link href={DASHBOARD_ROUTE}>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
+                    <SidebarMenuButton className="hover:bg-purple-500/20 hover:text-foreground">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
                       Dashboard
                     </SidebarMenuButton>
@@ -108,7 +108,7 @@ export function AppSidebar() {
                 </Link>
                 <Link href={PROJECTS_ROUTE}>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
+                    <SidebarMenuButton className="hover:bg-purple-500/20 hover:text-foreground">
                       <FolderKanban className="mr-2 h-4 w-4" />
                       Projects
                     </SidebarMenuButton>
@@ -116,7 +116,7 @@ export function AppSidebar() {
                 </Link>
                 <Link href={CLIENTS_ROUTE}>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
+                    <SidebarMenuButton className="hover:bg-purple-500/20 hover:text-foreground">
                       <Users className="mr-2 h-4 w-4" />
                       Clients
                     </SidebarMenuButton>
@@ -125,7 +125,7 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-          <SidebarGroup>
+          {/* <SidebarGroup>
             <SidebarGroupLabel>TOOLS</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -155,7 +155,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup>
+          </SidebarGroup> */}
         </SidebarContent>
       </Sidebar>
       <ProjectDialog open={isOpen && step === 'project'} onOpenChange={setIsOpen} onNext={handleProjectNext} />

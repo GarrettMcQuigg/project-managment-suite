@@ -2,7 +2,7 @@ import { ClientInfo } from './_src/client-info';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { unauthorized } from 'next/navigation';
 
-export default async function ClientDetailPage({ params }: { params: { id: string } }) {
+export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const currentUser = getCurrentUser();
   const resolvedParams = await params;
 

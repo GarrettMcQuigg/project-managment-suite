@@ -5,7 +5,6 @@ import { swrFetcher } from '@/packages/lib/helpers/fetcher';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_PROJECT_LIST_ROUTE, PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
 import { Project } from '@prisma/client';
-import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';

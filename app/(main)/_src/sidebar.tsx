@@ -73,6 +73,7 @@ export function AppSidebar() {
       setStep('project');
       toast.success('Project created successfully');
     } catch (error) {
+      console.error(error);
       toast.error('An error occurred');
     } finally {
       setLoading(false);
@@ -85,6 +86,7 @@ export function AppSidebar() {
         <SidebarHeader className="border-b border-purple-500/20 p-4 h-header">
           <Button
             onClick={() => setIsOpen(true)}
+            disabled={loading}
             className="w-full backdrop-blur-sm  border border-white/[0.08] shadow-xl shadow-black/10 transition-all duration-200 group/button"
           >
             <Plus className="mr-2 h-4 w-4 transition-transform group-hover/button:scale-110 group-hover/button:rotate-90" />

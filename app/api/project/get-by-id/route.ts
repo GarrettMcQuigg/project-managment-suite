@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     });
 
     return handleSuccess({ content: project });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleError({ message: 'Failed to fetch project', err });
   }
 }

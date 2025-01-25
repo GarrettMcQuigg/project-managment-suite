@@ -25,7 +25,7 @@ export async function GET() {
     });
 
     return handleSuccess({ content: clients });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleError({ message: 'Failed to fetch clients', err });
   }
 }

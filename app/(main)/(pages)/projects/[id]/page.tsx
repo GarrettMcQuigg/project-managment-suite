@@ -2,7 +2,7 @@ import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { unauthorized } from 'next/navigation';
 import { ProjectInfo } from './_src/project-info';
 
-export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const currentUser = getCurrentUser();
   const resolvedParams = await params;
 

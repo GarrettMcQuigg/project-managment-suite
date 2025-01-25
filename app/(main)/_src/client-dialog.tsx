@@ -78,7 +78,7 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack }: ClientDet
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
-            <Tabs defaultValue="new" className="w-full" onValueChange={(value) => setClientMode(value as 'existing' | 'new')}>
+            <Tabs defaultValue={clientMode} className="w-full" onValueChange={(value) => setClientMode(value as 'existing' | 'new')}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="new">New Client</TabsTrigger>
                 <TabsTrigger value="existing">Existing Client</TabsTrigger>

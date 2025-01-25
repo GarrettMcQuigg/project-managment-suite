@@ -4,7 +4,6 @@ import { DataTable } from '@/packages/lib/components/data-table';
 import { swrFetcher } from '@/packages/lib/helpers/fetcher';
 import { ClientWithMetadata } from '@/packages/lib/prisma/types';
 import { API_CLIENT_LIST_ROUTE, CLIENT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
-import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';

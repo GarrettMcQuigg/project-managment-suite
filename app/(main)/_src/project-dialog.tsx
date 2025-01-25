@@ -7,7 +7,7 @@ import { Input } from '@/packages/lib/components/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/packages/lib/components/popover';
 import { Button } from '@/packages/lib/components/button';
 import { cn } from '@/packages/lib/utils';
-import { PhaseType, ProjectStatus, ProjectType } from '@prisma/client';
+import { ProjectStatus, ProjectType } from '@prisma/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/packages/lib/components/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/packages/lib/components/form';
 import { useForm } from 'react-hook-form';

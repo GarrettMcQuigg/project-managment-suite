@@ -4,7 +4,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/packages/lib/compone
 import { ProjectList } from './project.info';
 import { Project } from '@prisma/client';
 import { useEffect, useState } from 'react';
-import { useLoading } from '@/packages/lib/providers/loading';
 import useSWR from 'swr';
 import { swrFetcher } from '@/packages/lib/helpers/fetcher';
 import { API_CLIENT_GET_BY_ID_ROUTE, CLIENTS_ROUTE } from '@/packages/lib/routes';
@@ -13,7 +12,6 @@ import { ClientWithMetadata } from '@/packages/lib/prisma/types';
 import { redirect } from 'next/navigation';
 
 export function ClientInfo({ clientId }: { clientId: string }) {
-  const { setLoading } = useLoading();
   const endpoint = API_CLIENT_GET_BY_ID_ROUTE + clientId;
   const { data, error, isLoading } = useSWR(endpoint, swrFetcher);
   const [client, setClient] = useState<ClientWithMetadata | null>(null);

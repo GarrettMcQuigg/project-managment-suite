@@ -25,9 +25,10 @@ export const PROJECTS_ROUTE = '/projects';
 export const CLIENTS_ROUTE = '/clients';
 
 // Project pages
+export const PROJECT_DETAILS_ROUTE = `${PROJECTS_ROUTE}/:id`;
 
 // Client pages
-export const CLIENTS_DETAILS_ROUTE = `${CLIENTS_ROUTE}/:id`;
+export const CLIENT_DETAILS_ROUTE = `${CLIENTS_ROUTE}/:id`;
 
 // API routes...
 export const API_ROUTE = '/api';
@@ -54,9 +55,11 @@ export const API_USER_ROUTE = `${API_ROUTE}/user`;
 
 export const API_PROJECT_ROUTE = `${API_ROUTE}/project`;
 export const API_PROJECT_ADD_ROUTE = `${API_PROJECT_ROUTE}/add`;
+export const API_PROJECT_LIST_ROUTE = `${API_PROJECT_ROUTE}/list`;
+export const API_PROJECT_GET_BY_ID_ROUTE = `${API_PROJECT_ROUTE}/get-by-id?id=`;
 
 export const API_CLIENT_ROUTE = `${API_ROUTE}/client`;
-export const API_CLIENTS_LIST_ROUTE = `${API_CLIENT_ROUTE}/list`;
+export const API_CLIENT_LIST_ROUTE = `${API_CLIENT_ROUTE}/list`;
 export const API_CLIENT_GET_BY_ID_ROUTE = `${API_CLIENT_ROUTE}/get-by-id?id=`;
 
 // Helpers

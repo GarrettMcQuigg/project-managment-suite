@@ -3,7 +3,7 @@
 import { DataTable } from '@/packages/lib/components/data-table';
 import { swrFetcher } from '@/packages/lib/helpers/fetcher';
 import { ClientWithMetadata } from '@/packages/lib/prisma/types';
-import { API_CLIENTS_LIST_ROUTE, CLIENTS_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import { API_CLIENT_LIST_ROUTE, CLIENT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
 import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -25,7 +25,7 @@ interface Project {
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<ClientWithMetadata[]>([]);
-  const { data, isLoading } = useSWR(API_CLIENTS_LIST_ROUTE, swrFetcher);
+  const { data, isLoading } = useSWR(API_CLIENT_LIST_ROUTE, swrFetcher);
 
   useEffect(() => {
     if (data) {
@@ -46,22 +46,19 @@ export default function ClientsPage() {
       key: 'details',
       label: '',
       render: (client: Client) => (
-        <Link href={routeWithParam(CLIENTS_DETAILS_ROUTE, { id: client.id })}>
-          <ExternalLink className="h-4 w-4" />
+        <Link href={routeWithParam(CLIENT_DETAILS_ROUTE, { id: client.id })}>
+          <div className="text-blue-500">View Details</div>
+          {/* <ExternalLink className="h-4 w-4" /> */}
         </Link>
       )
     }
   ];
-  const handleRowClick = (client: Client) => {
-    console.log(client.projects);
-  };
-
   if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="space-y-4 p-8">
       <h1 className="text-2xl font-bold">Clients</h1>
-      <DataTable data={clients} columns={columns} searchKey="name" onRowClick={handleRowClick} />
+      <DataTable data={clients} columns={columns} searchKey="name" />
     </div>
   );
 }

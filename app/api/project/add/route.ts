@@ -15,6 +15,10 @@ export async function POST(request: Request) {
     return handleBadRequest({ message: error.message, err: error });
   }
 
+  if (!client) {
+    return handleBadRequest({ message: 'Client is required' });
+  }
+
   try {
     const result = await db.$transaction(async (tx) => {
       const clientRecord = client.id

@@ -1,5 +1,3 @@
-'use client';
-
 import { ArrowRight, CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/packages/lib/components/calendar';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
@@ -14,6 +12,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Textarea } from '@/packages/lib/components/textarea';
+import { useEffect } from 'react';
 
 const projectFormSchema = z
   .object({
@@ -31,34 +30,11 @@ const projectFormSchema = z
         required_error: 'End date is required'
       })
       .min(new Date(), 'End date must be in the future')
-    // phases: z
-    //   .array(
-    //     z.object({
-    //       type: z.nativeEnum(PhaseType),
-    //       name: z.string().min(1, 'Phase name is required'),
-    //       description: z.string().optional(),
-    //       startDate: z.date(),
-    //       endDate: z.date()
-    //     })
-    //   )
-    //   .min(1, 'At least one phase is required')
   })
   .refine((data) => data.endDate > data.startDate, {
     message: 'End date must be after start date',
     path: ['endDate']
   });
-// .refine(
-//   (data) => {
-//     return data.phases.every((phase, index) => {
-//       if (index === 0) return phase.startDate >= data.startDate;
-//       return phase.startDate >= data.phases[index - 1].endDate;
-//     });
-//   },
-//   {
-//     message: 'Phase dates must be sequential',
-//     path: ['phases']
-// }
-// );
 
 export type ProjectFormValues = z.infer<typeof projectFormSchema>;
 
@@ -119,12 +95,14 @@ type ProjectDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onNext: (data: ProjectFormValues) => void;
+  mode?: 'create' | 'edit';
+  defaultValues?: ProjectFormValues;
 };
 
-export function ProjectDialog({ open, onOpenChange, onNext }: ProjectDialogProps) {
+export function ProjectDialog({ open, onOpenChange, onNext, mode = 'create', defaultValues }: ProjectDialogProps) {
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectFormSchema),
-    defaultValues: {
+    defaultValues: defaultValues || {
       name: '',
       description: '',
       status: ProjectStatus.PREPARATION,
@@ -133,13 +111,19 @@ export function ProjectDialog({ open, onOpenChange, onNext }: ProjectDialogProps
     }
   });
 
-  // const [phases, setPhases] = useState([{
-  //   type: PhaseType.PREPARATION,
-  //   name: "Project Preparation",
-  //   description: "",
-  //   startDate: new Date(),
-  //   endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-  // }]);
+  useEffect(() => {
+    if (!open) {
+      form.reset(
+        defaultValues || {
+          name: '',
+          description: '',
+          status: ProjectStatus.PREPARATION,
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+      );
+    }
+  }, [open, form, defaultValues]);
 
   function onSubmit(values: ProjectFormValues) {
     onNext(values);
@@ -149,8 +133,10 @@ export function ProjectDialog({ open, onOpenChange, onNext }: ProjectDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-purple-500/10 via-background to-background">
         <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
-          <DialogDescription>Launch your next creative masterpiece. Fill in the project details to get started.</DialogDescription>
+          <DialogTitle>{mode === 'edit' ? 'Edit Project' : 'Create New Project'}</DialogTitle>
+          <DialogDescription>
+            {mode === 'edit' ? 'Update your project details' : 'Launch your next creative masterpiece. Fill in the project details to get started.'}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">

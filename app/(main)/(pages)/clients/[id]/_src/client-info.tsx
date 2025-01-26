@@ -10,7 +10,7 @@ import { API_CLIENT_GET_BY_ID_ROUTE, API_CLIENT_UPDATE_ROUTE, CLIENTS_ROUTE } fr
 import { Skeleton } from '@/packages/lib/components/skeleton';
 import { ClientWithMetadata } from '@/packages/lib/prisma/types';
 import { redirect } from 'next/navigation';
-import { Pencil, TrashIcon } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { ClientDialog } from '@/app/(main)/_src/client-dialog';
 import { UpdateClientRequestBody } from '@/app/api/client/update/types';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';

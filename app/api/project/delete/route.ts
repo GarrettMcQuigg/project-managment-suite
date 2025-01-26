@@ -1,24 +1,24 @@
 import { db } from '@/packages/lib/prisma/client';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { DeleteClientRequestBody, DeleteClientRequestBodySchema } from './types';
+import { DeleteProjectRequestBody, DeleteProjectRequestBodySchema } from './types';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 
 export async function DELETE(request: Request) {
   const currentUser = await getCurrentUser();
-  const requestBody: DeleteClientRequestBody = await request.json();
+  const requestBody: DeleteProjectRequestBody = await request.json();
 
   if (!currentUser) return handleUnauthorized();
 
-  const { error } = DeleteClientRequestBodySchema.validate(requestBody);
+  const { error } = DeleteProjectRequestBodySchema.validate(requestBody);
   if (error) {
     return handleBadRequest({ message: error.message, err: error });
   }
 
   try {
-    await db.client.delete({ where: { id: requestBody.id } });
+    await db.project.delete({ where: { id: requestBody.id } });
 
-    return handleSuccess({ message: 'Successfully Deleted Client' });
+    return handleSuccess({ message: 'Successfully Deleted Project' });
   } catch (err: unknown) {
-    return handleError({ message: 'Failed to update client', err });
+    return handleError({ message: 'Failed to update project', err });
   }
 }

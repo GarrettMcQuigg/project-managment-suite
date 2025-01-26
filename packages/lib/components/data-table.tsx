@@ -15,9 +15,10 @@ interface DataTableProps<T> {
   }[];
   searchKey?: string;
   onRowClick?: (item: T) => void;
+  addRow?: React.ReactNode;
 }
 
-export function DataTable<T>({ data, columns, searchKey, onRowClick }: DataTableProps<T>) {
+export function DataTable<T>({ data, columns, searchKey, onRowClick, addRow }: DataTableProps<T>) {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
@@ -34,12 +35,15 @@ export function DataTable<T>({ data, columns, searchKey, onRowClick }: DataTable
 
   return (
     <div className="space-y-4">
-      {searchKey && (
-        <div className="relative">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-8" />
-        </div>
-      )}
+      <div className="flex gap-4 items-center">
+        {searchKey && (
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-8" />
+          </div>
+        )}
+        {addRow}
+      </div>
 
       <div className="rounded-md border">
         <Table>

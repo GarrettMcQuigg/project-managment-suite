@@ -18,7 +18,7 @@ import {
 import { Button } from '@/packages/lib/components/button';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
-import { ProjectCreateRequestBody } from '@/app/api/project/add/types';
+import { ProjectRequestBody } from '@/app/api/project/add/types';
 import { API_PROJECT_ADD_ROUTE, CLIENTS_ROUTE, DASHBOARD_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
 import { ClientDialog, ClientFormValues } from './client-dialog';
 import { ProjectFormValues, ProjectDialog } from './project-dialog';
@@ -53,7 +53,7 @@ export function AppSidebar() {
   const handleClientSubmit = async (clientData: ClientFormValues) => {
     setLoading(true);
     try {
-      const requestBody: ProjectCreateRequestBody = {
+      const requestBody: ProjectRequestBody = {
         client: {
           ...clientData!
         },

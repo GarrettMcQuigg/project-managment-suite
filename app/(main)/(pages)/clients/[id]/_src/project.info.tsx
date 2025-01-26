@@ -8,6 +8,7 @@ export function ProjectList({ projects }: { projects: Project[] }) {
     <div>
       <h2 className="text-2xl font-bold mb-4">Projects</h2>
       <div className="grid gap-4 md:grid-cols-2">
+        {projects.length === 0 && <p>No projects found</p>}
         {projects.map((project) => (
           <Card key={project.id}>
             <CardHeader>

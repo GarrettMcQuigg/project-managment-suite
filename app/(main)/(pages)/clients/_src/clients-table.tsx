@@ -1,0 +1,95 @@
+'use client';
+
+import { DataTable } from '@/packages/lib/components/data-table';
+import { fetcher, swrFetcher } from '@/packages/lib/helpers/fetcher';
+import { ClientWithMetadata } from '@/packages/lib/prisma/types';
+import { API_CLIENT_ADD_ROUTE, API_CLIENT_LIST_ROUTE, CLIENT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import useSWR, { mutate } from 'swr';
+import { ClientDialog, ClientFormValues } from '@/app/(main)/_src/client-dialog';
+import { toast } from 'react-toastify';
+import { ClientRequestBody } from '@/app/api/client/add/types';
+import { DialogTriggerButton } from '@/packages/lib/components/dialog';
+
+export default function ClientsTable() {
+  const [loading, setLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [clients, setClients] = useState<ClientWithMetadata[]>([]);
+  const { data, isLoading } = useSWR(API_CLIENT_LIST_ROUTE, swrFetcher);
+
+  useEffect(() => {
+    if (data) {
+      setClients(data.content);
+    }
+  }, [data]);
+
+  const columns = [
+    { key: 'name', label: 'Name' },
+    { key: 'email', label: 'Email' },
+    { key: 'phone', label: 'Phone' },
+    {
+      key: 'projects',
+      label: 'Projects',
+      render: (client: ClientWithMetadata) => client.projects?.length || 0
+    },
+    {
+      key: 'details',
+      label: '',
+      render: (client: ClientWithMetadata) => (
+        <Link href={routeWithParam(CLIENT_DETAILS_ROUTE, { id: client.id })}>
+          <div className="text-blue-500">View Details</div>
+        </Link>
+      )
+    }
+  ];
+
+  const handleClientSubmit = async (clientData: ClientFormValues) => {
+    setLoading(true);
+    try {
+      const requestBody: ClientRequestBody = {
+        name: clientData.name,
+        email: clientData.email,
+        phone: clientData.phone
+      };
+
+      const response = await fetcher({ url: API_CLIENT_ADD_ROUTE, requestBody });
+
+      if (response.err) {
+        toast.error('Failed to create project');
+        return;
+      }
+
+      setIsOpen(false);
+      toast.success('Project created successfully');
+    } catch (error) {
+      console.error(error);
+      toast.error('An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const revalidate = () => {
+    mutate(API_CLIENT_LIST_ROUTE);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+
+  return (
+    <>
+      <DataTable
+        data={clients}
+        columns={columns}
+        searchKey="name"
+        addRow={
+          // <ClientDialog revalidate={revalidate}>
+          <ClientDialog open={isOpen} onOpenChange={setIsOpen} onSubmit={handleClientSubmit}>
+            <DialogTriggerButton>New Client</DialogTriggerButton>
+          </ClientDialog>
+        }
+      />
+    </>
+  );
+}

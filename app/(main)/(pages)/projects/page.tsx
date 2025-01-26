@@ -32,7 +32,6 @@ export default function ProjectsPage() {
       render: (project: Project) => (
         <Link href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: project.id })}>
           <div className="text-blue-500">View Details</div>
-          {/* <ExternalLink className="h-4 w-4" /> */}
         </Link>
       )
     }

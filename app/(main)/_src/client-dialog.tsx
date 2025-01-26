@@ -1,4 +1,3 @@
-// ClientDetailsDialog.tsx
 'use client';
 
 import { Button } from '@/packages/lib/components/button';
@@ -21,7 +20,6 @@ const clientFormSchema = z.object({
   phone: z.string().min(1, 'Phone number is required')
 });
 
-// TODO : Fake data, remove once wired up
 const clients = [
   {
     id: 1,
@@ -42,13 +40,60 @@ const clients = [
 export type ClientFormValues = z.infer<typeof clientFormSchema>;
 
 type ClientDetailsDialogProps = {
+  children?: React.ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: ClientFormValues) => void;
-  onBack: () => void;
+  onBack?: () => void;
 };
 
-export function ClientDialog({ open, onOpenChange, onSubmit, onBack }: ClientDetailsDialogProps) {
+const NewClientForm = ({ form }: { form: any }) => (
+  <>
+    <FormField
+      control={form.control}
+      name="name"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Client name</FormLabel>
+          <FormControl>
+            <Input {...field} className="border-purple-500/20" placeholder="John Smith" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+
+    <FormField
+      control={form.control}
+      name="email"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Email</FormLabel>
+          <FormControl>
+            <Input {...field} type="email" className="border-purple-500/20" placeholder="johnsmith@gmail.com" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+
+    <FormField
+      control={form.control}
+      name="phone"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Phone</FormLabel>
+          <FormControl>
+            <Input {...field} type="tel" className="border-purple-500/20" placeholder="(123) 456 - 7890" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  </>
+);
+
+export function ClientDialog({ children, open, onOpenChange, onSubmit, onBack }: ClientDetailsDialogProps) {
   const [clientMode, setClientMode] = useState<'existing' | 'new'>('new');
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
@@ -70,124 +115,99 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack }: ClientDet
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+      {children}
+
       <DialogContent className="sm:max-w-[500px] bg-background backdrop-blur-xl bg-gradient-to-br from-purple-500/15 via-background/60 to-background/90">
         <DialogHeader>
           <DialogTitle>Client Details</DialogTitle>
-          <DialogDescription>Step 2 of 2 - Enter client information</DialogDescription>
+          <DialogDescription>Enter information about a new client</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
-            <Tabs defaultValue={clientMode} className="w-full" onValueChange={(value) => setClientMode(value as 'existing' | 'new')}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="new">New Client</TabsTrigger>
-                <TabsTrigger value="existing">Existing Client</TabsTrigger>
-              </TabsList>
+            {onBack ? (
+              <Tabs defaultValue={clientMode} className="w-full" onValueChange={(value) => setClientMode(value as 'existing' | 'new')}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="new">New Client</TabsTrigger>
+                  <TabsTrigger value="existing">Existing Client</TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="existing">
-                <FormField
-                  control={form.control}
-                  name="id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Select Client</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          handleExistingClientSelect(value);
-                        }}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="py-8 px-4">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose an existing client..." />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {clients.map((client) => (
-                            <SelectItem
-                              key={client.id}
-                              value={client.id.toString()}
-                              className="w-full my-1 data-[highlighted]:bg-purple-800/15 data-[state=checked]:bg-purple-800/30 cursor-pointer"
-                            >
-                              <div className="w-full flex gap-2">
-                                <Avatar>
-                                  <AvatarFallback>
-                                    {client.name
-                                      .split(' ')
-                                      .map((chunk) => chunk[0])
-                                      .join('')}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div className="flex flex-col items-start gap-1">
-                                  <span className="font-medium">{client.name}</span>
-                                  <span className="text-xs text-muted-foreground">
-                                    {client.email} • {client.phone}
-                                  </span>
+                <TabsContent value="existing">
+                  <FormField
+                    control={form.control}
+                    name="id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Select Client</FormLabel>
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            handleExistingClientSelect(value);
+                          }}
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="py-8 px-4">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Choose an existing client..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {clients.map((client) => (
+                              <SelectItem
+                                key={client.id}
+                                value={client.id.toString()}
+                                className="w-full my-1 data-[highlighted]:bg-purple-800/15 data-[state=checked]:bg-purple-800/30 cursor-pointer"
+                              >
+                                <div className="w-full flex gap-2">
+                                  <Avatar>
+                                    <AvatarFallback>
+                                      {client.name
+                                        .split(' ')
+                                        .map((chunk) => chunk[0])
+                                        .join('')}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex flex-col items-start gap-1">
+                                    <span className="font-medium">{client.name}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {client.email} • {client.phone}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </TabsContent>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
 
-              <TabsContent value="new">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Client name</FormLabel>
-                      <FormControl>
-                        <Input {...field} className="border-purple-500/20" placeholder="John Smith" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <TabsContent value="new">
+                  <NewClientForm form={form} />
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <NewClientForm form={form} />
+            )}
 
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="email" className="border-purple-500/20" placeholder="johnsmith@gmail.com" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="tel" className="border-purple-500/20" placeholder="(123) 456 - 7890" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </TabsContent>
-            </Tabs>
             <DialogFooter className="flex justify-between gap-2">
-              <Button type="button" variant="outline" onClick={onBack} className="border-purple-500/20 flex items-center gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Project
-              </Button>
-              <Button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white">
-                Create Project
-              </Button>
+              {onBack ? (
+                <>
+                  <Button type="button" variant="outline" onClick={onBack} className="border-purple-500/20 flex items-center gap-2">
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to Project
+                  </Button>
+                  <Button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white">
+                    Create Project
+                  </Button>
+                </>
+              ) : (
+                <Button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white">
+                  Create Client
+                </Button>
+              )}
             </DialogFooter>
           </form>
         </Form>

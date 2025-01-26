@@ -12,7 +12,7 @@ export const ProjectRequestBodySchema = Joi.object({
   endDate: Joi.date().required()
 });
 
-export type ProjectCreateRequestBody = {
+export type ProjectRequestBody = {
   client: {
     id?: string;
     name?: string;

@@ -59,6 +59,7 @@ export const API_PROJECT_LIST_ROUTE = `${API_PROJECT_ROUTE}/list`;
 export const API_PROJECT_GET_BY_ID_ROUTE = `${API_PROJECT_ROUTE}/get-by-id?id=`;
 
 export const API_CLIENT_ROUTE = `${API_ROUTE}/client`;
+export const API_CLIENT_ADD_ROUTE = `${API_CLIENT_ROUTE}/add`;
 export const API_CLIENT_LIST_ROUTE = `${API_CLIENT_ROUTE}/list`;
 export const API_CLIENT_GET_BY_ID_ROUTE = `${API_CLIENT_ROUTE}/get-by-id?id=`;
 

@@ -1,11 +1,11 @@
 import { db } from '@packages/lib/prisma/client';
 import { handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { ProjectCreateRequestBody } from './types';
+import { ProjectRequestBody } from './types';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
-  const { client, project }: ProjectCreateRequestBody = await request.json();
+  const { client, project }: ProjectRequestBody = await request.json();
 
   if (!currentUser) return handleUnauthorized();
 

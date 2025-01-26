@@ -1,7 +1,7 @@
 import { ProjectStatus, ProjectType } from '@prisma/client';
 import Joi from 'joi';
 
-export const ProjectRequestBodySchema = Joi.object({
+export const AddProjectRequestBodySchema = Joi.object({
   clientId: Joi.string().required(),
   type: Joi.string()
     .valid(...Object.values(ProjectType))
@@ -12,7 +12,7 @@ export const ProjectRequestBodySchema = Joi.object({
   endDate: Joi.date().required()
 });
 
-export type ProjectRequestBody = {
+export type AddProjectRequestBody = {
   client: {
     id?: string;
     name?: string;

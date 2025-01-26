@@ -1,35 +1,34 @@
 import { db } from '@packages/lib/prisma/client';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { AddClientRequestBody, AddClientRequestBodySchema } from './types';
+import { UpdateClientRequestBody, UpdateClientRequestBodySchema } from './types';
 
-export async function POST(request: Request) {
+export async function PUT(request: Request) {
   const currentUser = await getCurrentUser();
-  const requestBody: AddClientRequestBody = await request.json();
+  const requestBody: UpdateClientRequestBody = await request.json();
 
   if (!currentUser) return handleUnauthorized();
 
-  const { error } = AddClientRequestBodySchema.validate(requestBody);
+  const { error } = UpdateClientRequestBodySchema.validate(requestBody);
   if (error) {
     return handleBadRequest({ message: error.message, err: error });
   }
 
   try {
-    const client = await db.client.create({
+    const client = await db.client.update({
+      where: { id: requestBody.id },
       data: {
-        userId: currentUser.id,
         name: requestBody.name,
-        email: requestBody.email || '',
-        phone: requestBody.phone || '',
-        isArchived: false
+        email: requestBody.email,
+        phone: requestBody.phone
       }
     });
 
     return handleSuccess({
       content: client,
-      message: 'Successfully Created Client'
+      message: 'Successfully Updated Client'
     });
   } catch (err) {
-    return handleError({ message: 'Failed to create client', err });
+    return handleError({ message: 'Failed to update client', err });
   }
 }

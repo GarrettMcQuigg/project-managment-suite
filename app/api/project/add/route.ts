@@ -1,13 +1,19 @@
 import { db } from '@packages/lib/prisma/client';
-import { handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
+import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { ProjectRequestBody } from './types';
+import { AddProjectRequestBody, AddProjectRequestBodySchema } from './types';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
-  const { client, project }: ProjectRequestBody = await request.json();
+  const { client, project }: AddProjectRequestBody = await request.json();
+  const requestBody = { client, project };
 
   if (!currentUser) return handleUnauthorized();
+  // TODO : Test this validation works
+  const { error } = AddProjectRequestBodySchema.validate(requestBody);
+  if (error) {
+    return handleBadRequest({ message: error.message, err: error });
+  }
 
   try {
     const result = await db.$transaction(async (tx) => {

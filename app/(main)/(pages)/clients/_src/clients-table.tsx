@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
 import { ClientDialog, ClientFormValues } from '@/app/(main)/_src/client-dialog';
 import { toast } from 'react-toastify';
-import { ClientRequestBody } from '@/app/api/client/add/types';
+import { AddClientRequestBody } from '@/app/api/client/add/types';
 import { DialogTriggerButton } from '@/packages/lib/components/dialog';
 
 export default function ClientsTable() {
@@ -48,7 +48,7 @@ export default function ClientsTable() {
   const handleClientSubmit = async (clientData: ClientFormValues) => {
     setLoading(true);
     try {
-      const requestBody: ClientRequestBody = {
+      const requestBody: AddClientRequestBody = {
         name: clientData.name,
         email: clientData.email,
         phone: clientData.phone
@@ -61,6 +61,7 @@ export default function ClientsTable() {
         return;
       }
 
+      revalidate();
       setIsOpen(false);
       toast.success('Project created successfully');
     } catch (error) {
@@ -84,7 +85,6 @@ export default function ClientsTable() {
         columns={columns}
         searchKey="name"
         addRow={
-          // <ClientDialog revalidate={revalidate}>
           <ClientDialog open={isOpen} onOpenChange={setIsOpen} onSubmit={handleClientSubmit}>
             <DialogTriggerButton>New Client</DialogTriggerButton>
           </ClientDialog>

@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const clientFormSchema = z.object({
   id: z.string().optional(),
@@ -45,6 +45,8 @@ type ClientDetailsDialogProps = {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: ClientFormValues) => void;
   onBack?: () => void;
+  defaultValues?: ClientFormValues;
+  mode?: 'create' | 'edit';
 };
 
 const NewClientForm = ({ form }: { form: any }) => (
@@ -93,7 +95,7 @@ const NewClientForm = ({ form }: { form: any }) => (
   </>
 );
 
-export function ClientDialog({ children, open, onOpenChange, onSubmit, onBack }: ClientDetailsDialogProps) {
+export function ClientDialog({ children, open, onOpenChange, onSubmit, onBack, defaultValues, mode = 'create' }: ClientDetailsDialogProps) {
   const [clientMode, setClientMode] = useState<'existing' | 'new'>('new');
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
@@ -103,6 +105,18 @@ export function ClientDialog({ children, open, onOpenChange, onSubmit, onBack }:
       phone: ''
     }
   });
+
+  useEffect(() => {
+    if (!open) {
+      form.reset(
+        defaultValues || {
+          name: '',
+          email: '',
+          phone: ''
+        }
+      );
+    }
+  }, [open, form, defaultValues]);
 
   const handleExistingClientSelect = (clientId: string) => {
     const selectedClient = clients.find((c) => c.id.toString() === clientId);
@@ -119,8 +133,8 @@ export function ClientDialog({ children, open, onOpenChange, onSubmit, onBack }:
 
       <DialogContent className="sm:max-w-[500px] bg-background backdrop-blur-xl bg-gradient-to-br from-purple-500/15 via-background/60 to-background/90">
         <DialogHeader>
-          <DialogTitle>Client Details</DialogTitle>
-          <DialogDescription>Enter information about a new client</DialogDescription>
+          <DialogTitle>{mode === 'edit' ? 'Edit Client' : 'Client Details'}</DialogTitle>
+          <DialogDescription>{mode === 'edit' ? 'Update client information' : 'Enter information about a new client'}</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -205,7 +219,7 @@ export function ClientDialog({ children, open, onOpenChange, onSubmit, onBack }:
                 </>
               ) : (
                 <Button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white">
-                  Create Client
+                  {mode === 'edit' ? 'Update Client' : 'Create Client'}
                 </Button>
               )}
             </DialogFooter>

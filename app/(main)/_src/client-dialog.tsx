@@ -9,11 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarFallback } from '@packages/lib/components/avatar';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 import { useEffect, useState } from 'react';
 
-const clientFormSchema = z.object({
+export const clientFormSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, 'Client name is required'),
   email: z.string().email('Invalid email address'),
@@ -49,7 +49,7 @@ type ClientDetailsDialogProps = {
   mode?: 'create' | 'edit';
 };
 
-const NewClientForm = ({ form }: { form: any }) => (
+const NewClientForm = ({ form }: { form: UseFormReturn<ClientFormValues> }) => (
   <>
     <FormField
       control={form.control}

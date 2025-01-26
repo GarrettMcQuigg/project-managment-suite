@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
 import { toast } from 'react-toastify';
-import { DialogTriggerButton } from '@/packages/lib/components/dialog';
 import { ProjectDialog, ProjectFormValues } from '@/app/(main)/_src/project-dialog';
 import { AddProjectRequestBody } from '@/app/api/project/add/types';
 import { Project } from '@prisma/client';
@@ -16,8 +15,6 @@ import { ClientDialog, ClientFormValues } from '@/app/(main)/_src/client-dialog'
 import { AddProjectButton } from './add-project';
 
 export default function ProjectsTable() {
-  const [loading, setLoading] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [projects, setProjects] = useState<ProjectWithMetadata[]>([]);
   const { data, isLoading } = useSWR(API_PROJECT_LIST_ROUTE, swrFetcher);
@@ -53,7 +50,6 @@ export default function ProjectsTable() {
   ];
 
   const handleClientSubmit = async (clientData: ClientFormValues) => {
-    setLoading(true);
     try {
       const requestBody: AddProjectRequestBody = {
         client: { ...clientData },
@@ -73,46 +69,12 @@ export default function ProjectsTable() {
     } catch (error) {
       console.error(error);
       toast.error('An error occurred');
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleProjectNext = (data: ProjectFormValues) => {
     setProjectData(data);
     setStep('client');
-  };
-
-  const handleProjectSubmit = async (projectData: ProjectFormValues) => {
-    setLoading(true);
-    try {
-      const requestBody: AddProjectRequestBody = {
-        project: {
-          name: projectData.name,
-          description: projectData.description,
-          type: projectData.type,
-          status: projectData.status,
-          startDate: projectData.startDate,
-          endDate: projectData.endDate
-        }
-      };
-
-      const response = await fetcher({ url: API_PROJECT_ADD_ROUTE, requestBody });
-
-      if (response.err) {
-        toast.error('Failed to create project');
-        return;
-      }
-
-      revalidate();
-      setIsOpen(false);
-      toast.success('Project created successfully');
-    } catch (error) {
-      console.error(error);
-      toast.error('An error occurred');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const revalidate = () => {

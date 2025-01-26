@@ -11,21 +11,14 @@ import { Skeleton } from '@/packages/lib/components/skeleton';
 import { ClientWithMetadata } from '@/packages/lib/prisma/types';
 import { redirect } from 'next/navigation';
 import { Pencil } from 'lucide-react';
-import { ClientDialog } from '@/app/(main)/_src/client-dialog';
+import { ClientDialog, clientFormSchema } from '@/app/(main)/_src/client-dialog';
 import { UpdateClientRequestBody } from '@/app/api/client/update/types';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { DeleteClientButton } from './delete-client';
 
-const FormSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(1, 'Phone number is required')
-});
-
 export function ClientInfo({ clientId }: { clientId: string }) {
-  const [loading, setLoading] = useState(false);
   const endpoint = API_CLIENT_GET_BY_ID_ROUTE + clientId;
   const { data, error, isLoading } = useSWR(endpoint, swrFetcher);
   const [client, setClient] = useState<ClientWithMetadata | null>(null);
@@ -44,7 +37,7 @@ export function ClientInfo({ clientId }: { clientId: string }) {
     }
   }, [data, error]);
 
-  const handleEditSubmit = async (data: z.infer<typeof FormSchema>) => {
+  const handleEditSubmit = async (data: z.infer<typeof clientFormSchema>) => {
     try {
       const requestBody: UpdateClientRequestBody = {
         id: client!.id,
@@ -66,8 +59,6 @@ export function ClientInfo({ clientId }: { clientId: string }) {
     } catch (error) {
       console.error(error);
       toast.error('An error occurred');
-    } finally {
-      setLoading(false);
     }
   };
 

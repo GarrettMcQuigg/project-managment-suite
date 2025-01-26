@@ -1,7 +1,6 @@
 import { Breadcrumb } from '@/packages/lib/components/breadcrumb';
 import { ClientInfo } from './_src/client-info';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { ArrowLeft } from 'lucide-react';
 import { unauthorized } from 'next/navigation';
 import { CLIENTS_ROUTE } from '@/packages/lib/routes';
 

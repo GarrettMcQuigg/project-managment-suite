@@ -13,8 +13,6 @@ import { AddClientRequestBody } from '@/app/api/client/add/types';
 import { DialogTriggerButton } from '@/packages/lib/components/dialog';
 
 export default function ClientsTable() {
-  const [loading, setLoading] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [clients, setClients] = useState<ClientWithMetadata[]>([]);
   const { data, isLoading } = useSWR(API_CLIENT_LIST_ROUTE, swrFetcher);
@@ -46,7 +44,6 @@ export default function ClientsTable() {
   ];
 
   const handleClientSubmit = async (clientData: ClientFormValues) => {
-    setLoading(true);
     try {
       const requestBody: AddClientRequestBody = {
         name: clientData.name,
@@ -67,8 +64,6 @@ export default function ClientsTable() {
     } catch (error) {
       console.error(error);
       toast.error('An error occurred');
-    } finally {
-      setLoading(false);
     }
   };
 

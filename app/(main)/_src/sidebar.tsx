@@ -2,7 +2,7 @@
 
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { LayoutDashboard, FolderKanban, Users, BarChart, Clock, MessageSquare, FileText } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Users } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,

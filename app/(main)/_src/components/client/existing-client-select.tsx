@@ -31,7 +31,7 @@ export const ExistingClientSelect = ({ form, onSelect }: ExistingClientSelectPro
                     <AvatarFallback>
                       {client.name
                         .split(' ')
-                        .map((chunk: any) => chunk[0])
+                        .map((chunk) => chunk[0])
                         .join('')}
                     </AvatarFallback>
                   </Avatar>

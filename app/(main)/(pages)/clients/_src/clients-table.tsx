@@ -7,10 +7,11 @@ import { API_CLIENT_ADD_ROUTE, API_CLIENT_LIST_ROUTE, CLIENT_DETAILS_ROUTE, rout
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
-import { ClientDialog, ClientFormValues } from '@/app/(main)/_src/client-dialog';
+import { ClientDialog } from '@/app/(main)/_src/client-dialog';
 import { toast } from 'react-toastify';
 import { AddClientRequestBody } from '@/app/api/client/add/types';
 import { DialogTriggerButton } from '@/packages/lib/components/dialog';
+import { ClientFormValues } from '@/app/(main)/_src/components/client/types';
 
 export default function ClientsTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -80,9 +81,10 @@ export default function ClientsTable() {
         columns={columns}
         searchKey="name"
         addRow={
-          <ClientDialog open={isOpen} onOpenChange={setIsOpen} onSubmit={handleClientSubmit}>
-            <DialogTriggerButton>New Client</DialogTriggerButton>
-          </ClientDialog>
+          <>
+            <DialogTriggerButton onClick={() => setIsOpen(true)}>New Client</DialogTriggerButton>
+            <ClientDialog open={isOpen} onOpenChange={setIsOpen} onSubmit={handleClientSubmit} />
+          </>
         }
       />
     </>

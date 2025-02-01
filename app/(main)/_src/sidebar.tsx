@@ -20,9 +20,11 @@ import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
 import { AddProjectRequestBody } from '@/app/api/project/add/types';
 import { API_PROJECT_ADD_ROUTE, CLIENTS_ROUTE, DASHBOARD_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
-import { ClientDialog, ClientFormValues } from './client-dialog';
-import { ProjectFormValues, ProjectDialog } from './project-dialog';
+import { ClientDialog } from './client-dialog';
+import { ProjectDialog } from './project-dialog';
 import Link from 'next/link';
+import { ClientFormValues } from './components/client/types';
+import { ProjectFormValues } from './components/project/types';
 
 export type AddAddProjectRequestBody = {
   name: string;

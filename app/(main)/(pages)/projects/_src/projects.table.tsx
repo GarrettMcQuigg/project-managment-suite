@@ -8,11 +8,13 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
 import { toast } from 'react-toastify';
-import { ProjectDialog, ProjectFormValues } from '@/app/(main)/_src/project-dialog';
+import { ProjectDialog } from '@/app/(main)/_src/project-dialog';
 import { AddProjectRequestBody } from '@/app/api/project/add/types';
 import { Project } from '@prisma/client';
-import { ClientDialog, ClientFormValues } from '@/app/(main)/_src/client-dialog';
+import { ClientDialog } from '@/app/(main)/_src/client-dialog';
 import { AddProjectButton } from './add-project';
+import { ClientFormValues } from '@/app/(main)/_src/components/client/types';
+import { ProjectFormValues } from '@/app/(main)/_src/components/project/types';
 
 export default function ProjectsTable() {
   const [isOpen, setIsOpen] = useState(false);

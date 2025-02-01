@@ -11,12 +11,13 @@ import { Skeleton } from '@/packages/lib/components/skeleton';
 import { ClientWithMetadata } from '@/packages/lib/prisma/types';
 import { redirect } from 'next/navigation';
 import { Pencil } from 'lucide-react';
-import { ClientDialog, clientFormSchema } from '@/app/(main)/_src/client-dialog';
+import { ClientDialog } from '@/app/(main)/_src/client-dialog';
 import { UpdateClientRequestBody } from '@/app/api/client/update/types';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { DeleteClientButton } from './delete-client';
+import { clientFormSchema } from '@/app/(main)/_src/components/client/types';
 
 export function ClientInfo({ clientId }: { clientId: string }) {
   const endpoint = API_CLIENT_GET_BY_ID_ROUTE + clientId;

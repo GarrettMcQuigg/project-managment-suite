@@ -22,53 +22,53 @@ export function CommandPalette() {
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Search your creative universe..." />
       {/* <CommandInput /> */}
-      <CommandList className="border-purple-500/20">
+      <CommandList className="border-foreground/20">
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Creative Projects">
           <CommandItem>
-            <PenTool className="mr-2 h-4 w-4 text-purple-400" />
+            <PenTool className="mr-2 h-4 w-4 text-foreground" />
             <span>Illustration Projects</span>
           </CommandItem>
           <CommandItem>
-            <Camera className="mr-2 h-4 w-4 text-purple-400" />
+            <Camera className="mr-2 h-4 w-4 text-foreground" />
             <span>Photography Sessions</span>
           </CommandItem>
           <CommandItem>
-            <Video className="mr-2 h-4 w-4 text-purple-400" />
+            <Video className="mr-2 h-4 w-4 text-foreground" />
             <span>Video Productions</span>
           </CommandItem>
           <CommandItem>
-            <Code className="mr-2 h-4 w-4 text-purple-400" />
+            <Code className="mr-2 h-4 w-4 text-foreground" />
             <span>Web Development</span>
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Quick Actions">
           <CommandItem>
-            <Layout className="mr-2 h-4 w-4 text-purple-400" />
+            <Layout className="mr-2 h-4 w-4 text-foreground" />
             <span>New Project Board</span>
           </CommandItem>
           <CommandItem>
-            <MessageSquare className="mr-2 h-4 w-4 text-purple-400" />
+            <MessageSquare className="mr-2 h-4 w-4 text-foreground" />
             <span>Client Messages</span>
           </CommandItem>
           <CommandItem>
-            <Clock className="mr-2 h-4 w-4 text-purple-400" />
+            <Clock className="mr-2 h-4 w-4 text-foreground" />
             <span>Time Tracking</span>
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Resources">
           <CommandItem>
-            <ImageIcon className="mr-2 h-4 w-4 text-purple-400" />
+            <ImageIcon className="mr-2 h-4 w-4 text-foreground" />
             <span>Asset Library</span>
           </CommandItem>
           <CommandItem>
-            <Users className="mr-2 h-4 w-4 text-purple-400" />
+            <Users className="mr-2 h-4 w-4 text-foreground" />
             <span>Client Portal</span>
           </CommandItem>
           <CommandItem>
-            <FileText className="mr-2 h-4 w-4 text-purple-400" />
+            <FileText className="mr-2 h-4 w-4 text-foreground" />
             <span>Contracts</span>
           </CommandItem>
         </CommandGroup>

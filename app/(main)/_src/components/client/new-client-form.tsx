@@ -11,7 +11,7 @@ export const NewClientForm = ({ form }: NewClientFormProps) => (
         <FormItem>
           <FormLabel>Client name</FormLabel>
           <FormControl>
-            <Input {...field} className="border-purple-500/20" placeholder="John Smith" />
+            <Input {...field} className="border-foreground/20" placeholder="John Smith" />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -24,7 +24,7 @@ export const NewClientForm = ({ form }: NewClientFormProps) => (
         <FormItem>
           <FormLabel>Email</FormLabel>
           <FormControl>
-            <Input {...field} type="email" className="border-purple-500/20" placeholder="johnsmith@gmail.com" />
+            <Input {...field} type="email" className="border-foreground/20" placeholder="johnsmith@gmail.com" />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -37,7 +37,7 @@ export const NewClientForm = ({ form }: NewClientFormProps) => (
         <FormItem>
           <FormLabel>Phone</FormLabel>
           <FormControl>
-            <Input {...field} type="tel" className="border-purple-500/20" placeholder="(123) 456-7890" />
+            <Input {...field} type="tel" className="border-foreground/20" placeholder="(123) 456-7890" />
           </FormControl>
           <FormMessage />
         </FormItem>

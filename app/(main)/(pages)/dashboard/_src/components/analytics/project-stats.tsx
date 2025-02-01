@@ -30,7 +30,7 @@ const projects = [
 
 export function ProjectStats({ className }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <Card className={`border-purple-500/20 bg-gradient-to-r from-purple-500/4 via-background to-background ${className}`}>
+    <Card className={`border-foreground/20 bg-gradient-to-r from-foreground/4 via-background to-background ${className}`}>
       <CardHeader>
         <CardTitle>Active Projects</CardTitle>
         <CardDescription>Track your ongoing project progress</CardDescription>
@@ -43,15 +43,15 @@ export function ProjectStats({ className }: React.HTMLAttributes<HTMLDivElement>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="font-semibold">{project.name}</h4>
-                    <span className="rounded-full bg-purple-500/10 px-2 py-0.5 text-xs text-purple-400">{project.category}</span>
+                    <span className="rounded-full bg-foreground/10 px-2 py-0.5 text-xs text-foreground">{project.category}</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <p className="text-sm text-muted-foreground">Due {project.dueDate}</p>
-                    <p className="text-sm text-purple-400">{project.progress}% Complete</p>
+                    <p className="text-sm text-foreground">{project.progress}% Complete</p>
                   </div>
                 </div>
               </div>
-              <Progress value={project.progress} className="h-2 bg-purple-500" />
+              <Progress value={project.progress} className="h-2 bg-foreground" />
             </div>
           ))}
         </div>

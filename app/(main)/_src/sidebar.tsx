@@ -84,8 +84,8 @@ export function AppSidebar() {
 
   return (
     <SidebarProvider>
-      <Sidebar className="border-r border-purple-500/20 bg-gradient-to-br from-purple-500/10 via-background to-background">
-        <SidebarHeader className="border-b border-purple-500/20 p-4 h-header">
+      <Sidebar className="border-r border-foreground/20 bg-gradient-to-br from-foreground/10 via-background to-background">
+        <SidebarHeader className="border-b border-foreground/20 p-4 h-header">
           <Button
             onClick={() => setIsOpen(true)}
             disabled={loading}
@@ -102,7 +102,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 <Link href={DASHBOARD_ROUTE}>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-purple-500/20 hover:text-foreground">
+                    <SidebarMenuButton className="hover:bg-foreground/20 hover:text-foreground">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
                       Dashboard
                     </SidebarMenuButton>
@@ -110,7 +110,7 @@ export function AppSidebar() {
                 </Link>
                 <Link href={PROJECTS_ROUTE}>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-purple-500/20 hover:text-foreground">
+                    <SidebarMenuButton className="hover:bg-foreground/20 hover:text-foreground">
                       <FolderKanban className="mr-2 h-4 w-4" />
                       Projects
                     </SidebarMenuButton>
@@ -118,7 +118,7 @@ export function AppSidebar() {
                 </Link>
                 <Link href={CLIENTS_ROUTE}>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-purple-500/20 hover:text-foreground">
+                    <SidebarMenuButton className="hover:bg-foreground/20 hover:text-foreground">
                       <Users className="mr-2 h-4 w-4" />
                       Clients
                     </SidebarMenuButton>
@@ -132,25 +132,25 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
+                  <SidebarMenuButton className="hover:bg-foreground/10 hover:text-foreground">
                     <BarChart className="mr-2 h-4 w-4" />
                     Analytics
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
+                  <SidebarMenuButton className="hover:bg-foreground/10 hover:text-foreground">
                     <Clock className="mr-2 h-4 w-4" />
                     Time Tracking
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
+                  <SidebarMenuButton className="hover:bg-foreground/10 hover:text-foreground">
                     <MessageSquare className="mr-2 h-4 w-4" />
                     Messages
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-purple-500/10 hover:text-purple-400">
+                  <SidebarMenuButton className="hover:bg-foreground/10 hover:text-foreground">
                     <FileText className="mr-2 h-4 w-4" />
                     Documents
                   </SidebarMenuButton>

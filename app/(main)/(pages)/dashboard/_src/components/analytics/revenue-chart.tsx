@@ -14,7 +14,7 @@ const data = [
 
 export function RevenueChart({ className }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <Card className={`border-purple-500/20 bg-gradient-to-bl from-purple-500/4 via-background to-background ${className}`}>
+    <Card className={`border-foreground/20 bg-gradient-to-bl from-foreground/4 via-background to-background ${className}`}>
       <CardHeader>
         <CardTitle>Revenue Over Time</CardTitle>
         <CardDescription>Monthly revenue from all creative projects</CardDescription>

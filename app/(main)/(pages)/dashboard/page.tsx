@@ -5,7 +5,7 @@ import { RevenueChart } from './_src/components/analytics/revenue-chart';
 
 export default function DashboardPage() {
   return (
-    <div className="flex min-h-screen-minus-header bg-gradient-to-br from-purple-500/10 via-background to-background">
+    <div className="flex min-h-screen-minus-header bg-gradient-to-br from-foreground/5 via-background to-background">
       <div className="flex min-h-screen-minus-header">
         <main className="space-y-8 p-8 pt-6">
           <div className="flex items-center justify-between space-y-2">

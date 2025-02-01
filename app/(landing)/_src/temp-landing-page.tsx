@@ -57,14 +57,14 @@ function HeroSection() {
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Button className="bg-purple-600 text-white hover:bg-purple-700">Get Started</Button>
+              <Button className="bg-primary/70 text-white hover:bg-primary/90">Get Started</Button>
               <Button variant="outline">Watch Demo</Button>
             </div>
           </div>
           <div className="relative w-[600px] h-[400px] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
             <div className="absolute inset-0">
               <Image src="/images/landing/landing-page-stock-img.jpg" fill priority alt="Background" className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-violet-900/30 to-violet-900/20" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5" />
             </div>
           </div>
         </div>
@@ -81,21 +81,21 @@ function AppShowcaseSection() {
         <div className="grid gap-6 lg:grid-cols-3">
           <Card>
             <CardContent className="flex flex-col items-center space-y-2 p-6">
-              <Zap className="h-12 w-12 text-purple-500" />
+              <Zap className="h-12 w-12 text-foreground" />
               <h3 className="text-xl font-bold">Intuitive Interface</h3>
               <p className="text-center text-gray-500 dark:text-gray-400">Designed with creatives in mind, our interface is as beautiful as it is functional.</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="flex flex-col items-center space-y-2 p-6">
-              <Users className="h-12 w-12 text-purple-500" />
+              <Users className="h-12 w-12 text-foreground" />
               <h3 className="text-xl font-bold">Client Management</h3>
               <p className="text-center text-gray-500 dark:text-gray-400">Keep track of clients, projects, and communications all in one place.</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="flex flex-col items-center space-y-2 p-6">
-              <Calendar className="h-12 w-12 text-purple-500" />
+              <Calendar className="h-12 w-12 text-foreground" />
               <h3 className="text-xl font-bold">Project Timelines</h3>
               <p className="text-center text-gray-500 dark:text-gray-400">Visualize project timelines and never miss a deadline again.</p>
             </CardContent>

@@ -4,11 +4,11 @@ import { Clock, DollarSign, FolderKanban, MessageSquare, Star, Users } from 'luc
 export function OverviewCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-      <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/8 to-background">
+      <Card className="border-foreground/20 bg-gradient-to-br from-foreground/8 to-background">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-purple-500/10">
-              <DollarSign className="size-6 text-purple-400" />
+            <div className="flex size-12 items-center justify-center rounded-xl bg-foreground/10">
+              <DollarSign className="size-6 text-foreground" />
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Monthly Revenue</p>
@@ -23,11 +23,11 @@ export function OverviewCards() {
           </div>
         </CardContent>
       </Card>
-      <Card className="border-purple-500/20 bg-gradient-to-br from-background to-purple-500/5">
+      <Card className="border-foreground/20 bg-gradient-to-br from-background to-foreground/5">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-purple-500/10">
-              <Users className="size-6 text-purple-400" />
+            <div className="flex size-12 items-center justify-center rounded-xl bg-foreground/10">
+              <Users className="size-6 text-foreground" />
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Active Clients</p>
@@ -42,11 +42,11 @@ export function OverviewCards() {
           </div>
         </CardContent>
       </Card>
-      <Card className="border-purple-500/20 bg-gradient-to-br from-background to-purple-500/5">
+      <Card className="border-foreground/20 bg-gradient-to-br from-background to-foreground/5">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-purple-500/10">
-              <FolderKanban className="size-6 text-purple-400" />
+            <div className="flex size-12 items-center justify-center rounded-xl bg-foreground/10">
+              <FolderKanban className="size-6 text-foreground" />
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Active Projects</p>
@@ -61,11 +61,11 @@ export function OverviewCards() {
           </div>
         </CardContent>
       </Card>
-      <Card className="border-purple-500/20 bg-[linear-gradient(135deg,theme(colors.purple.500/0.06),transparent_50%),radial-gradient(70%_60%_at_50%_60%,theme(colors.purple.500/0.06),transparent)]">
+      <Card className="border-foreground/20 bg-[linear-gradient(135deg,theme(colors.purple.500/0.06),transparent_50%),radial-gradient(70%_60%_at_50%_60%,theme(colors.purple.500/0.06),transparent)]">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-purple-500/10">
-              <Clock className="size-6 text-purple-400" />
+            <div className="flex size-12 items-center justify-center rounded-xl bg-foreground/10">
+              <Clock className="size-6 text-foreground" />
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Hours Tracked</p>
@@ -80,11 +80,11 @@ export function OverviewCards() {
           </div>
         </CardContent>
       </Card>
-      <Card className="border-purple-500/20 bg-gradient-to-br from-background to-purple-500/5">
+      <Card className="border-foreground/20 bg-gradient-to-br from-background to-foreground/5">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-purple-500/10">
-              <MessageSquare className="size-6 text-purple-400" />
+            <div className="flex size-12 items-center justify-center rounded-xl bg-foreground/10">
+              <MessageSquare className="size-6 text-foreground" />
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Client Messages</p>

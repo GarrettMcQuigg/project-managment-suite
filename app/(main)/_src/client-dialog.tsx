@@ -91,7 +91,7 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
   if (mode === 'edit') {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-purple-500/10 via-background to-background">
+        <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-foreground/10 via-background to-background">
           <DialogHeader>
             <DialogTitle>Client Details</DialogTitle>
             <DialogDescription>Review or update client information</DialogDescription>
@@ -104,11 +104,11 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
                   <ClientCard client={defaultValues} form={form} onEdit={toggleEdit} isEditing={isEditing} />
 
                   <div className="flex gap-2">
-                    <Button type="button" variant="outline" className="w-full border-purple-500/20" onClick={() => setView('select')}>
+                    <Button type="button" variant="outline" className="w-full border-foreground/20" onClick={() => setView('select')}>
                       <Users className="w-4 h-4 mr-2" />
                       Change Client
                     </Button>
-                    <Button type="button" variant="outline" className="w-full border-purple-500/20" onClick={() => setView('new')}>
+                    <Button type="button" variant="outline" className="w-full border-foreground/20" onClick={() => setView('new')}>
                       <UserPlus className="w-4 h-4 mr-2" />
                       Create New
                     </Button>
@@ -119,7 +119,7 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
               {view === 'select' && (
                 <div className="space-y-4">
                   <ExistingClientSelect form={form} onSelect={handleClientSelect} />
-                  <Button type="button" variant="outline" className="w-full border-purple-500/20" onClick={() => setView('view')}>
+                  <Button type="button" variant="outline" className="w-full border-foreground/20" onClick={() => setView('view')}>
                     Cancel
                   </Button>
                 </div>
@@ -128,7 +128,7 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
               {view === 'new' && (
                 <div className="space-y-4">
                   <NewClientForm form={form} />
-                  <Button type="button" variant="outline" className="w-full border-purple-500/20" onClick={() => setView('view')}>
+                  <Button type="button" variant="outline" className="w-full border-foreground/20" onClick={() => setView('view')}>
                     Cancel
                   </Button>
                 </div>
@@ -137,14 +137,14 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
               <DialogFooter className="flex w-full items-center">
                 <div className="flex w-full justify-between gap-2">
                   {onBack && (
-                    <Button type="button" variant="ghost" onClick={onBack} className="border-purple-500/20">
+                    <Button type="button" variant="ghost" onClick={onBack} className="border-foreground/20">
                       <ArrowLeft className="w-4 h-4 mr-2" />
                       Back to Project
                     </Button>
                   )}
 
                   {!isEditing && (
-                    <Button type="submit" variant="ghost" className="text-purple-600 hover:text-purple-700 border-purple-500">
+                    <Button type="submit" variant="ghost" className="text-foreground hover:text-foreground border-foreground">
                       Update Project
                     </Button>
                   )}
@@ -159,7 +159,7 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-purple-500/10 via-background to-background">
+      <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-foreground/10 via-background to-background">
         <DialogHeader>
           <DialogTitle>Client Details</DialogTitle>
           <DialogDescription>Select an existing client or create a new one</DialogDescription>
@@ -185,13 +185,13 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
             <DialogFooter className="flex w-full items-center">
               <div className="flex w-full justify-between gap-2">
                 {onBack && (
-                  <Button type="button" variant="ghost" onClick={onBack} className="border-purple-500/20">
+                  <Button type="button" variant="ghost" onClick={onBack} className="border-foreground/20">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Project
                   </Button>
                 )}
 
-                <Button type="submit" variant="ghost" className="bg-purple-600 hover:bg-purple-700 text-white">
+                <Button type="submit" variant="ghost" className="bg-foreground hover:bg-foreground text-white">
                   Create Project
                 </Button>
               </div>

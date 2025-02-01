@@ -34,7 +34,7 @@ const engagements = [
 
 export function ClientEngagement({ className }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <Card className={`border-purple-500/20 bg-gradient-to-tl from-purple-500/4 via-background to-background ${className}`}>
+    <Card className={`border-foreground/20 bg-gradient-to-tl from-foreground/4 via-background to-background ${className}`}>
       <CardHeader>
         <CardTitle>Client Engagement</CardTitle>
         <CardDescription>Recent client interactions and project status</CardDescription>
@@ -53,7 +53,7 @@ export function ClientEngagement({ className }: React.HTMLAttributes<HTMLDivElem
               </div>
               <div className="ml-auto font-medium">
                 <p className="text-sm text-muted-foreground">Last Contact: {item.lastContact}</p>
-                <p className={`text-sm ${item.status === 'Completed' ? 'text-green-500' : 'text-purple-400'}`}>{item.status}</p>
+                <p className={`text-sm ${item.status === 'Completed' ? 'text-green-500' : 'text-foreground'}`}>{item.status}</p>
               </div>
             </div>
           ))}

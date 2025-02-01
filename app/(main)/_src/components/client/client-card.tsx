@@ -15,14 +15,14 @@ export const ClientCard = ({ client, form, onEdit, isEditing }: ClientCardProps)
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
       <Card
-        className={cn('bg-gradient-to-b from-purple-50 to-purple-100', 'dark:bg-gradient-to-br dark:from-purple-900/30 dark:via-purle-900/30 dark:to-transparent ')}
+        className={cn('bg-gradient-to-b from-foreground to-foreground', 'dark:bg-gradient-to-br dark:from-foreground/30 dark:via-purle-900/30 dark:to-transparent ')}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         <CardContent className="p-6">
           <div className="flex items-start gap-6">
-            <Avatar className="w-16 h-16 border-2 border-purple-200 dark:border-purple-700">
-              <AvatarFallback className="text-xl font-semibold bg-purple-200 text-purple-700 dark:bg-purple-700 dark:text-purple-200">
+            <Avatar className="w-16 h-16 border-2 border-foreground dark:border-foreground">
+              <AvatarFallback className="text-xl font-semibold bg-foreground text-foreground dark:bg-foreground dark:text-foreground">
                 {client.name
                   .split(' ')
                   .map((chunk) => chunk[0])
@@ -39,7 +39,7 @@ export const ClientCard = ({ client, form, onEdit, isEditing }: ClientCardProps)
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input {...field} className="text-lg font-semibold border-purple-300 dark:border-purple-600" />
+                            <Input {...field} className="text-lg font-semibold border-foreground dark:border-foreground" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -51,7 +51,7 @@ export const ClientCard = ({ client, form, onEdit, isEditing }: ClientCardProps)
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input {...field} type="email" className="border-purple-300 dark:border-purple-600" />
+                            <Input {...field} type="email" className="border-foreground dark:border-foreground" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -63,7 +63,7 @@ export const ClientCard = ({ client, form, onEdit, isEditing }: ClientCardProps)
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input {...field} type="tel" className="border-purple-300 dark:border-purple-600" />
+                            <Input {...field} type="tel" className="border-foreground dark:border-foreground" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -74,7 +74,7 @@ export const ClientCard = ({ client, form, onEdit, isEditing }: ClientCardProps)
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="border-purple-300 dark:border-purple-600"
+                        className="border-foreground dark:border-foreground"
                         onClick={() => {
                           form.reset(client);
                           onEdit();
@@ -82,7 +82,7 @@ export const ClientCard = ({ client, form, onEdit, isEditing }: ClientCardProps)
                       >
                         Cancel
                       </Button>
-                      <Button type="submit" size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
+                      <Button type="submit" size="sm" className="bg-foreground hover:bg-foreground text-white">
                         Save
                       </Button>
                     </div>
@@ -91,12 +91,12 @@ export const ClientCard = ({ client, form, onEdit, isEditing }: ClientCardProps)
               ) : (
                 <>
                   <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-2xl text-purple-800 dark:text-purple-200">{client.name}</h3>
-                    <Button type="button" variant="ghost" size="icon" className="hover:bg-purple-200/50 dark:hover:bg-purple-700/50" onClick={() => onEdit()}>
-                      <Pencil className={cn('w-4 h-4', isHovered ? 'text-purple-600 dark:text-purple-300' : 'text-purple-400 dark:text-purple-500')} />
+                    <h3 className="font-semibold text-2xl text-foreground dark:text-foreground">{client.name}</h3>
+                    <Button type="button" variant="ghost" size="icon" className="hover:bg-foreground/50 dark:hover:bg-foreground/50" onClick={() => onEdit()}>
+                      <Pencil className={cn('w-4 h-4', isHovered ? 'text-foreground dark:text-foreground' : 'text-foreground dark:text-foreground')} />
                     </Button>
                   </div>
-                  <div className="text-sm text-purple-600 dark:text-purple-300 space-y-2">
+                  <div className="text-sm text-foreground dark:text-foreground space-y-2">
                     <p className="flex items-center gap-2">
                       <Mail className="w-4 h-4" />
                       {client.email}

@@ -46,7 +46,7 @@ export function ProjectDialog({ open, onOpenChange, onNext, mode = 'create', def
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-purple-500/10 via-background to-background">
+      <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-foreground/10 via-background to-background">
         <DialogHeader>
           <DialogTitle>{mode === 'edit' ? 'Edit Project' : 'Create New Project'}</DialogTitle>
           <DialogDescription>
@@ -63,7 +63,7 @@ export function ProjectDialog({ open, onOpenChange, onNext, mode = 'create', def
                   <FormLabel>Project Type</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className="border-purple-500/20 py-7">
+                      <SelectTrigger className="border-foreground/20 py-7">
                         <SelectValue placeholder="Select project type..." />
                       </SelectTrigger>
                     </FormControl>
@@ -90,7 +90,7 @@ export function ProjectDialog({ open, onOpenChange, onNext, mode = 'create', def
                 <FormItem>
                   <FormLabel>Project Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter project name" className="border-purple-500/20" {...field} />
+                    <Input placeholder="Enter project name" className="border-foreground/20" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -104,7 +104,7 @@ export function ProjectDialog({ open, onOpenChange, onNext, mode = 'create', def
                 <FormItem>
                   <FormLabel>Project Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Describe your project" className="border-purple-500/20 resize-none" {...field} />
+                    <Textarea placeholder="Describe your project" className="border-foreground/20 resize-none" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -121,7 +121,7 @@ export function ProjectDialog({ open, onOpenChange, onNext, mode = 'create', def
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
-                          <Button variant={'outline'} className={cn('justify-start text-left font-normal border-purple-500/20', !field.value && 'text-muted-foreground')}>
+                          <Button variant={'outline'} className={cn('justify-start text-left font-normal border-foreground/20', !field.value && 'text-muted-foreground')}>
                             <CalendarIcon className="mr-2 size-4" />
                             {field.value ? field.value.toLocaleDateString() : 'Pick a date'}
                           </Button>
@@ -145,7 +145,7 @@ export function ProjectDialog({ open, onOpenChange, onNext, mode = 'create', def
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
-                          <Button variant={'outline'} className={cn('justify-start text-left font-normal border-purple-500/20', !field.value && 'text-muted-foreground')}>
+                          <Button variant={'outline'} className={cn('justify-start text-left font-normal border-foreground/20', !field.value && 'text-muted-foreground')}>
                             <CalendarIcon className="mr-2 size-4" />
                             {field.value ? field.value.toLocaleDateString() : 'Pick a date'}
                           </Button>
@@ -162,7 +162,7 @@ export function ProjectDialog({ open, onOpenChange, onNext, mode = 'create', def
             </div>
 
             <DialogFooter className="flex justify-between">
-              <Button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white ml-auto flex items-center gap-2">
+              <Button type="submit" className="bg-foreground hover:bg-foreground text-white ml-auto flex items-center gap-2">
                 Client Details
                 <ArrowRight className="w-4 h-4" />
               </Button>

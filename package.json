@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "turbo-build": "turbo run build",
     "start": "next start",
     "lint": "next lint --dir . --max-warnings 0",
     "lint:all": "eslint . --ext .ts,.tsx --max-warnings 9999",

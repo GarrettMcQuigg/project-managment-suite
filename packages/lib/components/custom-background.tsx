@@ -1,10 +1,25 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 
 export default function CustomBackground() {
   const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Return empty div with same classes during SSR and mounting
+  if (!mounted) {
+    return (
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-0 h-full w-full fill-[#f5f8fa] dark:fill-[#010305]" />
+      </div>
+    );
+  }
+
   const isDark = theme === 'dark';
 
   return (

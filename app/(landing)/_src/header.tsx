@@ -5,9 +5,15 @@ import { MoonIcon, Palette, Rocket, SunIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { User } from '@prisma/client';
+import { useEffect, useState } from 'react';
 
 export default function LandingHeader({ currentUser }: { currentUser: User | null }) {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50">
@@ -38,15 +44,22 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
             <span>{currentUser ? 'Launch App' : 'Sign In'}</span> <Rocket className="h-4 w-4" />
           </Link>
 
-          <div className="bg-transparent cursor-pointer" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-            <div className="transition-all duration-200 hover:scale-110">
-              {theme === 'dark' ? (
-                <MoonIcon className="h-5 w-5 text-white hover:text-gray-200 transition-colors duration-200" aria-hidden="true" />
-              ) : (
-                <SunIcon className="h-5 w-5 text-black hover:text-gray-800 transition-colors duration-200" aria-hidden="true" />
-              )}
-            </div>
-          </div>
+          {mounted && (
+            <button
+              type="button"
+              className="bg-transparent cursor-pointer"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              <div className="transition-all duration-200 hover:scale-110">
+                {theme === 'dark' ? (
+                  <MoonIcon className="h-5 w-5 text-white hover:text-gray-200 transition-colors duration-200" aria-hidden="true" />
+                ) : (
+                  <SunIcon className="h-5 w-5 text-black hover:text-gray-800 transition-colors duration-200" aria-hidden="true" />
+                )}
+              </div>
+            </button>
+          )}
         </div>
       </div>
     </header>

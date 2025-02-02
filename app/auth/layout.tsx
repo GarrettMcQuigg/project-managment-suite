@@ -1,4 +1,4 @@
-import CustomBackground from '@/packages/lib/components/custom-background';
+// import CustomBackground from '@/packages/lib/components/custom-background';
 import { DASHBOARD_ROUTE } from '@/packages/lib/routes';
 import { getCurrentUser } from '@packages/lib/helpers/get-current-user';
 import { redirect } from 'next/navigation';
@@ -12,7 +12,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
 
   return (
     <>
-      <CustomBackground />
+      {/* <CustomBackground /> */}
 
       <div className="w-full -mt-16">{children}</div>
     </>

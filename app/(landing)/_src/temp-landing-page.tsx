@@ -3,7 +3,7 @@
 // import Image from 'next/image';
 import Link from 'next/link';
 import { Zap, Users, Calendar } from 'lucide-react';
-import CustomBackground from '@/packages/lib/components/custom-background';
+// import CustomBackground from '@/packages/lib/components/custom-background';
 import { Card, CardContent } from '@/packages/lib/components/card';
 import { Button } from '@/packages/lib/components/button';
 import { Input } from '@/packages/lib/components/input';
@@ -21,7 +21,7 @@ export default function LandingPage({ currentUser }: { currentUser: User | null 
 
   return (
     <div className="relative flex flex-col min-h-screen">
-      <CustomBackground />
+      {/* <CustomBackground /> */}
       <LandingHeader currentUser={currentUser} />
       <main className="relative z-10 flex-1">
         <HeroSection />

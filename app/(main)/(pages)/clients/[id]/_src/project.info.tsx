@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, CardHeader, CardTitle, CardContent } from '@/packages/lib/components/card';
 import { Project } from '@prisma/client';
 import { Badge } from 'lucide-react';

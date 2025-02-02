@@ -1,3 +1,5 @@
+'use client';
+
 import { ArrowRight, CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/packages/lib/components/calendar';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';

@@ -1,3 +1,5 @@
+'use client';
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
 import { Input } from '@/packages/lib/components/input';
 import type { NewClientFormProps } from './types';

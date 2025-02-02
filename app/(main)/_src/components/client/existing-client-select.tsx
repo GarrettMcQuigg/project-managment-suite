@@ -1,3 +1,5 @@
+'use client';
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/packages/lib/components/select';
 import { Avatar, AvatarFallback } from '@packages/lib/components/avatar';

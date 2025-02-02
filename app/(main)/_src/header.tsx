@@ -1,3 +1,5 @@
+'use client';
+
 import { Separator } from '@/packages/lib/components/separator';
 import { User } from '@prisma/client';
 import { Menu, Search } from 'lucide-react';

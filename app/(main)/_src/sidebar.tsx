@@ -71,7 +71,7 @@ export function AppSidebar() {
 
   return (
     <SidebarProvider>
-      <Sidebar className="border-r border-white/[0.08] bg-gradient-to-b from-[#021111] to-black [&::-webkit-scrollbar]:!hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <Sidebar className="border-r border-white/[0.08] bg-gradient-to-b from-[#e8f7f7] to-white dark:from-[#021111] dark:to-black [&::-webkit-scrollbar]:!hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <SidebarHeader className="border-b border-white/[0.08] p-4 h-header">
           <Button
             onClick={() => setIsOpen(true)}
@@ -84,14 +84,14 @@ export function AppSidebar() {
         </SidebarHeader>
         <SidebarContent className="px-2 py-4 h-[calc(100vh-var(--header-height))] overflow-y-auto">
           <SidebarGroup>
-            <SidebarGroupLabel className="px-4 text-xs font-medium text-white/40">MAIN</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-4 text-xs font-medium text-foreground">MAIN</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <Link href={DASHBOARD_ROUTE}>
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       className={`w-full rounded-lg transition-all duration-200 ${
-                        pathname === DASHBOARD_ROUTE ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
+                        pathname === DASHBOARD_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
                       }`}
                     >
                       <LayoutDashboard className="mr-3 h-4 w-4" />
@@ -103,7 +103,7 @@ export function AppSidebar() {
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       className={`w-full rounded-lg transition-all duration-200 ${
-                        pathname === PROJECTS_ROUTE ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
+                        pathname === PROJECTS_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
                       }`}
                     >
                       <FolderKanban className="mr-3 h-4 w-4" />
@@ -115,7 +115,7 @@ export function AppSidebar() {
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       className={`w-full rounded-lg transition-all duration-200 ${
-                        pathname === CLIENTS_ROUTE ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
+                        pathname === CLIENTS_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
                       }`}
                     >
                       <Users className="mr-3 h-4 w-4" />

@@ -1,9 +1,9 @@
 'use client';
 
-// import Image from 'next/image';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Zap, Users, Calendar } from 'lucide-react';
-// import CustomBackground from '@/packages/lib/components/custom-background';
+import CustomBackground from '@/packages/lib/components/custom-background';
 import { Card, CardContent } from '@/packages/lib/components/card';
 import { Button } from '@/packages/lib/components/button';
 import { Input } from '@/packages/lib/components/input';
@@ -21,7 +21,7 @@ export default function LandingPage({ currentUser }: { currentUser: User | null 
 
   return (
     <div className="relative flex flex-col min-h-screen">
-      {/* <CustomBackground /> */}
+      <CustomBackground />
       <LandingHeader currentUser={currentUser} />
       <main className="relative z-10 flex-1">
         <HeroSection />
@@ -63,7 +63,7 @@ function HeroSection() {
           </div>
           <div className="relative w-[600px] h-[400px] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
             <div className="absolute inset-0">
-              {/* <Image src="/images/landing/landing-page-stock-img.jpg" fill priority alt="Background" className="object-cover" /> */}
+              <Image src="/images/landing/landing-page-stock-img.jpg" fill priority alt="Background" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5" />
             </div>
           </div>

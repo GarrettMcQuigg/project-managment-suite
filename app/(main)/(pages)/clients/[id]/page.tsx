@@ -13,7 +13,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
         <Breadcrumb href={CLIENTS_ROUTE} />
         <h1 className="text-3xl font-bold">Client Details</h1>

@@ -164,7 +164,7 @@ export function ProjectDialog({ open, onOpenChange, onNext, mode = 'create', def
             </div>
 
             <DialogFooter className="flex justify-between">
-              <Button type="submit" className="bg-foreground hover:bg-foreground text-white ml-auto flex items-center gap-2">
+              <Button type="submit" variant="ghost" className="text-primary hover:text-primary ml-auto flex items-center">
                 Client Details
                 <ArrowRight className="w-4 h-4" />
               </Button>

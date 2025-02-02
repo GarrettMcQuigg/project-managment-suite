@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form } from '@/packages/lib/components/form';
 import { Button } from '@/packages/lib/components/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/packages/lib/components/tabs';
-import { ArrowLeft, UserPlus, Users } from 'lucide-react';
+import { ArrowLeft, ArrowRight, UserPlus, Users } from 'lucide-react';
 import { ClientCard } from './components/client/client-card';
 import { NewClientForm } from './components/client/new-client-form';
 import { ExistingClientSelect } from './components/client/existing-client-select';
@@ -183,16 +183,17 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
             </Tabs>
 
             <DialogFooter className="flex w-full items-center">
-              <div className="flex w-full justify-between gap-2">
+              <div className="flex w-full justify-end">
                 {onBack && (
-                  <Button type="button" variant="ghost" onClick={onBack} className="border-foreground/20">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
+                  <Button type="button" variant="ghost" onClick={onBack} className="border-foreground/20 mr-auto">
+                    <ArrowLeft className="w-4 h-4" />
                     Back to Project
                   </Button>
                 )}
 
-                <Button type="submit" variant="ghost" className="bg-foreground hover:bg-foreground text-white">
+                <Button type="submit" variant="ghost" className="text-primary hover:text-primary">
                   Create Project
+                  <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
             </DialogFooter>

@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import { AddClientRequestBody } from '@/app/api/client/add/types';
 import { DialogTriggerButton } from '@/packages/lib/components/dialog';
 import { ClientFormValues } from '@/app/(main)/_src/components/client/types';
+import { Button } from '@/packages/lib/components/button';
 
 export default function ClientsTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -82,7 +83,7 @@ export default function ClientsTable() {
         searchKey="name"
         addRow={
           <>
-            <DialogTriggerButton onClick={() => setIsOpen(true)}>New Client</DialogTriggerButton>
+            <Button onClick={() => setIsOpen(true)}>New Client</Button>
             <ClientDialog open={isOpen} onOpenChange={setIsOpen} onSubmit={handleClientSubmit} />
           </>
         }

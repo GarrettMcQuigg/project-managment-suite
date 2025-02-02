@@ -13,7 +13,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
         <Breadcrumb href={PROJECTS_ROUTE} />
         <h1 className="text-3xl font-bold ">Project Details</h1>

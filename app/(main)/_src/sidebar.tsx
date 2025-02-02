@@ -11,41 +11,28 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuButton,
   SidebarProvider
 } from '@/packages/lib/components/sidebar';
 import { Button } from '@/packages/lib/components/button';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
-import { AddProjectRequestBody } from '@/app/api/project/add/types';
+import type { AddProjectRequestBody } from '@/app/api/project/add/types';
 import { API_PROJECT_ADD_ROUTE, CLIENTS_ROUTE, DASHBOARD_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
 import { ClientDialog } from './client-dialog';
 import { ProjectDialog } from './project-dialog';
 import Link from 'next/link';
-import { ClientFormValues } from './components/client/types';
-import { ProjectFormValues } from './components/project/types';
-
-export type AddAddProjectRequestBody = {
-  name: string;
-  description: string;
-  type: string;
-  status: string;
-  startDate: Date;
-  endDate: Date;
-};
-
-export type AddAddClientRequestBody = {
-  name: string;
-  email: string;
-  phone: string;
-};
+import type { ClientFormValues } from './components/client/types';
+import type { ProjectFormValues } from './components/project/types';
+import { usePathname } from 'next/navigation';
 
 export function AppSidebar() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'project' | 'client'>('project');
   const [isOpen, setIsOpen] = useState(false);
   const [projectData, setProjectData] = useState<ProjectFormValues | null>(null);
+  const pathname = usePathname();
 
   const handleProjectNext = (data: ProjectFormValues) => {
     setProjectData(data);
@@ -84,42 +71,54 @@ export function AppSidebar() {
 
   return (
     <SidebarProvider>
-      <Sidebar className="border-r border-foreground/20 bg-gradient-to-br from-foreground/10 via-background to-background">
-        <SidebarHeader className="border-b border-foreground/20 p-4 h-header">
+      <Sidebar className="border-r border-white/[0.08] bg-gradient-to-b from-[#021111] to-black [&::-webkit-scrollbar]:!hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <SidebarHeader className="border-b border-white/[0.08] p-4 h-header">
           <Button
             onClick={() => setIsOpen(true)}
             disabled={loading}
-            className="w-full backdrop-blur-sm  border border-white/[0.08] shadow-xl shadow-black/10 transition-all duration-200 group/button"
+            className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-white border-0 shadow-lg shadow-teal-500/20 transition-all duration-300 group/button"
           >
-            <Plus className="mr-2 h-4 w-4 transition-transform group-hover/button:scale-110 group-hover/button:rotate-90" />
+            <Plus className="mr-2 h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" />
             New Project
           </Button>
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className="px-2 py-4 h-[calc(100vh-var(--header-height))] overflow-y-auto">
           <SidebarGroup>
-            <SidebarGroupLabel>MAIN</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-4 text-xs font-medium text-white/40">MAIN</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <Link href={DASHBOARD_ROUTE}>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-foreground/20 hover:text-foreground">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <SidebarMenuButton
+                      className={`w-full rounded-lg transition-all duration-200 ${
+                        pathname === DASHBOARD_ROUTE ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
+                      }`}
+                    >
+                      <LayoutDashboard className="mr-3 h-4 w-4" />
                       Dashboard
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
                 <Link href={PROJECTS_ROUTE}>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-foreground/20 hover:text-foreground">
-                      <FolderKanban className="mr-2 h-4 w-4" />
+                    <SidebarMenuButton
+                      className={`w-full rounded-lg transition-all duration-200 ${
+                        pathname === PROJECTS_ROUTE ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
+                      }`}
+                    >
+                      <FolderKanban className="mr-3 h-4 w-4" />
                       Projects
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
                 <Link href={CLIENTS_ROUTE}>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-foreground/20 hover:text-foreground">
-                      <Users className="mr-2 h-4 w-4" />
+                    <SidebarMenuButton
+                      className={`w-full rounded-lg transition-all duration-200 ${
+                        pathname === CLIENTS_ROUTE ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
+                      }`}
+                    >
+                      <Users className="mr-3 h-4 w-4" />
                       Clients
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -127,37 +126,6 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-          {/* <SidebarGroup>
-            <SidebarGroupLabel>TOOLS</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-foreground/10 hover:text-foreground">
-                    <BarChart className="mr-2 h-4 w-4" />
-                    Analytics
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-foreground/10 hover:text-foreground">
-                    <Clock className="mr-2 h-4 w-4" />
-                    Time Tracking
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-foreground/10 hover:text-foreground">
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Messages
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="hover:bg-foreground/10 hover:text-foreground">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Documents
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup> */}
         </SidebarContent>
       </Sidebar>
       <ProjectDialog open={isOpen && step === 'project'} onOpenChange={setIsOpen} onNext={handleProjectNext} />

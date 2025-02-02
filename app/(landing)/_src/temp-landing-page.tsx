@@ -63,7 +63,7 @@ function HeroSection() {
           </div>
           <div className="relative w-[600px] h-[400px] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
             <div className="absolute inset-0">
-              <Image src="/images/landing/landing-page-stock-img.jpg" fill priority alt="Background" className="object-cover" />
+              {/* <Image src="/images/landing/landing-page-stock-img.jpg" fill priority alt="Background" className="object-cover" /> */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5" />
             </div>
           </div>

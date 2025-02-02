@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+// import Image from 'next/image';
 import Link from 'next/link';
 import { Zap, Users, Calendar } from 'lucide-react';
 import CustomBackground from '@/packages/lib/components/custom-background';

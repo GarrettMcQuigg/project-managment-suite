@@ -6,7 +6,8 @@ import { cn } from '@/packages/lib/utils';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
-  subsets: ['latin']
+  subsets: ['latin'],
+  preload: false
 });
 
 export const metadata: Metadata = {

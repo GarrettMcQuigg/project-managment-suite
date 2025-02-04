@@ -135,7 +135,6 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
       onPhasesChange(reorderedPhases);
     }
   };
-
   return (
     <div className="space-y-6">
       <div className="space-y-4">

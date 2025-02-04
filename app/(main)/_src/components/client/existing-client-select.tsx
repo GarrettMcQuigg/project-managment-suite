@@ -12,7 +12,6 @@ export const ExistingClientSelect = ({ form, onSelect }: ExistingClientSelectPro
     name="id"
     render={({ field }) => (
       <FormItem>
-        <FormLabel>Select Client</FormLabel>
         <Select
           onValueChange={(value) => {
             field.onChange(value);

@@ -26,32 +26,20 @@ import Link from 'next/link';
 import type { ClientFormValues } from './components/client/types';
 import type { ProjectFormValues } from './components/project/types';
 import { usePathname } from 'next/navigation';
+import UnifiedProjectWorkflow from './project-workflow-dialog';
 
 export function AppSidebar() {
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<'project' | 'client'>('project');
   const [isOpen, setIsOpen] = useState(false);
-  const [projectData, setProjectData] = useState<ProjectFormValues | null>(null);
   const pathname = usePathname();
 
-  const handleProjectNext = (data: ProjectFormValues) => {
-    setProjectData(data);
-    setStep('client');
-  };
-
-  const handleClientSubmit = async (clientData: ClientFormValues) => {
+  const handleComplete = async (data: any) => {
     setLoading(true);
     try {
-      const requestBody: AddProjectRequestBody = {
-        client: {
-          ...clientData!
-        },
-        project: {
-          ...projectData!
-        }
-      };
-
-      const response = await fetcher({ url: API_PROJECT_ADD_ROUTE, requestBody });
+      const response = await fetcher({
+        url: API_PROJECT_ADD_ROUTE,
+        requestBody: data
+      });
 
       if (response.err) {
         toast.error('Failed to create project');
@@ -59,7 +47,6 @@ export function AppSidebar() {
       }
 
       setIsOpen(false);
-      setStep('project');
       toast.success('Project created successfully');
     } catch (error) {
       console.error(error);
@@ -128,8 +115,7 @@ export function AppSidebar() {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <ProjectDialog open={isOpen && step === 'project'} onOpenChange={setIsOpen} onNext={handleProjectNext} />
-      <ClientDialog open={isOpen && step === 'client'} onOpenChange={setIsOpen} onSubmit={handleClientSubmit} onBack={() => setStep('project')} />
+      <UnifiedProjectWorkflow open={isOpen} onOpenChange={setIsOpen} onComplete={handleComplete} />
     </SidebarProvider>
   );
 }

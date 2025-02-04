@@ -128,6 +128,7 @@ model Phase {
   id          String      @id @default(uuid())
   project     Project     @relation(fields: [projectId], references: [id])
   projectId   String
+  order       Int         @default(autoincrement())
   type        PhaseType
   name        String
   description String?

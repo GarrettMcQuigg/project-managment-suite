@@ -5,9 +5,7 @@ export const projectFormSchema = z
   .object({
     name: z.string().min(1, 'Project name is required'),
     description: z.string().min(1, 'Project description is required'),
-    type: z.nativeEnum(ProjectType, {
-      required_error: 'Please select a project type'
-    }),
+    type: z.string().min(1, 'Project type is required'),
     status: z.nativeEnum(ProjectStatus).default(ProjectStatus.PREPARATION),
     startDate: z.date({
       required_error: 'Start date is required'

@@ -18,13 +18,8 @@ import {
 import { Button } from '@/packages/lib/components/button';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
-import type { AddProjectRequestBody } from '@/app/api/project/add/types';
 import { API_PROJECT_ADD_ROUTE, CLIENTS_ROUTE, DASHBOARD_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
-import { ClientDialog } from './client-dialog';
-import { ProjectDialog } from './project-dialog';
 import Link from 'next/link';
-import type { ClientFormValues } from './components/client/types';
-import type { ProjectFormValues } from './components/project/types';
 import { usePathname } from 'next/navigation';
 import UnifiedProjectWorkflow from './project-workflow-dialog';
 
@@ -34,6 +29,7 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const handleComplete = async (data: any) => {
+    console.log('data', data);
     setLoading(true);
     try {
       const response = await fetcher({

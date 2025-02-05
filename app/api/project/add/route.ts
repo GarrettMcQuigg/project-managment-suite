@@ -5,25 +5,38 @@ import { AddProjectRequestBody, AddProjectRequestBodySchema } from './types';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
-  const { client, project }: AddProjectRequestBody = await request.json();
-  const requestBody = { client, project };
-
   if (!currentUser) return handleUnauthorized();
-  // TODO : Test this validation works
+
+  const requestBody: AddProjectRequestBody = await request.json();
+
   const { error } = AddProjectRequestBodySchema.validate(requestBody);
   if (error) {
     return handleBadRequest({ message: error.message, err: error });
   }
 
-  if (!client) {
-    return handleBadRequest({ message: 'Client is required' });
-  }
+  const { client, name, description, type, status, startDate, endDate, phases, budget } = requestBody;
 
   try {
     const result = await db.$transaction(async (tx) => {
-      const clientRecord = client.id
-        ? await tx.client.findUnique({ where: { id: client.id } })
-        : await tx.client.create({
+      // 1. Check for existing client with this email for the current user
+      let clientRecord;
+
+      if (client.id) {
+        clientRecord = await tx.client.findUnique({
+          where: { id: client.id }
+        });
+      } else {
+        clientRecord = await tx.client.findUnique({
+          where: {
+            userId_email: {
+              userId: currentUser.id,
+              email: client.email!
+            }
+          }
+        });
+
+        if (!clientRecord) {
+          clientRecord = await tx.client.create({
             data: {
               userId: currentUser.id,
               name: client.name!,
@@ -31,27 +44,69 @@ export async function POST(request: Request) {
               phone: client.phone!
             }
           });
-
-      if (!clientRecord) {
-        throw new Error('Client not found');
+        }
       }
 
-      const newProject = await tx.project.create({
+      if (!clientRecord) {
+        return handleError({ message: 'Failed to create project' });
+      }
+
+      // 2. Create the project
+      const projectRecord = await tx.project.create({
         data: {
-          ...project,
+          name,
+          description,
+          type,
+          status,
+          startDate,
+          endDate,
           userId: currentUser.id,
           clientId: clientRecord.id
         }
       });
 
-      return { newProject, isNewClient: !client.id };
+      // 3. Create the payment/budget record
+      await tx.projectPayment.create({
+        data: {
+          projectId: projectRecord.id,
+          totalAmount: budget.totalAmount,
+          depositRequired: budget.depositRequired,
+          paymentSchedule: budget.paymentSchedule
+        }
+      });
+
+      // 4. Create all phases
+      const createdPhases = await Promise.all(
+        phases.map((phase) =>
+          tx.phase.create({
+            data: {
+              projectId: projectRecord.id,
+              type: phase.type,
+              name: phase.name,
+              description: phase.description,
+              startDate: new Date(phase.startDate),
+              endDate: new Date(phase.endDate),
+              status: phase.status,
+              order: phase.order
+            }
+          })
+        )
+      );
+
+      return {
+        project: projectRecord,
+        phases: createdPhases,
+        client: clientRecord,
+        isNewClient: !client.id
+      };
     });
 
     return handleSuccess({
-      message: result.isNewClient ? 'Successfully Created Project and Client' : 'Successfully Created Project',
-      content: result.newProject
+      message: 'Successfully created project',
+      content: result
     });
-  } catch (err) {
+  } catch (err: unknown) {
+    console.error('Project creation error:', err);
     return handleError({ message: 'Failed to create project', err });
   }
 }

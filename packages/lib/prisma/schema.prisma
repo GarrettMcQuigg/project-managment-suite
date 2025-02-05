@@ -63,8 +63,8 @@ model Project {
   name         String
   description  String
   status       ProjectStatus        @default(PREPARATION)
-  payment      ProjectPayment?
-  invoices     Invoice[]
+  payment      ProjectPayment? // Overall payment data for the project
+  invoices     Invoice[] // Tracks actual invoices for the project
   phases       Phase[]
   attachments  ProjectAttachment[]
   messages     ProjectMessage[]

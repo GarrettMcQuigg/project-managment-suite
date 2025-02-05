@@ -21,6 +21,8 @@ import { cn } from '@/packages/lib/utils';
 import { ExistingClientSelect } from './components/client/existing-client-select';
 import { ClientFormValues, clients } from './components/client/types';
 import TimelineStep from './components/timeline-step';
+import BudgetStep from './components/budget-step';
+import { UpdateClientRequestBody } from '@/app/api/client/update/types';
 
 // Interfaces
 interface Budget {
@@ -37,6 +39,7 @@ interface ProjectFormData {
   startDate: Date;
   endDate: Date;
   client: {
+    id?: string;
     name: string;
     email: string;
     phone: string;
@@ -204,63 +207,6 @@ const ProjectDetailsStep: React.FC<ProjectDetailsStepProps> = ({ form }) => (
   </div>
 );
 
-// Budget Step
-const BudgetStep: React.FC<BudgetStepProps> = ({ budget, onBudgetChange }) => (
-  <div className="space-y-6">
-    <h3 className="text-lg font-medium">Project Budget</h3>
-
-    <Card className="p-4">
-      <div className="space-y-4">
-        <div>
-          <FormLabel>Total Project Amount</FormLabel>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60">$</span>
-            <Input
-              type="number"
-              value={budget.totalAmount}
-              onChange={(e) => onBudgetChange({ ...budget, totalAmount: parseFloat(e.target.value) || 0 })}
-              className="pl-8 border-foreground/20"
-              placeholder="0.00"
-              step="0.01"
-            />
-          </div>
-        </div>
-
-        <div>
-          <FormLabel>Required Deposit</FormLabel>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60">$</span>
-            <Input
-              type="number"
-              value={budget.depositRequired}
-              onChange={(e) => onBudgetChange({ ...budget, depositRequired: parseFloat(e.target.value) || 0 })}
-              className="pl-8 border-foreground/20"
-              placeholder="0.00"
-              step="0.01"
-            />
-          </div>
-        </div>
-
-        <div>
-          <FormLabel>Payment Schedule</FormLabel>
-          <Select value={budget.paymentSchedule} onValueChange={(value) => onBudgetChange({ ...budget, paymentSchedule: value })}>
-            <SelectTrigger className="border-foreground/20">
-              <SelectValue placeholder="Select payment schedule" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="FULL_UPFRONT">Full Payment Upfront</SelectItem>
-              <SelectItem value="DEPOSIT_PLUS_FINAL">Deposit + Final Payment</SelectItem>
-              <SelectItem value="MILESTONE_BASED">Milestone Based</SelectItem>
-              <SelectItem value="INSTALLMENTS">Regular Installments</SelectItem>
-              <SelectItem value="CUSTOM">Custom Schedule</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </Card>
-  </div>
-);
-
 const ClientStep: React.FC<ClientStepProps> = ({ form }) => {
   const clientForm = useForm<ClientFormValues>();
 
@@ -271,6 +217,13 @@ const ClientStep: React.FC<ClientStepProps> = ({ form }) => {
       form.setValue('client.email', selectedClient.email);
       form.setValue('client.phone', selectedClient.phone);
     }
+
+    // const requestBody: UpdateClientRequestBody = {
+    //   id: defaultValues!.id,
+    //   name,
+    //   email,
+    //   phone
+    // };
   };
 
   return (
@@ -355,6 +308,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
       startDate: new Date(),
       endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       client: {
+        id: '',
         name: '',
         email: '',
         phone: ''
@@ -364,7 +318,11 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
 
   const steps = [
     { title: 'Project Details', component: <ProjectDetailsStep form={form} /> },
-    { title: 'Timeline', component: <TimelineStep phases={phases} onPhasesChange={setPhases} /> },
+    {
+      title: 'Timeline Phases',
+      description: 'Create checkpoints to build a shareable timeline',
+      component: <TimelineStep phases={phases} onPhasesChange={setPhases} />
+    },
     { title: 'Budget', component: <BudgetStep budget={budget} onBudgetChange={setBudget} /> },
     { title: 'Client Details', component: <ClientStep form={form} /> }
   ];
@@ -387,7 +345,10 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
       <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-foreground/10 via-background to-background">
         <DialogHeader>
           <DialogTitle>Create New Project</DialogTitle>
-          <DialogDescription>{steps[currentStep].title}</DialogDescription>
+          <DialogDescription>
+            {steps[currentStep].title}
+            {steps[currentStep].description ? <span> - {steps[currentStep].description}</span> : ''}
+          </DialogDescription>
         </DialogHeader>
 
         <StepIndicator currentStep={currentStep} />

@@ -139,8 +139,9 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
     <div className="space-y-6">
       <div className="space-y-4">
         <div className="mb-6">
-          <h3 className="text-lg font-medium">Project Timeline</h3>
-          <div className="text-xs opacity-55">Hover over the phase to drag and reorder.</div>
+          <h3 className="text-lg font-medium">Project Phases</h3>
+
+          {phases.length > 0 && <div className="text-xs opacity-55">Hover over a phase to drag and reorder.</div>}
         </div>
 
         {phases.length > 0 && (

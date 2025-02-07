@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Textarea } from '@/packages/lib/components/textarea';
 import { useEffect } from 'react';
-import { ProjectDialogProps, projectFormSchema, ProjectFormValues, projectTypes } from './components/project/types';
+import { ProjectDialogProps, projectFormSchema, ProjectFormValues, projectTypes } from './types';
 
 export function ProjectDialog({ open, onOpenChange, onNext, mode = 'create', defaultValues }: ProjectDialogProps) {
   const form = useForm<ProjectFormValues>({

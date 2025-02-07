@@ -1,10 +1,10 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/packages/lib/components/tabs';
 import { useForm, UseFormReturn } from 'react-hook-form';
-import { ExistingClientSelect } from './client/existing-client-select';
-import { ClientFormValues, clients } from './client/types';
+import { ClientFormValues, clients } from '../../(pages)/clients/[id]/_src/types';
 import { Input } from '@/packages/lib/components/input';
 import { ProjectFormData } from './project-step';
+import { ExistingClientSelect } from '../../(pages)/clients/[id]/_src/existing-client-select';
 
 interface ClientStepProps {
   form: UseFormReturn<ProjectFormData & { id?: string }>;

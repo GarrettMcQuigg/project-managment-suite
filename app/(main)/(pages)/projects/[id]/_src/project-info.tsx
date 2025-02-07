@@ -10,13 +10,13 @@ import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import { Pencil } from 'lucide-react';
-import { ProjectDialog } from '@/app/(main)/_src/project-dialog';
-import { ClientDialog } from '@/app/(main)/_src/client-dialog';
+import { ProjectDialog } from '@/app/(main)/(pages)/projects/[id]/_src/project-dialog';
 import { DeleteProjectButton } from './delete-project';
 import { toast } from 'react-toastify';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
-import { ClientFormValues } from '@/app/(main)/_src/components/client/types';
-import { ProjectFormValues } from '@/app/(main)/_src/components/project/types';
+import { ClientFormValues } from '@/app/(main)/(pages)/clients/[id]/_src/types';
+import { ProjectFormValues } from '@/app/(main)/(pages)/projects/[id]/_src/types';
+import { ClientDialog } from '../../../clients/[id]/_src/client-dialog';
 
 export function ProjectInfo({ projectId }: { projectId: string }) {
   const endpoint = API_PROJECT_GET_BY_ID_ROUTE + projectId;

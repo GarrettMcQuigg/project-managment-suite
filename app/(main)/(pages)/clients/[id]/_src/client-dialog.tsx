@@ -8,15 +8,15 @@ import { Form } from '@/packages/lib/components/form';
 import { Button } from '@/packages/lib/components/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/packages/lib/components/tabs';
 import { ArrowLeft, ArrowRight, UserPlus, Users } from 'lucide-react';
-import { ClientCard } from './components/client/client-card';
-import { NewClientForm } from './components/client/new-client-form';
-import { ExistingClientSelect } from './components/client/existing-client-select';
-import { type ClientDialogProps, type ClientFormValues, type ViewState, clientFormSchema, clients } from './components/client/types';
 import { toast } from 'react-toastify';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { API_CLIENT_UPDATE_ROUTE } from '@/packages/lib/routes';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import { UpdateClientRequestBody } from '@/app/api/client/update/types';
+import { ClientDialogProps, clientFormSchema, ClientFormValues, clients, ViewState } from './types';
+import { ClientCard } from './client-card';
+import { ExistingClientSelect } from './existing-client-select';
+import { NewClientForm } from './new-client-form';
 
 export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValues, mode = 'create' }: ClientDialogProps) {
   const [view, setView] = useState<ViewState>(mode === 'edit' ? 'view' : 'new');

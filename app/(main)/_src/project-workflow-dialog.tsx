@@ -8,13 +8,12 @@ import { Form } from '@/packages/lib/components/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { ProjectStatus, Phase } from '@prisma/client';
-import { projectFormSchema } from './components/project/types';
+import { projectFormSchema } from '../(pages)/projects/[id]/_src/types';
 import TimelineStep from './components/timeline-step';
 import BudgetStep from './components/budget-step';
 import ClientStep from './components/client-step';
 import ProjectDetailsStep, { ProjectFormData } from './components/project-step';
 
-// Interfaces
 interface Budget {
   totalAmount: number;
   depositRequired: number;
@@ -52,7 +51,6 @@ const defaultFormValues: ProjectFormData = {
   }
 };
 
-// Step Indicator Component
 const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
   const steps = ['Project', 'Timeline', 'Budget', 'Client'];
 
@@ -74,7 +72,6 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
   );
 };
 
-// Main Workflow Component
 export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ open, onOpenChange, onComplete }) => {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [phases, setPhases] = useState<Phase[]>([]);

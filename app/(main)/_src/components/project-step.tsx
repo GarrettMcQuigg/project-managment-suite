@@ -2,7 +2,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/pack
 import { Textarea } from '@/packages/lib/components/textarea';
 import { cn } from '@/packages/lib/utils';
 import { CalendarIcon } from 'lucide-react';
-import { projectTypes } from './project/types';
+import { projectTypes } from '../../(pages)/projects/[id]/_src/types';
 import { Input } from '@/packages/lib/components/input';
 import { Button } from '@/packages/lib/components/button';
 import { Calendar } from '@/packages/lib/components/calendar';

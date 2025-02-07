@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, GripVertical } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
 import { Input } from '@/packages/lib/components/input';
 import { FormLabel } from '@/packages/lib/components/form';
@@ -35,28 +35,41 @@ function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) 
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      style={style}
-      className="relative group bg-background/50 border border-foreground/20 rounded-lg p-2 w-32 cursor-grab active:cursor-grabbing"
-    >
-      {/* Order Circle */}
+    <div ref={setNodeRef} style={style} className="relative group bg-background/50 border border-foreground/20 rounded-lg p-2 w-32">
       <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-medium z-10">{phase.order}</div>
+
+      <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={(e) => onEdit(e, phase)}
+          className="h-6 w-6 bg-background rounded-medium text-muted-foreground hover:text-foreground shadow-sm"
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={(e) => onDelete(e, phase.id)}
+          className="h-6 w-6 bg-background rounded-medium text-red-500 hover:text-red-600 shadow-sm"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-grab active:cursor-grabbing"
+      >
+        <GripVertical className="w-6 h-6 text-foreground/60" />
+      </div>
 
       <div className="flex flex-col items-start pt-2">
         <span className="font-medium text-sm truncate w-full">{phase.type.replace('_', ' ')}</span>
         {phase.name && <span className="text-muted-foreground text-xs truncate w-full">{phase.name}</span>}
-      </div>
-
-      <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
-        <Button type="button" variant="ghost" size="icon" onClick={(e) => onEdit(e, phase)} className="h-6 w-6 text-muted-foreground hover:text-foreground">
-          <Pencil className="h-3 w-3" />
-        </Button>
-        <Button type="button" variant="ghost" size="icon" onClick={(e) => onDelete(e, phase.id)} className="h-6 w-6 text-red-500 hover:text-red-600">
-          <Trash2 className="h-3 w-3" />
-        </Button>
       </div>
     </div>
   );
@@ -141,14 +154,14 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
         <div className="mb-6">
           <h3 className="text-lg font-medium">Project Phases</h3>
 
-          {phases.length > 0 && <div className="text-xs opacity-55">Hover over a phase to drag and reorder.</div>}
+          {phases.length > 0 && <div className="text-xs opacity-55">Hover over a phase to drag and reorder, edit, or delete the phase.</div>}
         </div>
 
         {phases.length > 0 && (
           <>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={phases.map((phase) => phase.id)} strategy={horizontalListSortingStrategy}>
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex flex-wrap justify-center gap-3">
                   {phases.slice(0, showAllPhases ? undefined : 4).map((phase) => (
                     <SortablePhaseItem
                       key={phase.id}

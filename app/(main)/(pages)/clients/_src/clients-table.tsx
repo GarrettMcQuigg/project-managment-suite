@@ -10,7 +10,7 @@ import useSWR, { mutate } from 'swr';
 import { ClientDialog } from '@/app/(main)/_src/client-dialog';
 import { toast } from 'react-toastify';
 import { AddClientRequestBody } from '@/app/api/client/add/types';
-import { ClientFormValues } from '@/app/(main)/_src/components/client/types';
+import { ClientFormValues } from '@/app/(main)/(pages)/clients/[id]/_src/types';
 import { Button } from '@/packages/lib/components/button';
 
 export default function ClientsTable() {

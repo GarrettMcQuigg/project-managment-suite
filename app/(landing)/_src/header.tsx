@@ -1,6 +1,6 @@
 'use client';
 
-import { AUTH_CHECKPOINT_ROUTE, DASHBOARD_ROUTE, PRICING_ROUTE, PRIVACY_POLICY_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
+import { AUTH_CHECKPOINT_ROUTE, DASHBOARD_ROUTE, PRICING_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
 import { MoonIcon, Palette, Rocket, SunIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';

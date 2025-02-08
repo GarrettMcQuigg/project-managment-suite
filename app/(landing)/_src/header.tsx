@@ -1,6 +1,6 @@
 'use client';
 
-import { AUTH_CHECKPOINT_ROUTE, DASHBOARD_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
+import { AUTH_CHECKPOINT_ROUTE, DASHBOARD_ROUTE, PRICING_ROUTE, PRIVACY_POLICY_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
 import { MoonIcon, Palette, Rocket, SunIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
@@ -17,7 +17,7 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
 
   return (
     <header className="sticky top-0 z-50">
-      <div className="absolute inset-0 bg-white/10 dark:bg-gray-900/5 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-transparent dark:bg-gray-900/5 backdrop-blur-md" />
       <div className="relative flex items-center justify-between w-full max-w-7xl h-header p-4 mx-auto">
         <Link href={ROOT_ROUTE} className="flex items-center gap-2 font-bold text-2xl text-black dark:text-white">
           <Palette className="h-6 w-6" /> CreativeSuite CRM
@@ -26,15 +26,15 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
           <a href="/about-us" className="text-sm text-black dark:text-white hover:opacity-75 transition-opacity">
             About Us
           </a>
-          <a href="/pricing" className="text-sm text-black dark:text-white hover:opacity-75 transition-opacity">
-            Pricing
-          </a>
           <a href="/terms-of-service" className="text-sm text-black dark:text-white hover:opacity-75 transition-opacity">
             Features
           </a>
           <a href="/privacy-policy" className="text-sm text-black dark:text-white hover:opacity-75 transition-opacity">
             Testimonials
           </a>
+          <Link href={PRICING_ROUTE} className="text-sm text-black dark:text-white hover:opacity-75 transition-opacity">
+            Pricing
+          </Link>
         </nav>
         <div className="flex items-center space-x-8">
           <Link

@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { User } from '@prisma/client';
-import { Header } from '../(pages)/dashboard/_src/components/header';
 import SidebarLayout from './sidebar-layout';
 import { AppSidebar } from './sidebar';
+import { Header } from './header';
 
 export default function HUD({ children, currentUser }: { children: React.ReactNode; currentUser: User }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -1,45 +1,32 @@
 'use client';
 
-import { Separator } from '@/packages/lib/components/separator';
+import { MessageSquare, Search } from 'lucide-react';
+import React from 'react';
+import { Button } from '@/packages/lib/components/button';
 import { User } from '@prisma/client';
-import { Menu, Search } from 'lucide-react';
-import UserDropdown from './user-dropdown';
+import UserDropdown from '@/app/(main)/_src/user-dropdown';
+import { CommandPalette } from './components/command-palette';
 
 export function Header({ currentUser }: { currentUser: User }) {
   return (
-    <div className="sticky top-0 z-40">
-      <div className="relative bg-green-500">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#021111] to-transparent mix-blend-overlay" />
-        <div className="relative flex h-header shrink-0 items-center gap-x-4 border-b border-white/[0.08] px-4 sm:gap-x-6 sm:px-6 lg:px-8">
-          {/* <button className="lg:hidden text-muted-foreground hover:text-primary active:text-primary" onClick={() => setSidebarOpen(true)}> */}
-          <button className="lg:hidden text-muted-foreground hover:text-primary active:text-primary">
-            <span className="sr-only">Open sidebar</span>
-            <Menu className="h-6 w-6" aria-hidden="true" />
-          </button>
-
-          <Separator className="h-6 lg:hidden" orientation="vertical" />
-
-          <div className="flex flex-1 gap-x-2 self-stretch">
-            {/* Search */}
-            {/* <div
-              className="relative flex flex-1 items-center cursor-pointer text-muted-foreground hover:text-primary active:text-primary mx-1 px-2 py-1"
-              onClick={() => setCommandPaletteOpen(true)}
-            > */}
-            <div className="relative flex flex-1 items-center cursor-pointer text-muted-foreground hover:text-primary active:text-primary mx-1 px-2 py-1">
-              <Search className="h-5 w-5" />
-              <span className="px-2">Search</span>
-            </div>
-
-            {/* Utilities */}
-            <div className="flex items-center gap-x-2 lg:gap-x-4">
-              {/* <Messages /> */}
-              {/* <Notifications /> */}
-              <Separator className="h-6" orientation="vertical" />
-              <UserDropdown currentUser={currentUser} />
-            </div>
-          </div>
-        </div>
+    <header className="flex h-header lg:ml-64 items-center justify-between border-b border-white/[0.08] bg-gradient-to-r from-[#e8f7f7] to-white dark:from-[#021111] dark:to-black px-8">
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" className="w-72 justify-start text-muted-foreground hover:bg-foreground/10 hover:text-foreground">
+          <Search className="mr-2 h-4 w-4" />
+          Search your creative universe...
+          <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1 rounded border border-foreground/20 bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <span className="text-xs">⌘</span>K
+          </kbd>
+        </Button>
       </div>
-    </div>
+      <CommandPalette />
+      <div className="flex items-center gap-6">
+        <Button variant="ghost" className="relative size-9 rounded-full bg-foreground/10 p-0 hover:bg-foreground/20">
+          <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-foreground text-[10px] font-bold text-white">4</span>
+          <MessageSquare className="size-4 text-foreground" />
+        </Button>
+        <UserDropdown currentUser={currentUser} />
+      </div>
+    </header>
   );
 }

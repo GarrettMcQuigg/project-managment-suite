@@ -7,33 +7,45 @@ import { Button } from '@/packages/lib/components/button';
 import { Form } from '@/packages/lib/components/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { ProjectStatus, Phase } from '@prisma/client';
+import { ProjectStatus, Phase, ProjectPayment, PaymentSchedule } from '@prisma/client';
 import { projectFormSchema } from '../(pages)/projects/[id]/_src/types';
 import TimelineStep from './components/timeline-step';
-import BudgetStep from './components/budget-step';
 import ClientStep from './components/client-step';
 import ProjectDetailsStep, { ProjectFormData } from './components/project-step';
-
-interface Budget {
-  totalAmount: number;
-  depositRequired: number;
-  paymentSchedule: string;
-}
+import PaymentStep from './components/payment-step';
 
 interface StepIndicatorProps {
   currentStep: number;
 }
 
+export interface ProjectPaymentFormData {
+  totalAmount: number;
+  depositRequired: number | undefined;
+  depositDueDate: Date | undefined;
+  paymentSchedule: string;
+  paymentTerms: string | undefined;
+  notes: string | undefined;
+}
+
 interface UnifiedProjectWorkflowProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onComplete: (data: ProjectFormData & { phases: Phase[]; budget: Budget }) => void;
+  onComplete: (data: ProjectFormData & { phases: Phase[]; payment: ProjectPaymentFormData }) => void;
+  mode?: 'create' | 'edit';
+  defaultValues?: {
+    project?: ProjectFormData;
+    phases?: Phase[];
+    payment?: ProjectPayment;
+  };
 }
 
-const defaultBudget: Budget = {
+const defaultPayment: ProjectPaymentFormData = {
   totalAmount: 0,
   depositRequired: 0,
-  paymentSchedule: 'CUSTOM'
+  depositDueDate: undefined,
+  paymentSchedule: PaymentSchedule.CUSTOM,
+  paymentTerms: '',
+  notes: ''
 };
 
 const defaultFormValues: ProjectFormData = {
@@ -72,44 +84,59 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
   );
 };
 
-export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ open, onOpenChange, onComplete }) => {
+const convertPaymentToFormData = (payment: ProjectPayment | null | undefined): ProjectPaymentFormData => {
+  if (!payment) return defaultPayment;
+
+  return {
+    totalAmount: Number(payment.totalAmount),
+    depositRequired: payment.depositRequired ? Number(payment.depositRequired) : undefined,
+    depositDueDate: payment.depositDueDate || undefined,
+    paymentSchedule: payment.paymentSchedule,
+    paymentTerms: payment.paymentTerms || undefined,
+    notes: payment.notes || undefined
+  };
+};
+
+export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ open, onOpenChange, onComplete, mode = 'create', defaultValues }) => {
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [phases, setPhases] = useState<Phase[]>([]);
-  const [budget, setBudget] = useState<Budget>(defaultBudget);
+  const [phases, setPhases] = useState<Phase[]>(defaultValues?.phases || []);
+  const [payment, setPayment] = useState<ProjectPaymentFormData>(convertPaymentToFormData(defaultValues?.payment));
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectFormSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      type: null,
-      status: ProjectStatus.PREPARATION,
-      startDate: new Date(),
-      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      client: {
-        id: '',
-        name: '',
-        email: '',
-        phone: ''
-      }
-    }
+    defaultValues: defaultValues?.project || defaultFormValues
   });
 
   const steps = [
-    { title: 'Project Details', component: <ProjectDetailsStep form={form} /> },
+    {
+      title: `${mode === 'create' ? 'Create' : 'Edit'} Project Details`,
+      component: <ProjectDetailsStep form={form} />
+    },
     {
       title: 'Timeline Phases',
       description: 'Create checkpoints to build a shareable timeline',
       component: <TimelineStep phases={phases} onPhasesChange={setPhases} />
     },
-    { title: 'Budget', component: <BudgetStep budget={budget} onBudgetChange={setBudget} /> },
-    { title: 'Client Details', component: <ClientStep form={form} /> }
+    {
+      title: 'Payment Details',
+      component: <PaymentStep payment={payment} onPaymentChange={setPayment} />
+    },
+    {
+      title: 'Client Details',
+      component: <ClientStep form={form} />
+    }
   ];
 
   const resetWorkflow = () => {
-    form.reset(defaultFormValues);
-    setPhases([]);
-    setBudget(defaultBudget);
+    if (mode === 'create') {
+      form.reset(defaultFormValues);
+      setPhases([]);
+      setPayment(defaultPayment);
+    } else {
+      form.reset(defaultValues?.project);
+      setPhases(defaultValues?.phases || []);
+      setPayment(convertPaymentToFormData(defaultValues?.payment));
+    }
     setCurrentStep(0);
   };
 
@@ -119,7 +146,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
       await onComplete({
         ...formData,
         phases,
-        budget
+        payment
       });
       resetWorkflow();
     } else {
@@ -138,7 +165,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-foreground/10 via-background to-background">
         <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
+          <DialogTitle>{mode === 'create' ? 'Create New Project' : 'Edit Project'}</DialogTitle>
           <DialogDescription>
             {steps[currentStep].title}
             {steps[currentStep].description ? <span> - {steps[currentStep].description}</span> : ''}
@@ -158,7 +185,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
               </Button>
 
               <Button type="submit">
-                {currentStep === steps.length - 1 ? 'Complete' : 'Next'}
+                {currentStep === steps.length - 1 ? (mode === 'create' ? 'Create' : 'Save') : 'Next'}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>

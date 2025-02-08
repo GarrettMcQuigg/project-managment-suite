@@ -2,21 +2,16 @@ import { Card } from '@/packages/lib/components/card';
 import { FormLabel } from '@/packages/lib/components/form';
 import { Input } from '@/packages/lib/components/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/packages/lib/components/select';
+import { ProjectPaymentFormData } from '../project-workflow-dialog';
 
-interface Budget {
-  totalAmount: number;
-  depositRequired: number;
-  paymentSchedule: string;
+interface PaymentStepProps {
+  payment: ProjectPaymentFormData;
+  onPaymentChange: (payment: ProjectPaymentFormData) => void;
 }
 
-interface BudgetStepProps {
-  budget: Budget;
-  onBudgetChange: (budget: Budget) => void;
-}
-
-const BudgetStep: React.FC<BudgetStepProps> = ({ budget, onBudgetChange }) => (
+const PaymentStep: React.FC<PaymentStepProps> = ({ payment, onPaymentChange }) => (
   <div className="space-y-6">
-    <h3 className="text-lg font-medium">Project Budget</h3>
+    <h3 className="text-lg font-medium">Project Payment</h3>
 
     <Card className="p-4">
       <div className="space-y-4">
@@ -26,8 +21,8 @@ const BudgetStep: React.FC<BudgetStepProps> = ({ budget, onBudgetChange }) => (
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60">$</span>
             <Input
               type="number"
-              value={budget.totalAmount}
-              onChange={(e) => onBudgetChange({ ...budget, totalAmount: parseFloat(e.target.value) || 0 })}
+              value={payment.totalAmount}
+              onChange={(e) => onPaymentChange({ ...payment, totalAmount: parseFloat(e.target.value) || 0 })}
               className="pl-8 border-foreground/20"
               placeholder="0.00"
               step="0.01"
@@ -41,8 +36,8 @@ const BudgetStep: React.FC<BudgetStepProps> = ({ budget, onBudgetChange }) => (
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60">$</span>
             <Input
               type="number"
-              value={budget.depositRequired}
-              onChange={(e) => onBudgetChange({ ...budget, depositRequired: parseFloat(e.target.value) || 0 })}
+              value={payment.depositRequired}
+              onChange={(e) => onPaymentChange({ ...payment, depositRequired: parseFloat(e.target.value) || 0 })}
               className="pl-8 border-foreground/20"
               placeholder="0.00"
               step="0.01"
@@ -52,7 +47,7 @@ const BudgetStep: React.FC<BudgetStepProps> = ({ budget, onBudgetChange }) => (
 
         <div>
           <FormLabel>Payment Schedule</FormLabel>
-          <Select value={budget.paymentSchedule} onValueChange={(value) => onBudgetChange({ ...budget, paymentSchedule: value })}>
+          <Select value={payment.paymentSchedule} onValueChange={(value) => onPaymentChange({ ...payment, paymentSchedule: value })}>
             <SelectTrigger className="border-foreground/20">
               <SelectValue placeholder="Select payment schedule" />
             </SelectTrigger>
@@ -70,4 +65,4 @@ const BudgetStep: React.FC<BudgetStepProps> = ({ budget, onBudgetChange }) => (
   </div>
 );
 
-export default BudgetStep;
+export default PaymentStep;

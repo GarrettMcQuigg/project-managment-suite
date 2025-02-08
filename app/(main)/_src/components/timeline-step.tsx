@@ -113,10 +113,14 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
   const editPhase = (e: React.MouseEvent, phase: Phase) => {
     e.preventDefault();
     e.stopPropagation();
-    setActivePhase(phase);
+    const phaseWithDates = {
+      ...phase,
+      startDate: new Date(phase.startDate),
+      endDate: new Date(phase.endDate)
+    };
+    setActivePhase(phaseWithDates);
     setEditingPhaseId(phase.id);
   };
-
   const handlePhasePublish = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -234,11 +238,16 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
                 <PopoverTrigger asChild>
                   <Button type="button" variant="outline" className="w-full justify-start text-left font-normal border-foreground/20">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {activePhase.startDate.toLocaleDateString()}
+                    {activePhase.startDate instanceof Date ? activePhase.startDate.toLocaleDateString() : new Date(activePhase.startDate).toLocaleDateString()}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={activePhase.startDate} onSelect={(date) => date && updateActivePhase({ startDate: date })} initialFocus />
+                  <Calendar
+                    mode="single"
+                    selected={activePhase.startDate instanceof Date ? activePhase.startDate : new Date(activePhase.startDate)}
+                    onSelect={(date) => date && updateActivePhase({ startDate: date })}
+                    initialFocus
+                  />
                 </PopoverContent>
               </Popover>
             </div>
@@ -249,16 +258,15 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
                 <PopoverTrigger asChild>
                   <Button type="button" variant="outline" className="w-full justify-start text-left font-normal border-foreground/20">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {activePhase.endDate.toLocaleDateString()}
+                    {activePhase.endDate instanceof Date ? activePhase.endDate.toLocaleDateString() : new Date(activePhase.endDate).toLocaleDateString()}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={activePhase.endDate}
-                    onSelect={(date) => date && updateActivePhase({ endDate: date })}
+                    selected={activePhase.startDate instanceof Date ? activePhase.startDate : new Date(activePhase.startDate)}
+                    onSelect={(date) => date && updateActivePhase({ startDate: date })}
                     initialFocus
-                    disabled={(date) => date < activePhase.startDate}
                   />
                 </PopoverContent>
               </Popover>

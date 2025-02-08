@@ -5,5 +5,5 @@ export type ClientWithMetadata = Prisma.ClientGetPayload<{
 }>;
 
 export type ProjectWithMetadata = Prisma.ProjectGetPayload<{
-  include: { client: true };
+  include: { client: true; payment: true; phases: true };
 }>;

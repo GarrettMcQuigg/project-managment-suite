@@ -5,32 +5,25 @@ import { Skeleton } from '@/packages/lib/components/skeleton';
 import { swrFetcher, fetcher } from '@/packages/lib/helpers/fetcher';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_PROJECT_GET_BY_ID_ROUTE, API_PROJECT_UPDATE_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
-import { Client } from '@prisma/client';
+import { PaymentSchedule, Phase, Prisma } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import { Pencil } from 'lucide-react';
-import { ProjectDialog } from '@/app/(main)/(pages)/projects/[id]/_src/project-dialog';
 import { DeleteProjectButton } from './delete-project';
 import { toast } from 'react-toastify';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
-import { ClientFormValues } from '@/app/(main)/(pages)/clients/[id]/_src/types';
-import { ProjectFormValues } from '@/app/(main)/(pages)/projects/[id]/_src/types';
-import { ClientDialog } from '../../../clients/[id]/_src/client-dialog';
+import UnifiedProjectWorkflow from '@/app/(main)/_src/project-workflow-dialog';
 
 export function ProjectInfo({ projectId }: { projectId: string }) {
   const endpoint = API_PROJECT_GET_BY_ID_ROUTE + projectId;
   const { data, error, isLoading } = useSWR(endpoint, swrFetcher);
   const [project, setProject] = useState<ProjectWithMetadata | null>(null);
-  const [client, setClient] = useState<Client | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [step, setStep] = useState<'project' | 'client'>('project');
-  const [projectData, setProjectData] = useState<ProjectFormValues | null>(null);
 
   useEffect(() => {
     if (data) {
       setProject(data.content);
-      setClient(data.content.client);
     }
 
     if (error) {
@@ -39,22 +32,14 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
     }
   }, [data, error]);
 
-  const handleProjectNext = (data: ProjectFormValues) => {
-    setProjectData(data);
-    setStep('client');
-  };
-
-  const handleClientSubmit = async (clientData: ClientFormValues) => {
+  const handleProjectUpdate = async (formData: any) => {
     try {
-      const requestBody = {
-        id: project!.id,
-        projectData: projectData,
-        client: clientData
-      };
-
       const response = await fetcher({
         url: API_PROJECT_UPDATE_ROUTE,
-        requestBody,
+        requestBody: {
+          id: project!.id,
+          ...formData
+        },
         method: HttpMethods.PUT
       });
 
@@ -64,7 +49,6 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
       }
 
       setIsEditDialogOpen(false);
-      setStep('project');
       mutate(endpoint);
       toast.success('Project updated successfully');
     } catch (error) {
@@ -75,6 +59,25 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
 
   if (error) return redirect(PROJECTS_ROUTE);
 
+  const getDefaultPaymentValues = () => {
+    if (!project?.payment) {
+      return {
+        totalAmount: new Prisma.Decimal(0),
+        depositRequired: new Prisma.Decimal(0),
+        paymentSchedule: 'CUSTOM'
+      };
+    }
+
+    return {
+      totalAmount: project.payment.totalAmount,
+      depositRequired: project.payment.depositRequired || new Prisma.Decimal(0),
+      depositDueDate: project.payment.depositDueDate,
+      paymentSchedule: project.payment.paymentSchedule,
+      paymentTerms: project.payment.paymentTerms,
+      notes: project.payment.notes
+    };
+  };
+
   return (
     <>
       <Card className="mb-8 space-y-8">
@@ -82,7 +85,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
           <div className="flex items-center justify-between">
             <CardTitle>{isLoading ? <Skeleton className="h-8 w-48" /> : project?.name}</CardTitle>
             <div className="flex gap-4">
-              <Pencil className="h-5 w-5 cursor-pointer" onClick={() => setIsEditDialogOpen(true)} />
+              {project && <Pencil className="h-5 w-5 cursor-pointer" onClick={() => setIsEditDialogOpen(true)} />}
               {project && <DeleteProjectButton projectId={project.id} />}
             </div>
           </div>
@@ -106,7 +109,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
               <>
                 <div>
                   <dt className="font-medium text-gray-500">Client</dt>
-                  <dd>{client?.name}</dd>
+                  <dd>{project?.client?.name}</dd>
                 </div>
                 <div>
                   <dt className="font-medium text-gray-500">Project Type</dt>
@@ -133,34 +136,43 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
       </Card>
 
       {project && (
-        <>
-          <ProjectDialog
-            open={isEditDialogOpen && step === 'project'}
-            onOpenChange={setIsEditDialogOpen}
-            onNext={handleProjectNext}
-            mode="edit"
-            defaultValues={{
+        <UnifiedProjectWorkflow
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          onComplete={handleProjectUpdate}
+          mode="edit"
+          defaultValues={{
+            project: {
               name: project.name,
               description: project.description,
               type: project.type!,
               status: project.status,
               startDate: new Date(project.startDate),
-              endDate: new Date(project.endDate)
-            }}
-          />
-          <ClientDialog
-            open={isEditDialogOpen && step === 'client'}
-            onOpenChange={setIsEditDialogOpen}
-            onSubmit={handleClientSubmit}
-            onBack={() => setStep('project')}
-            defaultValues={{
-              name: client?.name || '',
-              email: client?.email || '',
-              phone: client?.phone || ''
-            }}
-            mode="edit"
-          />
-        </>
+              endDate: new Date(project.endDate),
+              client: {
+                id: project.client?.id || '',
+                name: project.client?.name || '',
+                email: project.client?.email || '',
+                phone: project.client?.phone || ''
+              }
+            },
+            phases: project.phases as Phase[],
+            payment: project.payment || {
+              id: projectId,
+              projectId: projectId,
+              totalAmount: new Prisma.Decimal(0),
+              amountPaid: new Prisma.Decimal(0),
+              depositRequired: null,
+              depositDueDate: null,
+              depositPaidAt: null,
+              paymentSchedule: PaymentSchedule.CUSTOM,
+              paymentTerms: null,
+              notes: null,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
+          }}
+        />
       )}
     </>
   );

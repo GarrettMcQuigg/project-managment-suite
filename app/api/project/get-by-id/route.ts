@@ -20,7 +20,9 @@ export async function GET(request: NextRequest) {
         deletedAt: null
       },
       include: {
-        client: true
+        client: true,
+        phases: true,
+        payment: true
       }
     });
 

@@ -15,10 +15,37 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    await db.project.delete({ where: { id: requestBody.id } });
+    await db.$transaction(async (tx) => {
+      const { id } = requestBody;
+
+      await tx.phase.deleteMany({
+        where: { projectId: id }
+      });
+
+      await tx.projectAttachment.deleteMany({
+        where: { projectId: id }
+      });
+
+      await tx.projectParticipant.deleteMany({
+        where: { projectId: id }
+      });
+
+      await tx.projectMessage.deleteMany({
+        where: { projectId: id }
+      });
+
+      await tx.project.update({
+        where: { id },
+        data: {
+          deletedAt: new Date(),
+          status: 'DELETED'
+        }
+      });
+    });
 
     return handleSuccess({ message: 'Successfully Deleted Project' });
   } catch (err: unknown) {
-    return handleError({ message: 'Failed to update project', err });
+    console.error('Project deletion error:', err);
+    return handleError({ message: 'Failed to delete project', err });
   }
 }

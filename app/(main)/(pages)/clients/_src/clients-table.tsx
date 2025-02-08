@@ -7,11 +7,11 @@ import { API_CLIENT_ADD_ROUTE, API_CLIENT_LIST_ROUTE, CLIENT_DETAILS_ROUTE, rout
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
-import { ClientDialog } from '@/app/(main)/_src/client-dialog';
 import { toast } from 'react-toastify';
 import { AddClientRequestBody } from '@/app/api/client/add/types';
 import { ClientFormValues } from '@/app/(main)/(pages)/clients/[id]/_src/types';
 import { Button } from '@/packages/lib/components/button';
+import { ClientDialog } from '../[id]/_src/client-dialog';
 
 export default function ClientsTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -83,7 +83,7 @@ export default function ClientsTable() {
         addRow={
           <>
             <Button onClick={() => setIsOpen(true)}>New Client</Button>
-            <ClientDialog open={isOpen} onOpenChange={setIsOpen} onSubmit={handleClientSubmit} />
+            <ClientDialog open={isOpen} onOpenChange={setIsOpen} onSubmit={handleClientSubmit} mode="create" />
           </>
         }
       />

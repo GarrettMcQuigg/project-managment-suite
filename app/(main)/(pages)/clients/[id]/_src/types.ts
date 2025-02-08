@@ -23,7 +23,7 @@ export interface ClientDialogProps {
   onSubmit: (data: ClientFormValues) => void;
   onBack?: () => void;
   defaultValues?: ClientFormValues;
-  mode?: 'create' | 'edit';
+  mode: 'create' | 'edit';
 }
 
 export interface NewClientFormProps {

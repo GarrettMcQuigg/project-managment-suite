@@ -123,7 +123,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
     },
     {
       title: 'Client Details',
-      component: <ClientStep form={form} />
+      component: <ClientStep form={form} mode={mode} />
     }
   ];
 

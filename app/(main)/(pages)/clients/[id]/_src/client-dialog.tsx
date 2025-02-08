@@ -98,7 +98,7 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="grid gap-4 py-4">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="grid gap-4 pt-4">
               {view === 'view' && defaultValues && (
                 <div className="space-y-4">
                   <ClientCard client={defaultValues} form={form} onEdit={toggleEdit} isEditing={isEditing} />
@@ -139,14 +139,14 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
                   {onBack && (
                     <Button type="button" variant="ghost" onClick={onBack} className="border-foreground/20">
                       <ArrowLeft className="w-4 h-4 mr-2" />
-                      Back to Project
+                      Back to Client
                     </Button>
                   )}
 
                   {!isEditing && (
-                    <Button type="submit" variant="ghost" className="text-foreground hover:text-foreground border-foreground">
-                      Update Project
-                    </Button>
+                    <div className="ml-auto">
+                      <Button type="submit">Update Client</Button>
+                    </div>
                   )}
                 </div>
               </DialogFooter>
@@ -162,25 +162,12 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
       <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-foreground/10 via-background to-background">
         <DialogHeader>
           <DialogTitle>Client Details</DialogTitle>
-          <DialogDescription>Select an existing client or create a new one</DialogDescription>
+          <DialogDescription>Create a new client</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
-            <Tabs defaultValue="new" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="new">New Client</TabsTrigger>
-                <TabsTrigger value="existing">Existing Client</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="new">
-                <NewClientForm form={form} />
-              </TabsContent>
-
-              <TabsContent value="existing">
-                <ExistingClientSelect form={form} onSelect={handleClientSelect} />
-              </TabsContent>
-            </Tabs>
+            <NewClientForm form={form} />
 
             <DialogFooter className="flex w-full items-center">
               <div className="flex w-full justify-end">
@@ -192,7 +179,7 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
                 )}
 
                 <Button type="submit" variant="ghost" className="text-primary hover:text-primary">
-                  Create Project
+                  Create Client
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>

@@ -1,3 +1,5 @@
+'use client';
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/packages/lib/components/tabs';
 import { useForm, UseFormReturn } from 'react-hook-form';
@@ -5,33 +7,88 @@ import { ClientFormValues, clients } from '../../(pages)/clients/[id]/_src/types
 import { Input } from '@/packages/lib/components/input';
 import { ProjectFormData } from './project-step';
 import { ExistingClientSelect } from '../../(pages)/clients/[id]/_src/existing-client-select';
+import { Button } from '@/packages/lib/components/button';
+import { Plus, Undo2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ClientStepProps {
   form: UseFormReturn<ProjectFormData & { id?: string }>;
+  mode?: 'create' | 'edit';
 }
 
-const ClientStep: React.FC<ClientStepProps> = ({ form }) => {
+const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create' }) => {
+  const [isNewClientForm, setIsNewClientForm] = useState(false);
+  const originalClientDataRef = useRef(form.getValues('client'));
   const clientForm = useForm<ClientFormValues>();
+
+  useEffect(() => {
+    const currentClient = form.getValues('client');
+    if (currentClient?.id && !isNewClientForm) {
+      originalClientDataRef.current = { ...currentClient };
+    }
+  }, [form, isNewClientForm]);
 
   const handleClientSelect = (clientId: string) => {
     const selectedClient = clients.find((c) => c.id.toString() === clientId);
     if (selectedClient) {
-      form.setValue('client.id', selectedClient.id.toString());
-      form.setValue('client.name', selectedClient.name);
-      form.setValue('client.email', selectedClient.email);
-      form.setValue('client.phone', selectedClient.phone);
+      setIsNewClientForm(false);
+      const clientData = {
+        id: selectedClient.id.toString(),
+        name: selectedClient.name,
+        email: selectedClient.email,
+        phone: selectedClient.phone
+      };
+      originalClientDataRef.current = { ...clientData };
+      form.setValue('client', clientData);
+    }
+  };
+
+  const handleCreateNewClick = () => {
+    setIsNewClientForm(true);
+    form.setValue('client.id', '');
+    form.setValue('client.name', '');
+    form.setValue('client.email', '');
+    form.setValue('client.phone', '');
+  };
+
+  const handleRestoreOriginalClient = () => {
+    setIsNewClientForm(false);
+    const originalData = originalClientDataRef.current;
+    if (originalData?.id) {
+      const restoredData = { ...originalData };
+      form.setValue('client', restoredData);
     }
   };
 
   return (
     <div className="space-y-4">
-      <Tabs defaultValue="new" className="w-full">
+      <Tabs defaultValue={mode === 'edit' ? 'edit' : 'new'} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="new">New Client</TabsTrigger>
+          <TabsTrigger value="edit">{mode === 'edit' ? 'Edit Client' : 'New Client'}</TabsTrigger>
           <TabsTrigger value="existing">Existing Client</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="new" className="space-y-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={isNewClientForm ? handleRestoreOriginalClient : handleCreateNewClick}
+          className="w-full mt-4 mb-2"
+          disabled={!originalClientDataRef.current?.id && !isNewClientForm}
+        >
+          {isNewClientForm ? (
+            <>
+              <Undo2 className="h-4 w-4 mr-2" />
+              Restore Original Client
+            </>
+          ) : (
+            <>
+              <Plus className="h-4 w-4 mr-2" />
+              Create New Client
+            </>
+          )}
+        </Button>
+
+        <TabsContent value="edit" className="space-y-4">
           <FormField
             control={form.control}
             name="client.name"

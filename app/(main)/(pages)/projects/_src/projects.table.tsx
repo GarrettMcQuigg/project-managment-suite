@@ -6,7 +6,7 @@ import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_PROJECT_ADD_ROUTE, API_PROJECT_LIST_ROUTE, PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 import { toast } from 'react-toastify';
 import { Project } from '@prisma/client';
 import { AddProjectButton } from './add-project';

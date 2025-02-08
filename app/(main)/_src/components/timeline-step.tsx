@@ -264,8 +264,8 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={activePhase.startDate instanceof Date ? activePhase.startDate : new Date(activePhase.startDate)}
-                    onSelect={(date) => date && updateActivePhase({ startDate: date })}
+                    selected={activePhase.endDate instanceof Date ? activePhase.endDate : new Date(activePhase.endDate)}
+                    onSelect={(date) => date && updateActivePhase({ endDate: date })}
                     initialFocus
                   />
                 </PopoverContent>

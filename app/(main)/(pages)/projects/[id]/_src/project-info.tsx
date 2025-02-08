@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import UnifiedProjectWorkflow from '@/app/(main)/_src/project-workflow-dialog';
 import { ProjectFormData } from '@/app/(main)/_src/components/project-step';
+import { ProjectTimeline } from './project-timeline';
 
 export function ProjectInfo({ projectId }: { projectId: string }) {
   const endpoint = API_PROJECT_GET_BY_ID_ROUTE + projectId;
@@ -105,17 +106,12 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
                   <dt className="font-medium text-gray-500">Status</dt>
                   <dd className="capitalize">{project?.status?.toLowerCase()}</dd>
                 </div>
-                <div>
-                  <dt className="font-medium text-gray-500">Timeline</dt>
-                  <dd>
-                    {new Date(project?.startDate || '').toLocaleDateString()} - {new Date(project?.endDate || '').toLocaleDateString()}
-                  </dd>
-                </div>
               </>
             )}
           </dl>
         </CardContent>
       </Card>
+      {project && <ProjectTimeline project={project} />}
 
       {project && (
         <UnifiedProjectWorkflow

@@ -45,7 +45,7 @@ const ProjectDetailsStep: React.FC<ProjectDetailsStepProps> = ({ form }) => (
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {Object.entries(projectTypes).map(([_, type]) => (
+              {Object.entries(projectTypes).map(([, type]) => (
                 <SelectItem key={type.key} value={type.key}>
                   <div className="flex flex-col gap-1">
                     <span className="font-medium text-left">{type.name}</span>

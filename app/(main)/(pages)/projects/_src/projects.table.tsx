@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import { Project } from '@prisma/client';
 import { AddProjectButton } from './add-project';
 import UnifiedProjectWorkflow from '@/app/(main)/_src/project-workflow-dialog';
+import { ProjectFormData } from '@/app/(main)/_src/components/project-step';
 
 export default function ProjectsTable() {
   // const [loading, setLoading] = useState(false);
@@ -46,7 +47,7 @@ export default function ProjectsTable() {
     // },
   ];
 
-  const handleComplete = async (data: any) => {
+  const handleComplete = async (data: ProjectFormData) => {
     console.log('data', data);
     // setLoading(true);
     try {
@@ -70,9 +71,9 @@ export default function ProjectsTable() {
     }
   };
 
-  const revalidate = () => {
-    mutate(API_PROJECT_LIST_ROUTE);
-  };
+  // const revalidate = () => {
+  //   mutate(API_PROJECT_LIST_ROUTE);
+  // };
 
   if (isLoading) return <div>Loading...</div>;
 

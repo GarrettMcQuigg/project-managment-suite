@@ -14,6 +14,7 @@ import { DeleteProjectButton } from './delete-project';
 import { toast } from 'react-toastify';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import UnifiedProjectWorkflow from '@/app/(main)/_src/project-workflow-dialog';
+import { ProjectFormData } from '@/app/(main)/_src/components/project-step';
 
 export function ProjectInfo({ projectId }: { projectId: string }) {
   const endpoint = API_PROJECT_GET_BY_ID_ROUTE + projectId;
@@ -32,7 +33,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
     }
   }, [data, error]);
 
-  const handleProjectUpdate = async (formData: any) => {
+  const handleProjectUpdate = async (formData: ProjectFormData) => {
     try {
       const response = await fetcher({
         url: API_PROJECT_UPDATE_ROUTE,
@@ -58,25 +59,6 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
   };
 
   if (error) return redirect(PROJECTS_ROUTE);
-
-  const getDefaultPaymentValues = () => {
-    if (!project?.payment) {
-      return {
-        totalAmount: new Prisma.Decimal(0),
-        depositRequired: new Prisma.Decimal(0),
-        paymentSchedule: 'CUSTOM'
-      };
-    }
-
-    return {
-      totalAmount: project.payment.totalAmount,
-      depositRequired: project.payment.depositRequired || new Prisma.Decimal(0),
-      depositDueDate: project.payment.depositDueDate,
-      paymentSchedule: project.payment.paymentSchedule,
-      paymentTerms: project.payment.paymentTerms,
-      notes: project.payment.notes
-    };
-  };
 
   return (
     <>

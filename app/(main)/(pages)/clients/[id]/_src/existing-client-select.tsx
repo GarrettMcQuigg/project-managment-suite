@@ -1,10 +1,9 @@
 'use client';
 
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
+import { FormField, FormItem, FormControl, FormMessage } from '@/packages/lib/components/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/packages/lib/components/select';
 import { Avatar, AvatarFallback } from '@packages/lib/components/avatar';
-import type { ExistingClientSelectProps } from './types';
-import { clients } from './types';
+import { clients, ExistingClientSelectProps } from './types';
 
 export const ExistingClientSelect = ({ form, onSelect }: ExistingClientSelectProps) => (
   <FormField

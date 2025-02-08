@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
 import { Form } from '@/packages/lib/components/form';
 import { Button } from '@/packages/lib/components/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/packages/lib/components/tabs';
 import { ArrowLeft, ArrowRight, UserPlus, Users } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { fetcher } from '@/packages/lib/helpers/fetcher';

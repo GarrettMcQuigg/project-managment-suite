@@ -22,14 +22,14 @@ import { API_PROJECT_ADD_ROUTE, CLIENTS_ROUTE, DASHBOARD_ROUTE, PROJECTS_ROUTE }
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import UnifiedProjectWorkflow from './project-workflow-dialog';
+import { ProjectFormData } from './components/project-step';
 
 export function AppSidebar() {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  const handleComplete = async (data: any) => {
-    console.log('data', data);
+  const handleComplete = async (data: ProjectFormData) => {
     setLoading(true);
     try {
       const response = await fetcher({

@@ -21,6 +21,7 @@ type FormData = z.infer<typeof CheckpointFormSchema>;
 export function CheckpointForm() {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
+  const [isInitialized, setIsInitialized] = React.useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(CheckpointFormSchema),
@@ -30,12 +31,15 @@ export function CheckpointForm() {
   });
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem('email');
-    if (storedEmail) {
-      form.reset({ email: storedEmail });
-      localStorage.removeItem('email');
+    if (!isInitialized) {
+      const storedEmail = localStorage.getItem('email');
+      if (storedEmail) {
+        form.reset({ email: storedEmail });
+        localStorage.removeItem('email');
+      }
+      setIsInitialized(true);
     }
-  });
+  }, [form, isInitialized]);
 
   const onSubmit = async (formData: FormData) => {
     setLoading(true);
@@ -61,6 +65,11 @@ export function CheckpointForm() {
       setLoading(false);
     }
   };
+
+  // Don't render the form until initialization is complete
+  if (!isInitialized) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

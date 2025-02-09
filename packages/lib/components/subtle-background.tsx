@@ -4,15 +4,20 @@ export default function SubtleBackground() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
       {/* Base gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(200,30%,98%)] via-[hsl(200,30%,96%)] to-[hsl(200,30%,94%)] dark:from-[hsl(175,90%,15%)] dark:via-[hsl(200,30%,5%)] dark:to-[hsl(200,30%,1%)] transition-colors duration-700" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(200,30%,98%)] via-[hsl(200,30%,96%)] to-[hsl(200,30%,94%)] dark:from-[hsl(175,90%,5%)] dark:via-[hsl(200,30%,2%)] dark:to-[hsl(200,30%,0%)] transition-colors duration-700" />
 
       {/* Elegant floating shapes with smoother gradients */}
       <div className="absolute inset-0 opacity-20">
         {/* Primary accent blob */}
         <div
           className="absolute h-[45rem] w-[45rem] -left-20 -top-32 rounded-[100%] 
-          bg-gradient-to-br from-[hsl(175,90%,45%)] via-[hsl(175,90%,40%)] to-transparent 
-          dark:from-[hsl(175,90%,35%)] dark:via-[hsl(175,90%,30%)] dark:to-transparent 
+          bg-gradient-to-br 
+          from-[hsl(175,90%,35%)] 
+          via-[hsl(175,90%,25%)] 
+          to-transparent
+          dark:from-[hsl(175,90%,45%)] 
+          dark:via-[hsl(175,90%,35%)] 
+          dark:to-transparent 
           blur-3xl transform-gpu transition-all duration-700
           animate-glow-slow"
         />
@@ -20,8 +25,13 @@ export default function SubtleBackground() {
         {/* Secondary floating element */}
         <div
           className="absolute h-[30rem] w-[30rem] right-0 top-1/4 rounded-[100%]
-          bg-gradient-to-bl from-[hsl(175,90%,50%)] via-[hsl(175,90%,45%)] to-transparent
-          dark:from-[hsl(175,90%,40%)] dark:via-[hsl(175,90%,35%)] dark:to-transparent
+          bg-gradient-to-bl 
+          from-[hsl(175,90%,30%)] 
+          via-[hsl(175,90%,25%)] 
+          to-transparent
+          dark:from-[hsl(175,90%,40%)] 
+          dark:via-[hsl(175,90%,30%)] 
+          dark:to-transparent
           blur-3xl transform-gpu transition-all duration-700
           animate-glow-medium"
         />
@@ -32,7 +42,7 @@ export default function SubtleBackground() {
         <defs>
           <linearGradient id="line-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="transparent" />
-            <stop offset="50%" stopColor="hsl(175,90%,35%)" stopOpacity="0.15" />
+            <stop offset="50%" stopColor="hsl(175,90%,30%)" stopOpacity="0.15" />
             <stop offset="100%" stopColor="transparent" />
           </linearGradient>
         </defs>

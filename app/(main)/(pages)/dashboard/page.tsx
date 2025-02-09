@@ -2,13 +2,10 @@ import { OverviewCards } from './_src/components/analytics/overview-cards';
 import { ProjectStats } from './_src/components/analytics/project-stats';
 import { ClientEngagement } from './_src/components/client-engagement';
 import { RevenueChart } from './_src/components/analytics/revenue-chart';
-import SubtleBackground from '@/packages/lib/components/subtle-background';
 
 export default function DashboardPage() {
   return (
     <div className="flex min-h-screen-minus-header bg-gradient-to-br from-foreground/5 via-background to-background">
-      <SubtleBackground />
-
       <div className="flex min-h-screen-minus-header">
         <main className="space-y-8 p-8 pt-6">
           <div className="flex items-center justify-between space-y-2">

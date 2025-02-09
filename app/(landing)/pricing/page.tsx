@@ -1,6 +1,6 @@
 import { Button } from '@/packages/lib/components/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/packages/lib/components/card';
-import CustomBackground from '@/packages/lib/components/custom-background';
+import SubtleBackground from '@/packages/lib/components/subtle-background';
 import { Check } from 'lucide-react';
 
 const tiers = [
@@ -33,12 +33,12 @@ const tiers = [
 export default function PricingPage() {
   return (
     <div className="min-h-screen min-w-full overflow-x-hidden">
-      <CustomBackground />
+      <SubtleBackground />
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 mt-12">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Pricing Plans</h1>
-          <p className="mt-2 text-sm text-gray-500">Choose the perfect plan for your creative journey - No hidden fees, ever.</p>
+          <h1 className="text-3xl font-bold text-foreground sm:text-4xl">Pricing Plans</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Choose the perfect plan for your creative journey - No hidden fees, ever.</p>
         </div>
 
         <div className="mt-12">

@@ -13,11 +13,7 @@ export const ABOUT_US_ROUTE = '/about-us';
 export const PRICING_ROUTE = '/pricing';
 export const TERMS_OF_SERVICE_ROUTE = '/terms-of-service';
 export const PRIVACY_POLICY_ROUTE = '/privacy-policy';
-export const PRODUCTS_ROUTE = '/products';
-export const PRODUCTS_BMS_ROUTE = `${PRODUCTS_ROUTE}/bms`;
-export const PRODUCTS_FINANCIAL_SERVICES_ROUTE = `${PRODUCTS_ROUTE}/financial-services`;
-export const PRODUCTS_PRODUCTIVITY_ROUTE = `${PRODUCTS_ROUTE}/productivity`;
-export const PRODUCTS_SUPPORT_AI_ROUTE = `${PRODUCTS_ROUTE}/support-ai`;
+export const FEATURES_ROUTE = '/features';
 
 // Main pages
 export const DASHBOARD_ROUTE = '/dashboard';

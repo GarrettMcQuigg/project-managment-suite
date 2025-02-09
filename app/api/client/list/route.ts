@@ -14,7 +14,10 @@ export async function GET() {
       where: {
         userId: currentUser.id,
         isArchived: false,
-        deletedAt: null
+        deletedAt: null,
+        NOT: {
+          email: 'system@deleted.client'
+        }
       },
       include: {
         projects: true

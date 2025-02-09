@@ -1,6 +1,6 @@
 import React from 'react';
 import SubtleBackground from '@/packages/lib/components/subtle-background';
-import { Zap, Users, BarChart3, Briefcase, MessageSquare, FileStack, Palette, Globe2, Shield, Rocket } from 'lucide-react';
+import { Users, BarChart3, Briefcase, MessageSquare, FileStack, Palette, Shield } from 'lucide-react';
 
 export default function Features() {
   return (

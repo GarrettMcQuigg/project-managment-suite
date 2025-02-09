@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   let requestBody: AddProjectRequestBody = await request.json();
 
   if (requestBody.client && (requestBody.client.id === '' || requestBody.client.id === undefined)) {
-    const { id, ...clientWithoutId } = requestBody.client;
+    const { ...clientWithoutId } = requestBody.client;
     requestBody = {
       ...requestBody,
       client: clientWithoutId

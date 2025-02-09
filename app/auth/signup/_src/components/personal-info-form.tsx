@@ -15,7 +15,13 @@ import { useRouter } from 'next/navigation';
 
 export const usePersonalInfoForm = () => {
   return useForm<z.infer<typeof PersonalInfoFormSchema>>({
-    resolver: zodResolver(PersonalInfoFormSchema)
+    resolver: zodResolver(PersonalInfoFormSchema),
+    defaultValues: {
+      firstname: '',
+      lastname: '',
+      email: typeof window !== 'undefined' ? localStorage.getItem('email') || '' : '',
+      phone: ''
+    }
   });
 };
 
@@ -35,11 +41,10 @@ interface PersonalInfoFormProps {
 export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loading, onSubmit }) => {
   const router = useRouter();
   useEffect(() => {
-    const storedEmail = localStorage.getItem('email');
-    if (storedEmail) {
-      form.setValue('email', storedEmail);
-    }
-  }, [form]);
+    return () => {
+      localStorage.removeItem('email');
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

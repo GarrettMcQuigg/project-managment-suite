@@ -32,10 +32,10 @@ export function CheckpointForm() {
   useEffect(() => {
     const storedEmail = localStorage.getItem('email');
     if (storedEmail) {
-      form.setValue('email', storedEmail);
+      form.reset({ email: storedEmail });
       localStorage.removeItem('email');
     }
-  }, [form]);
+  }, []);
 
   const onSubmit = async (formData: FormData) => {
     setLoading(true);
@@ -65,7 +65,7 @@ export function CheckpointForm() {
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
+        <div className="text-muted-foreground">
           <h2 className="mt-6 text-center text-3xl font-bold">Enter your email address</h2>
           <h5 className="mt-6 text-center text-normal">Please enter your email address to continue</h5>
         </div>

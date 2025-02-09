@@ -20,11 +20,10 @@ interface StepIndicatorProps {
 
 export interface ProjectPaymentFormData {
   totalAmount: number;
-  depositRequired: number | undefined;
-  depositDueDate: Date | undefined;
-  paymentSchedule: string;
-  paymentTerms: string | undefined;
-  notes: string | undefined;
+  depositRequired: number | null;
+  depositDueDate: Date | null;
+  paymentSchedule: PaymentSchedule;
+  notes?: string;
 }
 
 interface UnifiedProjectWorkflowProps {
@@ -41,10 +40,9 @@ interface UnifiedProjectWorkflowProps {
 
 const defaultPayment: ProjectPaymentFormData = {
   totalAmount: 0,
-  depositRequired: 0,
-  depositDueDate: undefined,
+  depositRequired: null,
+  depositDueDate: null,
   paymentSchedule: PaymentSchedule.CUSTOM,
-  paymentTerms: '',
   notes: ''
 };
 
@@ -64,7 +62,7 @@ const defaultFormValues: ProjectFormData = {
 };
 
 const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
-  const steps = ['Project', 'Timeline', 'Budget', 'Client'];
+  const steps = ['Project', 'Timeline', 'Payment', 'Client'];
 
   return (
     <div className="flex items-center justify-center space-x-2 mb-6">
@@ -89,11 +87,10 @@ const convertPaymentToFormData = (payment: ProjectPayment | null | undefined): P
 
   return {
     totalAmount: Number(payment.totalAmount),
-    depositRequired: payment.depositRequired ? Number(payment.depositRequired) : undefined,
-    depositDueDate: payment.depositDueDate || undefined,
+    depositRequired: payment.depositRequired ? Number(payment.depositRequired) : null,
+    depositDueDate: payment.depositDueDate || null,
     paymentSchedule: payment.paymentSchedule,
-    paymentTerms: payment.paymentTerms || undefined,
-    notes: payment.notes || undefined
+    notes: payment.notes || ''
   };
 };
 
@@ -143,17 +140,20 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
   const handleNext = async () => {
     if (currentStep === steps.length - 1) {
       const formData = form.getValues();
-      await onComplete({
-        ...formData,
-        phases,
-        payment
-      });
-      resetWorkflow();
+      try {
+        await onComplete({
+          ...formData,
+          phases,
+          payment
+        });
+        resetWorkflow();
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }
     } else {
       setCurrentStep(currentStep + 1);
     }
   };
-
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       resetWorkflow();

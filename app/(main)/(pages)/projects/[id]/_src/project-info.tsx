@@ -144,7 +144,6 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
               depositDueDate: null,
               depositPaidAt: null,
               paymentSchedule: PaymentSchedule.CUSTOM,
-              paymentTerms: null,
               notes: null,
               createdAt: new Date(),
               updatedAt: new Date()

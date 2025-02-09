@@ -7,14 +7,22 @@ export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
   if (!currentUser) return handleUnauthorized();
 
-  const requestBody: AddProjectRequestBody = await request.json();
+  let requestBody: AddProjectRequestBody = await request.json();
+
+  if (requestBody.client && (requestBody.client.id === '' || requestBody.client.id === undefined)) {
+    const { id, ...clientWithoutId } = requestBody.client;
+    requestBody = {
+      ...requestBody,
+      client: clientWithoutId
+    };
+  }
 
   const { error } = AddProjectRequestBodySchema.validate(requestBody);
   if (error) {
     return handleBadRequest({ message: error.message, err: error });
   }
 
-  const { client, name, description, type, status, startDate, endDate, phases, budget } = requestBody;
+  const { client, name, description, type, status, startDate, endDate, phases, payment } = requestBody;
 
   try {
     const result = await db.$transaction(async (tx) => {
@@ -65,13 +73,16 @@ export async function POST(request: Request) {
         }
       });
 
-      // 3. Create the payment/budget record
+      // 3. Create the payment record
       await tx.projectPayment.create({
         data: {
           projectId: projectRecord.id,
-          totalAmount: budget.totalAmount,
-          depositRequired: budget.depositRequired,
-          paymentSchedule: budget.paymentSchedule
+          totalAmount: payment.totalAmount,
+          depositRequired: payment.depositRequired || null,
+          depositDueDate: payment.depositDueDate || null,
+          paymentSchedule: payment.paymentSchedule,
+          notes: payment.notes || null,
+          amountPaid: 0
         }
       });
 

@@ -100,7 +100,6 @@ model ProjectPayment {
   depositDueDate  DateTime? // When deposit is due
   depositPaidAt   DateTime? // When deposit was paid
   paymentSchedule PaymentSchedule @default(CUSTOM) // How payments are structured
-  paymentTerms    String? // Description of payment terms
   notes           String? // Any additional payment notes
 
   createdAt DateTime @default(now())

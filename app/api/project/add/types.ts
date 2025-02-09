@@ -4,10 +4,12 @@ import { PhaseSchema } from '../phases/add/types';
 
 export const ProjectPaymentSchema = Joi.object({
   totalAmount: Joi.number().required(),
-  depositRequired: Joi.number().required(),
+  depositRequired: Joi.number().allow(null).optional(),
+  depositDueDate: Joi.date().allow(null).optional(),
   paymentSchedule: Joi.string()
     .valid(...Object.values(PaymentSchedule))
-    .required()
+    .required(),
+  notes: Joi.string().allow('', null).optional()
 });
 
 export const AddProjectRequestBodySchema = Joi.object({
@@ -34,8 +36,8 @@ export const AddProjectRequestBodySchema = Joi.object({
   // Phases section
   phases: Joi.array().items(PhaseSchema).required(),
 
-  // Budget section
-  budget: ProjectPaymentSchema.required()
+  // Payment section
+  payment: ProjectPaymentSchema.required()
 });
 
 export type AddProjectRequestBody = {
@@ -55,5 +57,5 @@ export type AddProjectRequestBody = {
     phone?: string;
   };
   phases: Phase[];
-  budget: ProjectPayment;
+  payment: ProjectPayment;
 };

@@ -45,10 +45,12 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create' }) => {
 
   const handleCreateNewClick = () => {
     setIsNewClientForm(true);
-    form.setValue('client.id', '');
-    form.setValue('client.name', '');
-    form.setValue('client.email', '');
-    form.setValue('client.phone', '');
+    form.setValue('client', {
+      id: undefined,
+      name: '',
+      email: '',
+      phone: ''
+    });
   };
 
   const handleRestoreOriginalClient = () => {
@@ -72,7 +74,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create' }) => {
           type="button"
           variant="outline"
           onClick={isNewClientForm ? handleRestoreOriginalClient : handleCreateNewClick}
-          className="w-full mt-4 mb-2"
+          className={mode === 'create' ? 'hidden' : 'w-full mt-4 mb-2'}
           disabled={!originalClientDataRef.current?.id && !isNewClientForm}
         >
           {isNewClientForm ? (
@@ -88,7 +90,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create' }) => {
           )}
         </Button>
 
-        <TabsContent value="edit" className="space-y-4">
+        <TabsContent value="edit" className="space-y-4 mt-4">
           <FormField
             control={form.control}
             name="client.name"

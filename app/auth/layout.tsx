@@ -1,4 +1,3 @@
-import CustomBackground from '@/packages/lib/components/custom-background';
 import SubtleBackground from '@/packages/lib/components/subtle-background';
 import { DASHBOARD_ROUTE } from '@/packages/lib/routes';
 import { getCurrentUser } from '@packages/lib/helpers/get-current-user';

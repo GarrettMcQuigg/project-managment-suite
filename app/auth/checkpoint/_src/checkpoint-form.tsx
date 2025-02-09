@@ -35,7 +35,7 @@ export function CheckpointForm() {
       form.reset({ email: storedEmail });
       localStorage.removeItem('email');
     }
-  }, []);
+  });
 
   const onSubmit = async (formData: FormData) => {
     setLoading(true);

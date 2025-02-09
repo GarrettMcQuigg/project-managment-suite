@@ -5,9 +5,11 @@ import { PhaseSchema } from '../phases/add/types';
 export const UpdateProjectPaymentSchema = Joi.object({
   totalAmount: Joi.number().required(),
   depositRequired: Joi.number().required(),
+  depositDueDate: Joi.date().allow(null),
   paymentSchedule: Joi.string()
     .valid(...Object.values(PaymentSchedule))
-    .required()
+    .required(),
+  notes: Joi.string().allow('')
 });
 
 export const UpdateProjectRequestBodySchema = Joi.object({

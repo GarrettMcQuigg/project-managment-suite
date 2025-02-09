@@ -12,9 +12,18 @@ interface PaymentStepProps {
 }
 
 const PaymentStep: React.FC<PaymentStepProps> = ({ payment, onPaymentChange }) => {
-  // Helper function to safely check if deposit is required
   const hasDeposit = () => {
-    return typeof payment.depositRequired === 'number' && payment.depositRequired > 0;
+    const deposit = payment.depositRequired ?? 0;
+    return deposit > 0;
+  };
+
+  const handleDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0;
+    onPaymentChange({
+      ...payment,
+      depositRequired: value,
+      depositDueDate: value === null ? null : payment.depositDueDate
+    });
   };
 
   return (
@@ -29,7 +38,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ payment, onPaymentChange }) =
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60">$</span>
               <Input
                 type="number"
-                value={payment.totalAmount}
+                value={payment.totalAmount ?? 0}
                 onChange={(e) => onPaymentChange({ ...payment, totalAmount: parseFloat(e.target.value) || 0 })}
                 className="pl-8 border-foreground/20"
                 placeholder="0.00"
@@ -42,17 +51,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ payment, onPaymentChange }) =
             <FormLabel>Required Deposit</FormLabel>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60">$</span>
-              <Input
-                type="number"
-                value={payment.depositRequired ?? ''}
-                onChange={(e) => {
-                  const value = e.target.value === '' ? null : parseFloat(e.target.value);
-                  onPaymentChange({ ...payment, depositRequired: value });
-                }}
-                className="pl-8 border-foreground/20"
-                placeholder="0.00"
-                step="0.01"
-              />
+              <Input type="number" value={payment.depositRequired ?? 0} onChange={handleDepositChange} className="pl-8 border-foreground/20" placeholder="0.00" step="0.01" />
             </div>
           </div>
 

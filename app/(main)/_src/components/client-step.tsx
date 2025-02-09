@@ -14,19 +14,48 @@ import { useEffect, useRef, useState } from 'react';
 interface ClientStepProps {
   form: UseFormReturn<ProjectFormData & { id?: string }>;
   mode?: 'create' | 'edit';
+  onValidationChange?: (isValid: boolean) => void;
 }
 
-const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create' }) => {
+const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValidationChange }) => {
   const [isNewClientForm, setIsNewClientForm] = useState(false);
+  const [currentClient, setCurrentClient] = useState<ClientFormValues>(form.getValues('client'));
   const originalClientDataRef = useRef(form.getValues('client'));
   const clientForm = useForm<ClientFormValues>();
 
+  const clientName = form.watch('client.name');
+  const clientEmail = form.watch('client.email');
+  const clientPhone = form.watch('client.phone');
+
   useEffect(() => {
-    const currentClient = form.getValues('client');
-    if (currentClient?.id && !isNewClientForm) {
-      originalClientDataRef.current = { ...currentClient };
+    const hasCurrentClient = form.getValues('client');
+    if (hasCurrentClient?.id && !isNewClientForm) {
+      setCurrentClient(hasCurrentClient);
+      originalClientDataRef.current = { ...hasCurrentClient };
+    }
+
+    if (hasCurrentClient?.id && hasCurrentClient.email === 'system@deleted.client') {
+      form.setValue('client', {
+        id: undefined,
+        name: '',
+        email: '',
+        phone: ''
+      });
+
+      setIsNewClientForm(true);
     }
   }, [form, isNewClientForm]);
+
+  useEffect(() => {
+    const validateClient = () => {
+      const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clientEmail || '');
+      const isValidPhone = /^\+?[\d\s-]{10,}$/.test(clientPhone || '');
+      const isValid = Boolean(clientName && clientName.length >= 2 && isValidEmail && isValidPhone);
+      onValidationChange?.(isValid);
+    };
+
+    validateClient();
+  }, [clientName, clientEmail, clientPhone, onValidationChange]);
 
   const handleClientSelect = (clientId: string) => {
     const selectedClient = clients.find((c) => c.id.toString() === clientId);
@@ -64,9 +93,9 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create' }) => {
 
   return (
     <div className="space-y-4">
-      <Tabs defaultValue={mode === 'edit' ? 'edit' : 'new'} className="w-full">
+      <Tabs defaultValue="edit" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="edit">{mode === 'edit' ? 'Edit Client' : 'New Client'}</TabsTrigger>
+          <TabsTrigger value="edit">{mode === 'create' ? 'New Client' : 'Edit Client'}</TabsTrigger>
           <TabsTrigger value="existing">Existing Client</TabsTrigger>
         </TabsList>
 
@@ -74,7 +103,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create' }) => {
           type="button"
           variant="outline"
           onClick={isNewClientForm ? handleRestoreOriginalClient : handleCreateNewClick}
-          className={mode === 'create' ? 'hidden' : 'w-full mt-4 mb-2'}
+          className={mode === 'create' || currentClient.email === 'system@deleted.client' ? 'hidden' : 'w-full mt-4 mb-2'}
           disabled={!originalClientDataRef.current?.id && !isNewClientForm}
         >
           {isNewClientForm ? (

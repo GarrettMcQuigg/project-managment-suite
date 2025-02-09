@@ -78,7 +78,7 @@ export async function POST(request: Request) {
         data: {
           projectId: projectRecord.id,
           totalAmount: payment.totalAmount,
-          depositRequired: payment.depositRequired || null,
+          depositRequired: payment.depositRequired || 0,
           depositDueDate: payment.depositDueDate || null,
           paymentSchedule: payment.paymentSchedule,
           notes: payment.notes || null,

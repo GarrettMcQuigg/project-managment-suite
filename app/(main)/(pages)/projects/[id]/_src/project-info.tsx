@@ -140,7 +140,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
               projectId: projectId,
               totalAmount: new Prisma.Decimal(0),
               amountPaid: new Prisma.Decimal(0),
-              depositRequired: null,
+              depositRequired: new Prisma.Decimal(0),
               depositDueDate: null,
               depositPaidAt: null,
               paymentSchedule: PaymentSchedule.CUSTOM,

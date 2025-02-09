@@ -20,10 +20,10 @@ interface StepIndicatorProps {
 
 export interface ProjectPaymentFormData {
   totalAmount: number;
-  depositRequired: number | null;
+  depositRequired: number;
   depositDueDate: Date | null;
   paymentSchedule: PaymentSchedule;
-  notes?: string;
+  notes?: string | null;
 }
 
 interface UnifiedProjectWorkflowProps {
@@ -40,10 +40,10 @@ interface UnifiedProjectWorkflowProps {
 
 const defaultPayment: ProjectPaymentFormData = {
   totalAmount: 0,
-  depositRequired: null,
+  depositRequired: 0,
   depositDueDate: null,
   paymentSchedule: PaymentSchedule.CUSTOM,
-  notes: ''
+  notes: null
 };
 
 const defaultFormValues: ProjectFormData = {
@@ -87,7 +87,7 @@ const convertPaymentToFormData = (payment: ProjectPayment | null | undefined): P
 
   return {
     totalAmount: Number(payment.totalAmount),
-    depositRequired: payment.depositRequired ? Number(payment.depositRequired) : null,
+    depositRequired: payment.depositRequired ? Number(payment.depositRequired) : 0,
     depositDueDate: payment.depositDueDate || null,
     paymentSchedule: payment.paymentSchedule,
     notes: payment.notes || ''
@@ -98,6 +98,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [phases, setPhases] = useState<Phase[]>(defaultValues?.phases || []);
   const [payment, setPayment] = useState<ProjectPaymentFormData>(convertPaymentToFormData(defaultValues?.payment));
+  const [clientFormValid, setClientFormValid] = useState(true);
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectFormSchema),
@@ -120,7 +121,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
     },
     {
       title: 'Client Details',
-      component: <ClientStep form={form} mode={mode} />
+      component: <ClientStep form={form} mode={mode} onValidationChange={setClientFormValid} />
     }
   ];
 
@@ -138,6 +139,10 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
   };
 
   const handleNext = async () => {
+    if (currentStep === 3 && !clientFormValid) {
+      return;
+    }
+
     if (currentStep === steps.length - 1) {
       const formData = form.getValues();
       try {
@@ -154,6 +159,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
       setCurrentStep(currentStep + 1);
     }
   };
+
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       resetWorkflow();

@@ -6,7 +6,7 @@ import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_PROJECT_ADD_ROUTE, API_PROJECT_LIST_ROUTE, PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { toast } from 'react-toastify';
 import { Project } from '@prisma/client';
 import { AddProjectButton } from './add-project';
@@ -60,6 +60,7 @@ export default function ProjectsTable() {
         return;
       }
 
+      revalidate();
       setIsOpen(false);
       toast.success('Project created successfully');
     } catch (error) {
@@ -70,9 +71,9 @@ export default function ProjectsTable() {
     }
   };
 
-  // const revalidate = () => {
-  //   mutate(API_PROJECT_LIST_ROUTE);
-  // };
+  const revalidate = () => {
+    mutate(API_PROJECT_LIST_ROUTE);
+  };
 
   if (isLoading) return <div>Loading...</div>;
 

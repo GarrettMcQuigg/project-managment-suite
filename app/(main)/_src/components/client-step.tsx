@@ -2,11 +2,12 @@
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/packages/lib/components/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/packages/lib/components/select';
+import { Avatar, AvatarFallback } from '@packages/lib/components/avatar';
 import { useForm, UseFormReturn } from 'react-hook-form';
 import { ClientFormValues } from '../../(pages)/clients/[id]/_src/types';
 import { Input } from '@/packages/lib/components/input';
 import { ProjectFormData } from './project-step';
-import { ExistingClientSelect } from '../../(pages)/clients/[id]/_src/existing-client-select';
 import { Button } from '@/packages/lib/components/button';
 import { Plus, Undo2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -19,9 +20,10 @@ interface ClientStepProps {
   form: UseFormReturn<ProjectFormData & { id?: string }>;
   mode?: 'create' | 'edit';
   onValidationChange?: (isValid: boolean) => void;
+  onClientSelect?: () => void;
 }
 
-const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValidationChange }) => {
+const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValidationChange, onClientSelect }) => {
   const [isNewClientForm, setIsNewClientForm] = useState(false);
   const [clientList, setClientList] = useState<Client[]>([]);
   const [currentClient, setCurrentClient] = useState<ClientFormValues>(form.getValues('client'));
@@ -82,6 +84,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
       };
       originalClientDataRef.current = { ...clientData };
       form.setValue('client', clientData);
+      onClientSelect?.();
     }
   };
 
@@ -178,7 +181,48 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
 
         <TabsContent value="existing">
           <div className="py-4">
-            <ExistingClientSelect form={clientForm} clientList={clientList} onSelect={handleClientSelect} />
+            <FormField
+              control={clientForm.control}
+              name="id"
+              render={({ field }) => (
+                <FormItem>
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      handleClientSelect(value);
+                    }}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="border-foreground/20">
+                        <SelectValue placeholder="Choose an existing client..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {clientList.map((client) => (
+                        <SelectItem key={client.id} value={client.id.toString()} className="py-2 data-[highlighted]:bg-foreground/15">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-8 h-8">
+                              <AvatarFallback>
+                                {client.name
+                                  .split(' ')
+                                  .map((chunk) => chunk[0])
+                                  .join('')}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{client.name}</span>
+                              <span className="text-xs text-muted-foreground">{client.email}</span>
+                            </div>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
         </TabsContent>
       </Tabs>

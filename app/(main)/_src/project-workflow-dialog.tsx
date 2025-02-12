@@ -99,6 +99,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
   const [phases, setPhases] = useState<Phase[]>(defaultValues?.phases || []);
   const [payment, setPayment] = useState<ProjectPaymentFormData>(convertPaymentToFormData(defaultValues?.payment));
   const [clientFormValid, setClientFormValid] = useState(true);
+  const [isClientSelected, setIsClientSelected] = useState(false);
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectFormSchema),
@@ -121,7 +122,20 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
     },
     {
       title: 'Client Details',
-      component: <ClientStep form={form} mode={mode} onValidationChange={setClientFormValid} />
+      component: (
+        <ClientStep
+          form={form}
+          mode={mode}
+          onValidationChange={setClientFormValid}
+          onClientSelect={() => {
+            setIsClientSelected(true);
+            const createButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
+            if (createButton) {
+              createButton.focus();
+            }
+          }}
+        />
+      )
     }
   ];
 
@@ -190,7 +204,11 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
                 Back
               </Button>
 
-              <Button type="submit">
+              <Button
+                type="submit"
+                variant={currentStep === 3 && isClientSelected ? 'default' : 'outline'}
+                className={currentStep === 3 && isClientSelected ? 'bg-teal-500 hover:bg-teal-600 text-white transition-colors' : ''}
+              >
                 {currentStep === steps.length - 1 ? (mode === 'create' ? 'Create' : 'Save') : 'Next'}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>

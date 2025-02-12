@@ -25,7 +25,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
   const [isNewClientForm, setIsNewClientForm] = useState(false);
   const [clientList, setClientList] = useState<Client[]>([]);
   const [currentClient, setCurrentClient] = useState<ClientFormValues>(form.getValues('client'));
-  const { data, error, isLoading } = useSWR(API_CLIENT_LIST_ROUTE, swrFetcher);
+  const { data, error } = useSWR(API_CLIENT_LIST_ROUTE, swrFetcher);
   const originalClientDataRef = useRef(form.getValues('client'));
   const clientForm = useForm<ClientFormValues>();
 

@@ -22,7 +22,7 @@ import { Client } from '@prisma/client';
 export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValues, mode = 'create' }: ClientDialogProps) {
   const [view, setView] = useState<ViewState>(mode === 'edit' ? 'view' : 'new');
   const [clientList, setClientList] = useState<Client[]>([]);
-  const { data, error, isLoading } = useSWR(API_CLIENT_LIST_ROUTE, swrFetcher);
+  const { data, error } = useSWR(API_CLIENT_LIST_ROUTE, swrFetcher);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {

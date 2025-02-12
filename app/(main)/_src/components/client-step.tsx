@@ -3,13 +3,17 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/packages/lib/components/tabs';
 import { useForm, UseFormReturn } from 'react-hook-form';
-import { ClientFormValues, clients } from '../../(pages)/clients/[id]/_src/types';
+import { ClientFormValues } from '../../(pages)/clients/[id]/_src/types';
 import { Input } from '@/packages/lib/components/input';
 import { ProjectFormData } from './project-step';
 import { ExistingClientSelect } from '../../(pages)/clients/[id]/_src/existing-client-select';
 import { Button } from '@/packages/lib/components/button';
 import { Plus, Undo2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import useSWR from 'swr';
+import { API_CLIENT_LIST_ROUTE } from '@/packages/lib/routes';
+import { swrFetcher } from '@/packages/lib/helpers/fetcher';
+import { Client } from '@prisma/client';
 
 interface ClientStepProps {
   form: UseFormReturn<ProjectFormData & { id?: string }>;
@@ -19,13 +23,22 @@ interface ClientStepProps {
 
 const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValidationChange }) => {
   const [isNewClientForm, setIsNewClientForm] = useState(false);
+  const [clientList, setClientList] = useState<Client[]>([]);
   const [currentClient, setCurrentClient] = useState<ClientFormValues>(form.getValues('client'));
+  const { data, error, isLoading } = useSWR(API_CLIENT_LIST_ROUTE, swrFetcher);
   const originalClientDataRef = useRef(form.getValues('client'));
   const clientForm = useForm<ClientFormValues>();
 
   const clientName = form.watch('client.name');
   const clientEmail = form.watch('client.email');
   const clientPhone = form.watch('client.phone');
+
+  useEffect(() => {
+    if (data) {
+      console.log('data', data.content);
+      setClientList(data.content);
+    }
+  }, [data, error]);
 
   useEffect(() => {
     const hasCurrentClient = form.getValues('client');
@@ -58,7 +71,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
   }, [clientName, clientEmail, clientPhone, onValidationChange]);
 
   const handleClientSelect = (clientId: string) => {
-    const selectedClient = clients.find((c) => c.id.toString() === clientId);
+    const selectedClient = clientList.find((client) => client.id.toString() === clientId);
     if (selectedClient) {
       setIsNewClientForm(false);
       const clientData = {
@@ -165,7 +178,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
 
         <TabsContent value="existing">
           <div className="py-4">
-            <ExistingClientSelect form={clientForm} onSelect={handleClientSelect} />
+            <ExistingClientSelect form={clientForm} clientList={clientList} onSelect={handleClientSelect} />
           </div>
         </TabsContent>
       </Tabs>

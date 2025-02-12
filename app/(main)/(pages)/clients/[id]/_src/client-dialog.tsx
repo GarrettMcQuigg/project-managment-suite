@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
@@ -8,18 +8,28 @@ import { Form } from '@/packages/lib/components/form';
 import { Button } from '@/packages/lib/components/button';
 import { ArrowLeft, ArrowRight, UserPlus, Users } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fetcher } from '@/packages/lib/helpers/fetcher';
-import { API_CLIENT_UPDATE_ROUTE } from '@/packages/lib/routes';
+import { fetcher, swrFetcher } from '@/packages/lib/helpers/fetcher';
+import { API_CLIENT_LIST_ROUTE, API_CLIENT_UPDATE_ROUTE } from '@/packages/lib/routes';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import { UpdateClientRequestBody } from '@/app/api/client/update/types';
-import { ClientDialogProps, clientFormSchema, ClientFormValues, clients, ViewState } from './types';
+import { ClientDialogProps, clientFormSchema, ClientFormValues, ViewState } from './types';
 import { ClientCard } from './client-card';
 import { ExistingClientSelect } from './existing-client-select';
 import { NewClientForm } from './new-client-form';
+import useSWR from 'swr';
+import { Client } from '@prisma/client';
 
 export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValues, mode = 'create' }: ClientDialogProps) {
   const [view, setView] = useState<ViewState>(mode === 'edit' ? 'view' : 'new');
+  const [clientList, setClientList] = useState<Client[]>([]);
+  const { data, error, isLoading } = useSWR(API_CLIENT_LIST_ROUTE, swrFetcher);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (data) {
+      setClientList(data.content);
+    }
+  }, [data, error]);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
@@ -31,7 +41,7 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
   });
 
   const handleClientSelect = (clientId: string) => {
-    const selectedClient = clients.find((c) => c.id.toString() === clientId);
+    const selectedClient = clientList.find((client) => client.id.toString() === clientId);
     if (selectedClient) {
       form.reset({
         id: clientId,
@@ -117,7 +127,7 @@ export function ClientDialog({ open, onOpenChange, onSubmit, onBack, defaultValu
 
               {view === 'select' && (
                 <div className="space-y-4">
-                  <ExistingClientSelect form={form} onSelect={handleClientSelect} />
+                  <ExistingClientSelect form={form} clientList={clientList} onSelect={handleClientSelect} />
                   <Button type="button" variant="outline" className="w-full border-foreground/20" onClick={() => setView('view')}>
                     Cancel
                   </Button>

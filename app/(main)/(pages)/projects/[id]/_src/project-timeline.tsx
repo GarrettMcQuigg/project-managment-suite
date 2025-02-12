@@ -6,14 +6,19 @@ import { Phase } from '@prisma/client';
 import type React from 'react';
 
 export function ProjectTimeline({ project }: { project: ProjectWithMetadata }) {
-  const startDate = new Date(project.phases[0].startDate);
-  const endDate = new Date(project.phases[project.phases.length - 1].endDate);
+  const startDate = new Date(project.startDate);
+  const endDate = new Date(project.endDate);
   const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24);
+
+  const getMinWidth = (phase: Phase) => {
+    const phaseDuration = (new Date(phase.endDate).getTime() - new Date(phase.startDate).getTime()) / (1000 * 3600 * 24);
+    return Math.max(200, (phaseDuration / totalDays) * 1000);
+  };
 
   return (
     <>
       <div className="w-full border-b border-foreground/50 mb-4">
-        <dt className="font-medium text-gray-500">Timeline</dt>
+        <dt className="font-medium text-gray-500">Timeline Preview</dt>
         <dd className="mb-2">
           {new Date(project?.startDate || '').toLocaleDateString()} - {new Date(project?.endDate || '').toLocaleDateString()}
         </dd>
@@ -25,6 +30,7 @@ export function ProjectTimeline({ project }: { project: ProjectWithMetadata }) {
             const phaseEnd = new Date(phase.endDate);
             const startOffset = ((phaseStart.getTime() - startDate.getTime()) / (1000 * 3600 * 24) / totalDays) * 100;
             const duration = ((phaseEnd.getTime() - phaseStart.getTime()) / (1000 * 3600 * 24) / totalDays) * 100;
+            const minWidth = getMinWidth(phase);
 
             return (
               <Card
@@ -32,15 +38,17 @@ export function ProjectTimeline({ project }: { project: ProjectWithMetadata }) {
                 className="mb-4"
                 style={{
                   marginLeft: `${startOffset}%`,
-                  width: `calc(100px + ${duration}%)`
+                  width: `max(${minWidth}px, calc(${duration}% + 200px))`,
+                  minWidth: '200px',
+                  maxWidth: '100%'
                 }}
               >
                 <CardContent className="p-3">
                   <div className="mb-2">
                     <h4 className="text-md font-semibold">{phase.name}</h4>
-                    <div className="text-sm text-muted-foreground">{phase.description}</div>
+                    <div className="text-sm text-muted-foreground break-words">{phase.description}</div>
                   </div>
-                  <div className="text-xs text-muted-foreground whitespace-nowrap">
+                  <div className="text-xs text-muted-foreground">
                     {new Date(phase.startDate).toLocaleDateString()} - {new Date(phase.endDate).toLocaleDateString()}
                   </div>
                 </CardContent>

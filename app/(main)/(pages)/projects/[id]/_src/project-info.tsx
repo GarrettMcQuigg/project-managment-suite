@@ -25,6 +25,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
 
   useEffect(() => {
     if (data) {
+      console.log(data.content);
       setProject(data.content);
     }
 

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { UseFormReturn } from 'react-hook-form';
+import { Client } from '@prisma/client';
 
 export const clientFormSchema = z.object({
   id: z.string().optional(),
@@ -32,24 +33,8 @@ export interface NewClientFormProps {
 
 export interface ExistingClientSelectProps {
   form: UseFormReturn<ClientFormValues>;
+  clientList: Client[];
   onSelect: (clientId: string) => void;
 }
 
 export type ViewState = 'view' | 'select' | 'new';
-
-export const clients = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'johndoe@aol.com',
-    phone: '555-555-5555',
-    isArchived: false
-  },
-  {
-    id: 2,
-    name: 'Jane Doe',
-    email: 'janedoe@aol.com',
-    phone: '777-777-5555',
-    isArchived: false
-  }
-];

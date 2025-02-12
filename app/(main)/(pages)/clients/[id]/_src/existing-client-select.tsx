@@ -3,9 +3,9 @@
 import { FormField, FormItem, FormControl, FormMessage } from '@/packages/lib/components/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/packages/lib/components/select';
 import { Avatar, AvatarFallback } from '@packages/lib/components/avatar';
-import { clients, ExistingClientSelectProps } from './types';
+import { ExistingClientSelectProps } from './types';
 
-export const ExistingClientSelect = ({ form, onSelect }: ExistingClientSelectProps) => (
+export const ExistingClientSelect = ({ form, clientList, onSelect }: ExistingClientSelectProps) => (
   <FormField
     control={form.control}
     name="id"
@@ -24,7 +24,7 @@ export const ExistingClientSelect = ({ form, onSelect }: ExistingClientSelectPro
             </SelectTrigger>
           </FormControl>
           <SelectContent>
-            {clients.map((client) => (
+            {clientList.map((client) => (
               <SelectItem key={client.id} value={client.id.toString()} className="py-2 data-[highlighted]:bg-foreground/15">
                 <div className="flex items-center gap-2">
                   <Avatar className="w-8 h-8">

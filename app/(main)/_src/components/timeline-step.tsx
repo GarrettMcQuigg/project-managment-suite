@@ -9,8 +9,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/packages/lib/componen
 import { Calendar } from '@/packages/lib/components/calendar';
 import { Card } from '@/packages/lib/components/card';
 import { Phase, PhaseType } from '@prisma/client';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { DndContext, closestCenter, KeyboardSensor, useSensor, useSensors, DragEndEvent, MouseSensor, TouchSensor } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { CalendarIcon } from 'lucide-react';
 
@@ -26,7 +26,13 @@ interface SortablePhaseItemProps {
 }
 
 function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: phase.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: phase.id,
+    transition: {
+      duration: 150,
+      easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
+    }
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -35,7 +41,7 @@ function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) 
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="relative group bg-background/50 border border-foreground/20 rounded-lg p-2 w-32">
+    <div ref={setNodeRef} style={style} className="relative group bg-background/50 border border-foreground/20 rounded-lg p-2 w-32 touch-none">
       <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-medium z-10">{phase.order}</div>
 
       <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
@@ -81,7 +87,17 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
   const [activePhase, setActivePhase] = useState<Phase>(createEmptyPhase());
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8
+      }
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 100,
+        tolerance: 8
+      }
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates
     })
@@ -164,8 +180,8 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
         {phases.length > 0 && (
           <>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={phases.map((phase) => phase.id)} strategy={horizontalListSortingStrategy}>
-                <div className="flex flex-wrap justify-center gap-3">
+              <SortableContext items={phases.map((phase) => phase.id)} strategy={rectSortingStrategy}>
+                <div className="grid grid-cols-4 gap-3 auto-rows-fr">
                   {phases.slice(0, showAllPhases ? undefined : 4).map((phase) => (
                     <SortablePhaseItem
                       key={phase.id}
@@ -274,7 +290,7 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
           </div>
 
           <div className="flex justify-end mt-4">
-            <Button type="button" onClick={handlePhasePublish} className="w-full sm:w-auto">
+            <Button type="button" variant="outlinePrimary" onClick={handlePhasePublish} className="w-full sm:w-auto">
               {editingPhaseId ? 'Update' : 'Add'} Phase
             </Button>
           </div>

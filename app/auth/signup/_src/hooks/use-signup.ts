@@ -30,15 +30,12 @@ export const useSignup = () => {
   const verificationForm = useVerificationForm();
 
   const checkAvailability = async (email: string, phone: string) => {
-    console.log(phone, email);
     // const emailAvailability = await fetcher({
     //   url: API_AUTH_SIGNUP_AVAILABILITY_EMAIL_ROUTE,
     //   requestBody: { email }
     // });
     // if (emailAvailability.err) throw new Error(emailAvailability.message);
-
     // const emailAvailability = await CheckEmailAvailability(email);
-
     // const phoneAvailability = await fetcher({
     //   url: API_AUTH_SIGNUP_AVAILABILITY_PHONE_ROUTE,
     //   requestBody: { phone }

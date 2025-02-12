@@ -20,11 +20,12 @@ import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
 import { API_PROJECT_ADD_ROUTE, CLIENTS_ROUTE, DASHBOARD_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import UnifiedProjectWorkflow from './project-workflow-dialog';
 import { ProjectFormData } from './components/project-step';
 
 export function AppSidebar() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
@@ -44,6 +45,7 @@ export function AppSidebar() {
 
       setIsOpen(false);
       toast.success('Project created successfully');
+      router.push(PROJECTS_ROUTE);
     } catch (error) {
       console.error(error);
       toast.error('An error occurred');

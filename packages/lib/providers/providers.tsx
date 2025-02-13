@@ -14,7 +14,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
       <SpeedInsights />
       <LoadingProvider>
-        <NextTopLoader color="#2299DD" initialPosition={0.08} showSpinner={false} height={3} shadow="0 0 10px #2299DD,0 0 5px #2299DD" />
+        <NextTopLoader color="#09AA9C" initialPosition={0.08} showSpinner={false} height={3} shadow="0 0 10px #09AA9C,0 0 5px #09AA9C" />
 
         <ToastContainer
           position="bottom-right"

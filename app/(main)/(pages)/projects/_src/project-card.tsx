@@ -35,7 +35,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     router.push(routeWithParam(PROJECT_DETAILS_ROUTE, { id: project.id }));
   };
 
-  const handleSharePortal = () => {
+  const handleClientPortal = () => {
     console.log('Sharing project portal for:', project.id);
   };
 
@@ -78,11 +78,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={handleSharePortal}
+            onClick={handleClientPortal}
             className="flex items-center rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
-            Share Portal
+            Client Portal
           </motion.button>
         </div>
       </div>

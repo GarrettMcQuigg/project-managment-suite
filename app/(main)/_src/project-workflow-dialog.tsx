@@ -206,7 +206,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
 
               <Button
                 type="submit"
-                variant={currentStep === 3 && isClientSelected ? 'default' : 'outline'}
+                variant={currentStep === 3 && isClientSelected ? 'default' : 'ghost'}
                 className={currentStep === 3 && isClientSelected ? 'bg-teal-500 hover:bg-teal-600 text-white transition-colors' : ''}
               >
                 {currentStep === steps.length - 1 ? (mode === 'create' ? 'Create' : 'Save') : 'Next'}

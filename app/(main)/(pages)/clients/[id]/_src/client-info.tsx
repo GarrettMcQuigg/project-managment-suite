@@ -4,19 +4,14 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/packages/lib/compone
 import { ProjectList } from './project.info';
 import { Project } from '@prisma/client';
 import { useEffect, useState } from 'react';
-import useSWR, { mutate } from 'swr';
-import { fetcher, swrFetcher } from '@/packages/lib/helpers/fetcher';
+import useSWR from 'swr';
+import { swrFetcher } from '@/packages/lib/helpers/fetcher';
 import { API_CLIENT_GET_BY_ID_ROUTE, API_CLIENT_UPDATE_ROUTE, CLIENTS_ROUTE } from '@/packages/lib/routes';
 import { Skeleton } from '@/packages/lib/components/skeleton';
 import { ClientWithMetadata } from '@/packages/lib/prisma/types';
 import { redirect } from 'next/navigation';
 import { Pencil } from 'lucide-react';
-import { UpdateClientRequestBody } from '@/app/api/client/update/types';
-import { HttpMethods } from '@/packages/lib/constants/http-methods';
-import { toast } from 'react-toastify';
-import { z } from 'zod';
 import { DeleteClientButton } from './delete-client';
-import { clientFormSchema } from '@/app/(main)/(pages)/clients/[id]/_src/types';
 import { ClientFormDialog } from './client-form-dialog';
 
 export function ClientInfo({ clientId }: { clientId: string }) {

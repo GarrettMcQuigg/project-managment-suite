@@ -21,7 +21,7 @@ export default async function ProjectsPage() {
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {projects.map((project) => (
-          <div className="transition-transform hover:scale-[1.02]">
+          <div key={project.id} className="transition-transform hover:scale-[1.02]">
             <ProjectCard
               project={{
                 id: project.id,

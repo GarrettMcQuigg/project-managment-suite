@@ -42,8 +42,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   return (
     <motion.div
       key={project.id}
+      initial={{ opacity: 0, y: 0 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
       className="group relative overflow-hidden rounded-lg bg-card shadow-md transition-all duration-300 hover:shadow-lg dark:shadow-lg dark:shadow-primary/5 dark:hover:shadow-primary/10 cursor-default"
     >
       <div className="absolute inset-0 rounded-lg border border-border/50" />

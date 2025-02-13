@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { DeleteClientButton } from './delete-client';
 import { clientFormSchema } from '@/app/(main)/(pages)/clients/[id]/_src/types';
-import { ClientDialog } from './client-dialog';
+import { ClientFormDialog } from './client-form-dialog';
 
 export function ClientInfo({ clientId }: { clientId: string }) {
   const endpoint = API_CLIENT_GET_BY_ID_ROUTE + clientId;
@@ -37,31 +37,6 @@ export function ClientInfo({ clientId }: { clientId: string }) {
       redirect(CLIENTS_ROUTE);
     }
   }, [data, error]);
-
-  const handleEditSubmit = async (data: z.infer<typeof clientFormSchema>) => {
-    try {
-      const requestBody: UpdateClientRequestBody = {
-        id: client!.id,
-        name: data.name,
-        email: data.email,
-        phone: data.phone
-      };
-
-      const response = await fetcher({ url: API_CLIENT_UPDATE_ROUTE, requestBody, method: HttpMethods.PUT });
-
-      if (response.err) {
-        toast.error('Failed to create project');
-        return;
-      }
-
-      setIsEditDialogOpen(false);
-      mutate(endpoint);
-      toast.success('Client updated successfully');
-    } catch (error) {
-      console.error(error);
-      toast.error('An error occurred');
-    }
-  };
 
   if (error) return redirect(CLIENTS_ROUTE);
 
@@ -120,10 +95,9 @@ export function ClientInfo({ clientId }: { clientId: string }) {
           <ProjectList projects={projects} />
         </CardContent>
       </Card>
-      <ClientDialog
+      <ClientFormDialog
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
-        onSubmit={handleEditSubmit}
         defaultValues={
           client
             ? {
@@ -135,6 +109,7 @@ export function ClientInfo({ clientId }: { clientId: string }) {
             : undefined
         }
         mode="edit"
+        endpoint={API_CLIENT_UPDATE_ROUTE}
       />
     </>
   );

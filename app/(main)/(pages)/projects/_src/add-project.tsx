@@ -36,8 +36,8 @@ export function AddProjectButton() {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)} className="gap-2">
-        <Plus className="h-4 w-4" />
+      <Button onClick={() => setIsOpen(true)} className="transition-all duration-300 group/button">
+        <Plus className="h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" />
         <span className="sm:block hidden">New Project</span>
       </Button>
       <UnifiedProjectWorkflow open={isOpen} onOpenChange={setIsOpen} onComplete={handleComplete} />

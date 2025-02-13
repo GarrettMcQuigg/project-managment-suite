@@ -1,7 +1,7 @@
 import { db } from '../prisma/client';
 import { getCurrentUser } from './get-current-user';
 
-export async function getProjectList() {
+export async function getClientList() {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
@@ -9,25 +9,20 @@ export async function getProjectList() {
   }
 
   try {
-    const projects = await db.project.findMany({
+    const clients = await db.client.findMany({
       include: {
-        client: true,
-        phases: true,
-        payment: true
+        projects: true
       },
       orderBy: {
         createdAt: 'desc'
       },
       where: {
-        userId: currentUser.id,
-        NOT: {
-          status: 'DELETED'
-        }
+        userId: currentUser.id
       }
     });
-    return projects;
+    return clients;
   } catch (error: unknown) {
-    console.error('Failed to fetch projects:', error);
+    console.error('Failed to fetch clients:', error);
     return null;
   }
 }

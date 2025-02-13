@@ -58,12 +58,8 @@ export function AppSidebar() {
     <SidebarProvider>
       <Sidebar className="border-r border-white/[0.08] bg-gradient-to-b from-[#e8f7f7] to-white dark:from-[#021111] dark:to-black [&::-webkit-scrollbar]:!hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <SidebarHeader className="border-b border-white/[0.08] p-4 h-header">
-          <Button
-            onClick={() => setIsOpen(true)}
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-white border-0 shadow-lg shadow-teal-500/20 transition-all duration-300 group/button"
-          >
-            <Plus className="mr-2 h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" />
+          <Button onClick={() => setIsOpen(true)} disabled={loading} className="transition-all duration-300 group/button">
+            <Plus className="h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" />
             New Project
           </Button>
         </SidebarHeader>

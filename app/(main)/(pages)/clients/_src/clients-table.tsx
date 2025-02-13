@@ -11,7 +11,6 @@ import { toast } from 'react-toastify';
 import { AddClientRequestBody } from '@/app/api/client/add/types';
 import { ClientFormValues } from '@/app/(main)/(pages)/clients/[id]/_src/types';
 import { Button } from '@/packages/lib/components/button';
-import { ClientDialog } from '../[id]/_src/client-dialog';
 
 export default function ClientsTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -76,17 +75,7 @@ export default function ClientsTable() {
 
   return (
     <>
-      <DataTable
-        data={clients}
-        columns={columns}
-        searchKey="name"
-        addRow={
-          <>
-            <Button onClick={() => setIsOpen(true)}>New Client</Button>
-            <ClientDialog open={isOpen} onOpenChange={setIsOpen} onSubmit={handleClientSubmit} mode="create" />
-          </>
-        }
-      />
+      <DataTable data={clients} columns={columns} searchKey="name" addRow={<></>} />
     </>
   );
 }

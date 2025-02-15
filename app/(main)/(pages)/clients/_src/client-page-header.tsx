@@ -13,8 +13,8 @@ export function ClientPageHeader() {
     <div className="flex items-center justify-between">
       <h1 className="text-3xl font-bold">Clients</h1>
       <Button onClick={() => setIsCreateDialogOpen(true)}>
-        <Plus className="mr-2 h-4 w-4" />
-        Add Client
+        <Plus className="h-4 w-4" />
+        New Client
       </Button>
       <ClientFormDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} mode="create" endpoint={API_CLIENT_ADD_ROUTE} />
     </div>

@@ -37,7 +37,6 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
 
   useEffect(() => {
     if (data) {
-      console.log('data', data.content);
       setClientList(data.content);
     }
   }, [data, error]);

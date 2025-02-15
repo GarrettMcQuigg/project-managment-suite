@@ -117,7 +117,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
       component: <TimelineStep phases={phases} onPhasesChange={setPhases} />
     },
     {
-      title: 'Payment Details',
+      title: 'Invoice Details',
       component: <PaymentStep payment={payment} onPaymentChange={setPayment} />
     },
     {

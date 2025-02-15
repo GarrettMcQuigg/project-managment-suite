@@ -1,5 +1,3 @@
-'use client';
-
 import { Card, CardContent } from '@/packages/lib/components/card';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { Phase } from '@prisma/client';
@@ -8,11 +6,16 @@ import type React from 'react';
 export function ProjectTimeline({ project }: { project: ProjectWithMetadata }) {
   const startDate = new Date(project.startDate);
   const endDate = new Date(project.endDate);
-  const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24);
+  const totalDays = Math.max(1, (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
 
   const getMinWidth = (phase: Phase) => {
     const phaseDuration = (new Date(phase.endDate).getTime() - new Date(phase.startDate).getTime()) / (1000 * 3600 * 24);
     return Math.max(200, (phaseDuration / totalDays) * 1000);
+  };
+
+  const getStartOffset = (phase: Phase) => {
+    const offset = ((new Date(phase.startDate).getTime() - startDate.getTime()) / (1000 * 3600 * 24) / totalDays) * 100;
+    return Math.max(0, offset);
   };
 
   return (
@@ -28,7 +31,7 @@ export function ProjectTimeline({ project }: { project: ProjectWithMetadata }) {
           {project.phases.map((phase: Phase, index: number) => {
             const phaseStart = new Date(phase.startDate);
             const phaseEnd = new Date(phase.endDate);
-            const startOffset = ((phaseStart.getTime() - startDate.getTime()) / (1000 * 3600 * 24) / totalDays) * 100;
+            const startOffset = getStartOffset(phase);
             const duration = ((phaseEnd.getTime() - phaseStart.getTime()) / (1000 * 3600 * 24) / totalDays) * 100;
             const minWidth = getMinWidth(phase);
 

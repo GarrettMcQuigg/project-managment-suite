@@ -1,6 +1,6 @@
 import { getProjectList } from '@/packages/lib/helpers/get-project-list';
 import ProjectCard from './_src/project-card';
-import { AddProjectButton } from './_src/add-project';
+import { NewProjectButton } from './_src/add-project';
 
 export default async function ProjectsPage() {
   const projects = await getProjectList();
@@ -17,7 +17,7 @@ export default async function ProjectsPage() {
     <div className="space-y-4 p-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Projects</h1>
-        <AddProjectButton />
+        <NewProjectButton />
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {projects.map((project) => (

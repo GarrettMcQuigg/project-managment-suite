@@ -28,7 +28,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ payment, onPaymentChange }) =
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-medium">Project Payment</h3>
+      <h3 className="text-lg font-medium">Project Invoices</h3>
 
       <Card className="p-4">
         <div className="space-y-4">

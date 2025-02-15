@@ -10,7 +10,7 @@ import { API_PROJECT_ADD_ROUTE, API_PROJECT_LIST_ROUTE } from '@/packages/lib/ro
 import { toast } from 'react-toastify';
 import { mutate } from 'swr';
 
-export function AddProjectButton() {
+export function NewProjectButton() {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleComplete = async (data: ProjectFormData) => {

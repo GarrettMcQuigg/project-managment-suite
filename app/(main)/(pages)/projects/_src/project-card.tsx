@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { Calendar, ExternalLink, Eye } from 'lucide-react';
 import type { ProjectStatus } from '@prisma/client';
 import { useRouter } from 'next/navigation';
-import { PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import { PROJECT_DETAILS_ROUTE, PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import { toast } from 'react-toastify';
 
 interface ProjectCardProps {
   project: {
@@ -15,6 +16,7 @@ interface ProjectCardProps {
     status: ProjectStatus;
     startDate: Date;
     endDate: Date;
+    portalSlug: string;
   };
 }
 
@@ -36,7 +38,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   };
 
   const handleClientPortal = () => {
-    console.log('Sharing project portal for:', project.id);
+    router.push(routeWithParam(PROJECT_PORTAL_ROUTE, { id: project.id, portalSlug: project.portalSlug }));
   };
 
   return (

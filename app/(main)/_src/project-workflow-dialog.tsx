@@ -165,6 +165,8 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
           phases,
           payment
         });
+
+        // TODO : Reset form ONLY on success
         resetWorkflow();
       } catch (error) {
         console.error('Error submitting form:', error);

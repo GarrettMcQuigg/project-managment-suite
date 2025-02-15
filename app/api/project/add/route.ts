@@ -2,6 +2,8 @@ import { db } from '@packages/lib/prisma/client';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { AddProjectRequestBody, AddProjectRequestBodySchema } from './types';
+import { hash } from 'bcrypt';
+import { generatePortalSlug, generateSecurePassword } from '@/packages/lib/helpers/project-portals';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
@@ -59,6 +61,10 @@ export async function POST(request: Request) {
         return handleError({ message: 'Failed to create project' });
       }
 
+      const portalSlug = generatePortalSlug();
+      const portalPassword = generateSecurePassword();
+      const hashedPassword = await hash(portalPassword, 10);
+
       // 2. Create the project
       const projectRecord = await tx.project.create({
         data: {
@@ -69,7 +75,9 @@ export async function POST(request: Request) {
           startDate,
           endDate,
           userId: currentUser.id,
-          clientId: clientRecord.id
+          clientId: clientRecord.id,
+          portalPass: hashedPassword,
+          portalSlug
         }
       });
 
@@ -108,14 +116,12 @@ export async function POST(request: Request) {
         project: projectRecord,
         phases: createdPhases,
         client: clientRecord,
-        isNewClient: !client.id
+        isNewClient: !client.id,
+        portalPassword
       };
     });
 
-    return handleSuccess({
-      message: 'Successfully created project',
-      content: result
-    });
+    return handleSuccess({ message: 'Successfully created project', content: result });
   } catch (err: unknown) {
     console.error('Project creation error:', err);
     return handleError({ message: 'Failed to create project', err });

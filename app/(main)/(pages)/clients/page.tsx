@@ -22,6 +22,12 @@ export default async function ClientsPage() {
             <ClientCard client={client} />
           </div>
         ))}
+
+        {clients.length === 0 && (
+          <div className="col-span-full text-center">
+            <p className="text-lg text-black dark:text-white">No clients found</p>
+          </div>
+        )}
       </div>
     </div>
   );

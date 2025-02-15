@@ -22,6 +22,7 @@ export const CLIENTS_ROUTE = '/clients';
 
 // Project pages
 export const PROJECT_DETAILS_ROUTE = `${PROJECTS_ROUTE}/:id`;
+export const PROJECT_PORTAL_ROUTE = `${PROJECTS_ROUTE}/:id/portal/:portalSlug`;
 
 // Client pages
 export const CLIENT_DETAILS_ROUTE = `${CLIENTS_ROUTE}/:id`;

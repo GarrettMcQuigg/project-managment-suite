@@ -17,7 +17,11 @@ export async function getClientList() {
         createdAt: 'desc'
       },
       where: {
-        userId: currentUser.id
+        userId: currentUser.id,
+        deletedAt: null,
+        NOT: {
+          email: 'system@deleted.client'
+        }
       }
     });
     return clients;

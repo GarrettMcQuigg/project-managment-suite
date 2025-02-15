@@ -29,11 +29,18 @@ export default async function ProjectsPage() {
                 description: project.description || '',
                 status: project.status,
                 startDate: project.startDate,
-                endDate: project.endDate
+                endDate: project.endDate,
+                portalSlug: project.portalSlug
               }}
             />
           </div>
         ))}
+
+        {projects.length === 0 && (
+          <div className="col-span-full text-center">
+            <p className="text-lg text-black dark:text-white">No projects found</p>
+          </div>
+        )}
       </div>
     </div>
   );

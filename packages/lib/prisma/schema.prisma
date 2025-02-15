@@ -70,11 +70,25 @@ model Project {
   messages     ProjectMessage[]
   participants ProjectParticipant[]
 
+  // Portal fields
+  portalSlug    String       @unique @default(cuid())
+  portalPass    String
+  portalEnabled Boolean      @default(true)
+  portalViews   PortalView[]
+
   startDate DateTime
   endDate   DateTime
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+}
+
+model PortalView {
+  id        String   @id @default(cuid())
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId String
+  viewedAt  DateTime @default(now())
+  ipAddress String?
 }
 
 enum ProjectType {

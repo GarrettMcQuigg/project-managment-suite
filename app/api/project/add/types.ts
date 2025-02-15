@@ -27,7 +27,7 @@ export const AddProjectRequestBodySchema = Joi.object({
 
   // Client section
   client: Joi.object({
-    id: Joi.string().optional(),
+    id: Joi.string().allow('').optional(),
     name: Joi.string().min(1).when('id', { is: undefined, then: Joi.required() }),
     email: Joi.string().email().when('id', { is: undefined, then: Joi.required() }),
     phone: Joi.string().min(1).when('id', { is: undefined, then: Joi.required() })

@@ -8,16 +8,9 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@packages/lib/components/button';
 import { Input } from '@packages/lib/components/input';
-// import { InputPhone } from '@packages/lib/components/input-phone';
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '@packages/lib/components/form';
 import { AUTH_SIGNIN_ROUTE, AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
 import { useRouter } from 'next/navigation';
-
-export const usePersonalInfoForm = () => {
-  return useForm<z.infer<typeof PersonalInfoFormSchema>>({
-    resolver: zodResolver(PersonalInfoFormSchema)
-  });
-};
 
 const PersonalInfoFormSchema = z.object({
   firstname: z.string().min(1, 'First name is required'),
@@ -25,6 +18,20 @@ const PersonalInfoFormSchema = z.object({
   email: z.string().email('Invalid email address'),
   phone: z.string().min(1, 'Phone number is required')
 });
+
+export const usePersonalInfoForm = () => {
+  const storedEmail = typeof window !== 'undefined' ? localStorage.getItem('email') : null;
+
+  return useForm<z.infer<typeof PersonalInfoFormSchema>>({
+    resolver: zodResolver(PersonalInfoFormSchema),
+    defaultValues: {
+      firstname: '',
+      lastname: '',
+      email: storedEmail || '',
+      phone: ''
+    }
+  });
+};
 
 interface PersonalInfoFormProps {
   form: UseFormReturn<z.infer<typeof PersonalInfoFormSchema>>;
@@ -34,24 +41,6 @@ interface PersonalInfoFormProps {
 
 export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loading, onSubmit }) => {
   const router = useRouter();
-  const [isInitialized, setIsInitialized] = React.useState(false);
-
-  useEffect(() => {
-    if (!isInitialized) {
-      const storedEmail = localStorage.getItem('email');
-      if (storedEmail) {
-        form.reset({
-          ...form.getValues(),
-          email: storedEmail
-        });
-      }
-      setIsInitialized(true);
-    }
-  }, [form, isInitialized]);
-
-  if (!isInitialized) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -122,7 +111,6 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loadin
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>Phone #</FormLabel>
-                    {/* <InputPhone {...field} placeholder="(913) 555-0123" defaultCountry="US" required disabled={loading} /> */}
                     <Input
                       className="backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2  focus:border-violet-500 dark:focus:border-violet-400"
                       {...field}
@@ -146,7 +134,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loadin
             <div className="text-gray-600 dark:text-gray-400 text-center mt-6">
               Already have an account?{' '}
               <Link href={AUTH_SIGNIN_ROUTE} onClick={() => localStorage.removeItem('email')}>
-                <Button variant="link" type="button" disabled={loading}>
+                <Button variant="link" type="button" disabled={loading} loading={loading}>
                   Sign in
                 </Button>
               </Link>

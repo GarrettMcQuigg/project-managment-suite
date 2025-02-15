@@ -89,10 +89,10 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({ form, loadin
             </div>
 
             <div className="flex flex-wrap">
-              <Button type="submit" className="w-full h-12 mt-6" loading={loading}>
+              <Button type="submit" className="w-full mt-6" loading={loading}>
                 Sign up
               </Button>
-              <Button onClick={onBack} variant="outline" type="button" className="w-full h-12 mt-6" disabled={loading}>
+              <Button onClick={onBack} variant="outline" type="button" className="w-full mt-6" disabled={loading}>
                 Back
               </Button>
             </div>

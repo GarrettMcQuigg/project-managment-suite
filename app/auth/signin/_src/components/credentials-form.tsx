@@ -95,7 +95,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({ form, loading, onSubm
               Forgot your password? Click <span className="text-blue-400 cursor-pointer">here</span> to reset it.
             </div>
 
-            <Button className="w-full" type="submit" disabled={loading}>
+            <Button className="w-full" type="submit" disabled={loading} loading={loading}>
               {loading ? 'Signing in...' : 'Sign in'}
             </Button>
             <Button variant="outline" onClick={() => router.push(AUTH_CHECKPOINT_ROUTE)} type="button" className="w-full mt-6" disabled={loading}>

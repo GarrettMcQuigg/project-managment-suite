@@ -9,6 +9,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from '@/packages/lib/components/input-otp';
 import { Button } from '@/packages/lib/components/button';
+import { AUTH_CHECKPOINT_ROUTE, AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
+import { useRouter } from 'next/navigation';
 
 export const VerificationFormSchema = z.object({
   smsCode: z.string().min(1, 'SMS code is required')
@@ -30,6 +32,7 @@ interface VerificationFormProps {
 }
 
 const VerificationForm: React.FC<VerificationFormProps> = ({ form, loading, onSubmit }) => {
+  const router = useRouter();
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -84,8 +87,11 @@ const VerificationForm: React.FC<VerificationFormProps> = ({ form, loading, onSu
               />
             </div>
 
-            <Button className="w-full" type="submit" disabled={loading}>
+            <Button className="w-full" type="submit" disabled={loading} loading={loading}>
               {loading ? 'Verifying...' : 'Verify'}
+            </Button>
+            <Button variant="outline" onClick={() => router.push(AUTH_CHECKPOINT_ROUTE)} type="button" className="w-full mt-6" disabled={loading}>
+              Back
             </Button>
           </form>
         </Form>

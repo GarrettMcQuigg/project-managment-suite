@@ -1,7 +1,5 @@
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent } from '@/packages/lib/components/card';
-import { Skeleton } from '@/packages/lib/components/skeleton';
 import { swrFetcher, fetcher } from '@/packages/lib/helpers/fetcher';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_PROJECT_GET_BY_ID_ROUTE, API_PROJECT_UPDATE_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
@@ -9,19 +7,16 @@ import { PaymentSchedule, Phase, Prisma } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
-import { Calendar, Clock, Pencil, Users } from 'lucide-react';
-import { DeleteProjectButton } from './delete-project';
 import { toast } from 'react-toastify';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import UnifiedProjectWorkflow from '@/app/(main)/_src/project-workflow-dialog';
 import { ProjectFormData } from '@/app/(main)/_src/components/project-step';
 import { ProjectTimeline } from './project-timeline';
-import { format } from 'date-fns';
 import ProjectDetails from './project-details';
 
 export function ProjectInfo({ projectId }: { projectId: string }) {
   const endpoint = API_PROJECT_GET_BY_ID_ROUTE + projectId;
-  const { data, error, isLoading } = useSWR(endpoint, swrFetcher);
+  const { data, error } = useSWR(endpoint, swrFetcher);
   const [project, setProject] = useState<ProjectWithMetadata | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 

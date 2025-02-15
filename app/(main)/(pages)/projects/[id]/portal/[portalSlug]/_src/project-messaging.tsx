@@ -3,12 +3,19 @@
 import { useState } from 'react';
 import { Send } from 'lucide-react';
 
+interface FakeProjectMessages {
+  id: string;
+  sender: string;
+  content: string;
+  createdAt: string;
+}
+
 export default function ProjectMessaging({ projectId }: { projectId: string }) {
   console.log('projectId:', projectId);
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<FakeProjectMessages[]>([]);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessages([]);
   };

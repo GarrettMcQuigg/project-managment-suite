@@ -6,7 +6,6 @@ import { Calendar, ExternalLink, Eye } from 'lucide-react';
 import type { ProjectStatus } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { PROJECT_DETAILS_ROUTE, PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
-import { toast } from 'react-toastify';
 
 interface ProjectCardProps {
   project: {

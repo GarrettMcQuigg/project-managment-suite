@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from '@/packages/lib/components/input-otp';
 import { Button } from '@/packages/lib/components/button';
-import { AUTH_CHECKPOINT_ROUTE, AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
+import { AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
 import { useRouter } from 'next/navigation';
 
 export const VerificationFormSchema = z.object({

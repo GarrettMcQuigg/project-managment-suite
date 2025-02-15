@@ -20,7 +20,7 @@ export function ProjectTimeline({ project }: { project: ProjectWithMetadata }) {
 
   return (
     <>
-      <div className="w-full border-b border-foreground/50 mb-4">
+      <div className="w-full border-b border-foreground/50 mb-4 mt-8">
         <dt className="font-medium text-gray-500">Timeline Preview</dt>
         <dd className="mb-2">
           {new Date(project?.startDate || '').toLocaleDateString()} - {new Date(project?.endDate || '').toLocaleDateString()}

@@ -1,8 +1,8 @@
-import ProjectDetails from './_src/project-details';
 import ProjectTimeline from './_src/project-timeline';
 import ProjectMessaging from './_src/project-messaging';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import ProjectDetails from '../../_src/project-details';
 
 export default async function ProjectPortalPage({ params }: { params: Promise<{ id: string }> }) {
   const currentUser = getCurrentUser();

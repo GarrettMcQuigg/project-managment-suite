@@ -9,13 +9,15 @@ import { PaymentSchedule, Phase, Prisma } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
-import { Pencil } from 'lucide-react';
+import { Calendar, Clock, Pencil, Users } from 'lucide-react';
 import { DeleteProjectButton } from './delete-project';
 import { toast } from 'react-toastify';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import UnifiedProjectWorkflow from '@/app/(main)/_src/project-workflow-dialog';
 import { ProjectFormData } from '@/app/(main)/_src/components/project-step';
 import { ProjectTimeline } from './project-timeline';
+import { format } from 'date-fns';
+import ProjectDetails from './project-details';
 
 export function ProjectInfo({ projectId }: { projectId: string }) {
   const endpoint = API_PROJECT_GET_BY_ID_ROUTE + projectId;
@@ -63,54 +65,8 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
 
   return (
     <>
-      <Card className="mb-8 space-y-8">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>{isLoading ? <Skeleton className="h-8 w-48" /> : project?.name}</CardTitle>
-            <div className="flex gap-4">
-              {project && <Pencil className="h-5 w-5 cursor-pointer" onClick={() => setIsEditDialogOpen(true)} />}
-              {project && <DeleteProjectButton projectId={project.id} />}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-12">
-          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {isLoading ? (
-              <>
-                {[...Array(5)].map((_, i) => (
-                  <div key={i}>
-                    <dt className="font-medium text-gray-500">
-                      <Skeleton className="h-4 w-20" />
-                    </dt>
-                    <dd>
-                      <Skeleton className="h-4 w-32 mt-1" />
-                    </dd>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <>
-                <div>
-                  <dt className="font-medium text-gray-500">Client</dt>
-                  <dd>{project?.client?.name}</dd>
-                </div>
-                <div>
-                  <dt className="font-medium text-gray-500">Project Type</dt>
-                  <dd className="capitalize">{project?.type?.toLowerCase()}</dd>
-                </div>
-                <div className="col-span-2">
-                  <dt className="font-medium text-gray-500">Description</dt>
-                  <dd className="whitespace-pre-wrap">{project?.description}</dd>
-                </div>
-                <div>
-                  <dt className="font-medium text-gray-500">Status</dt>
-                  <dd className="capitalize">{project?.status?.toLowerCase()}</dd>
-                </div>
-              </>
-            )}
-          </dl>
-        </CardContent>
-      </Card>
+      <ProjectDetails projectId={projectId} showEditControls={true} onEditClick={() => setIsEditDialogOpen(true)} />
+
       {project && <ProjectTimeline project={project} />}
 
       {project && (

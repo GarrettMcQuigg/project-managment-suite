@@ -1,5 +1,4 @@
-'use client';
-
+// UnifiedProjectWorkflow.tsx
 import React, { useState } from 'react';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
@@ -7,44 +6,28 @@ import { Button } from '@/packages/lib/components/button';
 import { Form } from '@/packages/lib/components/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { ProjectStatus, Phase, ProjectPayment, PaymentSchedule } from '@prisma/client';
+import { ProjectStatus, Phase, Invoice } from '@prisma/client';
 import { projectFormSchema } from '../(pages)/projects/[id]/_src/types';
 import TimelineStep from './components/timeline-step';
 import ClientStep from './components/client-step';
 import ProjectDetailsStep, { ProjectFormData } from './components/project-step';
-import PaymentStep from './components/payment-step';
+import InvoiceStep from './components/invoice-step';
 
 interface StepIndicatorProps {
   currentStep: number;
 }
 
-export interface ProjectPaymentFormData {
-  totalAmount: number;
-  depositRequired: number;
-  depositDueDate: Date | null;
-  paymentSchedule: PaymentSchedule;
-  notes?: string | null;
-}
-
 interface UnifiedProjectWorkflowProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onComplete: (data: ProjectFormData & { phases: Phase[]; payment: ProjectPaymentFormData }) => void;
+  onComplete: (data: ProjectFormData & { phases: Phase[]; invoices: Invoice[] }) => void;
   mode?: 'create' | 'edit';
   defaultValues?: {
     project?: ProjectFormData;
     phases?: Phase[];
-    payment?: ProjectPayment;
+    invoices?: Invoice[];
   };
 }
-
-const defaultPayment: ProjectPaymentFormData = {
-  totalAmount: 0,
-  depositRequired: 0,
-  depositDueDate: null,
-  paymentSchedule: PaymentSchedule.CUSTOM,
-  notes: null
-};
 
 const defaultFormValues: ProjectFormData = {
   name: '',
@@ -62,7 +45,7 @@ const defaultFormValues: ProjectFormData = {
 };
 
 const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
-  const steps = ['Project', 'Timeline', 'Payment', 'Client'];
+  const steps = ['Project', 'Timeline', 'Invoices', 'Client'];
 
   return (
     <div className="flex items-center justify-center space-x-2 mb-6">
@@ -82,22 +65,10 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
   );
 };
 
-const convertPaymentToFormData = (payment: ProjectPayment | null | undefined): ProjectPaymentFormData => {
-  if (!payment) return defaultPayment;
-
-  return {
-    totalAmount: Number(payment.totalAmount),
-    depositRequired: payment.depositRequired ? Number(payment.depositRequired) : 0,
-    depositDueDate: payment.depositDueDate || null,
-    paymentSchedule: payment.paymentSchedule,
-    notes: payment.notes || ''
-  };
-};
-
 export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ open, onOpenChange, onComplete, mode = 'create', defaultValues }) => {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [phases, setPhases] = useState<Phase[]>(defaultValues?.phases || []);
-  const [payment, setPayment] = useState<ProjectPaymentFormData>(convertPaymentToFormData(defaultValues?.payment));
+  const [invoices, setInvoices] = useState<Invoice[]>(defaultValues?.invoices || []);
   const [clientFormValid, setClientFormValid] = useState(true);
   const [isClientSelected, setIsClientSelected] = useState(false);
 
@@ -118,7 +89,8 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
     },
     {
       title: 'Invoice Details',
-      component: <PaymentStep payment={payment} onPaymentChange={setPayment} />
+      description: 'Create and manage project invoices',
+      component: <InvoiceStep invoices={invoices} onInvoicesChange={setInvoices} phases={phases.map((phase) => ({ id: phase.id, name: phase.name }))} />
     },
     {
       title: 'Client Details',
@@ -143,11 +115,11 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
     if (mode === 'create') {
       form.reset(defaultFormValues);
       setPhases([]);
-      setPayment(defaultPayment);
+      setInvoices([]);
     } else {
       form.reset(defaultValues?.project);
       setPhases(defaultValues?.phases || []);
-      setPayment(convertPaymentToFormData(defaultValues?.payment));
+      setInvoices(defaultValues?.invoices || []);
     }
     setCurrentStep(0);
   };
@@ -163,10 +135,9 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
         await onComplete({
           ...formData,
           phases,
-          payment
+          invoices
         });
 
-        // TODO : Reset form ONLY on success
         resetWorkflow();
       } catch (error) {
         console.error('Error submitting form:', error);

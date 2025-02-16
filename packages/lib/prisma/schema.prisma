@@ -63,7 +63,6 @@ model Project {
   name         String
   description  String
   status       ProjectStatus        @default(PREPARATION)
-  payment      ProjectPayment? // Overall payment data for the project
   invoices     Invoice[] // Tracks actual invoices for the project
   phases       Phase[]
   attachments  ProjectAttachment[]
@@ -102,22 +101,6 @@ enum ProjectType {
   EXHIBITION // Art shows, installations, gallery work
   CAMPAIGN // Multi-channel creative campaigns
   COLLABORATION // Joint creative projects
-}
-
-model ProjectPayment {
-  id              String          @id @default(uuid())
-  project         Project         @relation(fields: [projectId], references: [id])
-  projectId       String          @unique
-  totalAmount     Decimal         @db.Decimal(10, 2) // Total project cost to client
-  amountPaid      Decimal         @default(0) @db.Decimal(10, 2) // Running total of payments
-  depositRequired Decimal?        @db.Decimal(10, 2) // If deposit is greater than 0, it is required. Otherwise, not required
-  depositDueDate  DateTime? // When deposit is due
-  depositPaidAt   DateTime? // When deposit was paid
-  paymentSchedule PaymentSchedule @default(CUSTOM) // How payments are structured
-  notes           String? // Any additional payment notes
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 enum PaymentSchedule {
@@ -286,12 +269,12 @@ model Invoice {
   phase         Phase?         @relation(fields: [phaseId], references: [id]) // Optional relation to Phase
   phaseId       String?        @unique // Only used for milestone payments
   invoiceNumber String
-  type          PaymentType
+  type          InvoiceType    @default(STANDARD)
   amount        Decimal        @db.Decimal(10, 2)
   status        InvoiceStatus  @default(SENT)
   dueDate       DateTime
   payments      Payment[] // Track all payments made against this invoice
-  paymentMethod PaymentMethod?
+  paymentMethod PaymentMethod? // Do we even need?
   notes         String?
 
   createdAt DateTime @default(now())
@@ -300,11 +283,27 @@ model Invoice {
   @@unique([projectId, invoiceNumber])
 }
 
+enum InvoiceType {
+  STANDARD
+  MILESTONE
+  ADDITIONAL
+}
+
+enum InvoiceStatus {
+  VOID
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
 enum PaymentType {
   DEPOSIT // Initial payment to start project
   INSTALLMENT // Regular partial payments
   MILESTONE // Payments tied to project phases... maybe
   ADDITIONAL // Extra work/changes/bonuses
+  FINAL // Final payment to complete project
   OTHER
 }
 
@@ -314,17 +313,18 @@ model Payment {
   invoiceId     String
   amount        Decimal       @db.Decimal(10, 2)
   paymentMethod PaymentMethod
-  paidAt        DateTime      @default(now())
+  status        PaymentStatus @default(PENDING)
+  paidAt        DateTime?
   notes         String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-enum InvoiceStatus {
-  DRAFT
-  SENT
-  PAID
-  OVERDUE
-  CANCELLED
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
 }

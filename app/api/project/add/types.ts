@@ -1,19 +1,26 @@
 import Joi from 'joi';
-import { PaymentSchedule, Phase, ProjectPayment, ProjectStatus, ProjectType } from '@prisma/client';
+import { Phase, ProjectStatus, ProjectType, InvoiceStatus, InvoiceType } from '@prisma/client';
 import { PhaseSchema } from '../phases/add/types';
 
-export const ProjectPaymentSchema = Joi.object({
-  totalAmount: Joi.number().required(),
-  depositRequired: Joi.number().allow(null).optional(),
-  depositDueDate: Joi.date().allow(null).optional(),
-  paymentSchedule: Joi.string()
-    .valid(...Object.values(PaymentSchedule))
+export const NewInvoiceSchema = Joi.object({
+  invoiceNumber: Joi.string().required(),
+  type: Joi.string()
+    .valid(...Object.values(InvoiceType))
     .required(),
-  notes: Joi.string().allow('', null).optional()
+  amount: Joi.alternatives().try(Joi.number(), Joi.string()).required(),
+  status: Joi.string()
+    .valid(...Object.values(InvoiceStatus))
+    .required(),
+  dueDate: Joi.date().required(),
+  notes: Joi.string().allow('', null),
+  phaseId: Joi.string().allow(null),
+  id: Joi.string().optional(),
+  projectId: Joi.string().allow('').optional(),
+  createdAt: Joi.date().optional(),
+  updatedAt: Joi.date().optional()
 });
 
 export const AddProjectRequestBodySchema = Joi.object({
-  // Project fields at root level
   name: Joi.string().min(1).required(),
   description: Joi.string().min(1).required(),
   type: Joi.string()
@@ -25,31 +32,38 @@ export const AddProjectRequestBodySchema = Joi.object({
   startDate: Joi.date().required(),
   endDate: Joi.date().required(),
 
-  // Client section
   client: Joi.object({
     id: Joi.string().allow('').optional(),
-    name: Joi.string().min(1).when('id', { is: undefined, then: Joi.required() }),
-    email: Joi.string().email().when('id', { is: undefined, then: Joi.required() }),
-    phone: Joi.string().min(1).when('id', { is: undefined, then: Joi.required() })
+    name: Joi.string().min(1).when('id', { is: '', then: Joi.required() }),
+    email: Joi.string().email().when('id', { is: '', then: Joi.required() }),
+    phone: Joi.string().min(1).when('id', { is: '', then: Joi.required() })
   }).required(),
 
-  // Phases section
   phases: Joi.array().items(PhaseSchema).required(),
-
-  // Payment section
-  payment: ProjectPaymentSchema.required()
+  invoices: Joi.array().items(NewInvoiceSchema).required()
 });
 
+type NewInvoiceData = {
+  id?: string;
+  projectId?: string;
+  invoiceNumber: string;
+  type: InvoiceType;
+  amount: string | number;
+  status: InvoiceStatus;
+  dueDate: Date;
+  notes?: string | null;
+  phaseId?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
 export type AddProjectRequestBody = {
-  // Project fields at root level
   name: string;
   description: string;
   type: ProjectType;
   status: ProjectStatus;
   startDate: Date;
   endDate: Date;
-
-  // Other sections
   client: {
     id?: string;
     name?: string;
@@ -57,5 +71,5 @@ export type AddProjectRequestBody = {
     phone?: string;
   };
   phases: Phase[];
-  payment: ProjectPayment;
+  invoices: NewInvoiceData[];
 };

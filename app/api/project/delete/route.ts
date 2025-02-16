@@ -34,6 +34,14 @@ export async function DELETE(request: Request) {
         where: { projectId: id }
       });
 
+      await tx.invoice.updateMany({
+        where: { projectId: id },
+        data: {
+          status: 'VOID',
+          notes: `Invoice voided due to project deletion on ${new Date().toISOString()}`
+        }
+      });
+
       await tx.project.update({
         where: { id },
         data: {

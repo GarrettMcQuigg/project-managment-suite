@@ -52,24 +52,29 @@ export async function PUT(request: Request) {
         }
       });
 
-      if (requestBody.payment) {
-        await tx.projectPayment.upsert({
-          where: { projectId: requestBody.id },
-          create: {
-            projectId: requestBody.id,
-            totalAmount: requestBody.payment.totalAmount,
-            depositRequired: requestBody.payment.depositRequired,
-            paymentSchedule: requestBody.payment.paymentSchedule,
-            amountPaid: 0 // Default for new payment records
-          },
-          update: {
-            totalAmount: requestBody.payment.totalAmount,
-            depositRequired: requestBody.payment.depositRequired,
-            paymentSchedule: requestBody.payment.paymentSchedule
-          }
-        });
-      }
+      // Update invoices - delete existing and create new ones
+      await tx.invoice.deleteMany({
+        where: { projectId: requestBody.id }
+      });
 
+      await Promise.all(
+        requestBody.invoices.map((invoice) =>
+          tx.invoice.create({
+            data: {
+              projectId: requestBody.id,
+              invoiceNumber: invoice.invoiceNumber,
+              type: invoice.type,
+              amount: invoice.amount,
+              status: invoice.status,
+              dueDate: invoice.dueDate,
+              notes: invoice.notes,
+              phaseId: invoice.phaseId
+            }
+          })
+        )
+      );
+
+      // Update phases
       if (requestBody.phases && requestBody.phases.length > 0) {
         await tx.phase.deleteMany({
           where: { projectId: requestBody.id }
@@ -98,7 +103,7 @@ export async function PUT(request: Request) {
         include: {
           client: true,
           phases: true,
-          payment: true
+          invoices: true
         }
       });
 

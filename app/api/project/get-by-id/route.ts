@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       include: {
         client: true,
         phases: true,
-        payment: true
+        invoices: true
       }
     });
 

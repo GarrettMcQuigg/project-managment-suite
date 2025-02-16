@@ -3,7 +3,7 @@
 import { swrFetcher, fetcher } from '@/packages/lib/helpers/fetcher';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_PROJECT_GET_BY_ID_ROUTE, API_PROJECT_UPDATE_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
-import { PaymentSchedule, Phase, Prisma } from '@prisma/client';
+import { Phase } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
@@ -86,19 +86,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
               }
             },
             phases: project.phases as Phase[],
-            payment: project.payment || {
-              id: projectId,
-              projectId: projectId,
-              totalAmount: new Prisma.Decimal(0),
-              amountPaid: new Prisma.Decimal(0),
-              depositRequired: new Prisma.Decimal(0),
-              depositDueDate: null,
-              depositPaidAt: null,
-              paymentSchedule: PaymentSchedule.CUSTOM,
-              notes: null,
-              createdAt: new Date(),
-              updatedAt: new Date()
-            }
+            invoices: project.invoices || []
           }}
         />
       )}

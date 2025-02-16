@@ -13,7 +13,7 @@ export async function getProjectList() {
       include: {
         client: true,
         phases: true,
-        payment: true
+        invoices: true
       },
       orderBy: {
         createdAt: 'desc'

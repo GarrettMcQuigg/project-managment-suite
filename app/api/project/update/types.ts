@@ -1,20 +1,24 @@
 import Joi from 'joi';
-import { PaymentSchedule, Phase, ProjectPayment, ProjectStatus, ProjectType } from '@prisma/client';
+import { Phase, ProjectStatus, ProjectType, InvoiceStatus, InvoiceType } from '@prisma/client';
 import { PhaseSchema } from '../phases/add/types';
 
-export const UpdateProjectPaymentSchema = Joi.object({
-  totalAmount: Joi.number().required(),
-  depositRequired: Joi.number().required(),
-  depositDueDate: Joi.date().allow(null),
-  paymentSchedule: Joi.string()
-    .valid(...Object.values(PaymentSchedule))
+export const UpdateInvoiceSchema = Joi.object({
+  id: Joi.string().required(),
+  invoiceNumber: Joi.string().required(),
+  type: Joi.string()
+    .valid(...Object.values(InvoiceType))
     .required(),
-  notes: Joi.string().allow('')
-});
+  amount: Joi.number().required(),
+  status: Joi.string()
+    .valid(...Object.values(InvoiceStatus))
+    .required(),
+  dueDate: Joi.date().required(),
+  notes: Joi.string().allow('', null),
+  phaseId: Joi.string().allow(null)
+}).unknown(true);
 
 export const UpdateProjectRequestBodySchema = Joi.object({
   id: Joi.string().required(),
-
   name: Joi.string().min(1).required(),
   description: Joi.string().min(1).required(),
   type: Joi.string()
@@ -34,20 +38,17 @@ export const UpdateProjectRequestBodySchema = Joi.object({
   }).required(),
 
   phases: Joi.array().items(PhaseSchema).required(),
-
-  payment: UpdateProjectPaymentSchema.required()
+  invoices: Joi.array().items(UpdateInvoiceSchema).required()
 });
 
 export type UpdateProjectRequestBody = {
   id: string;
-
   name: string;
   description: string;
   type: ProjectType;
   status: ProjectStatus;
   startDate: Date;
   endDate: Date;
-
   client: {
     id: string;
     name: string;
@@ -55,11 +56,16 @@ export type UpdateProjectRequestBody = {
     phone: string;
   };
   phases: Phase[];
-  payment: {
-    totalAmount: number;
-    depositRequired: number;
-    paymentSchedule: PaymentSchedule;
-  };
+  invoices: {
+    id: string;
+    invoiceNumber: string;
+    type: InvoiceType;
+    amount: number;
+    status: InvoiceStatus;
+    dueDate: Date;
+    notes?: string | null;
+    phaseId?: string | null;
+  }[];
 };
 
 export type UpdateProjectResponse = {
@@ -79,7 +85,16 @@ export type UpdateProjectResponse = {
       phone: string;
     };
     phases: Phase[];
-    payment: ProjectPayment;
+    invoices: {
+      id: string;
+      invoiceNumber: string;
+      type: InvoiceType;
+      amount: number;
+      status: InvoiceStatus;
+      dueDate: Date;
+      notes?: string | null;
+      phaseId?: string | null;
+    }[];
     createdAt: Date;
     updatedAt: Date;
   };

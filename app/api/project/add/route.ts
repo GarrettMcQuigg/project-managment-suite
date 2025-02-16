@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return handleBadRequest({ message: error.message, err: error });
   }
 
-  const { client, name, description, type, status, startDate, endDate, phases, payment } = requestBody;
+  const { client, name, description, type, status, startDate, endDate, phases, invoices } = requestBody;
 
   try {
     const result = await db.$transaction(async (tx) => {
@@ -81,20 +81,25 @@ export async function POST(request: Request) {
         }
       });
 
-      // 3. Create the payment record
-      await tx.projectPayment.create({
-        data: {
-          projectId: projectRecord.id,
-          totalAmount: payment.totalAmount,
-          depositRequired: payment.depositRequired || 0,
-          depositDueDate: payment.depositDueDate || null,
-          paymentSchedule: payment.paymentSchedule,
-          notes: payment.notes || null,
-          amountPaid: 0
-        }
-      });
+      // 3. Create invoices
+      const createdInvoices = await Promise.all(
+        invoices.map((invoice) =>
+          tx.invoice.create({
+            data: {
+              projectId: projectRecord.id,
+              invoiceNumber: invoice.invoiceNumber,
+              type: invoice.type,
+              amount: invoice.amount,
+              status: invoice.status,
+              dueDate: invoice.dueDate,
+              notes: invoice.notes,
+              phaseId: invoice.phaseId
+            }
+          })
+        )
+      );
 
-      // 4. Create all phases
+      // 4. Create phases
       const createdPhases = await Promise.all(
         phases.map((phase) =>
           tx.phase.create({
@@ -115,6 +120,7 @@ export async function POST(request: Request) {
       return {
         project: projectRecord,
         phases: createdPhases,
+        invoices: createdInvoices,
         client: clientRecord,
         isNewClient: !client.id,
         portalPassword

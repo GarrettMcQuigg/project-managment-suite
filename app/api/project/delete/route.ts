@@ -42,6 +42,10 @@ export async function DELETE(request: Request) {
         }
       });
 
+      await tx.calendarEvent.deleteMany({
+        where: { projectId: id }
+      });
+
       await tx.project.update({
         where: { id },
         data: {

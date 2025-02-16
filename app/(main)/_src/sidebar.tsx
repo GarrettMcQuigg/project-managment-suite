@@ -1,8 +1,7 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { Calendar, Plus, LayoutDashboard, FolderKanban, Users } from 'lucide-react';
 import { useState } from 'react';
-import { LayoutDashboard, FolderKanban, Users } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -18,7 +17,7 @@ import {
 import { Button } from '@/packages/lib/components/button';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
-import { API_PROJECT_ADD_ROUTE, CLIENTS_ROUTE, DASHBOARD_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
+import { API_PROJECT_ADD_ROUTE, CLIENTS_ROUTE, DASHBOARD_ROUTE, PROJECTS_ROUTE, CALENDAR_ROUTE } from '@/packages/lib/routes';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import UnifiedProjectWorkflow from './project-workflow-dialog';
@@ -31,6 +30,7 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const handleComplete = async (data: ProjectFormData) => {
+    console.log('data', data);
     setLoading(true);
     try {
       const response = await fetcher({
@@ -101,6 +101,25 @@ export function AppSidebar() {
                     >
                       <Users className="mr-3 h-4 w-4" />
                       Clients
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupLabel className="px-4 text-xs font-medium text-foreground">UTILITIES</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <Link href={CALENDAR_ROUTE}>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      className={`w-full rounded-lg transition-all duration-200 ${
+                        pathname === CALENDAR_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
+                      }`}
+                    >
+                      <Calendar className="mr-3 h-4 w-4" />
+                      Calendar
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>

@@ -19,6 +19,7 @@ export const FEATURES_ROUTE = '/features';
 export const DASHBOARD_ROUTE = '/dashboard';
 export const PROJECTS_ROUTE = '/projects';
 export const CLIENTS_ROUTE = '/clients';
+export const CALENDAR_ROUTE = '/calendar';
 
 // Project pages
 export const PROJECT_DETAILS_ROUTE = `${PROJECTS_ROUTE}/:id`;

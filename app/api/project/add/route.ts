@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { AddProjectRequestBody, AddProjectRequestBodySchema } from './types';
 import { hash } from 'bcrypt';
 import { generatePortalSlug, generateSecurePassword } from '@/packages/lib/helpers/project-portals';
+import { CalendarEventStatus, CalendarEventType } from '@prisma/client';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
@@ -116,6 +117,33 @@ export async function POST(request: Request) {
           })
         )
       );
+
+      // 5. Create Calendar Events
+      await tx.calendarEvent.create({
+        data: {
+          title: projectRecord.name,
+          type: CalendarEventType.PROJECT_TIMELINE,
+          startDate: projectRecord.startDate,
+          endDate: projectRecord.endDate,
+          projectId: projectRecord.id,
+          userId: currentUser.id,
+          status: CalendarEventStatus.SCHEDULED
+        }
+      });
+
+      await tx.calendarEvent.createMany({
+        data: createdPhases.map((phase) => ({
+          title: `${projectRecord.name}: ${phase.name}`,
+          description: phase.description || '',
+          type: CalendarEventType.PHASE_DEADLINE,
+          startDate: phase.startDate,
+          endDate: phase.endDate,
+          projectId: projectRecord.id,
+          phaseId: phase.id,
+          userId: currentUser.id,
+          status: CalendarEventStatus.SCHEDULED
+        }))
+      });
 
       return {
         project: projectRecord,

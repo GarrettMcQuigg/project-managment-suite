@@ -65,6 +65,12 @@ export const API_CLIENT_DELETE_ROUTE = `${API_CLIENT_ROUTE}/delete`;
 export const API_CLIENT_LIST_ROUTE = `${API_CLIENT_ROUTE}/list`;
 export const API_CLIENT_GET_BY_ID_ROUTE = `${API_CLIENT_ROUTE}/get-by-id?id=`;
 
+export const API_CALENDAR_ROUTE = `${API_ROUTE}/calendar`;
+export const API_CALENDAR_EVENT_ADD_ROUTE = `${API_CALENDAR_ROUTE}/event/add`;
+export const API_CALENDAR_EVENT_UPDATE_ROUTE = `${API_CALENDAR_ROUTE}/event/update`;
+export const API_CALENDAR_EVENT_DELETE_ROUTE = `${API_CALENDAR_ROUTE}/event/delete`;
+export const API_CALENDAR_EVENT_LIST_ROUTE = `${API_CALENDAR_ROUTE}/event/list`;
+
 // Helpers
 export function routeWithPath(route: string, path: string) {
   return `${route}/${path}`;

@@ -7,3 +7,7 @@ export type ClientWithMetadata = Prisma.ClientGetPayload<{
 export type ProjectWithMetadata = Prisma.ProjectGetPayload<{
   include: { client: true; invoices: true; phases: true; portalViews: true };
 }>;
+
+export type CalendarEventWithMetadata = Prisma.CalendarEventGetPayload<{
+  include: { project: true; reminders: true };
+}>;

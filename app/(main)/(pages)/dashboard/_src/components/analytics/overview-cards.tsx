@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/packages/lib/components/card';
-import { Clock, DollarSign, FolderKanban, MessageSquare, Star, Users } from 'lucide-react';
+import { DollarSign, FolderKanban, MessageSquare, Star, Users } from 'lucide-react';
 
 export function OverviewCards() {
   return (

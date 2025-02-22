@@ -30,7 +30,6 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const handleComplete = async (data: ProjectFormData) => {
-    console.log('data', data);
     setLoading(true);
     try {
       const response = await fetcher({

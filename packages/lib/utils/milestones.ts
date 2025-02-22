@@ -1,3 +1,4 @@
+import { CalendarEventType } from '@prisma/client';
 import { db } from '../prisma/client';
 
 interface MilestoneConfig {
@@ -81,7 +82,7 @@ async function generatePlatformMilestones(userId: string, joinDate: Date) {
       const existingMilestone = await db.calendarEvent.findFirst({
         where: {
           userId,
-          type: 'PLATFORM_MILESTONE',
+          type: CalendarEventType.PLATFORM_MILESTONE,
           startDate: milestoneDate,
           title: milestone.title
         }
@@ -93,15 +94,15 @@ async function generatePlatformMilestones(userId: string, joinDate: Date) {
             userId,
             title: milestone.title,
             description: milestone.description,
-            type: 'PLATFORM_MILESTONE',
+            type: CalendarEventType.PLATFORM_MILESTONE,
             startDate: milestoneDate,
             isAllDay: true,
             status: 'SCHEDULED',
             reminders: {
               create: [
                 {
-                  reminderTime: new Date(milestoneDate.getTime() - 24 * 60 * 60 * 1000), // 1 day before
-                  type: 'BOTH'
+                  reminderTime: new Date(milestoneDate.getTime() - 24 * 60 * 60 * 1000),
+                  notificationEnabled: true
                 }
               ]
             }
@@ -126,7 +127,7 @@ async function generateClientMilestones(userId: string, clientId: string, relati
         where: {
           userId,
           clientId,
-          type: 'PLATFORM_MILESTONE',
+          type: CalendarEventType.PLATFORM_MILESTONE,
           startDate: milestoneDate,
           title: milestone.title
         }
@@ -139,15 +140,15 @@ async function generateClientMilestones(userId: string, clientId: string, relati
             clientId,
             title: milestone.title,
             description: milestone.description,
-            type: 'PLATFORM_MILESTONE',
+            type: CalendarEventType.PLATFORM_MILESTONE,
             startDate: milestoneDate,
             isAllDay: true,
             status: 'SCHEDULED',
             reminders: {
               create: [
                 {
-                  reminderTime: new Date(milestoneDate.getTime() - 24 * 60 * 60 * 1000), // 1 day before
-                  type: 'BOTH'
+                  reminderTime: new Date(milestoneDate.getTime() - 24 * 60 * 60 * 1000),
+                  notificationEnabled: true
                 }
               ]
             }

@@ -8,7 +8,7 @@ import { Textarea } from '@/packages/lib/components/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/packages/lib/components/popover';
 import { Calendar } from '@/packages/lib/components/calendar';
 import { Card } from '@/packages/lib/components/card';
-import { Phase, PhaseType } from '@prisma/client';
+import { Phase, PhaseStatus, PhaseType } from '@prisma/client';
 import { DndContext, closestCenter, KeyboardSensor, useSensor, useSensors, DragEndEvent, MouseSensor, TouchSensor } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -103,7 +103,7 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
     })
   );
 
-  function createEmptyPhase(): Phase {
+  function createEmptyPhase(): Phase & { isModified?: boolean } {
     return {
       id: Date.now().toString(),
       projectId: '',
@@ -112,10 +112,11 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
       description: '',
       startDate: new Date(),
       endDate: new Date(),
-      status: 'PENDING',
+      status: PhaseStatus.PENDING,
       order: phases.length + 1,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      isModified: true
     };
   }
 
@@ -132,16 +133,18 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
     const phaseWithDates = {
       ...phase,
       startDate: new Date(phase.startDate),
-      endDate: new Date(phase.endDate)
+      endDate: new Date(phase.endDate),
+      isModified: true
     };
     setActivePhase(phaseWithDates);
     setEditingPhaseId(phase.id);
   };
+
   const handlePhasePublish = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    let updatedPhases: Phase[];
+    let updatedPhases: (Phase & { isModified?: boolean })[];
     if (editingPhaseId) {
       updatedPhases = reorderPhases(phases.map((p) => (p.id === editingPhaseId ? activePhase : p)));
     } else {

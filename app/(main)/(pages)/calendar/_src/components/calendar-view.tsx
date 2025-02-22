@@ -112,6 +112,7 @@ export default function CalendarView({ events }: CalendarViewProps) {
             endAccessor="endDate"
             style={{ height: 600 }}
             views={['month', 'week', 'day']}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             view={view as any}
             onView={(newView) => setView(newView)}
             eventPropGetter={eventStyleGetter}

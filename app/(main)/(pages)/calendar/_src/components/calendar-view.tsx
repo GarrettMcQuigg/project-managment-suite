@@ -54,6 +54,7 @@ export default function CalendarView({ events }: CalendarViewProps) {
   const getDefaultValues = () => {
     if (selectedEvent) {
       return {
+        id: selectedEvent.id,
         title: selectedEvent.title,
         description: selectedEvent.description || '',
         startDate: moment(selectedEvent.startDate).format('YYYY-MM-DDTHH:mm'),

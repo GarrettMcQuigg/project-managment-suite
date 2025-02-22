@@ -17,8 +17,9 @@ import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { API_CALENDAR_EVENT_ADD_ROUTE, API_CALENDAR_EVENT_LIST_ROUTE, API_CALENDAR_EVENT_UPDATE_ROUTE } from '@/packages/lib/routes';
+import { API_CALENDAR_EVENT_ADD_ROUTE, API_CALENDAR_EVENT_DELETE_ROUTE, API_CALENDAR_EVENT_LIST_ROUTE, API_CALENDAR_EVENT_UPDATE_ROUTE } from '@/packages/lib/routes';
 import { CalendarEventStatus, CalendarEventType } from '@prisma/client';
+import { ReminderTypeSelect } from './reminder-type-select';
 
 const reminderTypeSchema = z.object({
   email: z.boolean().default(false),
@@ -27,6 +28,7 @@ const reminderTypeSchema = z.object({
 });
 
 const calendarEventSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   startDate: z.string(),
@@ -60,57 +62,7 @@ const calendarEventSchema = z.object({
     .default([])
 });
 
-type CalendarEventFormValues = z.infer<typeof calendarEventSchema>;
-
-interface ReminderTypeSelectProps {
-  index: number;
-  control: Control<CalendarEventFormValues>;
-}
-
-function ReminderTypeSelect({ index, control }: ReminderTypeSelectProps) {
-  return (
-    <div className="space-y-2">
-      <FormField
-        control={control}
-        name={`reminders.${index}.types.email`}
-        render={({ field }) => (
-          <FormItem className="flex items-center space-x-2">
-            <FormControl>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </FormControl>
-            <FormLabel className="text-sm">Email</FormLabel>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={control}
-        name={`reminders.${index}.types.phone`}
-        render={({ field }) => (
-          <FormItem className="flex items-center space-x-2">
-            <FormControl>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </FormControl>
-            <FormLabel className="text-sm">Phone</FormLabel>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={control}
-        name={`reminders.${index}.types.notification`}
-        render={({ field }) => (
-          <FormItem className="flex items-center space-x-2">
-            <FormControl>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </FormControl>
-            <FormLabel className="text-sm">Notification</FormLabel>
-          </FormItem>
-        )}
-      />
-    </div>
-  );
-}
+export type CalendarEventFormValues = z.infer<typeof calendarEventSchema>;
 
 interface CalendarEventDialogProps {
   open: boolean;
@@ -144,10 +96,33 @@ export function CalendarEventDialog({ open, onOpenChange, onBack, defaultValues,
   }, [defaultValues, form, open]);
 
   const handleSubmit = async (data: CalendarEventFormValues) => {
+    let hasValidationErrors = false;
+
+    data.reminders.forEach((_, index) => {
+      form.clearErrors(`reminders.${index}.types`);
+    });
+
+    data.reminders.forEach((reminder, index) => {
+      if (reminder.reminderTime && reminder.reminderTime.trim() !== '' && !reminder.types.email && !reminder.types.phone && !reminder.types.notification) {
+        form.setError(`reminders.${index}.types`, {
+          type: 'manual',
+          message: 'Select at least one notification type'
+        });
+
+        hasValidationErrors = true;
+      }
+    });
+
+    if (hasValidationErrors) {
+      return;
+    }
+
+    const filteredReminders = data.reminders.filter((reminder) => reminder.reminderTime && reminder.reminderTime.trim() !== '');
+
     try {
       const requestBody = {
         ...data,
-        reminders: data.reminders.map((reminder) => ({
+        reminders: filteredReminders.map((reminder) => ({
           reminderTime: new Date(reminder.reminderTime).toISOString(),
           emailEnabled: reminder.types.email,
           phoneEnabled: reminder.types.phone,
@@ -168,8 +143,8 @@ export function CalendarEventDialog({ open, onOpenChange, onBack, defaultValues,
 
       const message = mode === 'create' ? 'Calendar event created successfully' : 'Calendar event updated successfully';
       toast.success(message);
-      onOpenChange(false);
 
+      onOpenChange(false);
       router.refresh();
       mutate(API_CALENDAR_EVENT_LIST_ROUTE);
     } catch (error) {
@@ -199,6 +174,33 @@ export function CalendarEventDialog({ open, onOpenChange, onBack, defaultValues,
       'reminders',
       currentReminders.filter((_, i) => i !== index)
     );
+  };
+
+  const handleDeleteClick = async (id: string) => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const response = await fetcher({
+        url: API_CALENDAR_EVENT_DELETE_ROUTE,
+        requestBody: { id },
+        method: HttpMethods.DELETE
+      });
+
+      if (response.err) {
+        toast.error('Failed to delete calendar event');
+        return;
+      }
+
+      toast.success('Calendar event deleted successfully');
+      onOpenChange(false);
+      router.refresh();
+      mutate(API_CALENDAR_EVENT_LIST_ROUTE);
+    } catch (error) {
+      console.error(error);
+      toast.error('An error occurred');
+    }
   };
 
   return (
@@ -282,7 +284,6 @@ export function CalendarEventDialog({ open, onOpenChange, onBack, defaultValues,
               )}
             />
 
-            {/* Related entity selectors based on event type */}
             {form.watch('type') === CalendarEventType.PROJECT_TIMELINE && projects && (
               <FormField
                 control={form.control}
@@ -309,8 +310,6 @@ export function CalendarEventDialog({ open, onOpenChange, onBack, defaultValues,
                 )}
               />
             )}
-
-            {/* Similar selectors for phases, invoices, and clients based on type */}
 
             {/* Reminder Section */}
             <div className="space-y-4">
@@ -348,12 +347,27 @@ export function CalendarEventDialog({ open, onOpenChange, onBack, defaultValues,
               ))}
             </div>
 
-            <DialogFooter className="flex w-full items-center">
+            <DialogFooter className="flex w-full items-center mt-6">
               <div className="flex w-full justify-between">
                 {onBack && (
                   <Button type="button" variant="ghost" onClick={onBack} className="border-foreground/20">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back
+                  </Button>
+                )}
+
+                {mode === 'edit' && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      const id = form.getValues().id;
+                      if (id) handleDeleteClick(id);
+                    }}
+                    className="border-foreground/20"
+                  >
+                    <Trash className="w-4 h-4 mr-2 text-red-500" />
+                    <span className="text-red-500">Delete Event</span>
                   </Button>
                 )}
 

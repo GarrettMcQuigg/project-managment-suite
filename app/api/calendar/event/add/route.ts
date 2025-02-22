@@ -1,18 +1,22 @@
-import { AddCalendarEventRequestBody } from './types';
+import { AddCalendarEventRequestBody, AddCalendarEventRequestBodySchema } from './types';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { handleError, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import { db } from '@/packages/lib/prisma/client';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
+  const requestBody: AddCalendarEventRequestBody = await request.json();
 
   if (!currentUser) {
     return handleUnauthorized();
   }
 
-  try {
-    const requestBody: AddCalendarEventRequestBody = await request.json();
+  const { error } = AddCalendarEventRequestBodySchema.validate(requestBody);
+  if (error) {
+    return handleBadRequest({ message: error.message, err: error });
+  }
 
+  try {
     const transformedReminders = requestBody.reminders.map((reminder) => ({
       reminderTime: new Date(reminder.reminderTime),
       emailEnabled: reminder.emailEnabled,
@@ -43,7 +47,7 @@ export async function POST(request: Request) {
     });
 
     return handleSuccess({ message: 'Successfully created event' });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating calendar event:', error);
     return handleError({ message: 'Error creating calendar event' });
   }

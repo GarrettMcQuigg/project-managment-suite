@@ -14,7 +14,7 @@ export default async function ProjectsPage() {
   }
 
   return (
-    <div className="space-y-4 p-8">
+    <div className="space-y-8 p-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Projects</h1>
         <NewProjectButton />

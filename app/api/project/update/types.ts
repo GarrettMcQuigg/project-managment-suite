@@ -2,6 +2,10 @@ import Joi from 'joi';
 import { Phase, ProjectStatus, ProjectType, InvoiceStatus, InvoiceType } from '@prisma/client';
 import { PhaseSchema } from '../phases/add/types';
 
+export const PhaseSchemaExtended = PhaseSchema.keys({
+  isModified: Joi.boolean().optional()
+});
+
 export const UpdateInvoiceSchema = Joi.object({
   id: Joi.string().required(),
   invoiceNumber: Joi.string().required(),
@@ -37,7 +41,7 @@ export const UpdateProjectRequestBodySchema = Joi.object({
     phone: Joi.string().min(1).required()
   }).required(),
 
-  phases: Joi.array().items(PhaseSchema).required(),
+  phases: Joi.array().items(PhaseSchemaExtended).required(),
   invoices: Joi.array().items(UpdateInvoiceSchema).required()
 });
 

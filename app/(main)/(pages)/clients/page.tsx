@@ -14,7 +14,7 @@ export default async function ClientsPage() {
   }
 
   return (
-    <div className="space-y-4 p-8">
+    <div className="space-y-8 p-8">
       <ClientPageHeader />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {clients.map((client) => (

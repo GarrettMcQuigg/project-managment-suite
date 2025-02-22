@@ -15,7 +15,8 @@ export async function getCalendarEvents() {
         project: true,
         user: true,
         phase: true,
-        invoice: true
+        invoice: true,
+        reminders: true
       },
       orderBy: {
         startDate: 'desc'

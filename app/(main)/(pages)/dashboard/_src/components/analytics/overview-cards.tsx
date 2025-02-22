@@ -1,9 +1,9 @@
 import { Card, CardContent } from '@/packages/lib/components/card';
-import { Clock, DollarSign, FolderKanban, MessageSquare, Star, Users } from 'lucide-react';
+import { DollarSign, FolderKanban, MessageSquare, Star, Users } from 'lucide-react';
 
 export function OverviewCards() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card className="border-foreground/20 bg-gradient-to-br from-foreground/8 to-background">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
@@ -58,25 +58,6 @@ export function OverviewCards() {
               <Star className="size-4 text-emerald-500" />
             </div>
             <p className="text-sm text-emerald-500">85% on track</p>
-          </div>
-        </CardContent>
-      </Card>
-      <Card className="border-foreground/20 bg-[linear-gradient(135deg,theme(colors.purple.500/0.06),transparent_50%),radial-gradient(70%_60%_at_50%_60%,theme(colors.purple.500/0.06),transparent)]">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-foreground/10">
-              <Clock className="size-6 text-foreground" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Hours Tracked</p>
-              <h3 className="text-2xl font-semibold">573</h3>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center gap-2">
-            <div className="flex size-6 items-center justify-center rounded-full bg-emerald-500/10">
-              <Star className="size-4 text-emerald-500" />
-            </div>
-            <p className="text-sm text-emerald-500">+201 hours from last month</p>
           </div>
         </CardContent>
       </Card>

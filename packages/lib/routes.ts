@@ -20,6 +20,8 @@ export const DASHBOARD_ROUTE = '/dashboard';
 export const PROJECTS_ROUTE = '/projects';
 export const CLIENTS_ROUTE = '/clients';
 export const CALENDAR_ROUTE = '/calendar';
+export const SUPPORT_ROUTE = '/support';
+export const SETTINGS_ROUTE = '/settings';
 
 // Project pages
 export const PROJECT_DETAILS_ROUTE = `${PROJECTS_ROUTE}/:id`;
@@ -64,6 +66,12 @@ export const API_CLIENT_UPDATE_ROUTE = `${API_CLIENT_ROUTE}/update`;
 export const API_CLIENT_DELETE_ROUTE = `${API_CLIENT_ROUTE}/delete`;
 export const API_CLIENT_LIST_ROUTE = `${API_CLIENT_ROUTE}/list`;
 export const API_CLIENT_GET_BY_ID_ROUTE = `${API_CLIENT_ROUTE}/get-by-id?id=`;
+
+export const API_CALENDAR_ROUTE = `${API_ROUTE}/calendar`;
+export const API_CALENDAR_EVENT_ADD_ROUTE = `${API_CALENDAR_ROUTE}/event/add`;
+export const API_CALENDAR_EVENT_UPDATE_ROUTE = `${API_CALENDAR_ROUTE}/event/update`;
+export const API_CALENDAR_EVENT_DELETE_ROUTE = `${API_CALENDAR_ROUTE}/event/delete`;
+export const API_CALENDAR_EVENT_LIST_ROUTE = `${API_CALENDAR_ROUTE}/event/list`;
 
 // Helpers
 export function routeWithPath(route: string, path: string) {

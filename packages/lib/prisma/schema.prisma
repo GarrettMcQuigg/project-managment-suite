@@ -387,15 +387,16 @@ model CalendarEvent {
 }
 
 model EventReminder {
-  id              String        @id @default(uuid())
-  calendarEvent   CalendarEvent @relation(fields: [calendarEventId], references: [id])
-  calendarEventId String
-  reminderTime    DateTime
-  type            ReminderType
-  sent            Boolean       @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String        @id @default(uuid())
+  calendarEvent       CalendarEvent @relation(fields: [calendarEventId], references: [id])
+  calendarEventId     String
+  reminderTime        DateTime
+  emailEnabled        Boolean       @default(false)
+  phoneEnabled        Boolean       @default(false)
+  notificationEnabled Boolean       @default(false)
+  sent                Boolean       @default(false)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
 }
 
 enum CalendarEventType {
@@ -412,10 +413,4 @@ enum CalendarEventStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
-}
-
-enum ReminderType {
-  EMAIL
-  NOTIFICATION
-  BOTH
 }

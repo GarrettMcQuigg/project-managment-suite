@@ -1,7 +1,7 @@
 import { db } from '@packages/lib/prisma/client';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { Phase } from '@prisma/client';
+import { CalendarEventStatus, CalendarEventType, Phase } from '@prisma/client';
 import { UpdateProjectRequestBody, UpdateProjectRequestBodySchema } from './types';
 
 export async function PUT(request: Request) {
@@ -21,6 +21,7 @@ export async function PUT(request: Request) {
 
   try {
     const result = await db.$transaction(async (tx) => {
+      // Update client
       const clientRecord = requestBody.client.id
         ? await tx.client.update({
             where: { id: requestBody.client.id },
@@ -39,7 +40,8 @@ export async function PUT(request: Request) {
             }
           });
 
-      await tx.project.update({
+      // Update project
+      const updatedProject = await tx.project.update({
         where: { id: requestBody.id },
         data: {
           name: requestBody.name,
@@ -52,7 +54,7 @@ export async function PUT(request: Request) {
         }
       });
 
-      // Update invoices - delete existing and create new ones
+      // Update invoices
       await tx.invoice.deleteMany({
         where: { projectId: requestBody.id }
       });
@@ -74,29 +76,77 @@ export async function PUT(request: Request) {
         )
       );
 
-      // Update phases
+      // Handle phases
       if (requestBody.phases && requestBody.phases.length > 0) {
-        await tx.phase.deleteMany({
-          where: { projectId: requestBody.id }
-        });
+        const modifiedPhases = requestBody.phases.filter((phase) => (phase as Phase & { isModified?: boolean }).isModified === true);
 
-        await Promise.all(
-          requestBody.phases.map((phase: Phase) =>
-            tx.phase.create({
-              data: {
-                projectId: requestBody.id,
-                type: phase.type,
-                name: phase.name,
-                description: phase.description,
-                startDate: new Date(phase.startDate),
-                endDate: new Date(phase.endDate),
-                status: phase.status,
-                order: phase.order
+        if (modifiedPhases.length > 0) {
+          const modifiedPhaseIds = modifiedPhases.map((phase) => phase.id);
+
+          for (const phaseId of modifiedPhaseIds) {
+            await tx.calendarEvent.deleteMany({
+              where: {
+                phaseId: phaseId,
+                type: CalendarEventType.PHASE_DEADLINE
               }
+            });
+          }
+
+          await tx.phase.deleteMany({
+            where: {
+              id: { in: modifiedPhaseIds },
+              projectId: requestBody.id
+            }
+          });
+
+          await Promise.all(
+            modifiedPhases.map(async (phase) => {
+              const { ...phaseData } = phase as Phase & { isModified?: boolean };
+
+              const newPhase = await tx.phase.create({
+                data: {
+                  projectId: requestBody.id,
+                  type: phaseData.type,
+                  name: phaseData.name,
+                  description: phaseData.description,
+                  startDate: new Date(phaseData.startDate),
+                  endDate: new Date(phaseData.endDate),
+                  status: phaseData.status,
+                  order: phaseData.order
+                }
+              });
+
+              await tx.calendarEvent.create({
+                data: {
+                  title: `${updatedProject.name}: ${newPhase.name}`,
+                  description: newPhase.description || '',
+                  type: CalendarEventType.PHASE_DEADLINE,
+                  startDate: newPhase.startDate,
+                  endDate: newPhase.endDate,
+                  projectId: updatedProject.id,
+                  phaseId: newPhase.id,
+                  userId: currentUser.id,
+                  status: CalendarEventStatus.SCHEDULED
+                }
+              });
+
+              return newPhase;
             })
-          )
-        );
+          );
+        }
       }
+
+      await tx.calendarEvent.updateMany({
+        where: {
+          projectId: requestBody.id,
+          type: CalendarEventType.PROJECT_TIMELINE
+        },
+        data: {
+          title: updatedProject.name,
+          startDate: updatedProject.startDate,
+          endDate: updatedProject.endDate
+        }
+      });
 
       const completeProject = await tx.project.findUnique({
         where: { id: requestBody.id },

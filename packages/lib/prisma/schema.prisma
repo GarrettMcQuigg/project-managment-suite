@@ -20,6 +20,8 @@ model User {
   profileImgId       String?
   coverImg           String?
   coverImgId         String?
+  location           String?
+  bio                String?
   dateOfBirth        DateTime?
   password           String
   role               UserRole           @default(USER)

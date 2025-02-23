@@ -11,3 +11,7 @@ export type ProjectWithMetadata = Prisma.ProjectGetPayload<{
 export type CalendarEventWithMetadata = Prisma.CalendarEventGetPayload<{
   include: { project: true; reminders: true };
 }>;
+
+export type InvoiceWithMetadata = Prisma.InvoiceGetPayload<{
+  include: { project: true; payments: true; phase: true };
+}>;

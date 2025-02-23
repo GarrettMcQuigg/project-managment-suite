@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, Plus, LayoutDashboard, FolderKanban, Users, Settings } from 'lucide-react';
+import { Calendar, Plus, LayoutDashboard, FolderKanban, Users, Settings, Receipt, Trello } from 'lucide-react';
 import { useState } from 'react';
 import {
   Sidebar,
@@ -17,7 +17,17 @@ import {
 import { Button } from '@/packages/lib/components/button';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
-import { API_PROJECT_ADD_ROUTE, CLIENTS_ROUTE, DASHBOARD_ROUTE, PROJECTS_ROUTE, CALENDAR_ROUTE, SETTINGS_ROUTE, SUPPORT_ROUTE } from '@/packages/lib/routes';
+import {
+  API_PROJECT_ADD_ROUTE,
+  CLIENTS_ROUTE,
+  DASHBOARD_ROUTE,
+  PROJECTS_ROUTE,
+  CALENDAR_ROUTE,
+  SETTINGS_ROUTE,
+  SUPPORT_ROUTE,
+  PROJECT_BOARD_ROUTE,
+  INVOICES_ROUTE
+} from '@/packages/lib/routes';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import UnifiedProjectWorkflow from './project-workflow-dialog';
@@ -104,6 +114,18 @@ export function AppSidebar() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   </Link>
+                  <Link href={INVOICES_ROUTE}>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        className={`w-full rounded-lg transition-all duration-200 ${
+                          pathname === INVOICES_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
+                        }`}
+                      >
+                        <Receipt className="mr-2 h-4 w-4" />
+                        Invoices
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -120,6 +142,18 @@ export function AppSidebar() {
                       >
                         <Calendar className="mr-2 h-4 w-4" />
                         Calendar
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                  <Link href={PROJECT_BOARD_ROUTE}>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        className={`w-full rounded-lg transition-all duration-200 ${
+                          pathname === PROJECT_BOARD_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
+                        }`}
+                      >
+                        <Trello className="mr-2 h-4 w-4" />
+                        Project Board
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   </Link>

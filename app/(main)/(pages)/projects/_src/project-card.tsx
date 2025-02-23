@@ -70,20 +70,20 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={handleViewDetails}
-            className="flex items-center rounded-md border bg-primary dark:bg-transparent border-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors dark:hover:bg-primary/30 hover:bg-primary/90"
-          >
-            <Eye className="mr-2 h-4 w-4" />
-            View Details
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
             onClick={handleClientPortal}
             className="flex items-center rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             Client Portal
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleViewDetails}
+            className="flex items-center rounded-md border bg-primary dark:bg-transparent border-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors dark:hover:bg-primary/30 hover:bg-primary/90"
+          >
+            <Eye className="mr-2 h-4 w-4" />
+            View Details
           </motion.button>
         </div>
       </div>

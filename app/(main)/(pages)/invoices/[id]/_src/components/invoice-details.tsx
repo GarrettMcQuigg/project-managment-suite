@@ -1,0 +1,97 @@
+'use client';
+
+import { Pencil } from 'lucide-react';
+import { Button } from '@/packages/lib/components/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/packages/lib/components/card';
+import { swrFetcher } from '@/packages/lib/helpers/fetcher';
+import useSWR from 'swr';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { INVOICES_ROUTE, API_INVOICE_GET_BY_ID_ROUTE } from '@/packages/lib/routes';
+import { InvoiceWithMetadata } from '@/packages/lib/prisma/types';
+
+interface InvoiceDetailsProps {
+  invoiceId: string;
+  showEditControls?: boolean;
+  onEditClick?: () => void;
+}
+
+export default function InvoiceDetails({ invoiceId, showEditControls = false, onEditClick }: InvoiceDetailsProps) {
+  const router = useRouter();
+  const endpoint = API_INVOICE_GET_BY_ID_ROUTE + invoiceId;
+  const { data, error, isLoading } = useSWR(endpoint, swrFetcher);
+  const [invoice, setInvoice] = useState<InvoiceWithMetadata | null>(null);
+
+  useEffect(() => {
+    if (data) {
+      setInvoice(data.content);
+    }
+
+    if (error) {
+      console.error('Error fetching project:', error.message);
+      router.push(INVOICES_ROUTE);
+    }
+  }, [data, error]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error || !invoice) {
+    return <div>Error loading invoice details</div>;
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-2xl font-bold">Invoice #{invoice.invoiceNumber}</CardTitle>
+        {showEditControls && (
+          <Button variant="outline" size="sm" onClick={onEditClick}>
+            <Pencil className="mr-2 h-4 w-4" />
+            Edit
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <h3 className="font-semibold">Project</h3>
+            <p>{invoice.project.name}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Status</h3>
+            <p>{invoice.status}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Type</h3>
+            <p>{invoice.type}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Amount</h3>
+            <p>${Number(invoice.amount).toFixed(2)}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Due Date</h3>
+            <p>{new Date(invoice.dueDate).toLocaleDateString()}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Payment Method</h3>
+            <p>{invoice.paymentMethod || 'Not specified'}</p>
+          </div>
+          {invoice.phaseId && (
+            <div>
+              <h3 className="font-semibold">Phase</h3>
+              <p>{invoice.phase?.name || 'Unknown'}</p>
+            </div>
+          )}
+        </div>
+        {invoice.notes && (
+          <div className="mt-4">
+            <h3 className="font-semibold">Notes</h3>
+            <p>{invoice.notes}</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

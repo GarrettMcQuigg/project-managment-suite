@@ -19,7 +19,9 @@ export const FEATURES_ROUTE = '/features';
 export const DASHBOARD_ROUTE = '/dashboard';
 export const PROJECTS_ROUTE = '/projects';
 export const CLIENTS_ROUTE = '/clients';
+export const INVOICES_ROUTE = '/invoices';
 export const CALENDAR_ROUTE = '/calendar';
+export const PROJECT_BOARD_ROUTE = '/project-board';
 export const SUPPORT_ROUTE = '/support';
 export const SETTINGS_ROUTE = '/settings';
 
@@ -29,6 +31,9 @@ export const PROJECT_PORTAL_ROUTE = `${PROJECTS_ROUTE}/:id/portal/:portalSlug`;
 
 // Client pages
 export const CLIENT_DETAILS_ROUTE = `${CLIENTS_ROUTE}/:id`;
+
+// Invoice pages
+export const INVOICE_DETAILS_ROUTE = `${INVOICES_ROUTE}/:id`;
 
 // API routes...
 export const API_ROUTE = '/api';
@@ -66,6 +71,13 @@ export const API_CLIENT_UPDATE_ROUTE = `${API_CLIENT_ROUTE}/update`;
 export const API_CLIENT_DELETE_ROUTE = `${API_CLIENT_ROUTE}/delete`;
 export const API_CLIENT_LIST_ROUTE = `${API_CLIENT_ROUTE}/list`;
 export const API_CLIENT_GET_BY_ID_ROUTE = `${API_CLIENT_ROUTE}/get-by-id?id=`;
+
+export const API_INVOICE_ROUTE = `${API_ROUTE}/invoice`;
+export const API_INVOICE_ADD_ROUTE = `${API_INVOICE_ROUTE}/add`;
+export const API_INVOICE_UPDATE_ROUTE = `${API_INVOICE_ROUTE}/update`;
+export const API_INVOICE_DELETE_ROUTE = `${API_INVOICE_ROUTE}/delete`;
+export const API_INVOICE_LIST_ROUTE = `${API_INVOICE_ROUTE}/list`;
+export const API_INVOICE_GET_BY_ID_ROUTE = `${API_INVOICE_ROUTE}/get-by-id?id=`;
 
 export const API_CALENDAR_ROUTE = `${API_ROUTE}/calendar`;
 export const API_CALENDAR_EVENT_ADD_ROUTE = `${API_CALENDAR_ROUTE}/event/add`;

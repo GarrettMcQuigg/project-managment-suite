@@ -4,7 +4,7 @@ const nextConfig = {
   transpilePackages: ['@packages/lib'],
   images: {
     dangerouslyAllowSVG: true,
-    domains: ['vercel-storage.com'],
+    domains: ['dkxluoddm8u1ixug.public.blob.vercel-storage.com'],
     formats: ['image/avif', 'image/webp']
   }
 };

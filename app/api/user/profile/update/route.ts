@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     });
 
     return handleSuccess({ message: 'Account info successfully updated!' });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleError({ message: 'Failed to update account info.', err });
   }
 }

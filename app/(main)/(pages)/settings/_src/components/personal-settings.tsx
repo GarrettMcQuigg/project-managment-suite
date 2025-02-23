@@ -7,13 +7,14 @@ import { Camera, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { Card, CardContent } from '@/packages/lib/components/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/packages/lib/components/form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/packages/lib/components/form';
 import { Input } from '@/packages/lib/components/input';
 import { Button } from '@/packages/lib/components/button';
 import { User } from '@prisma/client';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { API_USER_PROFILE_UPDATE_ROUTE } from '@/packages/lib/routes';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const userSettingsSchema = z.object({
   firstname: z.string().min(2, { message: 'First name must be at least 2 characters.' }),
@@ -86,7 +87,13 @@ export default function PersonalSettings({ currentUser }: { currentUser: User })
           <div className="mb-20">
             <div className="relative">
               <div className="h-32 rounded-lg relative">
-                <img src={coverPreviewUrl || currentUser?.coverImg || '/placeholder.svg?height=128&width=896'} alt="Cover" className="w-full h-full object-cover rounded-t-lg" />
+                <Image
+                  src={coverPreviewUrl || currentUser?.coverImg || '/placeholder.svg?height=128&width=896'}
+                  alt="Cover"
+                  width={896}
+                  height={128}
+                  className="w-full h-full object-cover rounded-t-lg"
+                />
                 <div className="absolute top-2 right-12 space-x-2">
                   <FormField
                     control={form.control}
@@ -122,7 +129,13 @@ export default function PersonalSettings({ currentUser }: { currentUser: User })
 
               <div className="absolute top-16 left-4">
                 <div className="w-32 h-32 rounded-full border-4 border-background bg-background overflow-hidden">
-                  <img src={profilePreviewUrl || currentUser?.profileImg || '/placeholder.svg?height=128&width=128'} alt="Profile" className="w-full h-full object-cover" />
+                  <Image
+                    src={profilePreviewUrl || currentUser?.profileImg || '/placeholder.svg?height=128&width=128'}
+                    alt="Profile"
+                    width={896}
+                    height={128}
+                    className="w-full h-full object-cover rounded-t-lg"
+                  />
                 </div>
                 <div className="absolute bottom-0 right-2 rounded-full">
                   <FormField

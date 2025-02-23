@@ -73,6 +73,8 @@ export const API_CALENDAR_EVENT_UPDATE_ROUTE = `${API_CALENDAR_ROUTE}/event/upda
 export const API_CALENDAR_EVENT_DELETE_ROUTE = `${API_CALENDAR_ROUTE}/event/delete`;
 export const API_CALENDAR_EVENT_LIST_ROUTE = `${API_CALENDAR_ROUTE}/event/list`;
 
+export const API_USER_PROFILE_UPDATE_ROUTE = `${API_USER_ROUTE}/profile/update`;
+
 // Helpers
 export function routeWithPath(route: string, path: string) {
   return `${route}/${path}`;

@@ -31,7 +31,7 @@ export default function InvoiceDetails({ invoiceId, showEditControls = false, on
       console.error('Error fetching project:', error.message);
       router.push(INVOICES_ROUTE);
     }
-  }, [data, error]);
+  }, [data, error, router]);
 
   if (isLoading) {
     return <div>Loading...</div>;

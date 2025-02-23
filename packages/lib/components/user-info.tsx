@@ -4,11 +4,12 @@ import React from 'react';
 import { User } from '@prisma/client';
 import { cn } from '../utils';
 import { PROFILE_IMG_PLACEHOLDER } from '../constants/misc';
+import Image from 'next/image';
 
 export function UserInfo({ user, responsive, className }: { user: User; responsive?: boolean; className?: string }) {
   return (
     <div className={cn('flex items-center', className)}>
-      <img alt={user.firstname + 's profile picture'} src={user.profileImg ?? PROFILE_IMG_PLACEHOLDER} className="inline-block h-8 w-8 rounded-full" />
+      <Image alt={user.firstname + 's profile picture'} width={8} height={8} src={user.profileImg ?? PROFILE_IMG_PLACEHOLDER} className="inline-block h-8 w-8 rounded-full" />
       <div className={cn('ml-2 max-w-56', responsive && 'hidden md:block')}>
         <p className="flex text-sm items-center font-medium text-primary">
           <span className="overflow-hidden whitespace-nowrap overflow-ellipsis">

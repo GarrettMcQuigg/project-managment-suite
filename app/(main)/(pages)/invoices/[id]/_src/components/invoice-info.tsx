@@ -29,7 +29,7 @@ export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
       console.error('Error fetching invoice:', error.message);
       router.push(INVOICES_ROUTE);
     }
-  }, [data, error]);
+  }, [data, error, router]);
 
   const handleInvoiceUpdate = async (formData: Partial<InvoiceWithMetadata>) => {
     try {

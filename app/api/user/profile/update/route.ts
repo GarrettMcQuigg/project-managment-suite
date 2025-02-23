@@ -14,6 +14,9 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const firstname = formData.get('firstname') as string;
     const lastname = formData.get('lastname') as string;
+    const email = formData.get('email') as string;
+    const phone = formData.get('phone') as string;
+    const dateOfBirth = formData.get('dateOfBirth') as string;
     const location = formData.get('location') as string;
     const bio = formData.get('bio') as string;
 
@@ -34,6 +37,9 @@ export async function POST(request: Request) {
       data: {
         firstname,
         lastname,
+        email,
+        phone,
+        dateOfBirth,
         location,
         bio,
         profileImg: profileImgBlob?.url ?? undefined,

@@ -1,6 +1,6 @@
 'use client';
 
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/packages/lib/components/card';
 import { swrFetcher } from '@/packages/lib/helpers/fetcher';
@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { INVOICES_ROUTE, API_INVOICE_GET_BY_ID_ROUTE } from '@/packages/lib/routes';
 import { InvoiceWithMetadata } from '@/packages/lib/prisma/types';
+import { DeleteInvoiceButton } from './delete-invoice';
 
 interface InvoiceDetailsProps {
   invoiceId: string;
@@ -46,17 +47,20 @@ export default function InvoiceDetails({ invoiceId, showEditControls = false, on
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-2xl font-bold">Invoice #{invoice.invoiceNumber}</CardTitle>
         {showEditControls && (
-          <Button variant="outline" size="sm" onClick={onEditClick}>
-            <Pencil className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
+          <div className="flex space-x-2">
+            <Button variant="outline" size="sm" onClick={onEditClick}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit
+            </Button>
+            <DeleteInvoiceButton invoiceId={invoiceId} />
+          </div>
         )}
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h3 className="font-semibold">Project</h3>
-            <p>{invoice.project.name}</p>
+            <p>{invoice?.project?.name}</p>
           </div>
           <div>
             <h3 className="font-semibold">Status</h3>

@@ -31,7 +31,7 @@ export default async function InvoicesPage() {
                 amount: invoice.amount?.toString() || '',
                 status: invoice.status,
                 dueDate: invoice.dueDate,
-                projectName: invoice.project.name
+                projectName: invoice.project?.name || ''
               }}
             />
           </div>

@@ -5,14 +5,35 @@ import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { InvoiceWithMetadata } from '@/packages/lib/prisma/types';
 import { InvoiceForm } from './invoice-form';
+import { mutate } from 'swr';
+import { toast } from 'react-toastify';
+import { API_INVOICE_ADD_ROUTE } from '@/packages/lib/routes';
+import { fetcher } from '@/packages/lib/helpers/fetcher';
 
 export function InvoiceHeader() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  const handleCreateInvoice = (formData: Partial<InvoiceWithMetadata>) => {
-    console.log('Creating new invoice:', formData);
+  const handleCreateInvoice = async (formData: Partial<InvoiceWithMetadata>) => {
+    try {
+      const response = await fetcher({
+        url: API_INVOICE_ADD_ROUTE,
+        requestBody: {
+          ...formData
+        }
+      });
 
-    setIsCreateDialogOpen(false);
+      if (response.err) {
+        toast.error('Failed to update invoice');
+        return;
+      }
+
+      setIsCreateDialogOpen(false);
+      // mutate(endpoint);
+      toast.success('Invoice updated successfully');
+    } catch (error) {
+      console.error(error);
+      toast.error('An error occurred');
+    }
   };
 
   const handleCancel = () => {

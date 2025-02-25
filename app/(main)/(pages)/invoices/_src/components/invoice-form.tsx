@@ -117,8 +117,8 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
                 <SelectValue placeholder="Select invoice type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="STANDARD">Standard</SelectItem>
-                <SelectItem value="MILESTONE">Milestone</SelectItem>
+                <SelectItem value={InvoiceType.STANDARD}>Standard</SelectItem>
+                <SelectItem value={InvoiceType.MILESTONE}>Milestone</SelectItem>
                 <SelectItem value="RECURRING">Recurring</SelectItem>
               </SelectContent>
             </Select>
@@ -134,11 +134,11 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
                 <SelectValue placeholder="Select invoice status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="DRAFT">Draft</SelectItem>
-                <SelectItem value="SENT">Sent</SelectItem>
-                <SelectItem value="PAID">Paid</SelectItem>
-                <SelectItem value="OVERDUE">Overdue</SelectItem>
-                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                <SelectItem value={InvoiceStatus.DRAFT}>Draft</SelectItem>
+                <SelectItem value={InvoiceStatus.SENT}>Sent</SelectItem>
+                <SelectItem value={InvoiceStatus.PAID}>Paid</SelectItem>
+                <SelectItem value={InvoiceStatus.OVERDUE}>Overdue</SelectItem>
+                <SelectItem value={InvoiceStatus.CANCELLED}>Cancelled</SelectItem>
               </SelectContent>
             </Select>
           </div>

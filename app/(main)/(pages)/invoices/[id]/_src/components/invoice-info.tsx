@@ -10,8 +10,7 @@ import { toast } from 'react-toastify';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import { InvoiceTimeline } from './invoice-timeline';
 import InvoiceDetails from './invoice-details';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
-// import { EditInvoiceForm } from './edit-invoice';
+import { InvoiceForm } from '../../../_src/components/invoice-form';
 
 export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
   const router = useRouter();
@@ -37,7 +36,13 @@ export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
         url: API_INVOICE_UPDATE_ROUTE,
         requestBody: {
           id: invoice!.id,
-          ...formData
+          invoiceNumber: formData.invoiceNumber,
+          type: formData.type,
+          status: formData.status,
+          dueDate: formData.dueDate,
+          notes: formData.notes,
+          paymentMethod: formData.paymentMethod,
+          amount: formData.amount
         },
         method: HttpMethods.PUT
       });
@@ -62,14 +67,7 @@ export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
 
       {invoice && <InvoiceTimeline invoice={invoice} />}
 
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Invoice</DialogTitle>
-          </DialogHeader>
-          {/* {invoice && <EditInvoiceForm invoice={invoice} onSubmit={handleInvoiceUpdate} onCancel={() => setIsEditDialogOpen(false)} />} */}
-        </DialogContent>
-      </Dialog>
+      {invoice && <InvoiceForm invoice={invoice} isOpen={isEditDialogOpen} onSubmit={handleInvoiceUpdate} onCancel={() => setIsEditDialogOpen(false)} />}
     </>
   );
 }

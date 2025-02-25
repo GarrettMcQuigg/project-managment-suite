@@ -12,7 +12,7 @@ export const UpdateInvoiceSchema = Joi.object({
   type: Joi.string()
     .valid(...Object.values(InvoiceType))
     .required(),
-  amount: Joi.number().required(),
+  amount: Joi.string().required(),
   status: Joi.string()
     .valid(...Object.values(InvoiceStatus))
     .required(),

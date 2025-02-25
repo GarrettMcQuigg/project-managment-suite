@@ -17,7 +17,7 @@ type NewInvoice = {
   projectId: string;
   invoiceNumber: string;
   type: InvoiceType;
-  amount: Prisma.Decimal;
+  amount: string;
   status: InvoiceStatus;
   dueDate: Date;
   notes: string | null;
@@ -86,7 +86,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
       projectId: '',
       invoiceNumber: `INV-${Math.floor(Math.random() * 10000)}`,
       type: InvoiceType.STANDARD,
-      amount: new Prisma.Decimal(0),
+      amount: '',
       status: InvoiceStatus.DRAFT,
       dueDate: new Date(),
       notes: '',
@@ -113,7 +113,10 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
   };
 
   const handleEdit = (invoice: Invoice) => {
-    setActiveInvoice(invoice);
+    setActiveInvoice({
+      ...invoice,
+      amount: invoice.amount || ''
+    });
     setEditingInvoiceId(invoice.id);
   };
 
@@ -162,7 +165,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
                 <Input
                   type="number"
                   value={Number(activeInvoice.amount)}
-                  onChange={(e) => setActiveInvoice({ ...activeInvoice, amount: new Prisma.Decimal(e.target.value || 0) })}
+                  onChange={(e) => setActiveInvoice({ ...activeInvoice, amount: e.target.value || '' })}
                   className="pl-8 border-foreground/20"
                   placeholder="0.00"
                   step="0.01"

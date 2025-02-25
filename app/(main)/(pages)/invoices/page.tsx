@@ -1,6 +1,6 @@
 import { getInvoiceList } from '@/packages/lib/helpers/get-invoice-list';
 import InvoiceCard from './_src/components/invoice-card';
-// import { NewInvoiceButton } from './_src/add-invoice';
+import { InvoiceHeader } from './_src/components/invoice-header';
 
 export default async function InvoicesPage() {
   const invoices = await getInvoiceList();
@@ -18,10 +18,7 @@ export default async function InvoicesPage() {
 
   return (
     <div className="space-y-8 p-8">
-      <div className="flex justify-between items-center">
-        <h1 className="font-bold text-3xl">Invoices</h1>
-        {/* <NewInvoiceButton /> */}
-      </div>
+      <InvoiceHeader />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {invoices.map((invoice) => (
@@ -31,7 +28,7 @@ export default async function InvoicesPage() {
                 id: invoice.id,
                 invoiceNumber: invoice.invoiceNumber,
                 type: invoice.type,
-                amount: Number(invoice.amount),
+                amount: invoice.amount?.toString() || '',
                 status: invoice.status,
                 dueDate: invoice.dueDate,
                 projectName: invoice.project.name

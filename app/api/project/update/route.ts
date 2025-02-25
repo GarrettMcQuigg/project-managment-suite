@@ -66,7 +66,7 @@ export async function PUT(request: Request) {
               projectId: requestBody.id,
               invoiceNumber: invoice.invoiceNumber,
               type: invoice.type,
-              amount: invoice.amount,
+              amount: invoice.amount.toString(),
               status: invoice.status,
               dueDate: invoice.dueDate,
               notes: invoice.notes,

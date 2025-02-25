@@ -284,7 +284,7 @@ model Invoice {
   phaseId       String?        @unique // Only used for milestone payments
   invoiceNumber String
   type          InvoiceType    @default(STANDARD)
-  amount        Decimal        @db.Decimal(10, 2)
+  amount        String?
   status        InvoiceStatus  @default(SENT)
   dueDate       DateTime
   payments      Payment[] // Track all payments made against this invoice

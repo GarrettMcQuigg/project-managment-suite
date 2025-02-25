@@ -11,7 +11,7 @@ import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import { InvoiceTimeline } from './invoice-timeline';
 import InvoiceDetails from './invoice-details';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
-import { EditInvoiceForm } from './edit-invoice';
+// import { EditInvoiceForm } from './edit-invoice';
 
 export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
   const router = useRouter();
@@ -67,7 +67,7 @@ export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
           <DialogHeader>
             <DialogTitle>Edit Invoice</DialogTitle>
           </DialogHeader>
-          {invoice && <EditInvoiceForm invoice={invoice} onSubmit={handleInvoiceUpdate} onCancel={() => setIsEditDialogOpen(false)} />}
+          {/* {invoice && <EditInvoiceForm invoice={invoice} onSubmit={handleInvoiceUpdate} onCancel={() => setIsEditDialogOpen(false)} />} */}
         </DialogContent>
       </Dialog>
     </>

@@ -90,7 +90,7 @@ export async function POST(request: Request) {
               projectId: projectRecord.id,
               invoiceNumber: invoice.invoiceNumber,
               type: invoice.type,
-              amount: invoice.amount,
+              amount: String(invoice.amount),
               status: invoice.status,
               dueDate: invoice.dueDate,
               notes: invoice.notes,

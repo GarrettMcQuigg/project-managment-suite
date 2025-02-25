@@ -13,7 +13,7 @@ interface InvoiceCardProps {
     id: string;
     invoiceNumber: string;
     type: keyof typeof InvoiceType;
-    amount: number;
+    amount: string;
     status: keyof typeof InvoiceStatus;
     dueDate: Date;
     projectName: string;
@@ -63,7 +63,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice }) => {
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <DollarSign className="h-5 w-5 text-primary" />
-            <span className="text-lg font-semibold text-primary">{invoice.amount.toFixed(2)}</span>
+            <span className="text-lg font-semibold text-primary">{Number(invoice.amount).toFixed(2)}</span>
           </div>
           <div className="flex items-center space-x-2">
             <FileText className="h-4 w-4 text-muted-foreground" />

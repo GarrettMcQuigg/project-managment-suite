@@ -7,12 +7,11 @@ import { FormLabel } from '@/packages/lib/components/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/packages/lib/components/select';
 import { Textarea } from '@/packages/lib/components/textarea';
 import { Card } from '@/packages/lib/components/card';
-import { InvoiceType, InvoiceStatus, Invoice, Prisma } from '@prisma/client';
+import { InvoiceType, InvoiceStatus, Invoice } from '@prisma/client';
 import { Popover, PopoverContent, PopoverTrigger } from '@/packages/lib/components/popover';
 import { Calendar } from '@/packages/lib/components/calendar';
 import { fetchUniqueInvoiceNumber, generateTemporaryInvoiceNumber } from '@/packages/lib/helpers/generate-invoice-number';
 
-// Define our own Invoice type without paymentMethod
 type NewInvoice = {
   id: string;
   projectId: string;
@@ -83,7 +82,6 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
   const [isGeneratingNumber, setIsGeneratingNumber] = useState(false);
 
   function createEmptyInvoice(): NewInvoice {
-    // Use the temporary generator for initial render
     return {
       id: Date.now().toString(),
       projectId: '',
@@ -99,9 +97,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
     };
   }
 
-  // Fetch a unique invoice number when creating a new invoice
   useEffect(() => {
-    // Only fetch if we're not editing an existing invoice
     if (!editingInvoiceId && !isGeneratingNumber) {
       setIsGeneratingNumber(true);
       fetchUniqueInvoiceNumber()
@@ -113,12 +109,12 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
         })
         .catch((error) => {
           console.error('Error fetching invoice number:', error);
-          // The temporary number set in createEmptyInvoice will be used as fallback
         })
         .finally(() => {
           setIsGeneratingNumber(false);
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingInvoiceId]);
 
   const handleInvoicePublish = (e: React.MouseEvent) => {
@@ -134,12 +130,10 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
 
     onInvoicesChange(updatedInvoices);
 
-    // Reset and create a new invoice with fresh number
     setEditingInvoiceId(null);
     const newEmptyInvoice = createEmptyInvoice();
     setActiveInvoice(newEmptyInvoice);
 
-    // Fetch a new unique number for the next invoice
     setIsGeneratingNumber(true);
     fetchUniqueInvoiceNumber()
       .then((uniqueNumber) => {
@@ -157,9 +151,9 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
   };
 
   const handleEdit = (invoice: Invoice) => {
-    // When editing, use the existing invoice number
     setActiveInvoice({
       ...invoice,
+      projectId: invoice.projectId || '',
       amount: invoice.amount || ''
     });
     setEditingInvoiceId(invoice.id);

@@ -5,7 +5,6 @@ import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { InvoiceWithMetadata } from '@/packages/lib/prisma/types';
 import { InvoiceForm } from './invoice-form';
-import { mutate } from 'swr';
 import { toast } from 'react-toastify';
 import { API_INVOICE_ADD_ROUTE } from '@/packages/lib/routes';
 import { fetcher } from '@/packages/lib/helpers/fetcher';

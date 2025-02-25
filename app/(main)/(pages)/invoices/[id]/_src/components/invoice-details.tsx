@@ -1,6 +1,6 @@
 'use client';
 
-import { Pencil, Trash } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/packages/lib/components/card';
 import { swrFetcher } from '@/packages/lib/helpers/fetcher';

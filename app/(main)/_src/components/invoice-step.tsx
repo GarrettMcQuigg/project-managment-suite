@@ -1,5 +1,5 @@
 // InvoiceStep.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2, Pencil, CalendarIcon } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
 import { Input } from '@/packages/lib/components/input';
@@ -10,6 +10,7 @@ import { Card } from '@/packages/lib/components/card';
 import { InvoiceType, InvoiceStatus, Invoice, Prisma } from '@prisma/client';
 import { Popover, PopoverContent, PopoverTrigger } from '@/packages/lib/components/popover';
 import { Calendar } from '@/packages/lib/components/calendar';
+import { fetchUniqueInvoiceNumber, generateTemporaryInvoiceNumber } from '@/packages/lib/helpers/generate-invoice-number';
 
 // Define our own Invoice type without paymentMethod
 type NewInvoice = {
@@ -79,12 +80,14 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onEdit, onDelete }) 
 const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, phases }) => {
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
   const [activeInvoice, setActiveInvoice] = useState<NewInvoice>(createEmptyInvoice());
+  const [isGeneratingNumber, setIsGeneratingNumber] = useState(false);
 
   function createEmptyInvoice(): NewInvoice {
+    // Use the temporary generator for initial render
     return {
       id: Date.now().toString(),
       projectId: '',
-      invoiceNumber: `INV-${Math.floor(Math.random() * 10000)}`,
+      invoiceNumber: generateTemporaryInvoiceNumber(),
       type: InvoiceType.STANDARD,
       amount: '',
       status: InvoiceStatus.DRAFT,
@@ -95,6 +98,28 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
       updatedAt: new Date()
     };
   }
+
+  // Fetch a unique invoice number when creating a new invoice
+  useEffect(() => {
+    // Only fetch if we're not editing an existing invoice
+    if (!editingInvoiceId && !isGeneratingNumber) {
+      setIsGeneratingNumber(true);
+      fetchUniqueInvoiceNumber()
+        .then((uniqueNumber) => {
+          setActiveInvoice((prev) => ({
+            ...prev,
+            invoiceNumber: uniqueNumber
+          }));
+        })
+        .catch((error) => {
+          console.error('Error fetching invoice number:', error);
+          // The temporary number set in createEmptyInvoice will be used as fallback
+        })
+        .finally(() => {
+          setIsGeneratingNumber(false);
+        });
+    }
+  }, [editingInvoiceId]);
 
   const handleInvoicePublish = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -108,11 +133,31 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
     }
 
     onInvoicesChange(updatedInvoices);
-    setActiveInvoice(createEmptyInvoice());
+
+    // Reset and create a new invoice with fresh number
     setEditingInvoiceId(null);
+    const newEmptyInvoice = createEmptyInvoice();
+    setActiveInvoice(newEmptyInvoice);
+
+    // Fetch a new unique number for the next invoice
+    setIsGeneratingNumber(true);
+    fetchUniqueInvoiceNumber()
+      .then((uniqueNumber) => {
+        setActiveInvoice((prev) => ({
+          ...prev,
+          invoiceNumber: uniqueNumber
+        }));
+      })
+      .catch((error) => {
+        console.error('Error fetching invoice number:', error);
+      })
+      .finally(() => {
+        setIsGeneratingNumber(false);
+      });
   };
 
   const handleEdit = (invoice: Invoice) => {
+    // When editing, use the existing invoice number
     setActiveInvoice({
       ...invoice,
       amount: invoice.amount || ''
@@ -219,8 +264,9 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
           </div>
 
           <div className="flex justify-end mt-4">
-            <Button type="button" variant="outlinePrimary" onClick={handleInvoicePublish} className="w-full sm:w-auto">
+            <Button type="button" variant="outlinePrimary" onClick={handleInvoicePublish} className="w-full sm:w-auto" disabled={isGeneratingNumber}>
               {editingInvoiceId ? 'Update' : 'Add'} Invoice
+              {isGeneratingNumber && !editingInvoiceId && ' (Generating Number...)'}
             </Button>
           </div>
         </div>

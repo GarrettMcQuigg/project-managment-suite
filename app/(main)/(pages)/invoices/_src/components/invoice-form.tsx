@@ -57,25 +57,23 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
           invoiceNumber: generateTemporaryInvoiceNumber()
         });
 
-        if (!isLoadingNumber) {
-          setIsLoadingNumber(true);
-          fetchUniqueInvoiceNumber()
-            .then((uniqueNumber: string) => {
-              setFormData((prev) => ({
-                ...prev,
-                invoiceNumber: uniqueNumber
-              }));
-            })
-            .catch((error: unknown) => {
-              console.error('Error fetching unique invoice number:', error);
-            })
-            .finally(() => {
-              setIsLoadingNumber(false);
-            });
-        }
+        setIsLoadingNumber(true);
+        fetchUniqueInvoiceNumber()
+          .then((uniqueNumber: string) => {
+            setFormData((prev) => ({
+              ...prev,
+              invoiceNumber: uniqueNumber
+            }));
+          })
+          .catch((error: unknown) => {
+            console.error('Error fetching unique invoice number:', error);
+          })
+          .finally(() => {
+            setIsLoadingNumber(false);
+          });
       }
     }
-  }, [isOpen, isEditMode, invoice, isLoadingNumber]);
+  }, [isOpen, isEditMode, invoice]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -102,8 +100,15 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="invoiceNumber">Invoice Number</Label>
-            <Input id="invoiceNumber" name="invoiceNumber" value={formData.invoiceNumber} onChange={handleChange} disabled={!isEditMode && isLoadingNumber} required />
-            {!isEditMode && isLoadingNumber && <p className="text-xs text-muted-foreground mt-1">Generating unique invoice number...</p>}
+            <Input
+              id="invoiceNumber"
+              name="invoiceNumber"
+              value={formData.invoiceNumber}
+              onChange={handleChange}
+              disabled
+              placeholder={isLoadingNumber ? 'Generating unique invoice number...' : ''}
+              required
+            />
           </div>
           <div>
             <Label htmlFor="type">Type</Label>

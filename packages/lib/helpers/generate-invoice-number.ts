@@ -1,6 +1,8 @@
+import { API_INVOICE_GENERATE_NUMBER_ROUTE } from '../routes';
+
 export async function fetchUniqueInvoiceNumber(): Promise<string> {
   try {
-    const response = await fetch('/api/invoice-number');
+    const response = await fetch(API_INVOICE_GENERATE_NUMBER_ROUTE);
 
     if (!response.ok) {
       throw new Error('Failed to fetch invoice number');

@@ -78,6 +78,7 @@ export const API_INVOICE_UPDATE_ROUTE = `${API_INVOICE_ROUTE}/update`;
 export const API_INVOICE_DELETE_ROUTE = `${API_INVOICE_ROUTE}/delete`;
 export const API_INVOICE_LIST_ROUTE = `${API_INVOICE_ROUTE}/list`;
 export const API_INVOICE_GET_BY_ID_ROUTE = `${API_INVOICE_ROUTE}/get-by-id?id=`;
+export const API_INVOICE_GENERATE_NUMBER_ROUTE = `${API_INVOICE_ROUTE}/generate-invoice-number`;
 
 export const API_CALENDAR_ROUTE = `${API_ROUTE}/calendar`;
 export const API_CALENDAR_EVENT_ADD_ROUTE = `${API_CALENDAR_ROUTE}/event/add`;

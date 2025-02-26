@@ -25,6 +25,7 @@ model User {
   dateOfBirth        DateTime?
   password           String
   role               UserRole           @default(USER)
+  // Need to add subscriptionTier, SubscriptionStatus becomes SubscriptionTier
   subscriptionStatus SubscriptionStatus
   projects           Project[]
   clients            Client[]
@@ -242,7 +243,7 @@ model ProjectMessageAttachment {
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 
-// Client Models ===========================================================================================================================================================
+// Client Models ============================================================================================================================================================
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 
@@ -272,7 +273,7 @@ model Client {
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 
-// Invoice  Models ===============================================================================================================================================
+// Invoice  Models ==========================================================================================================================================================
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 
@@ -350,11 +351,10 @@ enum PaymentStatus {
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 
-// Calendar Models ===========================================================================================================================================================
+// Calendar Models ==========================================================================================================================================================
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 
-// Calendar Models
 model CalendarEvent {
   id          String              @id @default(uuid())
   title       String
@@ -416,3 +416,116 @@ enum CalendarEventStatus {
   COMPLETED
   CANCELLED
 }
+
+// ==========================================================================================================================================================================
+// ==========================================================================================================================================================================
+// ==========================================================================================================================================================================
+
+// Subscription Models ======================================================================================================================================================
+// ==========================================================================================================================================================================
+// ==========================================================================================================================================================================
+
+// model Subscription {
+//   id     String             @id @default(uuid())
+//   user   User               @relation(fields: [userId], references: [id])
+//   userId String             @unique
+//   status SubscriptionStatus @default(ACTIVE)
+
+//   // Reference to the tier
+//   tier   SubscriptionPlan @relation(fields: [tierId], references: [id])
+//   tierId String
+
+//   currentPeriodStart DateTime
+//   currentPeriodEnd   DateTime
+//   cancelAtPeriodEnd  Boolean      @default(false)
+//   billingCycle       BillingCycle @default(MONTHLY)
+//   nextBillingDate    DateTime
+
+//   // Payment details
+//   // TODO : Make more robust. Need to track payment history, payment method, card/bank details, etc.
+//   paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+//   paymentMethodId String?
+
+//   // For handling failed payments
+//   lastPaymentAttempt DateTime?
+//   failedPaymentCount Int       @default(0)
+
+//   // History
+//   subscriptionHistory SubscriptionHistory[]
+
+//   // Timestamps
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// model SubscriptionPlan {
+//   id          String @id @default(uuid())
+//   name        String @unique
+//   displayName String
+
+//   // Pricing
+//   monthlyPrice Decimal? @db.Decimal(10, 2)
+//   annualPrice  Decimal? @db.Decimal(10, 2)
+//   currency     String   @default("USD")
+
+//   // Feature limits
+//   projectLimit    Int?
+//   storageLimit    Int? // in MB
+//   clientLimit     Int?
+//   teamMemberLimit Int? // Studio feature
+
+//   // Additional features
+//   features PlanFeature[]
+
+//   // Subscriptions using this plan
+//   subscriptions Subscription[]
+
+//   // For tracking historical subscriptions
+//   subscriptionHistory SubscriptionHistory[]
+
+//   isActive  Boolean  @default(true)
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// model PlanFeature {
+//   id                 String           @id @default(uuid())
+//   name               String
+//   description        String?
+//   subscriptionPlan   SubscriptionPlan @relation(fields: [subscriptionPlanId], references: [id])
+//   subscriptionPlanId String
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@unique([subscriptionPlanId, name])
+// }
+
+// enum SubscriptionStatus {
+//   ACTIVE
+//   PAST_DUE
+//   CANCELED
+//   UNPAID
+//   TRIALING
+//   PAUSED
+// }
+
+// enum BillingCycle {
+//   MONTHLY
+//   ANNUALLY
+// }
+
+// model SubscriptionHistory {
+//   id             String       @id @default(uuid())
+//   subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+//   subscriptionId String
+
+//   // Reference to the plan at that time
+//   plan   SubscriptionPlan @relation(fields: [planId], references: [id])
+//   planId String
+
+//   status    SubscriptionStatus
+//   startDate DateTime
+//   endDate   DateTime?
+//   createdAt DateTime           @default(now())
+// }

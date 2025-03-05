@@ -9,7 +9,6 @@ import useSWR from 'swr';
 import { format } from 'date-fns';
 import { Calendar, Clock, Users, Pencil, Eye } from 'lucide-react';
 import { DeleteProjectButton } from './delete-project';
-import { Input } from '@/packages/lib/components/input';
 
 interface ProjectDetailsProps {
   projectId: string;
@@ -84,7 +83,7 @@ export default function ProjectDetails({ projectId, showEditControls = false, on
                   <Users className="h-5 w-5" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <div>password here</div>
+                  <div>{project.portalPassEncryption}</div>
                   <Eye className="h-5 w-5" />
                 </div>
               </div>

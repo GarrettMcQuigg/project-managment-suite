@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
 import { Button } from '@/packages/lib/components/button';
@@ -26,7 +26,7 @@ interface UnifiedProjectWorkflowProps {
     phases?: Phase[];
     invoices?: Invoice[];
   };
-  ref?: React.RefObject<any>;
+  resetTrigger?: number;
 }
 
 const defaultFormValues: ProjectFormData = {
@@ -65,17 +65,46 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
   );
 };
 
-export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ open, onOpenChange, onComplete, mode = 'create', defaultValues }) => {
+export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ open, onOpenChange, onComplete, mode = 'create', defaultValues, resetTrigger = 0 }) => {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [phases, setPhases] = useState<Phase[]>(defaultValues?.phases || []);
   const [invoices, setInvoices] = useState<Invoice[]>(defaultValues?.invoices || []);
   const [clientFormValid, setClientFormValid] = useState(true);
   const [isClientSelected, setIsClientSelected] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectFormSchema),
     defaultValues: defaultValues?.project || defaultFormValues
   });
+
+  useEffect(() => {
+    if (open) {
+      setCurrentStep(0);
+      setIsClientSelected(false);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (resetTrigger > 0) {
+      resetWorkflow();
+    }
+  }, [resetTrigger]);
+
+  const resetWorkflow = () => {
+    if (mode === 'create') {
+      form.reset(defaultFormValues);
+      setPhases([]);
+      setInvoices([]);
+    } else {
+      form.reset(defaultValues?.project);
+      setPhases(defaultValues?.phases || []);
+      setInvoices(defaultValues?.invoices || []);
+    }
+    setCurrentStep(0);
+    setIsClientSelected(false);
+    setIsSubmitting(false);
+  };
 
   const steps = [
     {
@@ -118,6 +147,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
 
     if (currentStep === steps.length - 1) {
       const formData = form.getValues();
+      setIsSubmitting(true);
       try {
         await onComplete({
           ...formData,
@@ -126,6 +156,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
         });
       } catch (error) {
         console.error('Error submitting form:', error);
+        setIsSubmitting(false);
       }
     } else {
       setCurrentStep(currentStep + 1);
@@ -133,19 +164,9 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
   };
 
   const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      if (mode === 'create') {
-        form.reset(defaultFormValues);
-        setPhases([]);
-        setInvoices([]);
-      } else {
-        form.reset(defaultValues?.project);
-        setPhases(defaultValues?.phases || []);
-        setInvoices(defaultValues?.invoices || []);
-      }
-      setCurrentStep(0);
+    if (!isSubmitting) {
+      onOpenChange(newOpen);
     }
-    onOpenChange(newOpen);
   };
 
   return (
@@ -166,7 +187,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
             {steps[currentStep].component}
 
             <div className="flex justify-between mt-6">
-              <Button type="button" variant="ghost" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
+              <Button type="button" variant="ghost" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0 || isSubmitting}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
@@ -175,9 +196,10 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
                 type="submit"
                 variant={currentStep === 3 && isClientSelected ? 'default' : 'ghost'}
                 className={currentStep === 3 && isClientSelected ? 'bg-teal-500 hover:bg-teal-600 text-white transition-colors' : ''}
+                disabled={isSubmitting}
               >
-                {currentStep === steps.length - 1 ? (mode === 'create' ? 'Create' : 'Save') : 'Next'}
-                <ArrowRight className="w-4 h-4 ml-2" />
+                {isSubmitting ? 'Submitting...' : currentStep === steps.length - 1 ? (mode === 'create' ? 'Create' : 'Save') : 'Next'}
+                {!isSubmitting && <ArrowRight className="w-4 h-4 ml-2" />}
               </Button>
             </div>
           </form>

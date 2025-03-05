@@ -26,21 +26,24 @@ import {
   SETTINGS_ROUTE,
   SUPPORT_ROUTE,
   PROJECT_BOARD_ROUTE,
-  INVOICES_ROUTE
+  INVOICES_ROUTE,
+  API_PROJECT_LIST_ROUTE
 } from '@/packages/lib/routes';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import UnifiedProjectWorkflow from './project-workflow-dialog';
 import { ProjectFormData } from './components/project-step';
+import { Phase, Invoice } from '@prisma/client';
+import { mutate } from 'swr';
 
 export function AppSidebar() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const workflowRef = useRef(null);
+  const [resetTrigger, setResetTrigger] = useState(0);
 
-  const handleComplete = async (data: ProjectFormData) => {
+  const handleComplete = async (data: ProjectFormData & { phases: Phase[]; invoices: Invoice[] }) => {
     setLoading(true);
     try {
       const response = await fetcher({
@@ -50,16 +53,23 @@ export function AppSidebar() {
 
       if (response.err) {
         toast.error('Failed to create project');
+        setLoading(false);
         return;
       }
 
-      setIsOpen(false);
       toast.success('Project created successfully');
+
+      setResetTrigger((prev) => prev + 1);
+
+      setIsOpen(false);
+
+      // TODO : Not working
+      router.refresh();
+      mutate(API_PROJECT_LIST_ROUTE);
       router.push(PROJECTS_ROUTE);
     } catch (error) {
       console.error(error);
       toast.error('An error occurred');
-    } finally {
       setLoading(false);
     }
   };
@@ -197,7 +207,7 @@ export function AppSidebar() {
           </div>
         </SidebarContent>
       </Sidebar>
-      <UnifiedProjectWorkflow ref={workflowRef} open={isOpen} onOpenChange={setIsOpen} onComplete={handleComplete} />
+      <UnifiedProjectWorkflow open={isOpen} onOpenChange={setIsOpen} onComplete={handleComplete} resetTrigger={resetTrigger} />
     </SidebarProvider>
   );
 }

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/packages/lib/prisma/client';
 import { handleError } from '@/packages/lib/helpers/api-response-handlers';
+import { compare } from 'bcrypt';
 
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
   const { slug } = params;
@@ -128,8 +129,8 @@ export async function POST(request: NextRequest, { params }: { params: { slug: s
       return handleError({ message: 'Project not found' });
     }
 
-    // Verify password
-    if (project.portalPass !== password) {
+    const passwordValid = await compare(password, project.portalPass);
+    if (!passwordValid) {
       return handleError({ message: 'Invalid password' });
     }
 

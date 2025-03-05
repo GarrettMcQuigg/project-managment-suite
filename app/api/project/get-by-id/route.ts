@@ -2,6 +2,7 @@ import { db } from '@packages/lib/prisma/client';
 import { handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { NextRequest } from 'next/server';
+import { decrypt } from '@/packages/lib/utils/encryption';
 
 export async function GET(request: NextRequest) {
   const currentUser = await getCurrentUser();
@@ -25,6 +26,10 @@ export async function GET(request: NextRequest) {
         invoices: true
       }
     });
+
+    if (project) {
+      project.portalPassEncryption = decrypt(project.portalPassEncryption);
+    }
 
     return handleSuccess({ content: project });
   } catch (err: unknown) {

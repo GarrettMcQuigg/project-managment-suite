@@ -7,8 +7,9 @@ import { redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { format } from 'date-fns';
-import { Calendar, Clock, Users, Pencil } from 'lucide-react';
+import { Calendar, Clock, Users, Pencil, Eye } from 'lucide-react';
 import { DeleteProjectButton } from './delete-project';
+import { Input } from '@/packages/lib/components/input';
 
 interface ProjectDetailsProps {
   projectId: string;
@@ -23,6 +24,7 @@ export default function ProjectDetails({ projectId, showEditControls = false, on
 
   useEffect(() => {
     if (data) {
+      console.log('Project data:', data);
       setProject(data.content);
     }
 
@@ -62,15 +64,29 @@ export default function ProjectDetails({ projectId, showEditControls = false, on
             <p className="text-gray-700 dark:text-gray-300">{project.description}</p>
           </div>
 
-          <div>
-            <h3 className="mb-3 text-sm font-medium uppercase text-gray-500 dark:text-gray-400">Client Information</h3>
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-[#1A2729] text-emerald-600 dark:text-[#00b894]">
-                <Users className="h-5 w-5" />
+          <div className="flex justify-between max-w-[86%]">
+            <div>
+              <h3 className="mb-3 text-sm font-medium uppercase text-gray-500 dark:text-gray-400">Client Information</h3>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-[#1A2729] text-emerald-600 dark:text-[#00b894]">
+                  <Users className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white">{project.client.name}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{project.type}</p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-gray-900 dark:text-white">{project.client.name}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{project.type}</p>
+            </div>
+            <div>
+              <h3 className="mb-3 text-sm font-medium uppercase text-gray-500 dark:text-gray-400">Portal Password</h3>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-[#1A2729] text-emerald-600 dark:text-[#00b894]">
+                  <Users className="h-5 w-5" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div>password here</div>
+                  <Eye className="h-5 w-5" />
+                </div>
               </div>
             </div>
           </div>

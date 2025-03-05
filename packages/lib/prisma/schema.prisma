@@ -76,10 +76,11 @@ model Project {
   participants ProjectParticipant[]
 
   // Portal fields
-  portalSlug    String       @unique @default(cuid())
-  portalPass    String
-  portalEnabled Boolean      @default(true)
-  portalViews   PortalView[]
+  portalSlug           String       @unique @default(cuid())
+  portalPass           String
+  portalPassEncryption String
+  portalEnabled        Boolean      @default(true)
+  portalViews          PortalView[]
 
   // Calendar fields
   calendarEvent CalendarEvent[]

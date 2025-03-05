@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/packages/lib/prisma/client';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
+import { handleError, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 
 async function generateUniqueInvoiceNumber(prefix = 'INV-'): Promise<string> {
   const generateSevenDigitNumber = (): string => {
@@ -40,7 +41,7 @@ export async function GET() {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return handleUnauthorized();
   }
 
   try {
@@ -48,6 +49,6 @@ export async function GET() {
     return NextResponse.json({ invoiceNumber });
   } catch (error) {
     console.error('Error generating invoice number:', error);
-    return NextResponse.json({ error: 'Failed to generate invoice number' }, { status: 500 });
+    return handleError({ message: 'Failed to generate invoice number', err: error });
   }
 }

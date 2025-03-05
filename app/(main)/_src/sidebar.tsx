@@ -1,7 +1,7 @@
 'use client';
 
 import { Calendar, Plus, LayoutDashboard, FolderKanban, Users, Settings, Receipt, Trello } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -38,6 +38,7 @@ export function AppSidebar() {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const workflowRef = useRef(null);
 
   const handleComplete = async (data: ProjectFormData) => {
     setLoading(true);
@@ -196,7 +197,7 @@ export function AppSidebar() {
           </div>
         </SidebarContent>
       </Sidebar>
-      <UnifiedProjectWorkflow open={isOpen} onOpenChange={setIsOpen} onComplete={handleComplete} />
+      <UnifiedProjectWorkflow ref={workflowRef} open={isOpen} onOpenChange={setIsOpen} onComplete={handleComplete} />
     </SidebarProvider>
   );
 }

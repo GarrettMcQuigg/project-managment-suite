@@ -5,6 +5,7 @@ import { AddProjectRequestBody, AddProjectRequestBodySchema } from './types';
 import { hash } from 'bcrypt';
 import { generatePortalSlug, generateSecurePassword } from '@/packages/lib/helpers/project-portals';
 import { CalendarEventStatus, CalendarEventType } from '@prisma/client';
+import { encrypt } from '@/packages/lib/utils/encryption';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
@@ -65,6 +66,7 @@ export async function POST(request: Request) {
       const portalSlug = generatePortalSlug();
       const portalPassword = generateSecurePassword();
       const hashedPassword = await hash(portalPassword, 10);
+      const encryptedPortalPassword = await encrypt(portalPassword);
 
       // 2. Create the project
       const projectRecord = await tx.project.create({
@@ -78,6 +80,7 @@ export async function POST(request: Request) {
           userId: currentUser.id,
           clientId: clientRecord.id,
           portalPass: hashedPassword,
+          portalPassEncryption: encryptedPortalPassword,
           portalSlug
         }
       });

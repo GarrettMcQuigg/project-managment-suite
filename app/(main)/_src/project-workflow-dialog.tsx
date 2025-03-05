@@ -26,6 +26,7 @@ interface UnifiedProjectWorkflowProps {
     phases?: Phase[];
     invoices?: Invoice[];
   };
+  ref?: React.RefObject<any>;
 }
 
 const defaultFormValues: ProjectFormData = {
@@ -110,19 +111,6 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
     }
   ];
 
-  const resetWorkflow = () => {
-    if (mode === 'create') {
-      form.reset(defaultFormValues);
-      setPhases([]);
-      setInvoices([]);
-    } else {
-      form.reset(defaultValues?.project);
-      setPhases(defaultValues?.phases || []);
-      setInvoices(defaultValues?.invoices || []);
-    }
-    setCurrentStep(0);
-  };
-
   const handleNext = async () => {
     if (currentStep === 3 && !clientFormValid) {
       return;
@@ -136,8 +124,6 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
           phases,
           invoices
         });
-
-        resetWorkflow();
       } catch (error) {
         console.error('Error submitting form:', error);
       }
@@ -148,7 +134,16 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
-      resetWorkflow();
+      if (mode === 'create') {
+        form.reset(defaultFormValues);
+        setPhases([]);
+        setInvoices([]);
+      } else {
+        form.reset(defaultValues?.project);
+        setPhases(defaultValues?.phases || []);
+        setInvoices(defaultValues?.invoices || []);
+      }
+      setCurrentStep(0);
     }
     onOpenChange(newOpen);
   };

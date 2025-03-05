@@ -3,9 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/packages/lib/prisma/client';
 import { handleError } from '@/packages/lib/helpers/api-response-handlers';
 import { compare } from 'bcrypt';
+import { TOKEN_COOKIE_KEY } from '@/packages/lib/constants/cookie-keys';
 
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
-  const { slug } = params;
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
   const searchParams = request.nextUrl.searchParams;
   const redirectUrl = searchParams.get('redirect') || '/';
 
@@ -109,7 +111,8 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
 }
 
 export async function POST(request: NextRequest, { params }: { params: { slug: string } }) {
-  const { slug } = params;
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
   const { password, redirect } = await request.json();
 
   try {
@@ -121,7 +124,8 @@ export async function POST(request: NextRequest, { params }: { params: { slug: s
       },
       select: {
         id: true,
-        portalPass: true
+        portalPass: true,
+        userId: true // Add this to check project ownership
       }
     });
 
@@ -138,13 +142,41 @@ export async function POST(request: NextRequest, { params }: { params: { slug: s
     await db.portalView.create({
       data: {
         projectId: project.id
-        // ipAddress: request.ip || undefined,
       }
     });
 
     // Set the access cookie
     const response = NextResponse.json({ success: true, redirect }, { status: 200 });
 
+    // Check if user is already logged in
+    const tokenCookie = request.cookies.get(TOKEN_COOKIE_KEY);
+    if (tokenCookie) {
+      try {
+        // Decode token to get userId (without verification, since we can't use verify in Edge)
+        const tokenParts = tokenCookie.value.split('.');
+        if (tokenParts.length === 3) {
+          // Extract payload
+          const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
+
+          // If user owns this project, we'll set a special cookie
+          if (payload.userId === project.userId) {
+            // User owns the project, set a cookie indicating this
+            response.cookies.set('project_owner', 'true', {
+              httpOnly: true,
+              maxAge: 60 * 60 * 24, // 24 hours
+              path: '/',
+              sameSite: 'lax',
+              secure: process.env.NODE_ENV === 'production'
+            });
+          }
+        }
+      } catch (e) {
+        // Ignore token decoding errors
+        console.error('Error decoding token:', e);
+      }
+    }
+
+    // Set portal access cookie for everyone who provides correct password
     response.cookies.set(`portal_access_${slug}`, 'true', {
       httpOnly: true,
       maxAge: 60 * 60 * 24, // 24 hours

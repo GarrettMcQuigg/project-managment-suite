@@ -3,13 +3,36 @@ import ProjectMessaging from './_src/project-messaging';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import ProjectDetails from '../../_src/project-details';
+import { db } from '@/packages/lib/prisma/client';
+import { redirect } from 'next/navigation';
 
-export default async function ProjectPortalPage({ params }: { params: Promise<{ id: string }> }) {
-  const currentUser = getCurrentUser();
+export default async function ProjectPortalPage({ params }: { params: Promise<{ id: string; portalSlug: string }> }) {
+  const currentUser = await getCurrentUser();
   const resolvedParams = await params;
 
   if (!currentUser) {
     return handleUnauthorized();
+  }
+
+  const isPortalUser = (currentUser as any)._portalAccess === true;
+
+  if (!isPortalUser) {
+    try {
+      const project = await db.project.findUnique({
+        where: {
+          id: resolvedParams.id,
+          userId: currentUser.id
+        }
+      });
+
+      if (!project) {
+        // User doesn't own this project, redirect to portal auth
+        redirect(`/api/auth/portal/${resolvedParams.portalSlug}?redirect=/projects/${resolvedParams.id}/portal/${resolvedParams.portalSlug}`);
+      }
+    } catch (error) {
+      // Error checking project ownership, redirect to portal auth
+      redirect(`/api/auth/portal/${resolvedParams.portalSlug}?redirect=/projects/${resolvedParams.id}/portal/${resolvedParams.portalSlug}`);
+    }
   }
 
   return (

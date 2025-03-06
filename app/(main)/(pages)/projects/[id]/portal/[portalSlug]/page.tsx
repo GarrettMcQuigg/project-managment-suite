@@ -5,18 +5,20 @@ import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers
 import ProjectDetails from '../../_src/project-details';
 import { db } from '@/packages/lib/prisma/client';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 export default async function ProjectPortalPage({ params }: { params: Promise<{ id: string; portalSlug: string }> }) {
-  const currentUser = await getCurrentUser();
   const resolvedParams = await params;
+  const cookieStore = await cookies();
+  const currentUser = await getCurrentUser();
+  const portalAccessCookie = cookieStore.get(`portal_access_${resolvedParams.portalSlug}`);
+  const hasPortalAccess = !!portalAccessCookie;
 
-  if (!currentUser) {
+  if (!currentUser && !hasPortalAccess) {
     return handleUnauthorized();
   }
 
-  const isPortalUser = (currentUser as any)._portalAccess === true;
-
-  if (!isPortalUser) {
+  if (!hasPortalAccess && currentUser) {
     try {
       const project = await db.project.findUnique({
         where: {

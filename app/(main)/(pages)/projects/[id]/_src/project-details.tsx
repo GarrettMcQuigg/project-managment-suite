@@ -43,6 +43,7 @@ export default function ProjectDetails({ projectId, showEditControls = false, on
         <div className="w-full">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{project.name}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{project.type}</p>
             {showEditControls && (
               <div className="flex gap-4">
                 <Pencil className="h-5 w-5 cursor-pointer" onClick={onEditClick} />
@@ -72,7 +73,7 @@ export default function ProjectDetails({ projectId, showEditControls = false, on
                 </div>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">{project.client.name}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{project.type}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{project.client.email}</p>
                 </div>
               </div>
             </div>

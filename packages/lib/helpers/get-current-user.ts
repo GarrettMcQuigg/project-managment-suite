@@ -10,60 +10,72 @@ export async function getCurrentUser(): Promise<User | null> {
 
     // Check for regular token first
     const tokenCookie = cookieStore.get(TOKEN_COOKIE_KEY);
+    const userCookie = cookieStore.get(USER_COOKIE_KEY);
 
-    if (tokenCookie?.value) {
+    if (tokenCookie?.value && userCookie?.value && userCookie.value !== 'undefined') {
       // Regular auth flow
-      const decodedToken = jwt.verify(tokenCookie.value, process.env.JWT_SECRET!) as { userId: string };
+      try {
+        const decodedToken = jwt.verify(tokenCookie.value, process.env.JWT_SECRET!) as { userId: string };
+        const decodedUser = JSON.parse(userCookie.value);
 
-      const userCookie = cookieStore.get(USER_COOKIE_KEY);
-      if (!userCookie || userCookie.value === 'undefined') {
-        return null;
-      }
-
-      const decodedUser = JSON.parse(userCookie.value);
-
-      if (decodedUser.id !== decodedToken.userId) {
-        return null;
-      }
-
-      const user = await db.user.findUniqueOrThrow({
-        where: {
-          id: decodedToken.userId,
-          email: decodedUser.email
+        // Check if the token is valid for this user
+        if (decodedUser.id !== decodedToken.userId) {
+          // Token mismatch, try portal flow
+          throw new Error('Token mismatch');
         }
-      });
 
-      return user;
+        // Get the user from the database
+        const user = await db.user.findUnique({
+          where: {
+            id: decodedToken.userId,
+            email: decodedUser.email
+          }
+        });
+
+        if (!user) {
+          // User not found, try portal flow
+          throw new Error('User not found');
+        }
+
+        return user;
+      } catch (error) {
+        // If regular auth fails, fall through to portal auth
+        console.log('Regular auth failed, trying portal auth');
+      }
     }
 
     // Check for portal session
     const portalSessionCookie = cookieStore.get('portal_session');
-    const userCookie = cookieStore.get(USER_COOKIE_KEY);
 
     if (portalSessionCookie?.value && userCookie?.value) {
-      const portalSession = JSON.parse(portalSessionCookie.value);
-      const decodedUser = JSON.parse(userCookie.value);
+      try {
+        const portalSession = JSON.parse(portalSessionCookie.value);
+        const decodedUser = JSON.parse(userCookie.value);
 
-      if (portalSession.authorized && decodedUser.isPortalUser) {
-        // Return a User-compatible object for portal sessions
-        return {
-          id: decodedUser.id,
-          email: decodedUser.email,
-          name: decodedUser.name,
-          // Add minimal required User properties
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          password: '', // Add an empty password field to match User type
-          // Add special portal properties
-          _portalAccess: true,
-          _portalProjectId: portalSession.projectId,
-          _portalSlug: portalSession.slug
-        } as unknown as User;
+        if (portalSession.authorized && decodedUser.isPortalUser) {
+          // Return a User-compatible object for portal sessions
+          return {
+            id: decodedUser.id,
+            email: decodedUser.email,
+            name: decodedUser.name,
+            // Add minimal required User properties
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            password: '', // Add an empty password field to match User type
+            // Add special portal properties
+            _portalAccess: true,
+            _portalProjectId: portalSession.projectId,
+            _portalSlug: portalSession.slug
+          } as unknown as User;
+        }
+      } catch (error) {
+        console.error('Portal auth failed:', error);
       }
     }
 
     return null;
   } catch (err: any) {
+    console.error('Error in getCurrentUser:', err);
     return null;
   }
 }

@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { TOKEN_COOKIE_KEY, USER_COOKIE_KEY } from '@/packages/lib/constants/cookie-keys';
+import { generateUniquePortalId } from './packages/lib/helpers/project-portals';
 
 export const config = {
   matcher: ['/projects/:projectId/portal/:slug*']
 };
 
-export default function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const portalMatch = pathname.match(/\/projects\/([^\/]+)\/portal\/([^\/]+)/);
 
@@ -28,20 +29,26 @@ export default function middleware(request: NextRequest) {
 
     if (tokenCookie && userCookie) {
       // User is already logged in, just let them through
-      // No need to create a portal session
       return NextResponse.next();
     } else {
       // User is not logged in but has portal access
       // Create portal session for anonymous portal users
       try {
+        const uniqueId = await generateUniquePortalId();
+
+        // Get the visitor name from the cookie, or use default if not present
+        const visitorNameCookie = request.cookies.get(`portal_name_${portalSlug}`);
+        const visitorName = visitorNameCookie ? visitorNameCookie.value : 'Portal Visitor';
+
         const portalUser = {
-          id: `portal_${projectId}`,
-          email: `portal@${portalSlug}`,
-          name: 'Portal Visitor',
+          id: `portal_${uniqueId}`,
+          name: visitorName, // Use the name from the form
           isPortalUser: true,
           portalProjectId: projectId,
           portalSlug: portalSlug
         };
+
+        console.log('Creating portal session for:', portalUser);
 
         const response = NextResponse.next();
 
@@ -50,7 +57,8 @@ export default function middleware(request: NextRequest) {
           JSON.stringify({
             projectId,
             slug: portalSlug,
-            authorized: true
+            authorized: true,
+            visitorName
           }),
           {
             httpOnly: true,

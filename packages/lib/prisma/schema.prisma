@@ -96,6 +96,7 @@ model PortalView {
   id        String   @id @default(cuid())
   project   Project  @relation(fields: [projectId], references: [id])
   projectId String
+  name      String   @default("Portal User")
   viewedAt  DateTime @default(now())
   ipAddress String?
 }

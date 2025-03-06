@@ -25,3 +25,21 @@ export function generatePortalSlug(): string {
 
   return randomString;
 }
+
+export async function generateUniquePortalId(): Promise<string> {
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const segments = [8, 4, 4, 4, 12];
+
+  const randomChars = Array.from({ length: segments.reduce((a, b) => a + b, 0) }, () => characters[Math.floor(Math.random() * characters.length)]);
+
+  let position = 0;
+  const formattedToken = segments
+    .map((segmentLength) => {
+      const segment = randomChars.slice(position, position + segmentLength).join('');
+      position += segmentLength;
+      return segment;
+    })
+    .join('-');
+
+  return formattedToken;
+}

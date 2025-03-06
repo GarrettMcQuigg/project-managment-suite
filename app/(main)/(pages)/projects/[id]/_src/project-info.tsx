@@ -60,7 +60,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
 
   return (
     <>
-      <ProjectDetails projectId={projectId} showEditControls={true} onEditClick={() => setIsEditDialogOpen(true)} />
+      <ProjectDetails projectId={projectId} showInteralControls={true} onEditClick={() => setIsEditDialogOpen(true)} />
 
       {project && <ProjectTimeline project={project} />}
 

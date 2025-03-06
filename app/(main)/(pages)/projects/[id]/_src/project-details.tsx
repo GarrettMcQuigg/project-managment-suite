@@ -97,7 +97,7 @@ export default function ProjectDetails({ projectId, showInteralControls = false,
                       className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-200 transition-colors"
                       onClick={togglePasswordVisibility}
                     >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </div>
                   </div>
                 </div>

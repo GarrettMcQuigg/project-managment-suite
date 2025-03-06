@@ -58,7 +58,6 @@ export default function PersonalSettings({ currentUser }: { currentUser: User })
     if (data.coverImg) formData.append('coverImg', data.coverImg);
 
     try {
-      console.log('Form data:', Object.fromEntries(formData.entries()));
       const response = await fetcher({
         url: API_USER_PROFILE_UPDATE_ROUTE,
         formData

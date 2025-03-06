@@ -1,3 +1,7 @@
+import { RequestCookies } from 'next/dist/compiled/@edge-runtime/cookies';
+import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
+import { cookies } from 'next/headers';
+
 export function generateSecurePassword(): string {
   const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
@@ -42,4 +46,47 @@ export async function generateUniquePortalId(): Promise<string> {
     .join('-');
 
   return formattedToken;
+}
+
+export async function validateProjectAccess(
+  projectId: string,
+  portalSlug: string | null,
+  userId: string | null | undefined,
+  projectOwnerId: string,
+  cookieStore?: ReadonlyRequestCookies | RequestCookies
+): Promise<boolean> {
+  // If the user is the owner, they always have access
+  if (userId && userId === projectOwnerId) {
+    return true;
+  }
+
+  // If no portal slug exists, only the owner can access
+  if (!portalSlug) {
+    return false;
+  }
+
+  // Get cookie store
+  const cookieJar = cookieStore || (await cookies());
+
+  // Check if the user has portal access for this project
+  const portalAccessCookie = cookieJar.get(`portal_access_${portalSlug}`);
+  const hasPortalAccess = !!portalAccessCookie;
+
+  if (!hasPortalAccess) {
+    return false;
+  }
+
+  // Check if the portal session is for this specific project
+  const portalSessionCookie = cookieJar.get('portal_session');
+  if (!portalSessionCookie) {
+    return false;
+  }
+
+  try {
+    const portalSession = JSON.parse(portalSessionCookie.value);
+    return portalSession.projectId === projectId && portalSession.slug === portalSlug;
+  } catch (e) {
+    console.error('Error parsing portal session cookie:', e);
+    return false;
+  }
 }

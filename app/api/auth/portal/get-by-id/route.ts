@@ -3,22 +3,17 @@ import { handleError, handleSuccess, handleUnauthorized } from '@packages/lib/he
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { NextRequest } from 'next/server';
 import { decrypt } from '@/packages/lib/utils/encryption';
+import { validateProjectAccess } from '@/packages/lib/helpers/project-portals';
 
 export async function GET(request: NextRequest) {
   const currentUser = await getCurrentUser();
-
-  if (!currentUser) {
-    return handleUnauthorized();
-  }
-
   const searchParams = request.nextUrl.searchParams;
   const id = searchParams.get('id');
 
   try {
-    const project = await db.project.findFirst({
+    const project = await db.project.findUnique({
       where: {
         id: id?.toString(),
-        userId: currentUser.id,
         deletedAt: null
       },
       include: {
@@ -29,14 +24,27 @@ export async function GET(request: NextRequest) {
     });
 
     if (!project) {
+      return handleError({ message: 'Project not found' });
+    }
+
+    const hasAccess = validateProjectAccess(project.id, project.portalSlug, currentUser?.id, project.userId, request.cookies);
+
+    if (!hasAccess) {
       return handleUnauthorized();
     }
 
-    if (project) {
-      project.portalPassEncryption = decrypt(project.portalPassEncryption);
-    }
+    const portalProjectData = {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      startDate: project.startDate,
+      endDate: project.endDate,
+      status: project.status,
+      phases: project.phases,
+      client: project.client
+    };
 
-    return handleSuccess({ content: project });
+    return handleSuccess({ content: portalProjectData });
   } catch (err: unknown) {
     return handleError({ message: 'Failed to fetch project', err });
   }

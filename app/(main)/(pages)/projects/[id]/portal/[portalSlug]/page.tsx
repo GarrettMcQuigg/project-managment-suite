@@ -1,8 +1,8 @@
 import ProjectTimeline from './_src/project-timeline';
 import ProjectMessaging from './_src/project-messaging';
+import ProjectDetails from './_src/project-details';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
-import ProjectDetails from '../../_src/project-details';
 import { db } from '@/packages/lib/prisma/client';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';

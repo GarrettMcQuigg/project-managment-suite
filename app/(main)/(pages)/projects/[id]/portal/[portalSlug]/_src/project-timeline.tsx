@@ -2,7 +2,7 @@
 
 import { swrFetcher } from '@/packages/lib/helpers/fetcher';
 import type { ProjectWithMetadata } from '@/packages/lib/prisma/types';
-import { API_PROJECT_GET_BY_ID_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
+import { API_AUTH_PORTAL_GET_BY_ID_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -10,7 +10,7 @@ import useSWR from 'swr';
 import { CheckCircle, Clock, Circle } from 'lucide-react';
 
 export default function ProjectTimeline({ projectId }: { projectId: string }) {
-  const endpoint = API_PROJECT_GET_BY_ID_ROUTE + projectId;
+  const endpoint = API_AUTH_PORTAL_GET_BY_ID_ROUTE + projectId;
   const { data, error } = useSWR(endpoint, swrFetcher);
   const [project, setProject] = useState<ProjectWithMetadata | null>(null);
 

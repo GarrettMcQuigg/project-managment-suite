@@ -48,8 +48,6 @@ export default async function middleware(request: NextRequest) {
           portalSlug: portalSlug
         };
 
-        console.log('Creating portal session for:', portalUser);
-
         const response = NextResponse.next();
 
         response.cookies.set(

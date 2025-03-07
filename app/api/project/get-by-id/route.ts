@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const id = searchParams.get('id');
 
   try {
-    const project = await db.project.findFirst({
+    const project = await db.project.findUniqueOrThrow({
       where: {
         id: id?.toString(),
         userId: currentUser.id,
@@ -27,10 +27,6 @@ export async function GET(request: NextRequest) {
         invoices: true
       }
     });
-
-    if (!project) {
-      return handleUnauthorized();
-    }
 
     if (project) {
       project.portalPassEncryption = decrypt(project.portalPassEncryption);

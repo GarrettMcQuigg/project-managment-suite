@@ -18,6 +18,7 @@ export async function POST(request: Request) {
   try {
     await db.invoice.create({
       data: {
+        userId: currentUser.id,
         invoiceNumber: requestBody.invoiceNumber,
         type: requestBody.type as InvoiceType,
         status: requestBody.status as InvoiceStatus,

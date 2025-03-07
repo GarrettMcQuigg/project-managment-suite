@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     const client = await db.client.findUniqueOrThrow({
       where: {
         id: id?.toString(),
+        userId: currentUser.id,
         isArchived: false,
         deletedAt: null
       },

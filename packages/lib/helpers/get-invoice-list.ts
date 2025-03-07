@@ -10,6 +10,9 @@ export async function getInvoiceList() {
 
   try {
     const invoices = await db.invoice.findMany({
+      where: {
+        userId: currentUser.id
+      },
       include: {
         project: true,
         phase: true,

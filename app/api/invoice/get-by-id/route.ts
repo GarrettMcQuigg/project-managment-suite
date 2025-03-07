@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
   try {
     const invoice = await db.invoice.findUniqueOrThrow({
       where: {
-        id: id?.toString()
+        id: id?.toString(),
+        userId: currentUser.id
       },
       include: {
         project: true,

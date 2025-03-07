@@ -90,6 +90,7 @@ export async function POST(request: Request) {
         invoices.map((invoice) =>
           tx.invoice.create({
             data: {
+              userId: currentUser.id,
               projectId: projectRecord.id,
               invoiceNumber: invoice.invoiceNumber,
               type: invoice.type,

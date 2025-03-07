@@ -1,7 +1,7 @@
 'use client';
 
 import { Calendar, Plus, LayoutDashboard, FolderKanban, Users, Settings, Receipt, Trello } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import {
   Sidebar,
   SidebarContent,

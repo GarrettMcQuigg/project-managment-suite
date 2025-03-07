@@ -58,11 +58,9 @@ export async function getCurrentUser(): Promise<User | null> {
             id: decodedUser.id,
             email: decodedUser.email,
             name: decodedUser.name,
-            // Add minimal required User properties
             createdAt: new Date(),
             updatedAt: new Date(),
-            password: '', // Add an empty password field to match User type
-            // Add special portal properties
+            password: '',
             _portalAccess: true,
             _portalProjectId: portalSession.projectId,
             _portalSlug: portalSession.slug

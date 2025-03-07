@@ -33,6 +33,7 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
       }
     } catch (error) {
       // Error checking project ownership, redirect to portal auth
+      console.error('Error checking project ownership:', error);
       redirect(`/api/auth/portal/${resolvedParams.portalSlug}?redirect=/projects/${resolvedParams.id}/portal/${resolvedParams.portalSlug}`);
     }
   }

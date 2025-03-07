@@ -6,7 +6,7 @@ import { compare } from 'bcrypt';
 import { TOKEN_COOKIE_KEY } from '@/packages/lib/constants/cookie-keys';
 import { DASHBOARD_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
 
-export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
   const searchParams = request.nextUrl.searchParams;
@@ -168,7 +168,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
   const { visitorName, password, redirect } = await request.json();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
 import { Button } from '@/packages/lib/components/button';
@@ -78,20 +78,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
     defaultValues: defaultValues?.project || defaultFormValues
   });
 
-  useEffect(() => {
-    if (open) {
-      setCurrentStep(0);
-      setIsClientSelected(false);
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (resetTrigger > 0) {
-      resetWorkflow();
-    }
-  }, [resetTrigger]);
-
-  const resetWorkflow = () => {
+  const resetWorkflow = useCallback(() => {
     if (mode === 'create') {
       form.reset(defaultFormValues);
       setPhases([]);
@@ -104,7 +91,20 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
     setCurrentStep(0);
     setIsClientSelected(false);
     setIsSubmitting(false);
-  };
+  }, [mode, form, defaultValues, setPhases, setInvoices, setCurrentStep, setIsClientSelected, setIsSubmitting]);
+
+  useEffect(() => {
+    if (open) {
+      setCurrentStep(0);
+      setIsClientSelected(false);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (resetTrigger > 0) {
+      resetWorkflow();
+    }
+  }, [resetTrigger, resetWorkflow]);
 
   const steps = [
     {

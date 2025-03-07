@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/packages/lib/prisma/client';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { handleError, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { handleError, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 
 async function generateUniqueInvoiceNumber(prefix = 'INV-'): Promise<string> {
   const generateSevenDigitNumber = (): string => {

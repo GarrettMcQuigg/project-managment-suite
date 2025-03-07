@@ -63,6 +63,7 @@ export async function PUT(request: Request) {
         requestBody.invoices.map((invoice) =>
           tx.invoice.create({
             data: {
+              userId: currentUser.id,
               projectId: requestBody.id,
               invoiceNumber: invoice.invoiceNumber,
               type: invoice.type,

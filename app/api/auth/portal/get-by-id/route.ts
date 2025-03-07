@@ -2,7 +2,6 @@ import { db } from '@packages/lib/prisma/client';
 import { handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { NextRequest } from 'next/server';
-import { decrypt } from '@/packages/lib/utils/encryption';
 import { validateProjectAccess } from '@/packages/lib/helpers/project-portals';
 
 export async function GET(request: NextRequest) {

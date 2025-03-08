@@ -10,7 +10,6 @@ interface PortalHeaderProps {
   visitorName: string;
 }
 
-// Status colors mapping - adjusted for dark mode
 const statusColors: Record<ProjectStatus, string> = {
   DRAFT: 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
   PREPARATION: 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800/40 dark:text-yellow-300',

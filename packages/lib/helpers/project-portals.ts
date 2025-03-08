@@ -1,6 +1,7 @@
 import { RequestCookies } from 'next/dist/compiled/@edge-runtime/cookies';
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 import { cookies } from 'next/headers';
+import { db } from '../prisma/client';
 
 export function generateSecurePassword(): string {
   const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -89,4 +90,30 @@ export async function validateProjectAccess(
     console.error('Error parsing portal session cookie:', e);
     return false;
   }
+}
+
+export async function hasPortalAccess(projectId: string, userId: string | null, portalSlug: string | null): Promise<boolean> {
+  if (!portalSlug) {
+    return false;
+  }
+
+  if (userId) {
+    try {
+      const project = await db.project.findUnique({
+        where: {
+          id: projectId,
+          userId,
+          portalEnabled: true
+        }
+      });
+
+      if (project) {
+        return true;
+      }
+    } catch (error) {
+      console.error('Error checking project ownership:', error);
+    }
+  }
+
+  return false;
 }

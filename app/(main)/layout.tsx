@@ -1,20 +1,30 @@
-import { getCurrentUser } from '@packages/lib/helpers/get-current-user';
 import { Unauth } from './_src/unauth';
 import HUD from './_src/hud';
 import SubtleBackground from '@/packages/lib/components/subtle-background';
+import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
+import { redirect } from 'next/navigation';
+import { AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
-  const currentUser = await getCurrentUser();
+  const sessionContext = await getSessionContext();
 
-  if (!currentUser) {
+  if (!sessionContext) {
     return <Unauth />;
   }
 
-  return (
-    <HUD currentUser={currentUser}>
-      <SubtleBackground />
+  if (sessionContext.type === 'none') {
+    redirect(AUTH_SIGNIN_ROUTE);
+  }
 
-      <div className="lg:ml-64">{children}</div>
-    </HUD>
-  );
+  if (sessionContext.type === 'user') {
+    return (
+      <HUD currentUser={sessionContext.user}>
+        <SubtleBackground />
+
+        <div>{children}</div>
+      </HUD>
+    );
+  }
+
+  return <>{children}</>;
 }

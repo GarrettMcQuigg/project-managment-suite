@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/packages/lib/providers/providers';
 import { cn } from '@/packages/lib/utils';
+import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -15,14 +16,16 @@ export const metadata: Metadata = {
   description: 'A platform for creative professionals'
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const sessionContext = await getSessionContext();
+
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn('min-h-screen bg-background font-sans antialiased', geistSans.variable)}>
+      <body className={cn('min-h-screen bg-background font-sans antialiased', geistSans.variable, sessionContext.type === 'portal' ? 'portal-visitor' : '')}>
         <Providers>{children}</Providers>
       </body>
     </html>

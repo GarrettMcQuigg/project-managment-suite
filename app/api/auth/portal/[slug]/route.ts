@@ -5,6 +5,8 @@ import { handleError } from '@/packages/lib/helpers/api-response-handlers';
 import { compare } from 'bcrypt';
 import { TOKEN_COOKIE_KEY } from '@/packages/lib/constants/cookie-keys';
 import { DASHBOARD_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
+import { generateUniquePortalId } from '@/packages/lib/helpers/project-portals';
+import { PORTAL_SESSION_COOKIE, PORTAL_VISITOR_COOKIE } from '@/packages/lib/helpers/get-portal-user';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
@@ -201,6 +203,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return handleError({ message: 'Invalid password' });
     }
 
+    // Garrett TODO : This may end up duplicating a portal view record since the page.tsx also writes a record
     // Record the portal view
     await db.portalView.create({
       data: {
@@ -209,7 +212,19 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       }
     });
 
-    // Set the access cookie
+    // Generate unique ID for portal visitor
+    const uniqueId = await generateUniquePortalId();
+
+    // Create portal visitor object
+    const portalVisitor = {
+      id: `portal_${uniqueId}`,
+      name: visitorName,
+      projectId: project.id,
+      portalSlug: slug,
+      createdAt: new Date()
+    };
+
+    // Set the access cookies
     const response = NextResponse.json({ success: true, redirect }, { status: 200 });
 
     // Check if user is already logged in
@@ -235,7 +250,34 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       }
     }
 
-    // Store the visitor name in a cookie so middleware can use it
+    // Set portal session cookie
+    response.cookies.set(
+      PORTAL_SESSION_COOKIE,
+      JSON.stringify({
+        projectId: project.id,
+        slug,
+        authorized: true,
+        timestamp: Date.now()
+      }),
+      {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24, // 24 hours
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    );
+
+    // Set portal visitor cookie
+    response.cookies.set(PORTAL_VISITOR_COOKIE, JSON.stringify(portalVisitor), {
+      httpOnly: false,
+      maxAge: 60 * 60 * 24, // 24 hours
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production'
+    });
+
+    // Store the visitor name in a cookie for backwards compatibility
     response.cookies.set(`portal_name_${slug}`, visitorName, {
       httpOnly: true,
       maxAge: 60 * 60 * 24,
@@ -244,7 +286,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       secure: process.env.NODE_ENV === 'production'
     });
 
-    // Set portal access cookie for everyone who provides correct password
+    // Set portal access cookie for backwards compatibility
     response.cookies.set(`portal_access_${slug}`, 'true', {
       httpOnly: true,
       maxAge: 60 * 60 * 24,

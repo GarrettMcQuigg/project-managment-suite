@@ -21,7 +21,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
       <HUD currentUser={sessionContext.user}>
         <SubtleBackground />
 
-        <div>{children}</div>
+        <div className="ml-64">{children}</div>
       </HUD>
     );
   }

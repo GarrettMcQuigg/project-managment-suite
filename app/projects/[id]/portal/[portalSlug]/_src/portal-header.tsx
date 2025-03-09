@@ -1,12 +1,16 @@
 'use client';
 
+import { Button } from '@/packages/lib/components/button';
 import { ProjectStatus } from '@prisma/client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface PortalHeaderProps {
-  projectName: string;
   projectStatus: ProjectStatus;
   isOwner: boolean;
   visitorName: string;
+  projectId: string;
+  portalSlug: string;
 }
 
 const statusColors: Record<ProjectStatus, string> = {
@@ -19,7 +23,25 @@ const statusColors: Record<ProjectStatus, string> = {
   DELETED: 'bg-red-200 text-red-800 dark:bg-red-800/40 dark:text-red-300'
 };
 
-export default function PortalHeader({ projectName, projectStatus, isOwner, visitorName }: PortalHeaderProps) {
+export default function PortalHeader({ projectStatus, isOwner, visitorName, projectId, portalSlug }: PortalHeaderProps) {
+  const router = useRouter();
+  const searchParams = new URLSearchParams(window.location.search);
+  const isPreview = searchParams.get('preview') === 'true';
+
+  const [previewMode, setPreviewMode] = useState<boolean>(isPreview);
+
+  const handleToggleView = () => {
+    if (isOwner) {
+      const newPreviewMode = !previewMode;
+      setPreviewMode(newPreviewMode);
+
+      const url = `/projects/${projectId}/portal/${portalSlug}${newPreviewMode ? '?preview=true' : ''}`;
+      router.push(url);
+    }
+  };
+
+  const viewText = isOwner ? (previewMode ? 'Client View Preview' : 'Owner View') : 'Client Portal';
+
   return (
     <div className="container mx-auto px-4 py-6 lg:w-3/4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -30,8 +52,17 @@ export default function PortalHeader({ projectName, projectStatus, isOwner, visi
 
         <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-emerald-500 dark:bg-[#00b894]" />
-            <span className="text-sm text-gray-500 dark:text-gray-400">{isOwner ? 'Owner View' : 'Client Portal'}</span>
+            {isOwner ? (
+              <Button variant="outline" onClick={handleToggleView}>
+                <div className={`h-2 w-2 rounded-full ${!previewMode ? 'bg-emerald-500 dark:bg-[#00b894]' : 'bg-red-500/80 dark:bg-red-400'}`} />
+                <span className="text-sm text-gray-500 dark:text-gray-400">{viewText}</span>
+              </Button>
+            ) : (
+              <>
+                <div className="h-2 w-2 rounded-full bg-gray-400 dark:bg-gray-500" />
+                <span className="text-sm text-gray-500 dark:text-gray-400">{viewText}</span>
+              </>
+            )}
           </div>
 
           <div className="text-sm">

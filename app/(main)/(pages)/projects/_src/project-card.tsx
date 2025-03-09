@@ -63,7 +63,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         </div>
 
         <div className="flex flex-wrap justify-end gap-3">
-          <Link href={clientPortalUrl} target="_blank" rel="noopener noreferrer">
+          <Link href={clientPortalUrl} rel="noopener noreferrer">
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button variant="outline" className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90">
                 <ExternalLink className="h-4 w-4" />

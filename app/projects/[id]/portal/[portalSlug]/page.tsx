@@ -63,20 +63,20 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
   const isOwner = context.type === 'user' && context.user.id === project.userId;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-[#0B1416] dark:to-[#0B1416] text-gray-900 dark:text-white">
+    <div className="min-h-screen text-gray-900 dark:text-white">
       <PortalHeader projectName={project.name} projectStatus={project.status} isOwner={isOwner} visitorName={visitorName} />
 
-      <main className="md:container md:mx-auto sm:px-4 py-8">
+      <main className={`${isOwner ? 'mb-4' : ''} md:container md:mx-auto sm:px-4 lg:w-3/4 py-8`}>
         <div className="grid gap-8">
           <ProjectDetails projectId={resolvedParams.id} />
-          <ProjectTimeline projectId={resolvedParams.id} />
+          <ProjectTimeline projectId={resolvedParams.id} isOwner={isOwner} />
           <ProjectMessaging projectId={resolvedParams.id} />
         </div>
       </main>
 
       {/* Owner badge - only visible to the project owner */}
       {isOwner && (
-        <div className="fixed bottom-0 left-0 w-full bg-primary/10 p-3 border-t shadow-md">
+        <div className="fixed bottom-0 left-0 w-full bg-primary/30 p-3 border-t shadow-md">
           <div className="container mx-auto flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Viewing as project owner</span>
             <a href={`/projects/${resolvedParams.id}`} className="text-sm text-primary hover:underline">

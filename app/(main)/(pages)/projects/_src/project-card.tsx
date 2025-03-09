@@ -6,6 +6,8 @@ import { Calendar, ExternalLink, Eye } from 'lucide-react';
 import type { ProjectStatus } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { PROJECT_DETAILS_ROUTE, PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import Link from 'next/link';
+import { Button } from '@/packages/lib/components/button';
 
 interface ProjectCardProps {
   project: {
@@ -36,9 +38,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     router.push(routeWithParam(PROJECT_DETAILS_ROUTE, { id: project.id }));
   };
 
-  const handleClientPortal = () => {
-    router.push(routeWithParam(PROJECT_PORTAL_ROUTE, { id: project.id, portalSlug: project.portalSlug }));
-  };
+  const clientPortalUrl = routeWithParam(PROJECT_PORTAL_ROUTE, { id: project.id, portalSlug: project.portalSlug });
 
   return (
     <motion.div
@@ -48,10 +48,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       transition={{ duration: 0.3 }}
       className="group relative overflow-hidden rounded-lg bg-card shadow-md transition-all duration-300 hover:shadow-lg dark:shadow-lg dark:shadow-primary/5 dark:hover:shadow-primary/10 cursor-default"
     >
-      <div className="absolute inset-0 rounded-lg border border-border/50" />
-
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 transition-colors duration-300 group-hover:from-primary/10 group-hover:to-accent/10 dark:from-primary/10 dark:via-transparent dark:to-accent/10 dark:group-hover:from-primary/15 dark:group-hover:to-accent/15"></div>
-
       <div className="relative z-10 p-6">
         <h2 className="mb-2 text-2xl font-semibold text-card-foreground">{project.name}</h2>
         <p className="mb-4 text-sm text-muted-foreground line-clamp-3">{project.description}</p>
@@ -67,23 +63,20 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         </div>
 
         <div className="flex flex-wrap justify-end gap-3">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleClientPortal}
-            className="flex items-center rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90"
-          >
-            <ExternalLink className="mr-2 h-4 w-4" />
-            Client Portal
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleViewDetails}
-            className="flex items-center rounded-md border bg-primary dark:bg-transparent border-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors dark:hover:bg-primary/30 hover:bg-primary/90"
-          >
-            <Eye className="mr-2 h-4 w-4" />
-            View Details
+          <Link href={clientPortalUrl} target="_blank" rel="noopener noreferrer">
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button variant="outline" className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90">
+                <ExternalLink className="h-4 w-4" />
+                Client Portal
+              </Button>
+            </motion.button>
+          </Link>
+
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleViewDetails}>
+            <Button className="flex items-center rounded-md border bg-primary dark:bg-transparent border-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors dark:hover:bg-primary/30 hover:bg-primary/90">
+              <Eye className="mr-2 h-4 w-4" />
+              View Details
+            </Button>
           </motion.button>
         </div>
       </div>

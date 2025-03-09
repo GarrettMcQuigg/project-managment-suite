@@ -11,8 +11,8 @@ import { toast } from 'react-toastify';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import UnifiedProjectWorkflow from '@/app/(main)/_src/project-workflow-dialog';
 import { ProjectFormData } from '@/app/(main)/_src/components/project-step';
-import { ProjectTimeline } from './project-timeline';
 import ProjectDetails from './project-details';
+import ProjectTimeline from '@/app/projects/[id]/portal/[portalSlug]/_src/project-timeline';
 
 export function ProjectInfo({ projectId }: { projectId: string }) {
   const endpoint = API_PROJECT_GET_BY_ID_ROUTE + projectId;
@@ -60,10 +60,11 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
 
   return (
     <>
-      <ProjectDetails projectId={projectId} showInteralControls={true} onEditClick={() => setIsEditDialogOpen(true)} />
+      <div className="space-y-8">
+        <ProjectDetails projectId={projectId} showInteralControls={true} onEditClick={() => setIsEditDialogOpen(true)} />
 
-      {project && <ProjectTimeline project={project} />}
-
+        {project && <ProjectTimeline projectId={project.id} isOwner={true} />}
+      </div>
       {project && (
         <UnifiedProjectWorkflow
           open={isEditDialogOpen}

@@ -1,7 +1,6 @@
 'use client';
 
 import { ProjectStatus } from '@prisma/client';
-import { motion } from 'framer-motion';
 
 interface PortalHeaderProps {
   projectName: string;
@@ -22,36 +21,29 @@ const statusColors: Record<ProjectStatus, string> = {
 
 export default function PortalHeader({ projectName, projectStatus, isOwner, visitorName }: PortalHeaderProps) {
   return (
-    <motion.header
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="border-b border-gray-200 dark:border-white/10 bg-white/50 dark:bg-[#0B1416]/50 backdrop-blur-xl"
-    >
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold">CreativeSuite Portal</h1>
-            <div className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[projectStatus]}`}>{projectStatus.replace('_', ' ')}</div>
-          </div>
-
-          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-emerald-500 dark:bg-[#00b894]" />
-              <span className="text-sm text-gray-500 dark:text-gray-400">{isOwner ? 'Owner View' : 'Client Portal'}</span>
-            </div>
-
-            <div className="text-sm">
-              <span className="text-gray-500 dark:text-gray-400 mr-2">Viewing as:</span>
-              <span className="font-medium">{visitorName}</span>
-            </div>
-          </div>
+    <div className="container mx-auto px-4 py-6 lg:w-3/4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold">CreativeSuite Portal</h1>
+          <div className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[projectStatus]}`}>{projectStatus.replace('_', ' ')}</div>
         </div>
 
-        <div className="mt-4">
-          <h2 className="text-xl font-medium">{projectName}</h2>
+        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-emerald-500 dark:bg-[#00b894]" />
+            <span className="text-sm text-gray-500 dark:text-gray-400">{isOwner ? 'Owner View' : 'Client Portal'}</span>
+          </div>
+
+          <div className="text-sm">
+            <span className="text-gray-500 dark:text-gray-400 mr-2">Viewing as:</span>
+            <span className="font-medium">{visitorName}</span>
+          </div>
         </div>
       </div>
-    </motion.header>
+
+      <div className="mt-4">
+        <h2 className="text-xl font-medium">{projectName}</h2>
+      </div>
+    </div>
   );
 }

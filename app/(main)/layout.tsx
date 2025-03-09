@@ -18,11 +18,10 @@ export default async function MainLayout({ children }: { children: React.ReactNo
 
   if (sessionContext.type === 'user') {
     return (
-      <HUD currentUser={sessionContext.user}>
+      <>
         <SubtleBackground />
-
-        <div className="ml-64">{children}</div>
-      </HUD>
+        <HUD currentUser={sessionContext.user}>{children}</HUD>
+      </>
     );
   }
 

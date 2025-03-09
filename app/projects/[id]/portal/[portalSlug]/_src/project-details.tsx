@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { format } from 'date-fns';
 import { Calendar, Clock, Users } from 'lucide-react';
+import { Card } from '@/packages/lib/components/card';
 
 interface ProjectDetailsProps {
   projectId: string;
@@ -34,7 +35,7 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
   }
 
   return (
-    <div className="rounded-xl bg-white dark:bg-[#0F1A1C] p-6 shadow-lg">
+    <Card className="bg-white dark:bg-[#0F1A1C] p-6">
       <div className="mb-6 flex items-start justify-between">
         <div className="w-full">
           <div className="flex items-center justify-between">
@@ -96,6 +97,6 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

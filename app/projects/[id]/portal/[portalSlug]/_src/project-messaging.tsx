@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Send } from 'lucide-react';
+import { Card } from '@/packages/lib/components/card';
 
 interface FakeProjectMessages {
   id: string;
@@ -21,7 +22,7 @@ export default function ProjectMessaging({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div className="rounded-xl bg-white dark:bg-[#0F1A1C] p-6 shadow-lg">
+    <Card className="bg-white dark:bg-[#0F1A1C] p-6">
       <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Project Messages</h2>
 
       <div className="mb-4 h-[400px] space-y-4 overflow-y-auto rounded-lg bg-gray-100 dark:bg-[#1A2729] p-4">
@@ -63,6 +64,6 @@ export default function ProjectMessaging({ projectId }: { projectId: string }) {
           <span>Send</span>
         </button>
       </form>
-    </div>
+    </Card>
   );
 }

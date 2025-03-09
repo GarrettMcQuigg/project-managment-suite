@@ -171,7 +171,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-foreground/10 via-background to-background">
+      <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-foreground/10 via-background to-background px-2 py-6 sm:p-6">
         <DialogHeader>
           <DialogTitle>{mode === 'create' ? 'Create New Project' : 'Edit Project'}</DialogTitle>
           <DialogDescription>

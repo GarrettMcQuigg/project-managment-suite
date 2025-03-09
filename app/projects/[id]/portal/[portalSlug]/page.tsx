@@ -33,6 +33,7 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
 
   const hasPortalAccess = !!portalAccessCookie;
 
+  // TODO : Clean this up
   if (context.type === 'none' && !hasPortalAccess) {
     redirect(`/api/auth/portal/${resolvedParams.portalSlug}?redirect=${encodeURIComponent(`/projects/${resolvedParams.id}/portal/${resolvedParams.portalSlug}`)}`);
   }
@@ -40,6 +41,7 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
   if (context.type === 'user' && !hasPortalAccess) {
     const isOwner = project.userId === context.user.id;
 
+    // TODO : Clean this up
     if (!isOwner) {
       redirect(`/api/auth/portal/${resolvedParams.portalSlug}?redirect=${encodeURIComponent(`/projects/${resolvedParams.id}/portal/${resolvedParams.portalSlug}`)}`);
     }
@@ -64,7 +66,7 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-[#0B1416] dark:to-[#0B1416] text-gray-900 dark:text-white">
       <PortalHeader projectName={project.name} projectStatus={project.status} isOwner={isOwner} visitorName={visitorName} />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="md:container md:mx-auto sm:px-4 py-8">
         <div className="grid gap-8">
           <ProjectDetails projectId={resolvedParams.id} />
           <ProjectTimeline projectId={resolvedParams.id} />
@@ -78,7 +80,7 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
           <div className="container mx-auto flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Viewing as project owner</span>
             <a href={`/projects/${resolvedParams.id}`} className="text-sm text-primary hover:underline">
-              Back to Project Dashboard
+              Back to Project Details
             </a>
           </div>
         </div>

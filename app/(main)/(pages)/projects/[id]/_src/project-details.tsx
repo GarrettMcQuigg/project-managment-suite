@@ -9,6 +9,7 @@ import useSWR from 'swr';
 import { format } from 'date-fns';
 import { Calendar, Clock, Users, Pencil, Eye, EyeOff, KeyRound } from 'lucide-react';
 import { DeleteProjectButton } from './delete-project';
+import { Card } from '@/packages/lib/components/card';
 
 interface ProjectDetailsProps {
   projectId: string;
@@ -42,12 +43,11 @@ export default function ProjectDetails({ projectId, showInteralControls = false,
   };
 
   return (
-    <div className="rounded-xl bg-white dark:bg-[#0F1A1C] p-6 shadow-lg">
+    <Card className="bg-white dark:bg-[#0F1A1C] p-6 min-w-full">
       <div className="mb-6 flex items-start justify-between">
         <div className="w-full">
-          <div className="flex items-center justify-between">
+          <div className="md:flex items-center justify-between">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{project.name}</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{project.type}</p>
             {showInteralControls && (
               <div className="flex gap-4">
                 <Pencil className="h-5 w-5 cursor-pointer" onClick={onEditClick} />
@@ -68,7 +68,7 @@ export default function ProjectDetails({ projectId, showInteralControls = false,
             <p className="text-gray-700 dark:text-gray-300">{project.description}</p>
           </div>
 
-          <div className="flex justify-between max-w-[86%]">
+          <div className="sm:flex justify-between md:max-w-[86%]">
             <div>
               <h3 className="mb-3 text-sm font-medium uppercase text-gray-500 dark:text-gray-400">Client Information</h3>
               <div className="flex items-center gap-3">
@@ -89,11 +89,11 @@ export default function ProjectDetails({ projectId, showInteralControls = false,
                     <KeyRound className="h-5 w-5" />
                   </div>
                   <div className="relative">
-                    <div className="bg-gray-800 dark:bg-[#0A1214] rounded px-3 py-2 pr-10 font-mono min-w-32">
+                    <div className="bg-gray-200 dark:bg-[#0A1214] rounded px-3 py-2 pr-10 font-mono min-w-32">
                       {showPassword ? project.portalPassEncryption : <span className="tracking-[0.2em]">••••••••</span>}
                     </div>
                     <div
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-200 transition-colors"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                       onClick={togglePasswordVisibility}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -131,6 +131,6 @@ export default function ProjectDetails({ projectId, showInteralControls = false,
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { CheckCircle, Clock, Circle } from 'lucide-react';
+import { Card } from '@/packages/lib/components/card';
 
 export default function ProjectTimeline({ projectId }: { projectId: string }) {
   const endpoint = API_AUTH_PORTAL_GET_BY_ID_ROUTE + projectId;
@@ -30,7 +31,7 @@ export default function ProjectTimeline({ projectId }: { projectId: string }) {
   }
 
   return (
-    <div className="rounded-xl bg-white dark:bg-[#0F1A1C] p-6 shadow-lg">
+    <Card className="bg-white dark:bg-[#0F1A1C] p-6">
       <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Project Timeline</h2>
       <div className="space-y-8">
         {project.phases.map((phase, index) => (
@@ -71,7 +72,7 @@ export default function ProjectTimeline({ projectId }: { projectId: string }) {
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
 

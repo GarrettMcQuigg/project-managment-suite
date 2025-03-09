@@ -2,18 +2,8 @@
 
 import { Calendar, Plus, LayoutDashboard, FolderKanban, Users, Settings, Receipt, Trello } from 'lucide-react';
 import { useState } from 'react';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarProvider
-} from '@/packages/lib/components/sidebar';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/packages/lib/components/button';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { toast } from 'react-toastify';
@@ -29,14 +19,12 @@ import {
   INVOICES_ROUTE,
   API_PROJECT_LIST_ROUTE
 } from '@/packages/lib/routes';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import UnifiedProjectWorkflow from './project-workflow-dialog';
 import { ProjectFormData } from './components/project-step';
 import { Phase, Invoice } from '@prisma/client';
 import { mutate } from 'swr';
 
-export function AppSidebar() {
+export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean) => void }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -63,10 +51,10 @@ export function AppSidebar() {
 
       setIsOpen(false);
 
-      // TODO : Not working
       router.refresh();
       mutate(API_PROJECT_LIST_ROUTE);
       router.push(PROJECTS_ROUTE);
+      setSidebarOpen(false);
     } catch (error) {
       console.error(error);
       toast.error('An error occurred');
@@ -74,140 +62,75 @@ export function AppSidebar() {
     }
   };
 
+  const renderMenuItem = (href: string, icon: any, label: string) => {
+    const isActive = pathname === href;
+    const Icon = icon;
+
+    const handleClick = () => {
+      setSidebarOpen(false);
+    };
+
+    return (
+      <li className="mb-1">
+        <Link href={href} onClick={handleClick}>
+          <div
+            className={`flex w-full items-center rounded-lg p-2 text-sm transition-all duration-200 ${
+              isActive ? 'bg-white/10 text-white font-medium' : 'text-foreground/60 hover:bg-white/[0.06] hover:text-white'
+            }`}
+          >
+            <Icon className="mr-2 h-4 w-4" />
+            {label}
+          </div>
+        </Link>
+      </li>
+    );
+  };
+
   return (
-    <SidebarProvider>
-      <Sidebar className="border-r border-white/[0.08] bg-gradient-to-b from-[#e8f7f7] to-white dark:from-[#021111] dark:to-black [&::-webkit-scrollbar]:!hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        <SidebarHeader className="border-b border-white/[0.08] p-4 h-header">
-          <Button onClick={() => setIsOpen(true)} disabled={loading} className="transition-all duration-300 group/button">
+    <>
+      <div className="flex flex-col h-full w-full border-r border-white/[0.08] bg-gradient-to-b from-[#021111] to-black">
+        {/* Header */}
+        <div className="border-b border-white/[0.08] p-4 h-header shrink-0">
+          <Button onClick={() => setIsOpen(true)} disabled={loading} className="transition-all duration-300 group/button lg:w-full">
             <Plus className="h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" />
             New Project
           </Button>
-        </SidebarHeader>
-        <SidebarContent className="px-2 py-4 h-[calc(100vh-var(--header-height))] overflow-y-auto flex flex-col">
-          <div className="flex-grow">
-            <SidebarGroup>
-              <SidebarGroupLabel className="px-4 text-xs font-medium text-foreground">MAIN</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <Link href={DASHBOARD_ROUTE}>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        className={`w-full rounded-lg transition-all duration-200 ${
-                          pathname === DASHBOARD_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
-                        }`}
-                      >
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </Link>
-                  <Link href={PROJECTS_ROUTE}>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        className={`w-full rounded-lg transition-all duration-200 ${
-                          pathname === PROJECTS_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
-                        }`}
-                      >
-                        <FolderKanban className="mr-2 h-4 w-4" />
-                        Projects
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </Link>
-                  <Link href={CLIENTS_ROUTE}>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        className={`w-full rounded-lg transition-all duration-200 ${
-                          pathname === CLIENTS_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
-                        }`}
-                      >
-                        <Users className="mr-2 h-4 w-4" />
-                        Clients
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </Link>
-                  <Link href={INVOICES_ROUTE}>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        className={`w-full rounded-lg transition-all duration-200 ${
-                          pathname === INVOICES_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
-                        }`}
-                      >
-                        <Receipt className="mr-2 h-4 w-4" />
-                        Invoices
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </Link>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-            <SidebarGroup>
-              <SidebarGroupLabel className="px-4 text-xs font-medium text-foreground">UTILITIES</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <Link href={CALENDAR_ROUTE}>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        className={`w-full rounded-lg transition-all duration-200 ${
-                          pathname === CALENDAR_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
-                        }`}
-                      >
-                        <Calendar className="mr-2 h-4 w-4" />
-                        Calendar
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </Link>
-                  <Link href={PROJECT_BOARD_ROUTE}>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        className={`w-full rounded-lg transition-all duration-200 ${
-                          pathname === PROJECT_BOARD_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
-                        }`}
-                      >
-                        <Trello className="mr-2 h-4 w-4" />
-                        Project Board
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </Link>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
+        </div>
+
+        {/* Main content area */}
+        <div className="flex flex-col px-2 flex-grow overflow-y-auto space-y-6">
+          {/* MAIN Section */}
+          <div className="my-4">
+            <div className="px-2 mb-2 text-xs font-medium text-white/90">MAIN</div>
+            <ul className="space-y-1">
+              {renderMenuItem(DASHBOARD_ROUTE, LayoutDashboard, 'Dashboard')}
+              {renderMenuItem(PROJECTS_ROUTE, FolderKanban, 'Projects')}
+              {renderMenuItem(CLIENTS_ROUTE, Users, 'Clients')}
+              {renderMenuItem(INVOICES_ROUTE, Receipt, 'Invoices')}
+            </ul>
           </div>
 
-          <div className="mt-auto pt-4">
-            <SidebarGroup>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <Link href={SUPPORT_ROUTE}>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        className={`w-full rounded-lg transition-all duration-200 ${
-                          pathname === SUPPORT_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
-                        }`}
-                      >
-                        <Users className="mr-2 h-4 w-4" />
-                        Support
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </Link>
-                  <Link href={SETTINGS_ROUTE}>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        className={`w-full rounded-lg transition-all duration-200 ${
-                          pathname === SETTINGS_ROUTE ? 'dark:bg-white/10 dark:text-white' : 'dark:text-foreground/60 dark:hover:bg-white/[0.06] dark:hover:text-white'
-                        }`}
-                      >
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </Link>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
+          {/* UTILITIES Section */}
+          <div className="mb-6">
+            <div className="px-2 mb-2 text-xs font-medium text-white/90">UTILITIES</div>
+            <ul>
+              {renderMenuItem(CALENDAR_ROUTE, Calendar, 'Calendar')}
+              {renderMenuItem(PROJECT_BOARD_ROUTE, Trello, 'Project Board')}
+            </ul>
           </div>
-        </SidebarContent>
-      </Sidebar>
+        </div>
+
+        {/* Bottom Section - Fixed at bottom */}
+        <div className="mt-auto px-2 pb-4">
+          <ul>
+            {renderMenuItem(SUPPORT_ROUTE, Users, 'Support')}
+            {renderMenuItem(SETTINGS_ROUTE, Settings, 'Settings')}
+          </ul>
+        </div>
+      </div>
+
+      {/* Project Creation Modal */}
       <UnifiedProjectWorkflow open={isOpen} onOpenChange={setIsOpen} onComplete={handleComplete} resetTrigger={resetTrigger} />
-    </SidebarProvider>
+    </>
   );
 }

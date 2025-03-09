@@ -68,6 +68,7 @@ model Project {
   clientId     String
   type         ProjectType?
   name         String
+  // TODO : Add a projectSlug
   description  String
   status       ProjectStatus        @default(PREPARATION)
   invoices     Invoice[] // Tracks actual invoices for the project
@@ -165,7 +166,8 @@ enum PhaseStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
-  BLOCKED
+  BLOCKED // TODO : Is this needed?
+  PAUSED
 }
 
 enum ProjectStatus {

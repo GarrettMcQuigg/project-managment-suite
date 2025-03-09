@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, Plus, LayoutDashboard, FolderKanban, Users, Settings, Receipt, Trello } from 'lucide-react';
+import { Calendar, Plus, LayoutDashboard, FolderKanban, Users, Settings, Receipt, Trello, LucideIcon } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -62,7 +62,7 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
     }
   };
 
-  const renderMenuItem = (href: string, icon: any, label: string) => {
+  const renderMenuItem = (href: string, icon: LucideIcon, label: string) => {
     const isActive = pathname === href;
     const Icon = icon;
 

@@ -1,8 +1,6 @@
 'use client';
 
-import { Button } from '@/packages/lib/components/button';
 import { Sheet, SheetContent, SheetTitle, SheetHeader } from '@/packages/lib/components/sheet';
-import { X } from 'lucide-react';
 
 export default function SidebarLayout({ children, sidebarOpen, setSidebarOpen }: { children: React.ReactNode; sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void }) {
   return (

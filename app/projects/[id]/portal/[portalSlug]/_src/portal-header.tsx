@@ -40,10 +40,6 @@ export default function PortalHeader({ projectName, projectStatus, isOwner, visi
           </div>
         </div>
       </div>
-
-      <div className="mt-4">
-        <h2 className="text-xl font-medium">{projectName}</h2>
-      </div>
     </div>
   );
 }

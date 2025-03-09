@@ -161,7 +161,7 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
             <div className="flex-1">
               <div className="rounded-lg bg-gray-100 dark:bg-[#1A2729] p-4">
                 <div className="mb-2 flex items-center justify-between">
-                  <div>
+                  <div className="flex items-center gap-4">
                     <h3 className="font-medium text-gray-900 dark:text-white">{phase.name}</h3>
                     <span className={`rounded-full px-3 py-1 text-sm ${getStatusStyle(phase.status)}`}>{getStatusText(phase.status)}</span>
                   </div>

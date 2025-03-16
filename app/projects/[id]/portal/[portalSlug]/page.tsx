@@ -7,7 +7,7 @@ import { db } from '@/packages/lib/prisma/client';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
-import { PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import { PROJECT_DETAILS_ROUTE, API_AUTH_PORTAL_ROUTE, routeWithParam, PROJECT_PORTAL_ROUTE } from '@/packages/lib/routes';
 
 export default async function ProjectPortalPage({ params, searchParams }: { params: Promise<{ id: string; portalSlug: string }>; searchParams: Promise<{ preview?: string }> }) {
   const resolvedParams = await params;
@@ -37,17 +37,27 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
 
   const hasPortalAccess = !!portalAccessCookie;
 
-  // TODO : Clean this up
   if (context.type === 'none' && !hasPortalAccess) {
-    redirect(`/api/auth/portal/${resolvedParams.portalSlug}?redirect=${encodeURIComponent(`/projects/${resolvedParams.id}/portal/${resolvedParams.portalSlug}`)}`);
+    const portalAuthRedirect = `${API_AUTH_PORTAL_ROUTE}/${resolvedParams.portalSlug}`;
+    const targetRoute = routeWithParam(PROJECT_PORTAL_ROUTE, {
+      id: resolvedParams.id,
+      portalSlug: resolvedParams.portalSlug
+    });
+
+    redirect(`${portalAuthRedirect}?redirect=${encodeURIComponent(targetRoute)}`);
   }
 
   if (context.type === 'user' && !hasPortalAccess) {
     const isOwner = project.userId === context.user.id;
 
-    // TODO : Clean this up
     if (!isOwner) {
-      redirect(`/api/auth/portal/${resolvedParams.portalSlug}?redirect=${encodeURIComponent(`/projects/${resolvedParams.id}/portal/${resolvedParams.portalSlug}`)}`);
+      const portalAuthRedirect = `${API_AUTH_PORTAL_ROUTE}/${resolvedParams.portalSlug}`;
+      const targetRoute = routeWithParam(PROJECT_PORTAL_ROUTE, {
+        id: resolvedParams.id,
+        portalSlug: resolvedParams.portalSlug
+      });
+
+      redirect(`${portalAuthRedirect}?redirect=${encodeURIComponent(targetRoute)}`);
     }
   }
 

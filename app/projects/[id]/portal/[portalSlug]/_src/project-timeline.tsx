@@ -1,24 +1,26 @@
 'use client';
 
-import { swrFetcher } from '@/packages/lib/helpers/fetcher';
+import { useEffect, useState } from 'react';
+import useSWR, { mutate } from 'swr';
+import { swrFetcher, fetcher } from '@/packages/lib/helpers/fetcher';
 import type { ProjectWithMetadata } from '@/packages/lib/prisma/types';
-import { API_AUTH_PORTAL_GET_BY_ID_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
+import { API_AUTH_PORTAL_GET_BY_ID_ROUTE, PROJECTS_ROUTE, API_PROJECT_UPDATE_PHASE_STATUS_ROUTE } from '@/packages/lib/routes';
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import useSWR from 'swr';
 import { CheckCircle, Clock, Circle } from 'lucide-react';
 import { Card } from '@/packages/lib/components/card';
 import { Button } from '@/packages/lib/components/button';
 import { Input } from '@/packages/lib/components/input';
 import { Phase, PhaseStatus } from '@prisma/client';
 import { Progress } from '@/packages/lib/components/progress';
+import { toast } from 'react-toastify';
 
 export default function ProjectTimeline({ projectId, isOwner }: { projectId: string; isOwner: boolean }) {
   const endpoint = API_AUTH_PORTAL_GET_BY_ID_ROUTE + projectId;
   const { data, error } = useSWR(endpoint, swrFetcher);
   const [project, setProject] = useState<ProjectWithMetadata | null>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -27,24 +29,8 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
         phases: [...data.content.phases].sort((a, b) => a.order - b.order)
       };
 
-      const phasesWithUpdatedStatus = projectWithSortedPhases.phases.map((phase: Phase, index: number) => {
-        if (index > 0) {
-          const previousPhase = projectWithSortedPhases.phases[index - 1];
-
-          if (previousPhase.status === PhaseStatus.COMPLETED && phase.status !== PhaseStatus.COMPLETED) {
-            return { ...phase, status: PhaseStatus.IN_PROGRESS };
-          }
-        }
-        return phase;
-      });
-
-      const updatedProject = {
-        ...projectWithSortedPhases,
-        phases: phasesWithUpdatedStatus
-      };
-
-      setProject(updatedProject);
-      updateProgressPercentage(updatedProject.phases);
+      setProject(projectWithSortedPhases);
+      updateProgressPercentage(projectWithSortedPhases.phases);
     }
 
     if (error) {
@@ -61,64 +47,46 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
     setProgressPercentage(percentage);
   };
 
-  const handleOnComplete = (phaseId: string) => {
-    setProject((prevProject) => {
-      if (!prevProject) return null;
+  const handleOnComplete = async (phaseId: string) => {
+    if (!project || isUpdating) return;
 
-      const phaseIndex = prevProject.phases.findIndex((p) => p.id === phaseId);
-      if (phaseIndex === -1) return prevProject;
+    setIsUpdating(true);
 
-      const currentPhase = prevProject.phases[phaseIndex];
-      const isCurrentlyCompleted = currentPhase.status === PhaseStatus.COMPLETED;
-
-      const updatedPhases = [...prevProject.phases];
-
-      if (isCurrentlyCompleted) {
-        // If marking as incomplete, set current to IN_PROGRESS
-        updatedPhases[phaseIndex] = {
-          ...currentPhase,
-          status: PhaseStatus.IN_PROGRESS
-        };
-
-        // Set all subsequent phases to PENDING
-        for (let i = phaseIndex + 1; i < updatedPhases.length; i++) {
-          updatedPhases[i] = {
-            ...updatedPhases[i],
-            status: PhaseStatus.PENDING
-          };
-        }
-      } else {
-        // Mark current phase as COMPLETED
-        updatedPhases[phaseIndex] = {
-          ...currentPhase,
-          status: PhaseStatus.COMPLETED
-        };
-
-        // Ensure all previous phases are also marked as COMPLETED
-        for (let i = 0; i < phaseIndex; i++) {
-          updatedPhases[i] = {
-            ...updatedPhases[i],
-            status: PhaseStatus.COMPLETED
-          };
-        }
-
-        // Set next phase (if exists) to IN_PROGRESS
-        if (phaseIndex + 1 < updatedPhases.length) {
-          updatedPhases[phaseIndex + 1] = {
-            ...updatedPhases[phaseIndex + 1],
-            status: PhaseStatus.IN_PROGRESS
-          };
-        }
+    try {
+      const currentPhase = project.phases.find((p) => p.id === phaseId);
+      if (!currentPhase) {
+        toast.error('Phase not found');
+        setIsUpdating(false);
+        return;
       }
 
-      // Update progress percentage
-      updateProgressPercentage(updatedPhases);
+      const newStatus = currentPhase.status === PhaseStatus.COMPLETED ? PhaseStatus.IN_PROGRESS : PhaseStatus.COMPLETED;
 
-      return {
-        ...prevProject,
-        phases: updatedPhases
-      };
-    });
+      console.log('Updating phase status:', newStatus, project.id, phaseId);
+
+      const response = await fetcher({
+        url: API_PROJECT_UPDATE_PHASE_STATUS_ROUTE,
+        requestBody: {
+          projectId: project.id,
+          phaseId: phaseId,
+          newStatus
+        }
+      });
+
+      if (response.err) {
+        toast.error('Failed to update phase status');
+        setIsUpdating(false);
+        return;
+      }
+
+      mutate(endpoint);
+      toast.success(`Phase ${newStatus === PhaseStatus.COMPLETED ? 'completed' : 'reopened'} successfully`);
+    } catch (error) {
+      console.error('Error updating phase status:', error);
+      toast.error('An error occurred while updating phase status');
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   if (!project) {
@@ -166,8 +134,8 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
                     <span className={`rounded-full px-3 py-1 text-sm ${getStatusStyle(phase.status)}`}>{getStatusText(phase.status)}</span>
                   </div>
                   {isOwner && (
-                    <Button onClick={() => handleOnComplete(phase.id)} variant="outline">
-                      Mark Complete <Input type="checkbox" checked={phase.status === PhaseStatus.COMPLETED} readOnly />
+                    <Button onClick={() => handleOnComplete(phase.id)} variant="outline" disabled={isUpdating}>
+                      {isUpdating ? 'Updating...' : 'Mark Complete'} <Input type="checkbox" checked={phase.status === PhaseStatus.COMPLETED} readOnly />
                     </Button>
                   )}
                 </div>

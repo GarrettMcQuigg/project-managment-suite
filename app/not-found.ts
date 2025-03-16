@@ -1,6 +1,13 @@
-import { DASHBOARD_ROUTE } from '@/packages/lib/routes';
+import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
+import { AUTH_SIGNIN_ROUTE, DASHBOARD_ROUTE } from '@/packages/lib/routes';
 import { redirect } from 'next/navigation';
 
 export default async function NotFound() {
-  redirect(DASHBOARD_ROUTE); // TODO : Maybe change to signin route
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    redirect(AUTH_SIGNIN_ROUTE);
+  } else {
+    redirect(DASHBOARD_ROUTE);
+  }
 }

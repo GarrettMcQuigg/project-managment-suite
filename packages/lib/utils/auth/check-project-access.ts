@@ -4,8 +4,6 @@ import { getSessionContext } from './get-session-context';
 export async function hasProjectAccess(projectId: string): Promise<boolean> {
   const context = await getSessionContext();
 
-  // Garrett TODO: Could cause issues with authenticated users who DO NOT own the project but DO have portal access from the password
-  // (MAYBE) If user owns the project, return true, if user does not own the project, check if the user has portal access
   if (context.type === 'user') {
     // Check if user owns this project
     const project = await db.project.findUnique({

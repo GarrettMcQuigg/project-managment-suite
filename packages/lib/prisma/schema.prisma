@@ -181,14 +181,14 @@ enum ProjectStatus {
 }
 
 model ProjectMessage {
-  id               String                     @id @default(uuid())
-  project          Project                    @relation(fields: [projectId], references: [id])
-  projectId        String
-  participantEmail String
-  text             String
-  attachments      ProjectMessageAttachment[]
-  createdAt        DateTime                   @default(now())
-  MessageRead      MessageRead[]
+  id          String                     @id @default(uuid())
+  project     Project                    @relation(fields: [projectId], references: [id])
+  projectId   String
+  sender      String?
+  text        String
+  attachments ProjectMessageAttachment[]
+  createdAt   DateTime                   @default(now())
+  messageRead MessageRead[] // TODO : implement later
 }
 
 model ProjectParticipant {

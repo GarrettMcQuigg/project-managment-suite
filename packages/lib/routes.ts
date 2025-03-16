@@ -65,6 +65,8 @@ export const API_PROJECT_DELETE_ROUTE = `${API_PROJECT_ROUTE}/delete`;
 export const API_PROJECT_LIST_ROUTE = `${API_PROJECT_ROUTE}/list`;
 export const API_PROJECT_GET_BY_ID_ROUTE = `${API_PROJECT_ROUTE}/get-by-id?id=`;
 export const API_PROJECT_UPDATE_PHASE_STATUS_ROUTE = `${API_PROJECT_ROUTE}/phases/status`;
+export const API_PROJECT_MESSAGES_SEND_ROUTE = `${API_PROJECT_ROUTE}/messages/send`;
+export const API_PROJECT_MESSAGES_LIST_ROUTE = `${API_PROJECT_ROUTE}/messages/list?id=`;
 
 export const API_CLIENT_ROUTE = `${API_ROUTE}/client`;
 export const API_CLIENT_ADD_ROUTE = `${API_CLIENT_ROUTE}/add`;

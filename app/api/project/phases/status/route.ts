@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PhaseStatus } from '@prisma/client';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { handleBadRequest, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { handleBadRequest, handleNotFound, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import { db } from '@/packages/lib/prisma/client';
 import { UpdateProjectPhaseStatusRequestBody, UpdateProjectPhaseStatusRequestBodySchema } from './types';
 
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     });
 
     if (!project) {
-      return handleUnauthorized();
+      return handleNotFound();
     }
 
     // Find the current phase index

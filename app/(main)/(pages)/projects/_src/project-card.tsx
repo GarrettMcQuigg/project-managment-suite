@@ -31,6 +31,12 @@ const statusColors: Record<ProjectStatus, string> = {
   DELETED: 'bg-destructive text-destructive-foreground'
 };
 
+// Motion button variants
+const buttonMotion = {
+  hover: { scale: 1.02 },
+  tap: { scale: 0.98 }
+};
+
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   const router = useRouter();
 
@@ -64,20 +70,20 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
         <div className="flex flex-wrap justify-end gap-3">
           <Link href={clientPortalUrl} rel="noopener noreferrer">
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div whileHover={buttonMotion.hover} whileTap={buttonMotion.tap} className="inline-block">
               <Button variant="outline" className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90">
                 <ExternalLink className="h-4 w-4" />
                 Client Portal
               </Button>
-            </motion.button>
+            </motion.div>
           </Link>
 
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleViewDetails}>
+          <motion.div whileHover={buttonMotion.hover} whileTap={buttonMotion.tap} className="inline-block" onClick={handleViewDetails}>
             <Button className="flex items-center rounded-md border bg-primary dark:bg-transparent border-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors dark:hover:bg-primary/30 hover:bg-primary/90">
               <Eye className="mr-2 h-4 w-4" />
               View Details
             </Button>
-          </motion.button>
+          </motion.div>
         </div>
       </div>
 

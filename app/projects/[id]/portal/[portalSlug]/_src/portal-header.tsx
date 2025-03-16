@@ -2,8 +2,10 @@
 
 import { Button } from '@/packages/lib/components/button';
 import { ProjectStatus } from '@prisma/client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
+import { MoonIcon, SunIcon } from 'lucide-react';
 
 interface PortalHeaderProps {
   projectStatus: ProjectStatus;
@@ -27,8 +29,13 @@ export default function PortalHeader({ projectStatus, isOwner, visitorName, proj
   const router = useRouter();
   const searchParams = new URLSearchParams(window.location.search);
   const isPreview = searchParams.get('preview') === 'true';
-
   const [previewMode, setPreviewMode] = useState<boolean>(isPreview);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleToggleView = () => {
     if (isOwner) {
@@ -69,6 +76,23 @@ export default function PortalHeader({ projectStatus, isOwner, visitorName, proj
             <span className="text-gray-500 dark:text-gray-400 mr-2">Viewing as:</span>
             <span className="font-medium">{visitorName}</span>
           </div>
+
+          {mounted && (
+            <button
+              type="button"
+              className="bg-transparent cursor-pointer"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              <div className="transition-all duration-200 hover:scale-110">
+                {theme === 'dark' ? (
+                  <MoonIcon className="h-5 w-5 text-white hover:text-gray-200 transition-colors duration-200" aria-hidden="true" />
+                ) : (
+                  <SunIcon className="h-5 w-5 text-black hover:text-gray-800 transition-colors duration-200" aria-hidden="true" />
+                )}
+              </div>
+            </button>
+          )}
         </div>
       </div>
     </div>

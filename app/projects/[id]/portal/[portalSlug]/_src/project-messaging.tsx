@@ -40,13 +40,12 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
 
   const endpoint = API_PROJECT_MESSAGES_LIST_ROUTE + projectId;
   const { data, error } = useSWR<{ content: ProjectMessage[] }>(endpoint, swrFetcher, {
-    refreshInterval: 10000 // Poll for new messages every 10 seconds
+    refreshInterval: 10000
   });
 
   const messages = data?.content || [];
   const isLoading = !data && !error;
 
-  // Handle scroll position
   const handleScroll = () => {
     if (messagesContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
@@ -55,14 +54,12 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
     }
   };
 
-  // Scroll to bottom when new messages arrive
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages.length]);
 
-  // Add scroll event listener
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (container) {

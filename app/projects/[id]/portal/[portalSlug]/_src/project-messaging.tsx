@@ -45,7 +45,6 @@ export default function ProjectMessaging({ projectId }: { projectId: string }) {
         requestBody: {
           projectId,
           text: message
-          // (MAYBE) The sender will be determined by the backend based on the authenticated user
         }
       });
 

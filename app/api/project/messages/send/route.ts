@@ -4,6 +4,7 @@ import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
 import { User } from '@prisma/client';
 import { NextResponse } from 'next/server';
+import { SendProjectMessageRequestBody, SendProjectMessageRequestBodySchema } from './types';
 
 export async function POST(request: Request) {
   try {
@@ -20,9 +21,13 @@ export async function POST(request: Request) {
       return handleUnauthorized();
     }
 
-    // TODO : type this shit
-    const requestBody = await request.json();
+    const requestBody: SendProjectMessageRequestBody = await request.json();
     const { projectId, text } = requestBody;
+
+    const { error } = SendProjectMessageRequestBodySchema.validate(requestBody);
+    if (error) {
+      return handleBadRequest({ message: error.message, err: error });
+    }
 
     if (!projectId || !text) {
       return handleBadRequest();

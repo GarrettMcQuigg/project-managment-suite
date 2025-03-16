@@ -84,9 +84,13 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
 
       <main className={`${effectiveIsOwner ? 'mb-4' : ''} md:container md:mx-auto sm:px-4 lg:w-3/4 py-8`}>
         <div className="grid gap-8">
-          <ProjectDetails projectId={resolvedParams.id} isOwner={effectiveIsOwner} />
-          <ProjectTimeline projectId={resolvedParams.id} isOwner={effectiveIsOwner} />
-          <ProjectMessaging projectId={resolvedParams.id} />
+          {context.type !== 'none' && (
+            <>
+              <ProjectDetails projectId={resolvedParams.id} isOwner={effectiveIsOwner} />
+              <ProjectTimeline projectId={resolvedParams.id} isOwner={effectiveIsOwner} />
+              <ProjectMessaging projectId={resolvedParams.id} isOwner={effectiveIsOwner} context={context} />
+            </>
+          )}
         </div>
       </main>
 

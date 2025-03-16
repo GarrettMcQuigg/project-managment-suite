@@ -1,10 +1,9 @@
-import { handleBadRequest, handleNotFound, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { handleBadRequest, handleError, handleNotFound, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import { PortalVisitor } from '@/packages/lib/helpers/get-portal-user';
 import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
 import { User } from '@prisma/client';
-import { NextResponse } from 'next/server';
-import { SendProjectMessageRequestBody, SendProjectMessageRequestBodySchema } from './types';
+import { put } from '@vercel/blob';
 
 export async function POST(request: Request) {
   try {
@@ -21,16 +20,18 @@ export async function POST(request: Request) {
       return handleUnauthorized();
     }
 
-    const requestBody: SendProjectMessageRequestBody = await request.json();
-    const { projectId, text } = requestBody;
+    const formData = await request.formData();
+    const projectId = formData.get('projectId') as string;
+    const text = formData.get('text') as string;
 
-    const { error } = SendProjectMessageRequestBodySchema.validate(requestBody);
-    if (error) {
-      return handleBadRequest({ message: error.message, err: error });
+    if (!projectId) {
+      return handleBadRequest({ message: 'Project ID is required' });
     }
 
-    if (!projectId || !text) {
-      return handleBadRequest();
+    const attachmentFiles = formData.getAll('attachments') as File[];
+
+    if (!text && attachmentFiles.length === 0) {
+      return handleBadRequest({ message: 'Message text or attachments are required' });
     }
 
     const project = await db.project.findUnique({
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
     });
 
     if (!project) {
-      return handleBadRequest();
+      return handleBadRequest({ message: 'Project not found' });
     }
 
     let newMessage;
@@ -61,14 +62,14 @@ export async function POST(request: Request) {
       });
 
       if (!userDetails) {
-        return handleNotFound();
+        return handleNotFound({ message: 'User not found' });
       }
 
       newMessage = await db.projectMessage.create({
         data: {
           projectId: projectId,
           sender: `${userDetails.firstname} ${userDetails.lastname}`,
-          text: text
+          text: text || ''
         }
       });
     } else if (context.type === 'portal') {
@@ -78,18 +79,42 @@ export async function POST(request: Request) {
         data: {
           projectId: projectId,
           sender: portalVisitor.name,
-          text: text
+          text: text || ''
         }
       });
     }
 
     if (!newMessage) {
-      return handleBadRequest();
+      return handleBadRequest({ message: 'Failed to create message' });
     }
 
-    return handleSuccess({ message: 'Message sent successfully' });
+    if (attachmentFiles.length > 0) {
+      const attachmentPromises = attachmentFiles.map(async (file) => {
+        try {
+          const blobPath = `project-messages/${projectId}/message-${newMessage.id}-${file.name}`;
+          const blob = await put(blobPath, file, { access: 'public' });
+
+          return db.projectMessageAttachment.create({
+            data: {
+              messageId: newMessage.id,
+              blobUrl: blob.url,
+              pathname: blob.pathname,
+              contentType: file.type
+            }
+          });
+        } catch (error) {
+          console.error('Error processing attachment:', error);
+          return null;
+        }
+      });
+
+      await Promise.all(attachmentPromises);
+    }
+
+    return handleSuccess({
+      message: 'Message sent successfully'
+    });
   } catch (error) {
-    console.error('Error adding project message:', error);
-    return NextResponse.json({ err: 'Internal server error' }, { status: 500 });
+    return handleError({ message: 'Failed to send message', err: error });
   }
 }

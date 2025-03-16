@@ -61,7 +61,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
   return (
     <>
       <div className="space-y-8">
-        <ProjectDetails projectId={projectId} showInteralControls={true} onEditClick={() => setIsEditDialogOpen(true)} />
+        <ProjectDetails projectId={projectId} onEditClick={() => setIsEditDialogOpen(true)} />
 
         {project && <ProjectTimeline projectId={project.id} isOwner={true} />}
       </div>

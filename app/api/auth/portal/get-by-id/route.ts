@@ -3,6 +3,7 @@ import { handleError, handleSuccess, handleUnauthorized } from '@packages/lib/he
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { NextRequest } from 'next/server';
 import { validateProjectAccess } from '@/packages/lib/helpers/project-portals';
+import { decrypt } from '@/packages/lib/utils/encryption';
 
 export async function GET(request: NextRequest) {
   const currentUser = await getCurrentUser();
@@ -24,6 +25,8 @@ export async function GET(request: NextRequest) {
 
     if (!project) {
       return handleError({ message: 'Project not found' });
+    } else {
+      project.portalPassEncryption = decrypt(project.portalPassEncryption);
     }
 
     const hasAccess = validateProjectAccess(project.id, project.portalSlug, currentUser?.id, project.userId, request.cookies);
@@ -40,7 +43,8 @@ export async function GET(request: NextRequest) {
       endDate: project.endDate,
       status: project.status,
       phases: project.phases,
-      client: project.client
+      client: project.client,
+      portalPassEncryption: project.portalPassEncryption
     };
 
     return handleSuccess({ content: portalProjectData });

@@ -3,9 +3,10 @@
 import { Button } from '@/packages/lib/components/button';
 import { ProjectStatus } from '@prisma/client';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { MoonIcon, SunIcon } from 'lucide-react';
+import { PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
 
 interface PortalHeaderProps {
   projectStatus: ProjectStatus;
@@ -27,7 +28,7 @@ const statusColors: Record<ProjectStatus, string> = {
 
 export default function PortalHeader({ projectStatus, isOwner, visitorName, projectId, portalSlug }: PortalHeaderProps) {
   const router = useRouter();
-  const searchParams = new URLSearchParams(window.location.search);
+  const searchParams = useSearchParams();
   const isPreview = searchParams.get('preview') === 'true';
   const [previewMode, setPreviewMode] = useState<boolean>(isPreview);
   const { theme, setTheme } = useTheme();
@@ -42,7 +43,12 @@ export default function PortalHeader({ projectStatus, isOwner, visitorName, proj
       const newPreviewMode = !previewMode;
       setPreviewMode(newPreviewMode);
 
-      const url = `/projects/${projectId}/portal/${portalSlug}${newPreviewMode ? '?preview=true' : ''}`;
+      const url =
+        routeWithParam(PROJECT_PORTAL_ROUTE, {
+          id: projectId,
+          portalSlug: portalSlug
+        }) + (newPreviewMode ? '?preview=true' : '');
+
       router.push(url);
     }
   };

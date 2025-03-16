@@ -24,12 +24,12 @@ export async function POST(request: Request) {
 
     const profileImg = formData.get('profileImg') as File | null;
     if (profileImg) {
-      profileImgBlob = await put(`profile-${currentUser.id}-${profileImg.name}`, profileImg, { access: 'public' });
+      profileImgBlob = await put(`profile_images/${currentUser.id}-${profileImg.name}`, profileImg, { access: 'public' });
     }
 
     const coverImg = formData.get('coverImg') as File | null;
     if (coverImg) {
-      coverImgBlob = await put(`cover-${currentUser.id}-${coverImg.name}`, coverImg, { access: 'public' });
+      coverImgBlob = await put(`cover_images/${currentUser.id}-${coverImg.name}`, coverImg, { access: 'public' });
     }
 
     await db.user.update({

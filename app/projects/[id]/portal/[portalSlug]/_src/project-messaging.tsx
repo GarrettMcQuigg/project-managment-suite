@@ -165,7 +165,6 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
     });
   };
 
-  // Group messages by date
   const groupedMessages = messages.reduce((groups, message) => {
     const date = new Date(message.createdAt).toLocaleDateString();
     if (!groups[date]) {

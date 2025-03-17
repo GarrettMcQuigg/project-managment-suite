@@ -176,86 +176,70 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
   }, {} as Record<string, ProjectMessage[]>);
 
   return (
-    <Card className="bg-gradient-to-br from-[#0F1A1C] to-[#162226] p-6 shadow-xl border border-[#1A2729] overflow-hidden rounded-xl">
-      <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
+    <Card className="bg-white dark:bg-gradient-to-br dark:from-[#0F1A1C] dark:to-[#162226] p-6 shadow-xl border border-gray-200 dark:border-[#1A2729] overflow-hidden rounded-xl">
+      <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none hidden dark:block">
         <div className="absolute top-0 left-0 w-20 h-20 bg-[#00b894] rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 right-0 w-40 h-40 bg-[#00b894] rounded-full blur-3xl"></div>
       </div>
 
-      <h2 className="mb-6 text-2xl font-bold text-white flex items-center relative z-10">
-        <MessageSquare className="mr-2 h-6 w-6 text-[#00b894]" />
+      <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white flex items-center relative z-10">
+        <MessageSquare className="mr-2 h-6 w-6 text-emerald-600 dark:text-[#00b894]" />
         Project Messages
         {isOwner && (
-          <span className="ml-2 text-xs bg-gradient-to-r from-[#00b894] to-[#00a583] text-white px-3 py-1 rounded-full flex items-center">
+          <span className="ml-2 text-xs bg-emerald-100 text-emerald-600 dark:bg-gradient-to-r dark:from-[#00b894] dark:to-[#00a583] dark:text-white px-3 py-1 rounded-full flex items-center">
             <Sparkles className="h-3 w-3 mr-1" />
             Owner View
           </span>
         )}
-        <div className="ml-auto text-sm text-gray-400">
+        <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
           {messages.length} {messages.length === 1 ? 'message' : 'messages'}
         </div>
       </h2>
 
       <div
         ref={messagesContainerRef}
-        className="relative mb-4 h-[800px] overflow-y-auto rounded-xl bg-[#1A2729] p-4 space-y-6 custom-scrollbar"
+        className="relative mb-4 h-[800px] overflow-y-auto rounded-xl bg-gray-100 dark:bg-[#1A2729] p-4 space-y-6 custom-scrollbar"
         style={{
           backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(0, 184, 148, 0.03) 0%, transparent 70%)',
-          boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.2)'
+          boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.1)'
         }}
       >
         {isLoading ? (
           <div className="flex h-full items-center justify-center">
             <div className="flex flex-col items-center">
               <div className="animate-pulse flex space-x-2 mb-3">
-                <div className="h-3 w-3 bg-[#00b894] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="h-3 w-3 bg-[#00b894] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="h-3 w-3 bg-[#00b894] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                <div className="h-3 w-3 bg-emerald-600 dark:bg-[#00b894] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="h-3 w-3 bg-emerald-600 dark:bg-[#00b894] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="h-3 w-3 bg-emerald-600 dark:bg-[#00b894] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
               </div>
-              <p className="text-gray-400">Loading messages...</p>
+              <p className="text-gray-500 dark:text-gray-400">Loading messages...</p>
             </div>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex h-full items-center justify-center flex-col">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#0F1A1C] to-[#1A2729] flex items-center justify-center mb-6 shadow-lg p-5 animate-pulse">
-              <Send className="h-10 w-10 text-[#00b894]" />
+            <div className="w-20 h-20 rounded-full bg-white dark:bg-gradient-to-br dark:from-[#0F1A1C] dark:to-[#1A2729] flex items-center justify-center mb-6 shadow-lg p-5 animate-pulse">
+              <Send className="h-10 w-10 text-emerald-600 dark:text-[#00b894]" />
             </div>
-            <p className="text-gray-400 text-lg mb-2">No messages yet</p>
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No messages yet</p>
             <p className="text-gray-500 text-sm">Start the conversation by sending a message below!</p>
           </div>
         ) : (
           Object.entries(groupedMessages).map(([date, dateMessages]) => (
             <div key={date} className="space-y-4">
               <div className="flex items-center justify-center my-6">
-                <div className="h-px bg-[#2A373A] flex-grow"></div>
-                <span className="px-4 text-xs text-gray-500 bg-[#1A2729] rounded-full py-1">{date}</span>
-                <div className="h-px bg-[#2A373A] flex-grow"></div>
+                <div className="h-px bg-gray-300 dark:bg-[#2A373A] flex-grow"></div>
+                <span className="px-4 text-xs text-gray-500 bg-gray-100 dark:bg-[#1A2729] rounded-full py-1">{date}</span>
+                <div className="h-px bg-gray-300 dark:bg-[#2A373A] flex-grow"></div>
               </div>
 
-              {dateMessages.map((msg) => {
+              {dateMessages.map((msg, index: number) => {
                 const isFromCurrentUser = isCurrentUserMessage(msg.sender);
 
                 return (
                   <div key={msg.id} className={`flex ${!isFromCurrentUser ? 'justify-end' : 'justify-start'}`}>
-                    <div
-                      className={`
-                        rounded-xl 
-                        bg-gradient-to-br from-[#0F1A1C] to-[#131F22]
-                        border-l-4 
-                        ${isFromCurrentUser ? 'border-[#00b894]' : 'border-[#ffffff]'}
-                        p-4 
-                        shadow-md
-                        w-full
-                        md:w-[70%]
-                        transition-all
-                        hover:shadow-lg
-                        hover:translate-y-[-2px]
-                        backdrop-blur-sm
-                      `}
-                    >
-                      <div className="flex gap-3 flex-row">
-                        <div
-                          className={`
+                    {dateMessages[index - 1]?.sender !== msg.sender && (
+                      <div
+                        className={`
                             flex-shrink-0 
                             h-10 
                             w-10 
@@ -269,19 +253,39 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
                             text-white
                             shadow-md
                             mr-2
-                            ring-2 ring-[#1A2729]
+                            ring-2 ring-white dark:ring-[#1A2729]
                           `}
-                        >
-                          {msg.sender.charAt(0).toUpperCase()}
-                        </div>
-
+                      >
+                        {msg.sender.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div
+                      className={`
+                        rounded-xl 
+                        ${isFromCurrentUser ? 'bg-emerald-600 dark:bg-primary/10' : 'bg-gray-100 dark:bg-gray-200/10'}
+                        border-l-4 
+                        ${isFromCurrentUser ? 'border-emerald-600 dark:border-[#00b894]' : 'border-gray-400 dark:border-[#ffffff]'}
+                        p-4 
+                        shadow-md
+                        w-full
+                        md:w-[70%]
+                        transition-all
+                        hover:shadow-lg
+                        hover:translate-y-[-2px]
+                        dark:backdrop-blur-sm
+                        ${dateMessages[index - 1]?.sender === msg.sender ? 'ml-12' : ''}
+                      `}
+                    >
+                      <div className="flex gap-3 flex-row">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-baseline mb-2 flex-row justify-between">
-                            <h3 className="font-semibold text-white text-base">{msg.sender}</h3>
-                            <span className="text-xs text-gray-400 bg-[#0F1A1C]/50 px-2 py-0.5 rounded-full">{formatTimestamp(msg.createdAt)}</span>
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-base">{msg.sender}</h3>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#0F1A1C]/50 px-2 py-0.5 rounded-full">
+                              {formatTimestamp(msg.createdAt)}
+                            </span>
                           </div>
 
-                          <p className="text-gray-300 break-words text-left leading-relaxed">{msg.text}</p>
+                          <p className="text-gray-700 dark:text-gray-300 break-words text-left leading-relaxed">{msg.text}</p>
 
                           {msg.attachments && msg.attachments.length > 0 && (
                             <div className="mt-3 flex flex-wrap gap-2 justify-start">
@@ -297,7 +301,7 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
                                     <img
                                       src={attachment.blobUrl}
                                       alt={fileName}
-                                      className="h-24 w-auto rounded-md object-cover border border-[#2A373A] group-hover:border-[#00b894] transition-all shadow-md group-hover:shadow-lg"
+                                      className="h-24 w-auto rounded-md object-cover border border-gray-300 dark:border-[#2A373A] group-hover:border-emerald-600 dark:group-hover:border-[#00b894] transition-all shadow-md group-hover:shadow-lg"
                                       loading="lazy"
                                     />
                                   </a>
@@ -307,7 +311,7 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
                                     href={attachment.blobUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="rounded-md bg-[#0F1A1C] px-3 py-2 text-sm text-[#00b894] hover:bg-[#1F2C2F] transition-all flex items-center gap-2 border border-[#2A373A] hover:border-[#00b894] shadow-sm hover:shadow-md"
+                                    className="rounded-md bg-gray-50 dark:bg-[#0F1A1C] px-3 py-2 text-sm text-emerald-600 dark:text-[#00b894] hover:bg-gray-100 dark:hover:bg-[#1F2C2F] transition-all flex items-center gap-2 border border-gray-300 dark:border-[#2A373A] hover:border-emerald-600 dark:hover:border-[#00b894] shadow-sm hover:shadow-md"
                                     download={fileName}
                                   >
                                     <File className="h-4 w-4" />
@@ -330,7 +334,7 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
         {showScrollButton && (
           <button
             onClick={scrollToBottom}
-            className="absolute bottom-4 right-4 bg-[#00b894] text-white rounded-full p-2 shadow-lg hover:bg-[#00a583] transition-all animate-bounce"
+            className="absolute bottom-4 right-4 bg-emerald-600 dark:bg-[#00b894] text-white rounded-full p-2 shadow-lg hover:bg-emerald-700 dark:hover:bg-[#00a583] transition-all animate-bounce"
             aria-label="Scroll to bottom"
           >
             <svg
@@ -351,22 +355,22 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
       </div>
 
       {files.length > 0 && (
-        <div className="mb-3 p-3 rounded-xl bg-gradient-to-r from-[#1A2729] to-[#1F2C2F] border border-[#2A373A] shadow-inner">
-          <div className="text-sm text-gray-400 mb-2 flex items-center">
-            <Image className="h-4 w-4 mr-2 text-[#00b894]" />
-            <span className="bg-[#0F1A1C] px-2 py-0.5 rounded-full text-xs">Attachments ({files.length})</span>
+        <div className="mb-3 p-3 rounded-xl bg-gray-100 dark:bg-gradient-to-r dark:from-[#1A2729] dark:to-[#1F2C2F] border border-gray-300 dark:border-[#2A373A] shadow-inner">
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center">
+            <Image className="h-4 w-4 mr-2 text-emerald-600 dark:text-[#00b894]" />
+            <span className="bg-white dark:bg-[#0F1A1C] px-2 py-0.5 rounded-full text-xs">Attachments ({files.length})</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {files.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center gap-2 bg-[#0F1A1C] rounded-md px-3 py-1.5 text-sm text-white border border-[#2A373A] hover:border-[#00b894] transition-all shadow-sm"
+                className="flex items-center gap-2 bg-white dark:bg-[#0F1A1C] rounded-md px-3 py-1.5 text-sm text-gray-700 dark:text-white border border-gray-300 dark:border-[#2A373A] hover:border-emerald-600 dark:hover:border-[#00b894] transition-all shadow-sm"
               >
                 <span className="truncate max-w-[150px]">{file.name}</span>
                 <button
                   type="button"
                   onClick={() => setFiles(files.filter((_, i) => i !== index))}
-                  className="text-gray-400 hover:text-white transition-colors bg-[#1A2729] rounded-full h-5 w-5 flex items-center justify-center"
+                  className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors bg-gray-100 dark:bg-[#1A2729] rounded-full h-5 w-5 flex items-center justify-center"
                   aria-label="Remove attachment"
                 >
                   &times;
@@ -383,7 +387,7 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
         <button
           type="button"
           onClick={handleAttachClick}
-          className="flex-shrink-0 rounded-lg bg-gradient-to-br from-[#1A2729] to-[#1F2C2F] p-3 text-gray-400 hover:text-[#00b894] transition-all shadow-md hover:shadow-lg"
+          className="flex-shrink-0 rounded-lg bg-gray-100 dark:bg-gradient-to-br dark:from-[#1A2729] dark:to-[#1F2C2F] p-3 text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-[#00b894] transition-all shadow-md hover:shadow-lg"
           title="Attach files"
         >
           <Paperclip className="h-5 w-5" />
@@ -394,13 +398,13 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type your message..."
-          className="flex-1 rounded-lg bg-gradient-to-r from-[#1A2729] to-[#1F2C2F] px-4 py-3 text-white placeholder-gray-500 outline-none ring-[#00b894] focus:ring-2 transition-all shadow-md"
+          className="flex-1 rounded-lg bg-gray-100 dark:bg-gradient-to-r dark:from-[#1A2729] dark:to-[#1F2C2F] px-4 py-3 text-gray-700 dark:text-white placeholder-gray-500 outline-none ring-emerald-600 dark:ring-[#00b894] focus:ring-2 transition-all shadow-md"
           disabled={isSubmitting}
         />
 
         <button
           type="submit"
-          className="flex-shrink-0 flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#00b894] to-[#00a583] px-4 py-3 font-medium text-white transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+          className="flex-shrink-0 flex items-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 dark:bg-gradient-to-r dark:from-[#00b894] dark:to-[#00a583] px-4 py-3 font-medium text-white transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
           disabled={isSubmitting || (!message.trim() && files.length === 0)}
         >
           <Send className="h-5 w-5" />

@@ -34,6 +34,11 @@ model User {
   // Calendar fields
   calendarEvent CalendarEvent[]
 
+  // Analytics
+  analytics    Analytics[]
+  userActivity UserActivity[]
+  pageView     PageView[]
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
   deletedAt DateTime?
@@ -266,6 +271,9 @@ model Client {
 
   // Calendar fields
   calendarEvent CalendarEvent[]
+
+  // Analytics
+  clientEngagement ClientEngagement[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -536,3 +544,127 @@ enum CalendarEventStatus {
 //   endDate   DateTime?
 //   createdAt DateTime           @default(now())
 // }
+
+// ==========================================================================================================================================================================
+// ==========================================================================================================================================================================
+// ==========================================================================================================================================================================
+
+// Analytics Models =========================================================================================================================================================
+// ==========================================================================================================================================================================
+// ==========================================================================================================================================================================
+model Analytics {
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  // User activity metrics
+  loginCount Int       @default(0)
+  lastLogin  DateTime?
+
+  // Project metrics
+  projectsCreated   Int @default(0)
+  projectsCompleted Int @default(0)
+  // avgProjectDuration Int?    // in days // Calculate on demand
+
+  // Revenue metrics
+  totalRevenue   Decimal          @default(0) @db.Decimal(10, 2)
+  monthlyRevenue MonthlyRevenue[]
+
+  // Client metrics
+  // activeClients    Int      @default(0) // Calculate on demand
+  clientEngagement ClientEngagement[]
+
+  // Message metrics
+  // totalMessages     Int      @default(0) // Calculate on demand
+  responseRate    Decimal? @db.Decimal(5, 2) // percentage
+  avgResponseTime Int? // in minutes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MonthlyRevenue {
+  id          String    @id @default(uuid())
+  analytics   Analytics @relation(fields: [analyticsId], references: [id])
+  analyticsId String
+  month       DateTime // Store the first day of each month
+  amount      Decimal   @db.Decimal(10, 2)
+  growth      Decimal?  @db.Decimal(5, 2) // percentage growth from previous month
+
+  createdAt DateTime @default(now())
+
+  @@unique([analyticsId, month])
+}
+
+model ClientEngagement {
+  id           String    @id @default(uuid())
+  analytics    Analytics @relation(fields: [analyticsId], references: [id])
+  analyticsId  String
+  client       Client    @relation(fields: [clientId], references: [id])
+  clientId     String
+  lastContact  DateTime
+  messageCount Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([analyticsId, clientId])
+}
+
+model UserActivity {
+  id        String     @id @default(uuid())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String
+  action    ActionType
+  resource  String? // ID of related resource (project, client, invoice)
+  timestamp DateTime   @default(now())
+
+  @@index([userId, timestamp])
+}
+
+enum ActionType {
+  LOGIN
+  LOGOUT
+  CREATE_PROJECT
+  UPDATE_PROJECT
+  DELETE_PROJECT
+  CREATE_CLIENT
+  UPDATE_CLIENT
+  DELETE_CLIENT
+  CREATE_INVOICE
+  UPDATE_INVOICE
+  DELETE_INVOICE
+  SEND_MESSAGE
+  VIEW_MESSAGE
+  CREATE_PHASE
+  UPDATE_PHASE
+  DELETE_PHASE
+  CREATE_ATTACHMENT
+  DELETE_ATTACHMENT
+  CREATE_EVENT
+  UPDATE_EVENT
+  DELETE_EVENT
+}
+
+model PageView {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  page       Pages
+  resourceId String? // ID of viewed resource
+  duration   Int? // Time spent on page in seconds
+  timestamp  DateTime @default(now())
+
+  @@index([userId, timestamp])
+}
+
+enum Pages {
+  DASHBOARD
+  PROJECT
+  CLIENT
+  INVOICE
+  CALENDAR
+  PROJECT_BOARD
+  SUPPORT
+  SETTINGS
+}

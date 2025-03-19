@@ -2,8 +2,21 @@ import { OverviewCards } from './_src/components/analytics/overview-cards';
 import { ProjectStats } from './_src/components/analytics/project-stats';
 import { ClientEngagement } from './_src/components/client-engagement';
 import { RevenueChart } from './_src/components/analytics/revenue-chart';
+import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
+import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { GetUserAnalytics } from '@/packages/lib/helpers/analytics/get-user-analytics';
+import GetTotalClientMessages from '@/packages/lib/helpers/analytics/messages/message-metrics';
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return handleUnauthorized();
+  }
+
+  const userAnalytics = await GetUserAnalytics(currentUser.id);
+  const totalMessages = await GetTotalClientMessages(currentUser.id);
+
   return (
     <div className="flex min-h-screen-minus-header bg-gradient-to-br from-foreground/5 via-background to-background">
       <div className="flex min-h-screen-minus-header">
@@ -12,10 +25,14 @@ export default function DashboardPage() {
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
           </div>
           <div className="space-y-8">
-            <OverviewCards />
+            <OverviewCards userAnalytics={userAnalytics} totalMessages={totalMessages} />
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
-              <ProjectStats className="md:col-span-2 lg:col-span-4" />
-              <ClientEngagement className="md:col-span-2 lg:col-span-3" />
+              <div className="md:col-span-2 lg:col-span-4">
+                <ProjectStats userAnalytics={userAnalytics} />
+              </div>
+              <div className="md:col-span-2 lg:col-span-3">
+                <ClientEngagement />
+              </div>
             </div>
             <RevenueChart className="md:col-span-2 lg:col-span-7" />
           </div>

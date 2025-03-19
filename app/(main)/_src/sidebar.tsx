@@ -55,6 +55,7 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
       mutate(API_PROJECT_LIST_ROUTE);
       router.push(PROJECTS_ROUTE);
       setSidebarOpen(false);
+      setLoading(false);
     } catch (error) {
       console.error(error);
       toast.error('An error occurred');

@@ -4,6 +4,7 @@ import { db } from '@/packages/lib/prisma/client';
 import { handleBadRequest, handleError, handleSuccess } from '@/packages/lib/helpers/api-response-handlers';
 import { setAuthCookies } from '@/packages/lib/helpers/cookies';
 import * as bcrypt from 'bcrypt';
+import { UpdateUserMetrics } from '@/packages/lib/helpers/analytics/user/user-metrics';
 
 export async function POST(request: NextRequest) {
   const requestBody: SigninRequestBody = await request.json();
@@ -45,6 +46,8 @@ export async function POST(request: NextRequest) {
     if (err) {
       throw err;
     }
+
+    await UpdateUserMetrics(user.id);
 
     return handleSuccess({ message: 'Successfully signed in. Welcome home!' });
   } catch (err: unknown) {

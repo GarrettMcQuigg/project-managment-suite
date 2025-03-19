@@ -1,7 +1,13 @@
 import { Card, CardContent } from '@/packages/lib/components/card';
+import { Analytics } from '@prisma/client';
 import { DollarSign, FolderKanban, MessageSquare, Star, Users } from 'lucide-react';
 
-export function OverviewCards() {
+interface OverviewCardsProps {
+  userAnalytics: Analytics;
+  totalMessages: number;
+}
+
+export function OverviewCards({ userAnalytics, totalMessages }: OverviewCardsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card className="border-foreground/20 bg-gradient-to-br from-foreground/8 to-background">
@@ -31,7 +37,7 @@ export function OverviewCards() {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Active Clients</p>
-              <h3 className="text-2xl font-semibold">24</h3>
+              <h3 className="text-2xl font-semibold">{userAnalytics.activeClients}</h3>
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2">
@@ -50,7 +56,7 @@ export function OverviewCards() {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Active Projects</p>
-              <h3 className="text-2xl font-semibold">12</h3>
+              <h3 className="text-2xl font-semibold">{userAnalytics.projectsCreated}</h3>
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2">
@@ -69,7 +75,7 @@ export function OverviewCards() {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Client Messages</p>
-              <h3 className="text-2xl font-semibold">182</h3>
+              <h3 className="text-2xl font-semibold">{totalMessages}</h3>
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2">

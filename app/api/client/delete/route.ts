@@ -2,6 +2,7 @@ import { db } from '@/packages/lib/prisma/client';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { DeleteClientRequestBody, DeleteClientRequestBodySchema } from './types';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { UpdateClientMetrics } from '@/packages/lib/helpers/analytics/client/client-metrics';
 
 export async function DELETE(request: Request) {
   const currentUser = await getCurrentUser();
@@ -54,6 +55,8 @@ export async function DELETE(request: Request) {
         where: { id: requestBody.id }
       });
     });
+
+    await UpdateClientMetrics(currentUser.id);
 
     return handleSuccess({ message: 'Successfully Deleted Client' });
   } catch (err: unknown) {

@@ -7,6 +7,7 @@ import { User } from '@prisma/client';
 import { handleBadRequest, handleConflict, handleError, handleSuccess } from '@packages/lib/helpers/api-response-handlers';
 import { setAuthCookies } from '@/packages/lib/helpers/cookies';
 import { CheckEmailAvailability } from '@/packages/lib/helpers/check-email-availability';
+import { CreateUserMetrics } from '@/packages/lib/helpers/analytics/user/user-metrics';
 
 // const twilioService = new TwilioService();
 
@@ -62,6 +63,8 @@ export async function POST(request: Request) {
     if (err) {
       throw err;
     }
+
+    await CreateUserMetrics(user.id);
 
     return handleSuccess({ message: 'Registered account successfully!' });
   } catch (err: unknown) {

@@ -35,7 +35,7 @@ model User {
   calendarEvent CalendarEvent[]
 
   // Analytics
-  analytics    Analytics[]
+  analytics    Analytics?
   userActivity UserActivity[]
   pageView     PageView[]
 
@@ -555,7 +555,7 @@ enum CalendarEventStatus {
 model Analytics {
   id     String @id @default(uuid())
   user   User   @relation(fields: [userId], references: [id])
-  userId String
+  userId String @unique
 
   // User activity metrics
   loginCount Int       @default(0)
@@ -563,19 +563,17 @@ model Analytics {
 
   // Project metrics
   projectsCreated   Int @default(0)
-  projectsCompleted Int @default(0)
-  // avgProjectDuration Int?    // in days // Calculate on demand
+  projectsCompleted Int @default(0) // TODO : Do I want this?
 
   // Revenue metrics
   totalRevenue   Decimal          @default(0) @db.Decimal(10, 2)
   monthlyRevenue MonthlyRevenue[]
 
   // Client metrics
-  // activeClients    Int      @default(0) // Calculate on demand
+  activeClients    Int                @default(0)
   clientEngagement ClientEngagement[]
 
   // Message metrics
-  // totalMessages     Int      @default(0) // Calculate on demand
   responseRate    Decimal? @db.Decimal(5, 2) // percentage
   avgResponseTime Int? // in minutes
 
@@ -597,13 +595,14 @@ model MonthlyRevenue {
 }
 
 model ClientEngagement {
-  id           String    @id @default(uuid())
-  analytics    Analytics @relation(fields: [analyticsId], references: [id])
-  analyticsId  String
-  client       Client    @relation(fields: [clientId], references: [id])
-  clientId     String
-  lastContact  DateTime
-  messageCount Int       @default(0)
+  id            String    @id @default(uuid())
+  analytics     Analytics @relation(fields: [analyticsId], references: [id])
+  analyticsId   String
+  client        Client    @relation(fields: [clientId], references: [id])
+  clientId      String
+  lastContact   DateTime
+  messageCount  Int       @default(0)
+  clientRevenue Decimal   @default(0) @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

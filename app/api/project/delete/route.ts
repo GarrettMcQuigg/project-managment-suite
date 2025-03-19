@@ -2,6 +2,7 @@ import { db } from '@/packages/lib/prisma/client';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { DeleteProjectRequestBody, DeleteProjectRequestBodySchema } from './types';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { UpdateProjectMetrics } from '@/packages/lib/helpers/analytics/project/project-metrics';
 
 export async function DELETE(request: Request) {
   const currentUser = await getCurrentUser();
@@ -54,6 +55,8 @@ export async function DELETE(request: Request) {
         }
       });
     });
+
+    await UpdateProjectMetrics(currentUser.id);
 
     return handleSuccess({ message: 'Successfully Deleted Project' });
   } catch (err: unknown) {

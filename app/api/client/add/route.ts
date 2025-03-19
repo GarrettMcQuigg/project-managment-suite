@@ -2,6 +2,7 @@ import { db } from '@packages/lib/prisma/client';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { AddClientRequestBody, AddClientRequestBodySchema } from './types';
+import { UpdateClientMetrics } from '@/packages/lib/helpers/analytics/client/client-metrics';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
@@ -24,6 +25,8 @@ export async function POST(request: Request) {
         isArchived: false
       }
     });
+
+    await UpdateClientMetrics(currentUser.id);
 
     return handleSuccess({
       content: client,

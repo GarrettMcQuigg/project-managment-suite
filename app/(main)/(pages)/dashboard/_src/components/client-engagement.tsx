@@ -32,9 +32,9 @@ const engagements = [
   }
 ];
 
-export function ClientEngagement({ className }: React.HTMLAttributes<HTMLDivElement>) {
+export function ClientEngagement() {
   return (
-    <Card className={`border-foreground/20 bg-gradient-to-tl from-foreground/4 via-background to-background ${className}`}>
+    <Card className="border-foreground/20 bg-gradient-to-tl from-foreground/4 via-background to-background">
       <CardHeader>
         <CardTitle>Client Engagement</CardTitle>
         <CardDescription>Recent client interactions and project status</CardDescription>

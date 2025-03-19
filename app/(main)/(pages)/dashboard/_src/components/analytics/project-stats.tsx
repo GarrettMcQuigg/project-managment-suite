@@ -1,5 +1,6 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/packages/lib/components/card';
 import { Progress } from '@/packages/lib/components/progress';
+import { Analytics } from '@prisma/client';
 
 const projects = [
   {
@@ -28,9 +29,9 @@ const projects = [
   }
 ];
 
-export function ProjectStats({ className }: React.HTMLAttributes<HTMLDivElement>) {
+export function ProjectStats({ userAnalytics }: { userAnalytics: Analytics }) {
   return (
-    <Card className={`border-foreground/20 bg-gradient-to-r from-foreground/4 via-background to-background ${className}`}>
+    <Card className="border-foreground/20 bg-gradient-to-r from-foreground/4 via-background to-background">
       <CardHeader>
         <CardTitle>Active Projects</CardTitle>
         <CardDescription>Track your ongoing project progress</CardDescription>

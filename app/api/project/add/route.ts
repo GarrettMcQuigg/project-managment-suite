@@ -6,6 +6,7 @@ import { hash } from 'bcrypt';
 import { generatePortalSlug, generateSecurePassword } from '@/packages/lib/helpers/project-portals';
 import { CalendarEventStatus, CalendarEventType } from '@prisma/client';
 import { encrypt } from '@/packages/lib/utils/encryption';
+import { UpdateProjectMetrics } from '@/packages/lib/helpers/analytics/project/project-metrics';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
@@ -158,6 +159,8 @@ export async function POST(request: Request) {
         portalPassword
       };
     });
+
+    await UpdateProjectMetrics(currentUser.id);
 
     return handleSuccess({ message: 'Successfully created project', content: result });
   } catch (err: unknown) {

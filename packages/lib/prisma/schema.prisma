@@ -574,8 +574,8 @@ model Analytics {
   clientEngagement ClientEngagement[]
 
   // Message metrics
-  responseRate    Decimal? @db.Decimal(5, 2) // percentage
-  avgResponseTime Int? // in minutes
+  responseRate Decimal? @db.Decimal(5, 2) // percentage
+  // avgResponseTime Int? // in minutes
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

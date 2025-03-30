@@ -4,6 +4,7 @@ import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
 import { User } from '@prisma/client';
 import { put } from '@vercel/blob';
+import { UpdateMessageMetrics } from '@/packages/lib/helpers/analytics/messages/message-metrics';
 
 export async function POST(request: Request) {
   try {
@@ -72,6 +73,8 @@ export async function POST(request: Request) {
           text: text || ''
         }
       });
+
+      await UpdateMessageMetrics(currentUser.id);
     } else if (context.type === 'portal') {
       const portalVisitor = currentUser as PortalVisitor;
 
@@ -82,6 +85,8 @@ export async function POST(request: Request) {
           text: text || ''
         }
       });
+
+      await UpdateMessageMetrics(currentUser.id);
     }
 
     if (!newMessage) {

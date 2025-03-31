@@ -1,4 +1,3 @@
-// app/auth/signin/_src/verification-form.tsx
 'use client';
 
 import React from 'react';

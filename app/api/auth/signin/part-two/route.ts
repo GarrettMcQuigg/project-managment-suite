@@ -5,6 +5,9 @@ import { handleBadRequest, handleError, handleSuccess } from '@/packages/lib/hel
 import { setAuthCookies } from '@/packages/lib/helpers/cookies';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserMetrics } from '@/packages/lib/helpers/analytics/user/user-metrics';
+import TwilioService from '@/packages/lib/utils/twilio/twilio-service';
+
+const twilioService = new TwilioService();
 
 export async function POST(request: NextRequest) {
   const requestBody: SigninRequestBody = await request.json();
@@ -37,12 +40,12 @@ export async function POST(request: NextRequest) {
       return handleBadRequest({ message: 'Invalid email or password' });
     }
 
-    // let err = await twilioService.checkVerificationCode(user.phone, requestBody.smsMFACode);
-    // if (err) {
-    //   throw err;
-    // }
+    let err = await twilioService.checkVerificationCode(user.phone, requestBody.smsMFACode);
+    if (err) {
+      throw err;
+    }
 
-    const err = await setAuthCookies(user);
+    err = await setAuthCookies(user);
     if (err) {
       throw err;
     }

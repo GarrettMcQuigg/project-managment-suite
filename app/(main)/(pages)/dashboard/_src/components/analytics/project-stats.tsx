@@ -30,6 +30,7 @@ const projects = [
 ];
 
 export function ProjectStats({ userAnalytics }: { userAnalytics: Analytics }) {
+  console.log('userAnalytics', userAnalytics);
   return (
     <Card className="border-foreground/20 bg-gradient-to-r from-foreground/4 via-background to-background">
       <CardHeader>

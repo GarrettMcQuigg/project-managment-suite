@@ -2,13 +2,15 @@
 
 import type React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Image, File, MessageSquare, Sparkles } from 'lucide-react';
+import { Send, Paperclip, Image as ImageIcon, File, MessageSquare, Sparkles } from 'lucide-react';
 import { Card } from '@/packages/lib/components/card';
 import { fetcher, swrFetcher } from '@/packages/lib/helpers/fetcher';
 import useSWR, { mutate } from 'swr';
 import { toast } from 'react-toastify';
 import { API_PROJECT_MESSAGES_LIST_ROUTE, API_PROJECT_MESSAGES_SEND_ROUTE } from '@/packages/lib/routes';
 import type { User } from '@prisma/client';
+import Image from 'next/image';
+import ImageLoader from './image-loader';
 
 interface ProjectMessage {
   id: string;
@@ -297,12 +299,16 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center">
                                       <span className="text-white text-xs px-2 py-1 bg-black/50 rounded-md backdrop-blur-sm">{fileName}</span>
                                     </div>
-                                    <img
-                                      src={attachment.blobUrl}
-                                      alt={fileName}
-                                      className="h-24 w-auto rounded-md object-cover border border-gray-300 dark:border-[#2A373A] group-hover:border-emerald-600 dark:group-hover:border-[#00b894] transition-all shadow-md group-hover:shadow-lg"
-                                      loading="lazy"
-                                    />
+                                    <div className="relative h-24 w-32">
+                                      <Image
+                                        src={attachment.blobUrl}
+                                        alt={fileName}
+                                        width={128}
+                                        height={96}
+                                        loader={ImageLoader}
+                                        className="rounded-md object-cover border border-gray-300 dark:border-[#2A373A] group-hover:border-emerald-600 dark:group-hover:border-[#00b894] transition-all shadow-md group-hover:shadow-lg h-24 w-32"
+                                      />
+                                    </div>
                                   </a>
                                 ) : (
                                   <a
@@ -356,7 +362,7 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
       {files.length > 0 && (
         <div className="mb-3 p-3 rounded-xl bg-gray-100 dark:bg-gradient-to-r dark:from-[#1A2729] dark:to-[#1F2C2F] border border-gray-300 dark:border-[#2A373A] shadow-inner">
           <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center">
-            <Image className="h-4 w-4 mr-2 text-emerald-600 dark:text-[#00b894]" />
+            <ImageIcon className="h-4 w-4 mr-2 text-emerald-600 dark:text-[#00b894]" />
             <span className="bg-white dark:bg-[#0F1A1C] px-2 py-0.5 rounded-full text-xs">Attachments ({files.length})</span>
           </div>
           <div className="flex flex-wrap gap-2">

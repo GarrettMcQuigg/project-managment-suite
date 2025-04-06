@@ -15,6 +15,7 @@ export const config = {
 
 async function getBodyContent(req: NextRequest): Promise<string> {
   const chunks = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   for await (const chunk of req.body as any) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
   }
@@ -250,6 +251,7 @@ export async function POST(req: NextRequest) {
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const subscriptionId = (invoice as any).subscription;
 
         if (subscriptionId) {

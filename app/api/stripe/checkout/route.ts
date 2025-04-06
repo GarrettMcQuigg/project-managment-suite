@@ -1,7 +1,7 @@
 import { handleError, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { DASHBOARD_ROUTE, PRICING_ROUTE } from '@/packages/lib/routes';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import Stripe from 'stripe';
 
 // TODO : implement environment variables for Stripe

@@ -1,36 +1,104 @@
+'use client';
+
+import { useState } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
 import { Button } from '@/packages/lib/components/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/packages/lib/components/card';
 import SubtleBackground from '@/packages/lib/components/subtle-background';
 import { Check } from 'lucide-react';
+import { fetcher } from '@/packages/lib/helpers/fetcher';
+import { HttpMethods } from '@/packages/lib/constants/http-methods';
+import { API_STRIPE_CHECKOUT_ROUTE } from '@/packages/lib/routes';
+import { toast } from 'react-toastify';
+
+// Initialize Stripe with your publishable key
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
 
 const tiers = [
   {
     name: 'Beginner',
     price: 'Free',
     description: 'Perfect for getting started',
-    features: ['Create up to 2 projects', 'Basic task management', 'Simple client communication']
+    features: ['Create up to 2 projects', 'Basic task management', 'Simple client communication'],
+    priceId: null // No Stripe price ID for free tier
   },
   {
     name: 'Creator',
     price: '$19.99',
     description: 'Ideal for growing creatives',
-    features: ['Create up to 10 projects', 'Advanced task management', 'Enhanced client communication', 'Basic analytics', 'File sharing up to 5GB']
+    features: ['Create up to 10 projects', 'Advanced task management', 'Enhanced client communication', 'Basic analytics', 'File sharing up to 5GB'],
+    priceId: 'price_1RAbGAPRJugMRQ0g7Zz1nc5K'
   },
   {
     name: 'Innovator',
-    price: '$79.99',
+    price: '$49.99',
     description: 'For established creative professionals',
-    features: ['Unlimited projects', 'Advanced analytics', 'Team collaboration tools', 'Custom branding', 'File sharing up to 50GB', 'Priority support']
+    features: ['Unlimited projects', 'Advanced analytics', 'Team collaboration tools', 'Custom branding', 'File sharing up to 50GB', 'Priority support'],
+    priceId: 'price_1RAbGRPRJugMRQ0gO9pfqXu4'
   },
   {
     name: 'Visionary',
-    price: '$199.99',
+    price: '$99.99',
     description: 'For creative agencies and large teams',
-    features: ['All Innovator features', 'Unlimited file sharing', 'Advanced team management', 'API access', 'Dedicated account manager', 'Custom integrations']
+    features: ['All Innovator features', 'Unlimited file sharing', 'Advanced team management', 'API access', 'Dedicated account manager', 'Custom integrations'],
+    priceId: 'price_1RAbGfPRJugMRQ0gB62ByWwk'
   }
 ];
 
 export default function PricingPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubscription = async (priceId: string | null, planName: string) => {
+    if (!priceId) return handleFreeTier(); // Handle free tier differently
+
+    setIsLoading(true);
+
+    try {
+      // Create checkout session using your custom fetcher
+      const response = await fetcher({
+        url: API_STRIPE_CHECKOUT_ROUTE,
+        requestBody: {
+          priceId,
+          planName
+        },
+        method: HttpMethods.POST
+      });
+
+      if (response.err) {
+        toast.error(response.message || 'Failed to create checkout session');
+        setIsLoading(false);
+        return;
+      }
+
+      // Redirect to checkout
+      const stripe = await stripePromise;
+      if (!stripe) {
+        toast.error('Stripe failed to load');
+        setIsLoading(false);
+        return;
+      }
+
+      const sessionId = response.content;
+      const { error } = await stripe.redirectToCheckout({ sessionId });
+
+      if (error) {
+        console.error('Error redirecting to checkout:', error);
+        toast.error('Error redirecting to checkout');
+      }
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFreeTier = () => {
+    console.log('oh baby we got a cheap skate over here!');
+    toast.info('You selected the Free plan!');
+    // Logic for handling the free tier subscription
+  };
+
   return (
     <div className="min-h-screen min-w-full overflow-x-hidden">
       <SubtleBackground />
@@ -65,8 +133,8 @@ export default function PricingPage() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" variant={index === 2 ? 'default' : 'outline'}>
-                    {index === 0 ? 'Get Started' : 'Subscribe'}
+                  <Button className="w-full" variant={index === 2 ? 'default' : 'outline'} disabled={isLoading} onClick={() => handleSubscription(tier.priceId, tier.name)}>
+                    {isLoading ? 'Loading...' : index === 0 ? 'Get Started' : 'Subscribe'}
                   </Button>
                 </CardFooter>
               </Card>

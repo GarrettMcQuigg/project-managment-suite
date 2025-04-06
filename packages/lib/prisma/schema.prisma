@@ -11,25 +11,26 @@ generator client {
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 model User {
-  id                 String             @id @default(uuid())
-  firstname          String
-  lastname           String
-  phone              String
-  email              String             @unique
-  profileImg         String?
-  profileImgId       String?
-  coverImg           String?
-  coverImgId         String?
-  location           String?
-  bio                String?
-  dateOfBirth        DateTime?
-  password           String
-  role               UserRole           @default(USER)
-  // Need to add subscriptionTier, SubscriptionStatus becomes SubscriptionTier
-  subscriptionStatus SubscriptionStatus
-  projects           Project[]
-  clients            Client[]
-  invoices           Invoice[]
+  id           String    @id @default(uuid())
+  firstname    String
+  lastname     String
+  phone        String
+  email        String    @unique
+  profileImg   String?
+  profileImgId String?
+  coverImg     String?
+  coverImgId   String?
+  location     String?
+  bio          String?
+  dateOfBirth  DateTime?
+  password     String
+  role         UserRole  @default(USER)
+  projects     Project[]
+  clients      Client[]
+  invoices     Invoice[]
+
+  // Subscription fields
+  subscription Subscription?
 
   // Calendar fields
   calendarEvent CalendarEvent[]
@@ -42,13 +43,6 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
   deletedAt DateTime?
-}
-
-enum SubscriptionStatus {
-  INACTIVE
-  CREATOR
-  INNOVATOR
-  VISIONARY
 }
 
 enum UserRole {
@@ -440,110 +434,119 @@ enum CalendarEventStatus {
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================
 
-// model Subscription {
-//   id     String             @id @default(uuid())
-//   user   User               @relation(fields: [userId], references: [id])
-//   userId String             @unique
-//   status SubscriptionStatus @default(ACTIVE)
+model Subscription {
+  id     String             @id @default(uuid())
+  user   User               @relation(fields: [userId], references: [id])
+  userId String             @unique
+  status SubscriptionStatus @default(ACTIVE)
 
-//   // Reference to the tier
-//   tier   SubscriptionPlan @relation(fields: [tierId], references: [id])
-//   tierId String
+  // Reference to the tier
+  tier   SubscriptionPlan @relation(fields: [tierId], references: [id])
+  tierId String
 
-//   currentPeriodStart DateTime
-//   currentPeriodEnd   DateTime
-//   cancelAtPeriodEnd  Boolean      @default(false)
-//   billingCycle       BillingCycle @default(MONTHLY)
-//   nextBillingDate    DateTime
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean      @default(false)
+  billingCycle       BillingCycle @default(MONTHLY)
+  nextBillingDate    DateTime
 
-//   // Payment details
-//   // TODO : Make more robust. Need to track payment history, payment method, card/bank details, etc.
-//   paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
-//   paymentMethodId String?
+  // Payment details
+  // TODO : Make more robust. Need to track payment history, payment method, card/bank details, etc.
+  // paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+  // paymentMethodId String?
 
-//   // For handling failed payments
-//   lastPaymentAttempt DateTime?
-//   failedPaymentCount Int       @default(0)
+  // For handling failed payments
+  lastPaymentAttempt DateTime?
+  failedPaymentCount Int       @default(0)
 
-//   // History
-//   subscriptionHistory SubscriptionHistory[]
+  // History
+  subscriptionHistory SubscriptionHistory[]
 
-//   // Timestamps
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-// model SubscriptionPlan {
-//   id          String @id @default(uuid())
-//   name        String @unique
-//   displayName String
+model SubscriptionPlan {
+  id          String               @id @default(uuid())
+  // TODO : Why 2 names?
+  name        SubscriptionTierName @unique
+  displayName String
 
-//   // Pricing
-//   monthlyPrice Decimal? @db.Decimal(10, 2)
-//   annualPrice  Decimal? @db.Decimal(10, 2)
-//   currency     String   @default("USD")
+  // Pricing
+  monthlyPrice Decimal? @db.Decimal(10, 2)
+  annualPrice  Decimal? @db.Decimal(10, 2)
+  currency     String   @default("USD")
 
-//   // Feature limits
-//   projectLimit    Int?
-//   storageLimit    Int? // in MB
-//   clientLimit     Int?
-//   teamMemberLimit Int? // Studio feature
+  // Feature limits
+  projectLimit    Int?
+  storageLimit    Int? // in MB
+  clientLimit     Int?
+  teamMemberLimit Int? // Studio feature
 
-//   // Additional features
-//   features PlanFeature[]
+  // Additional features
+  features PlanFeature[]
 
-//   // Subscriptions using this plan
-//   subscriptions Subscription[]
+  // Subscriptions using this plan
+  subscriptions Subscription[]
 
-//   // For tracking historical subscriptions
-//   subscriptionHistory SubscriptionHistory[]
+  // For tracking historical subscriptions
+  // TODO : This doesn't make sense to me to have this here and in Subscription model. However I do want a reference to the plan in the history model.
+  subscriptionHistory SubscriptionHistory[] // Why would I have this here if it's already in the Subscription model?
 
-//   isActive  Boolean  @default(true)
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-// model PlanFeature {
-//   id                 String           @id @default(uuid())
-//   name               String
-//   description        String?
-//   subscriptionPlan   SubscriptionPlan @relation(fields: [subscriptionPlanId], references: [id])
-//   subscriptionPlanId String
+model PlanFeature {
+  id                 String           @id @default(uuid())
+  name               String
+  description        String?
+  subscriptionPlan   SubscriptionPlan @relation(fields: [subscriptionPlanId], references: [id])
+  subscriptionPlanId String
 
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-//   @@unique([subscriptionPlanId, name])
-// }
+  @@unique([subscriptionPlanId, name])
+}
 
-// enum SubscriptionStatus {
-//   ACTIVE
-//   PAST_DUE
-//   CANCELED
-//   UNPAID
-//   TRIALING
-//   PAUSED
-// }
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+  TRIALING
+  PAUSED
+}
 
-// enum BillingCycle {
-//   MONTHLY
-//   ANNUALLY
-// }
+enum SubscriptionTierName {
+  INACTIVE
+  CREATOR
+  INNOVATOR
+  VISIONARY
+}
 
-// model SubscriptionHistory {
-//   id             String       @id @default(uuid())
-//   subscription   Subscription @relation(fields: [subscriptionId], references: [id])
-//   subscriptionId String
+enum BillingCycle {
+  MONTHLY
+  ANNUALLY
+}
 
-//   // Reference to the plan at that time
-//   plan   SubscriptionPlan @relation(fields: [planId], references: [id])
-//   planId String
+model SubscriptionHistory {
+  id             String       @id @default(uuid())
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String
 
-//   status    SubscriptionStatus
-//   startDate DateTime
-//   endDate   DateTime?
-//   createdAt DateTime           @default(now())
-// }
+  // Reference to the plan at that time
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id])
+  planId String
+
+  status    SubscriptionStatus
+  startDate DateTime
+  endDate   DateTime?
+  createdAt DateTime           @default(now())
+}
 
 // ==========================================================================================================================================================================
 // ==========================================================================================================================================================================

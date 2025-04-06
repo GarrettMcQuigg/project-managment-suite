@@ -13,7 +13,7 @@ class EmailService {
         pass: process.env.SMTP_AUTH_PASS
       },
       dkim: {
-        domainName: 'visiondeck.business', // TODO : update this to your domain name
+        domainName: 'solira.io', // TODO : update this to your domain name
         keySelector: 'default',
         privateKey: process.env.DKIM_PRIVATE_KEY!
       }

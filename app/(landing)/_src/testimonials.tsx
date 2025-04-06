@@ -14,7 +14,7 @@ export function TestimonialsSection() {
             {
               name: 'Alex Johnson',
               role: 'Freelance Designer',
-              content: "CreativeSuite CRM has transformed how I manage my freelance business. It's intuitive and powerful!"
+              content: "Solira CRM has transformed how I manage my freelance business. It's intuitive and powerful!"
             },
             {
               name: 'Sarah Lee',
@@ -24,7 +24,7 @@ export function TestimonialsSection() {
             {
               name: 'Mike Chen',
               role: 'Photographer',
-              content: 'I can focus more on my art now that CreativeSuite CRM handles the business side of things. Highly recommended!'
+              content: 'I can focus more on my art now that Solira CRM handles the business side of things. Highly recommended!'
             }
           ].map((testimonial, index) => (
             <Card key={index}>

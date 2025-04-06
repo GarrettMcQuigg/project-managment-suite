@@ -94,6 +94,11 @@ export const API_USER_PROFILE_UPDATE_ROUTE = `${API_USER_ROUTE}/profile/update`;
 export const API_AUTH_PORTAL_ROUTE = `${API_AUTH_ROUTE}/portal`;
 export const API_AUTH_PORTAL_GET_BY_ID_ROUTE = `${API_AUTH_PORTAL_ROUTE}/get-by-id?id=`;
 
+// Stripe API routes
+export const API_STRIPE_ROUTE = `${API_ROUTE}/stripe`;
+export const API_STRIPE_CHECKOUT_ROUTE = `${API_STRIPE_ROUTE}/checkout`;
+export const API_STRIPE_WEBHOOK_ROUTE = `${API_STRIPE_ROUTE}/webhook`;
+
 // Helpers
 export function routeWithPath(route: string, path: string) {
   return `${route}/${path}`;

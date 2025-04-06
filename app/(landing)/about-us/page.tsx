@@ -19,9 +19,9 @@ export default function AboutUs() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold text-foreground">Our Mission</h2>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  CreativeSuite CRM was born from a simple truth: creative professionals need a different kind of business tool. We're here to transform how creatives manage their
-                  client relationships. Our mission is to empower creatives with tools that understand their workflow, speak their language, and give them more time to do what they
-                  do best — create.
+                  Solira CRM was born from a simple truth: creative professionals need a different kind of business tool. We're here to transform how creatives manage their client
+                  relationships. Our mission is to empower creatives with tools that understand their workflow, speak their language, and give them more time to do what they do
+                  best — create.
                 </p>
               </div>
 
@@ -56,7 +56,7 @@ export default function AboutUs() {
                   <div className="space-y-4">
                     <h3 className="text-xl font-medium">Community Driven</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Our roadmap is shaped by real feedback from creative professionals. Your voice matters in building the future of CreativeSuite.
+                      Our roadmap is shaped by real feedback from creative professionals. Your voice matters in building the future of Solira.
                     </p>
                   </div>
                 </div>

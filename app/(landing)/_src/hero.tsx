@@ -10,7 +10,7 @@ export function HeroSection() {
         <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
           <div className="flex flex-col justify-center space-y-4">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">Unleash Your Creative Potential with CreativeSuite CRM</h1>
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">Unleash Your Creative Potential with Solira CRM</h1>
               <p className="max-w-[600px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 Streamline your workflow, manage clients, and boost productivity. The ultimate CRM designed for creatives, by creatives.
               </p>

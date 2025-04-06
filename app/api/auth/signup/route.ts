@@ -124,8 +124,7 @@ async function createNewUser(requestBody: SignupRequestBody): Promise<{ user: Us
         lastname: requestBody.lastname,
         email: requestBody.email,
         phone: requestBody.phone,
-        password: hashedPassword,
-        subscriptionStatus: 'VISIONARY'
+        password: hashedPassword
       }
     });
 

@@ -12,7 +12,7 @@ export default function Features() {
           {/* Hero Section */}
           <div className="mb-16">
             <h1 className="text-5xl font-bold">Features</h1>
-            <p className="text-xl text-muted-foreground mt-4">Discover how CreativeSuite CRM empowers your creative workflow with powerful, intuitive features.</p>
+            <p className="text-xl text-muted-foreground mt-4">Discover how Solira CRM empowers your creative workflow with powerful, intuitive features.</p>
           </div>
 
           {/* Features Grid */}

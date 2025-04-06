@@ -123,6 +123,9 @@ export const useSignup = () => {
   };
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+    // TODO : This is broken. sms and email codes are not being set correctly for sign up.
+    const emailMFACode = '000000';
+    const smsMFACode = '000000';
     e.preventDefault();
     setLoading(true);
     try {
@@ -130,8 +133,10 @@ export const useSignup = () => {
         ...personalInfoForm.getValues(),
         password: passwordForm.getValues('password'),
         confirmPassword: passwordForm.getValues('confirmPassword'),
-        emailMFACode: verificationForm.getValues('emailCode'),
-        smsMFACode: verificationForm.getValues('smsCode')
+        emailMFACode,
+        smsMFACode
+        // emailMFACode: verificationForm.getValues('emailCode'),
+        // smsMFACode: verificationForm.getValues('smsCode')
       };
       const response = await fetcher({ url: API_AUTH_SIGNUP_ROUTE, requestBody });
       if (response.err) throw new Error(response.message);

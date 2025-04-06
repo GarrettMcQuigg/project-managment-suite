@@ -59,7 +59,7 @@ export default function PortalHeader({ projectStatus, isOwner, visitorName, proj
     <div className="container mx-auto px-4 py-6 lg:w-3/4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold">CreativeSuite Portal</h1>
+          <h1 className="text-2xl font-semibold">Solira Portal</h1>
           <div className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[projectStatus]}`}>{projectStatus.replace('_', ' ')}</div>
         </div>
 

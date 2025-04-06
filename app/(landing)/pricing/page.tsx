@@ -82,7 +82,6 @@ export default function PricingPage() {
       const { error } = await stripe.redirectToCheckout({ sessionId });
 
       if (error) {
-        console.error('Error redirecting to checkout:', error);
         toast.error('Error redirecting to checkout');
       }
     } catch (error) {

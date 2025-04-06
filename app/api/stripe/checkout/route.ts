@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { DASHBOARD_ROUTE, PRICING_ROUTE } from '@/packages/lib/routes';
 import { NextRequest } from 'next/server';
 import Stripe from 'stripe';
+import jwt from 'jsonwebtoken';
 
 // TODO : implement environment variables for Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
@@ -19,6 +20,12 @@ export async function POST(req: NextRequest) {
 
     const { priceId, planName } = await req.json();
 
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET environment variable is not defined');
+    }
+
+    const userToken = jwt.sign({ userId: currentUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
     // Create Checkout Sessions from body params
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -30,8 +37,7 @@ export async function POST(req: NextRequest) {
           quantity: 1
         }
       ],
-      // Redirect URLs
-      success_url: `${req.nextUrl.origin}${DASHBOARD_ROUTE}`,
+      success_url: `${req.nextUrl.origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.nextUrl.origin}${PRICING_ROUTE}`,
       metadata: {
         userId: currentUser.id,

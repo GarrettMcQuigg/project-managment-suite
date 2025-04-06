@@ -24,7 +24,10 @@ export const config = {
     '/api/users/:path*',
 
     // Portal routes (don't redirect to login, but handle portal access)
-    '/projects/:projectId/portal/:slug*'
+    '/projects/:projectId/portal/:slug*',
+
+    // Stripe routes
+    '/((?!payment/success|api/stripe/process-success).*)'
   ]
 };
 

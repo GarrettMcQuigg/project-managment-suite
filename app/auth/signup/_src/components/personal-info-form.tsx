@@ -60,6 +60,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loadin
                     <Input
                       className="backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2  focus:border-violet-500 dark:focus:border-violet-400"
                       {...field}
+                      autoFocus
                       placeholder="john@example.com"
                       disabled={loading}
                     />
@@ -78,7 +79,6 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ form, loadin
                       <Input
                         className="backdrop-blur-sm bg-white/10 dark:bg-gray-900/40 border-gray-200/20 dark:border-gray-700/50 ring-1 ring-gray-700/10 dark:ring-gray-200/10 focus:ring-2  focus:border-violet-500 dark:focus:border-violet-400"
                         {...field}
-                        autoFocus
                         placeholder="John"
                         disabled={loading}
                       />

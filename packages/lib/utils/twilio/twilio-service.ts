@@ -8,7 +8,8 @@ class TwilioService {
 
   async sendVerificationCode(phone: string): Promise<Error | null> {
     try {
-      await twilioClient.verify.services(verifyServiceSid).verifications.create({ to: phone, channel: 'sms' });
+      // TODO : fix phone format coming from the frontend
+      await twilioClient.verify.services(verifyServiceSid).verifications.create({ to: '+1' + phone, channel: 'sms' });
 
       return null;
     } catch (err: any) {
@@ -19,7 +20,8 @@ class TwilioService {
 
   async checkVerificationCode(phone: string, code: string): Promise<Error | null> {
     try {
-      const response = await twilioClient.verify.services(verifyServiceSid).verificationChecks.create({ to: phone, code });
+      // TODO : fix phone format coming from the frontend
+      const response = await twilioClient.verify.services(verifyServiceSid).verificationChecks.create({ to: '+1' + phone, code });
       if (response.status !== 'approved') {
         throw new Error('Invalid verification code');
       }

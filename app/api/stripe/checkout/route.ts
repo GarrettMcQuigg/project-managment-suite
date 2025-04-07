@@ -1,21 +1,23 @@
-import { handleError, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { handleError, handleSuccess } from '@/packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { DASHBOARD_ROUTE, PRICING_ROUTE } from '@/packages/lib/routes';
+import { AUTH_SIGNUP_FROM_PRICING_ROUTE, PRICING_ROUTE } from '@/packages/lib/routes';
 import { NextRequest } from 'next/server';
 import Stripe from 'stripe';
-import jwt from 'jsonwebtoken';
 
-// TODO : implement environment variables for Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
 export async function POST(req: NextRequest) {
   try {
-    // TODO : Need to make sure the user has an ccount before reaching this route
-    // I want the !currentUser -> unauth error, but need to make sure it doesn't get tripped by the user not being logged in
-    // or the user gets stuck trying to sign up, and can't get to the checkout page
     const currentUser = await getCurrentUser();
+
     if (!currentUser) {
-      return handleUnauthorized();
+      return handleSuccess({
+        message: 'Authentication required',
+        content: {
+          requireAuth: true,
+          authRoute: `${AUTH_SIGNUP_FROM_PRICING_ROUTE}`
+        }
+      });
     }
 
     const { priceId, planName } = await req.json();
@@ -24,7 +26,9 @@ export async function POST(req: NextRequest) {
       throw new Error('JWT_SECRET environment variable is not defined');
     }
 
-    const userToken = jwt.sign({ userId: currentUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    if (!priceId || !planName) {
+      return handleError({ message: 'Missing required parameters: priceId and planName are required' });
+    }
 
     // Create Checkout Sessions from body params
     const session = await stripe.checkout.sessions.create({
@@ -45,9 +49,12 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    return handleSuccess({ content: session.id });
+    return handleSuccess({ content: { sessionId: session.id } });
   } catch (err) {
     console.error('Error creating checkout session:', err);
-    return handleError({ message: 'Error creating checkout session' });
+    return handleError({
+      message: 'Error creating checkout session',
+      err
+    });
   }
 }

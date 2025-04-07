@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { fetcher } from '@packages/lib/helpers/fetcher';
 import { usePersonalInfoForm } from '../components/personal-info-form';
@@ -12,8 +12,10 @@ import {
   // API_AUTH_MFA_SEND_EMAIL_ROUTE,
   // API_AUTH_MFA_SEND_SMS_ROUTE,
   API_AUTH_SIGNUP_ROUTE,
-  DASHBOARD_ROUTE
+  DASHBOARD_ROUTE,
+  PRICING_ROUTE
 } from '@/packages/lib/routes';
+import { useRouter, useSearchParams } from 'next/navigation';
 // import { CheckEmailAvailability } from '@/packages/lib/helpers/check-email-availability';
 
 const STEPS = {
@@ -28,6 +30,15 @@ export const useSignup = () => {
   const personalInfoForm = usePersonalInfoForm();
   const passwordForm = usePasswordForm();
   const verificationForm = useVerificationForm();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const fromPricing = searchParams.get('from') === 'pricing';
+    if (fromPricing) {
+      sessionStorage.setItem('returnToPricing', 'true');
+    }
+  }, [searchParams]);
 
   const checkAvailability = async (email: string, phone: string) => {
     console.log(phone, email);
@@ -141,7 +152,14 @@ export const useSignup = () => {
       const response = await fetcher({ url: API_AUTH_SIGNUP_ROUTE, requestBody });
       if (response.err) throw new Error(response.message);
       localStorage.clear();
-      window.location.href = DASHBOARD_ROUTE;
+
+      const returnToPricing = sessionStorage.getItem('returnToPricing');
+      if (returnToPricing) {
+        sessionStorage.removeItem('returnToPricing');
+        router.push(PRICING_ROUTE);
+      } else {
+        router.push(DASHBOARD_ROUTE);
+      }
     } catch (error: Error | unknown) {
       verificationForm.reset();
       if (error instanceof Error) {

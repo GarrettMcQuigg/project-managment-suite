@@ -5,6 +5,7 @@ export const ROUTE_SEPARATOR = '/';
 export const AUTH_ROUTE = '/auth';
 export const AUTH_CHECKPOINT_ROUTE = '/auth/checkpoint';
 export const AUTH_SIGNUP_ROUTE = `${AUTH_ROUTE}/signup`;
+export const AUTH_SIGNUP_FROM_PRICING_ROUTE = `${AUTH_ROUTE}/signup?from=pricing`;
 export const AUTH_SIGNIN_ROUTE = `${AUTH_ROUTE}/signin`;
 export const AUTH_RESET_PASSWORD_ROUTE = `${AUTH_ROUTE}/reset-password`;
 

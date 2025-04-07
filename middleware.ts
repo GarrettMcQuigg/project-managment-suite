@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { TOKEN_COOKIE_KEY, USER_COOKIE_KEY } from '@/packages/lib/constants/cookie-keys';
-import { PORTAL_SESSION_COOKIE, PORTAL_VISITOR_COOKIE } from './packages/lib/helpers/get-portal-user';
+import { PORTAL_VISITOR_COOKIE } from './packages/lib/helpers/get-portal-user';
 
 export const config = {
   matcher: [
@@ -24,10 +24,7 @@ export const config = {
     '/api/users/:path*',
 
     // Portal routes (don't redirect to login, but handle portal access)
-    '/projects/:projectId/portal/:slug*',
-
-    // Stripe routes
-    '/((?!payment/success|api/stripe/process-success).*)'
+    '/projects/:projectId/portal/:slug*'
   ]
 };
 
@@ -101,9 +98,6 @@ function handlePortalAccess(request: NextRequest, projectId: string, portalSlug:
   return NextResponse.redirect(authUrl);
 }
 
-/**
- * Checks if the user is authenticated
- */
 function isUserAuthenticated(request: NextRequest): boolean {
   const tokenCookie = request.cookies.get(TOKEN_COOKIE_KEY);
   const userCookie = request.cookies.get(USER_COOKIE_KEY);

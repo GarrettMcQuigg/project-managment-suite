@@ -29,7 +29,7 @@ export default function PaymentSuccessPage() {
         console.error('Error:', error);
         setMessage('An unexpected error occurred');
       });
-  }, []);
+  }, [router, searchParams]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

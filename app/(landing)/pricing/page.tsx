@@ -8,10 +8,9 @@ import SubtleBackground from '@/packages/lib/components/subtle-background';
 import { Check } from 'lucide-react';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { HttpMethods } from '@/packages/lib/constants/http-methods';
-import { API_STRIPE_CHECKOUT_ROUTE } from '@/packages/lib/routes';
+import { API_STRIPE_CHECKOUT_ROUTE, AUTH_SIGNUP_ROUTE } from '@/packages/lib/routes';
 import { toast } from 'react-toastify';
 
-// Initialize Stripe with your publishable key
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
 
 const tiers = [
@@ -54,7 +53,6 @@ export default function PricingPage() {
     setIsLoading(true);
 
     try {
-      // Create checkout session using your custom fetcher
       const response = await fetcher({
         url: API_STRIPE_CHECKOUT_ROUTE,
         requestBody: {
@@ -63,6 +61,11 @@ export default function PricingPage() {
         },
         method: HttpMethods.POST
       });
+
+      if (response.content?.requireAuth) {
+        window.location.href = `${AUTH_SIGNUP_ROUTE}?from=pricing`;
+        return;
+      }
 
       if (response.err) {
         toast.error(response.message || 'Failed to create checkout session');
@@ -78,7 +81,14 @@ export default function PricingPage() {
         return;
       }
 
-      const sessionId = response.content;
+      const sessionId = response.content.sessionId;
+
+      if (!sessionId) {
+        toast.error('No session ID returned from server');
+        setIsLoading(false);
+        return;
+      }
+
       const { error } = await stripe.redirectToCheckout({ sessionId });
 
       if (error) {

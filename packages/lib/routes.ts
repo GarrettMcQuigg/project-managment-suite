@@ -56,6 +56,7 @@ export const API_AUTH_SIGNOUT_ROUTE = `${API_AUTH_ROUTE}/signout`;
 export const API_AUTH_MFA_ROUTE = `${API_AUTH_ROUTE}/mfa`;
 export const API_AUTH_MFA_SEND_EMAIL_ROUTE = `${API_AUTH_MFA_ROUTE}/send-email`;
 export const API_AUTH_MFA_SEND_SMS_ROUTE = `${API_AUTH_MFA_ROUTE}/send-sms`;
+export const API_AUTH_SUBSCRIPTION_ROUTE = `${API_AUTH_ROUTE}/subscription`;
 
 export const API_USER_ROUTE = `${API_ROUTE}/user`;
 

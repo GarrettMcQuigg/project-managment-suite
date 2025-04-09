@@ -1,10 +1,10 @@
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
-import type { User } from '@prisma/client';
 import { db } from '../prisma/client';
 import { TOKEN_COOKIE_KEY, USER_COOKIE_KEY } from '../constants/cookie-keys';
+import { UserWithMetadata } from '@/packages/lib/prisma/types';
 
-export async function getCurrentUser(): Promise<User | null> {
+export async function getCurrentUser(): Promise<UserWithMetadata | null> {
   const cookieStore = await cookies();
   const tokenCookie = cookieStore.get(TOKEN_COOKIE_KEY);
   const userCookie = cookieStore.get(USER_COOKIE_KEY);
@@ -25,6 +25,9 @@ export async function getCurrentUser(): Promise<User | null> {
       where: {
         id: decodedToken.userId,
         email: decodedUser.email
+      },
+      include: {
+        subscription: true
       }
     });
 

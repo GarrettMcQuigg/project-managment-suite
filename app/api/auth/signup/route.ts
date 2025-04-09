@@ -8,6 +8,7 @@ import { handleBadRequest, handleConflict, handleError, handleSuccess } from '@p
 import { setAuthCookies } from '@/packages/lib/helpers/cookies';
 import { CheckEmailAvailability } from '@/packages/lib/helpers/check-email-availability';
 import { CreateUserMetrics } from '@/packages/lib/helpers/analytics/user/user-metrics';
+import { CreateFreeTierSubscription } from '@/packages/lib/helpers/free-tier-subscription';
 
 // const twilioService = new TwilioService();
 
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
       throw err;
     }
 
+    await CreateFreeTierSubscription(user.id);
     await CreateUserMetrics(user.id);
 
     return handleSuccess({ message: 'Registered account successfully!' });

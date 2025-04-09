@@ -1,5 +1,9 @@
 import { Prisma } from '@prisma/client';
 
+export type UserWithMetadata = Prisma.UserGetPayload<{
+  include: { subscription: true };
+}>;
+
 export type ClientWithMetadata = Prisma.ClientGetPayload<{
   include: { projects: true };
 }>;

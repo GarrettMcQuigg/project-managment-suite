@@ -55,6 +55,7 @@ interface PricingComponentProps {
 }
 
 export default function PricingComponent({ currentUser }: PricingComponentProps) {
+  console.log('Current User:', currentUser);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -167,9 +168,15 @@ export default function PricingComponent({ currentUser }: PricingComponentProps)
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full" variant={index === 2 ? 'default' : 'outline'} disabled={isLoading} onClick={() => handleSubscription(tier.priceId, tier.name)}>
-                  {isLoading ? 'Loading...' : index === 0 ? 'Get Started' : 'Subscribe'}
-                </Button>
+                {currentUser && currentUser.subscription && tier.id === currentUser.subscription.tierId ? (
+                  <Button className="w-full" variant="outline" disabled>
+                    Already Subscribed
+                  </Button>
+                ) : (
+                  <Button className="w-full" variant={index === 2 ? 'default' : 'outline'} disabled={isLoading} onClick={() => handleSubscription(tier.priceId, tier.name)}>
+                    {isLoading ? 'Loading...' : index === 0 ? 'Get Started' : 'Subscribe'}
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}

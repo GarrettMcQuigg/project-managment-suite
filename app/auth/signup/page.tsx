@@ -7,6 +7,7 @@ import { VerificationForm } from './_src/components/verification-form';
 import { PasswordForm } from './_src/components/password-form';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
+import TempSignInBlocker from '../checkpoint/_src/temp-signin-blocker';
 
 export default function Signup() {
   const { STEPS, loading, currentStep, personalInfoForm, passwordForm, verificationForm, nextStep, prevStep, handleSignup } = useSignup();
@@ -22,9 +23,11 @@ export default function Signup() {
 
   return (
     <>
-      {currentStep === STEPS.PERSONAL_INFO && <PersonalInfoForm form={personalInfoForm} loading={loading} onSubmit={nextStep} />}
+      {/* TODO : Rempove when ready to rip */}
+      <TempSignInBlocker />
+      {/* {currentStep === STEPS.PERSONAL_INFO && <PersonalInfoForm form={personalInfoForm} loading={loading} onSubmit={nextStep} />}
       {currentStep === STEPS.PASSWORD && <PasswordForm form={passwordForm} loading={loading} onSubmit={nextStep} onBack={prevStep} />}
-      {currentStep === STEPS.VERIFICATION && <VerificationForm form={verificationForm} loading={loading} onSubmit={handleSignup} onBack={prevStep} />}
+      {currentStep === STEPS.VERIFICATION && <VerificationForm form={verificationForm} loading={loading} onSubmit={handleSignup} onBack={prevStep} />} */}
     </>
   );
 }

@@ -166,7 +166,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
     onInvoicesChange(invoices.filter((inv) => inv.id !== id));
   };
 
-  const toggleNotify = (invoice: NewInvoice) => {
+  const toggleNotify = () => {
     setActiveInvoice((prev) => ({
       ...prev,
       notifyClient: !prev.notifyClient
@@ -257,7 +257,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 max-w-fit cursor-pointer" onClick={() => toggleNotify(activeInvoice)}>
+          <div className="flex flex-col gap-2 max-w-fit cursor-pointer" onClick={() => toggleNotify()}>
             <FormLabel htmlFor="notifyClient">Notify Client</FormLabel>
             <div className="flex items-center">
               <input

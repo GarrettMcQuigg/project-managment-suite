@@ -20,6 +20,7 @@ type NewInvoice = {
   amount: string;
   status: InvoiceStatus;
   dueDate: Date;
+  notifyClient: boolean;
   notes: string | null;
   phaseId: string | null;
   createdAt: Date;
@@ -90,6 +91,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
       amount: '',
       status: InvoiceStatus.DRAFT,
       dueDate: new Date(),
+      notifyClient: false,
       notes: '',
       phaseId: null,
       createdAt: new Date(),
@@ -154,13 +156,21 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
     setActiveInvoice({
       ...invoice,
       projectId: invoice.projectId || '',
-      amount: invoice.amount || ''
+      amount: invoice.amount || '',
+      notifyClient: invoice.notifyClient ?? false
     });
     setEditingInvoiceId(invoice.id);
   };
 
   const handleDelete = (id: string) => {
     onInvoicesChange(invoices.filter((inv) => inv.id !== id));
+  };
+
+  const toggleNotify = (invoice: NewInvoice) => {
+    setActiveInvoice((prev) => ({
+      ...prev,
+      notifyClient: !prev.notifyClient
+    }));
   };
 
   return (
@@ -244,6 +254,21 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 max-w-fit cursor-pointer" onClick={() => toggleNotify(activeInvoice)}>
+            <FormLabel htmlFor="notifyClient">Notify Client</FormLabel>
+            <div className="flex items-center">
+              <input
+                id="notifyClient"
+                type="checkbox"
+                checked={activeInvoice.notifyClient}
+                onChange={(e) => setActiveInvoice({ ...activeInvoice, notifyClient: e.target.checked })}
+                className="h-4 w-4 rounded border-foreground/20 text-primary focus:ring-primary"
+                disabled={isGeneratingNumber}
+              />
+              <span className="ml-2 text-sm text-muted-foreground">Send email notification when invoice is created</span>
             </div>
           </div>
 

@@ -12,6 +12,7 @@ export const NewInvoiceSchema = Joi.object({
     .valid(...Object.values(InvoiceStatus))
     .required(),
   dueDate: Joi.date().required(),
+  notifyClient: Joi.boolean().optional(),
   notes: Joi.string().allow('', null),
   phaseId: Joi.string().allow(null),
   id: Joi.string().optional(),
@@ -51,6 +52,7 @@ type NewInvoiceData = {
   amount: string | number;
   status: InvoiceStatus;
   dueDate: Date;
+  notifyClient?: boolean;
   notes?: string | null;
   phaseId?: string | null;
   createdAt?: Date;

@@ -297,6 +297,7 @@ model Invoice {
   amount        String?
   status        InvoiceStatus  @default(SENT)
   dueDate       DateTime
+  notifyClient  Boolean?       @default(false)
   payments      Payment[] // Track all payments made against this invoice
   paymentMethod PaymentMethod? // Do we even need?
   notes         String?

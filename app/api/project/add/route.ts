@@ -98,6 +98,7 @@ export async function POST(request: Request) {
               amount: String(invoice.amount),
               status: invoice.status,
               dueDate: invoice.dueDate,
+              notifyClient: invoice.notifyClient,
               notes: invoice.notes,
               phaseId: invoice.phaseId
             }

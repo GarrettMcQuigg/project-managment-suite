@@ -93,6 +93,7 @@ export async function POST(request: Request) {
             data: {
               userId: currentUser.id,
               projectId: projectRecord.id,
+              clientId: clientRecord.id,
               invoiceNumber: invoice.invoiceNumber,
               type: invoice.type,
               amount: String(invoice.amount),
@@ -157,9 +158,38 @@ export async function POST(request: Request) {
         invoices: createdInvoices,
         client: clientRecord,
         isNewClient: !client.id,
-        portalPassword
+        portalPassword,
+        invoiceCheckouts: [] as { invoiceId: string; checkoutUrl: string | null; sessionId: string | null }[]
       };
     });
+
+    if ('invoices' in result && result.invoices.length > 0) {
+      if (result.invoices.length > 0) {
+        // Create checkout sessions in parallel
+        const checkoutPromises = result.invoices.map(async (invoice) => {
+          const response = await fetch(`${request.url.split('/api/')[0]}/api/stripe/invoice/checkout`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Cookie: request.headers.get('cookie') || '',
+              Authorization: request.headers.get('authorization') || ''
+            },
+            body: JSON.stringify({ invoiceId: invoice.id })
+          });
+
+          return await response.json();
+        });
+
+        const checkoutResults = await Promise.all(checkoutPromises);
+
+        // Attach checkout URLs to the response
+        result.invoiceCheckouts = checkoutResults.map((checkout, index) => ({
+          invoiceId: result.invoices[index].id,
+          checkoutUrl: checkout.content?.checkoutUrl || null,
+          sessionId: checkout.content?.sessionId || null
+        }));
+      }
+    }
 
     await UpdateProjectMetrics(currentUser.id);
 

@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { db } from '@/packages/lib/prisma/client';
 import { handleBadRequest, handleError } from '@/packages/lib/helpers/api-response-handlers';
-import { SubscriptionStatus, BillingCycle, SubscriptionTierName } from '@prisma/client';
+import { SubscriptionStatus, BillingCycle, SubscriptionTierName, InvoiceStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
-// This disables body parsing to get the raw body
 export const config = {
   api: {
     bodyParser: false
@@ -22,7 +21,7 @@ async function getBodyContent(req: NextRequest): Promise<string> {
   return Buffer.concat(chunks).toString('utf8');
 }
 
-// Map Stripe subscription status to your DB SubscriptionStatus
+// Map Stripe subscription status to DB SubscriptionStatus
 function mapStripeStatusToDbStatus(stripeStatus: string): SubscriptionStatus {
   switch (stripeStatus) {
     case 'active':
@@ -84,7 +83,32 @@ export async function POST(req: NextRequest) {
         const planName = session.metadata?.planName;
         const billingCycle = session.metadata?.billingCycle === 'year' ? BillingCycle.ANNUALLY : BillingCycle.MONTHLY;
 
-        if (userId && session.subscription && planName) {
+        if (session.mode === 'payment' && session.metadata?.invoiceId) {
+          const invoiceId = session.metadata.invoiceId;
+
+          try {
+            await db.invoice.update({
+              where: { id: invoiceId },
+              data: {
+                status: InvoiceStatus.PAID,
+                stripePaid: true,
+                stripePaidAt: new Date()
+              }
+            });
+
+            // You might want to create a payment record or handle other business logic
+            await db.payment.create({
+              data: {
+                invoiceId,
+                amount: session.amount_total ? (session.amount_total / 100).toString() : '0',
+                paymentMethod: PaymentMethod.CREDIT_CARD,
+                status: PaymentStatus.COMPLETED
+              }
+            });
+          } catch (error) {
+            console.error('Error processing invoice payment:', error);
+          }
+        } else if (userId && session.subscription && planName) {
           try {
             // Get subscription details from Stripe
             const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription as string);
@@ -172,7 +196,24 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      // For the customer.subscription.updated event case
+      case 'checkout.session.async_payment_failed':
+      case 'payment_intent.payment_failed': {
+        const sessionId = event.data.object.id;
+        const invoice = await db.invoice.findFirst({
+          where: { stripeCheckoutId: sessionId }
+        });
+
+        if (invoice) {
+          await db.invoice.update({
+            where: { id: invoice.id },
+            data: {
+              status: InvoiceStatus.PAYMENT_FAILED
+            }
+          });
+        }
+        break;
+      }
+
       case 'customer.subscription.updated': {
         const stripeSubscription = event.data.object as Stripe.Subscription;
         const userId = stripeSubscription.metadata?.userId;

@@ -25,6 +25,7 @@ const statusColors: Record<InvoiceCardProps['invoice']['status'], string> = {
   DRAFT: 'bg-muted text-muted-foreground',
   SENT: 'bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200',
   PAID: 'bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200',
+  PAYMENT_FAILED: 'bg-orange-200 text-orange-800 dark:bg-orange-800 dark:text-orange-200',
   OVERDUE: 'bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200',
   CANCELLED: 'bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
 };

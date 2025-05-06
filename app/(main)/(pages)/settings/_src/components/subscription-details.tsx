@@ -9,7 +9,7 @@ import { Button } from '@/packages/lib/components/button';
 import { SubscriptionStatusBadge } from './subscription-status-bar';
 import { SubscriptionStatus } from '@prisma/client';
 
-async function getSubscription() {
+function getSubscription() {
   return {
     id: 'sub_123456',
     status: SubscriptionStatus.ACTIVE,
@@ -40,8 +40,8 @@ async function getSubscription() {
   };
 }
 
-export default async function SubscriptionDetails() {
-  const subscription = await getSubscription();
+export default function SubscriptionDetails() {
+  const subscription = getSubscription();
 
   const isActive = subscription.status === SubscriptionStatus.ACTIVE;
   const isCanceled = subscription.cancelAtPeriodEnd;

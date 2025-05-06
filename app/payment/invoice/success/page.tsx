@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 
 export default function PaymentSuccessPage() {
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [paymentInfo, setPaymentInfo] = useState<any>(null);
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');

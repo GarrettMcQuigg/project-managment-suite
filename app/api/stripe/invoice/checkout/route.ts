@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       return handleError({ message: 'Unauthorized access to invoice' });
     }
 
-    const clientEmail = invoice.client.email;
+    const clientEmail = invoice.client?.email;
     if (!clientEmail) {
       return handleError({ message: 'Client email not found' });
     }

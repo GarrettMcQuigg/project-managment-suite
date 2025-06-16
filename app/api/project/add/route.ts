@@ -165,29 +165,44 @@ export async function POST(request: Request) {
 
     if ('invoices' in result && result.invoices.length > 0) {
       if (result.invoices.length > 0) {
-        // Create checkout sessions in parallel
-        const checkoutPromises = result.invoices.map(async (invoice) => {
-          const response = await fetch(`${request.url.split('/api/')[0]}/api/stripe/invoice/checkout`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Cookie: request.headers.get('cookie') || '',
-              Authorization: request.headers.get('authorization') || ''
-            },
-            body: JSON.stringify({ invoiceId: invoice.id })
-          });
-
-          return await response.json();
+        // Check user's Stripe account status
+        const user = await db.user.findUnique({
+          where: { id: currentUser.id },
+          select: { stripeAccountId: true, stripeAccountStatus: true }
         });
 
-        const checkoutResults = await Promise.all(checkoutPromises);
+        // Create checkout sessions in parallel
+        const checkoutPromises = result.invoices.map(async (invoice) => {
+          // If user has a verified Stripe account, create invoice on their account
+          if (user?.stripeAccountId && user.stripeAccountStatus === 'VERIFIED') {
+            const response = await fetch(`${request.url.split('/api/')[0]}/api/stripe/invoice/connect-checkout`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Cookie: request.headers.get('cookie') || '',
+                Authorization: request.headers.get('authorization') || ''
+              },
+              body: JSON.stringify({ 
+                invoiceId: invoice.id,
+                stripeAccountId: user.stripeAccountId 
+              })
+            });
 
-        // Attach checkout URLs to the response
-        result.invoiceCheckouts = checkoutResults.map((checkout, index) => ({
-          invoiceId: result.invoices[index].id,
-          checkoutUrl: checkout.content?.checkoutUrl || null,
-          sessionId: checkout.content?.sessionId || null
-        }));
+            return await response.json();
+          } 
+        });
+
+        if(checkoutPromises.length > 0) {
+          const checkoutResults = await Promise.all(checkoutPromises);
+          
+          // Attach checkout URLs to the response
+          result.invoiceCheckouts = checkoutResults.map((checkout, index) => ({
+            invoiceId: result.invoices[index].id,
+            checkoutUrl: checkout.content?.checkoutUrl || null,
+            sessionId: checkout.content?.sessionId || null,
+            isConnectCheckout: !!checkout.content?.isConnectCheckout
+          }));
+        }
       }
     }
 

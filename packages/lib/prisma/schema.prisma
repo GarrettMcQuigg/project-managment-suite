@@ -29,6 +29,10 @@ model User {
   clients      Client[]
   invoices     Invoice[]
 
+  // Stripe Connect fields
+  stripeAccountId     String?   @map("stripe_account_id")
+  stripeAccountStatus StripeAccountStatus @default(NOT_CONNECTED) @map("stripe_account_status")
+
   // Subscription fields
   subscription Subscription?
 
@@ -43,6 +47,8 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
   deletedAt DateTime?
+
+  @@map("users")
 }
 
 enum UserRole {
@@ -50,6 +56,13 @@ enum UserRole {
   USER
   GUEST
   CLIENT
+}
+
+enum StripeAccountStatus {
+  NOT_CONNECTED
+  PENDING
+  VERIFIED
+  RESTRICTED
 }
 
 // ==========================================================================================================================================================================

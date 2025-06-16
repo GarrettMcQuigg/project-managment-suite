@@ -76,6 +76,30 @@ export async function POST(req: NextRequest) {
 
     // Handle the event
     switch (event.type) {
+      case 'account.updated': {
+        const account = event.data.object as Stripe.Account;
+        
+        try {
+          // Find user with this Stripe account ID
+          const user = await db.user.findFirst({
+            where: { stripeAccountId: account.id }
+          });
+
+          if (user) {
+            // Update user's Stripe account status
+            await db.user.update({
+              where: { id: user.id },
+              data: { 
+                stripeAccountStatus: account.details_submitted ? 'VERIFIED' : 'PENDING'
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error processing Stripe account update:', error);
+        }
+        break;
+      }
+
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
 

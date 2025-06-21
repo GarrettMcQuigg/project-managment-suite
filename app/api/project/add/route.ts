@@ -4,7 +4,7 @@ import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { AddProjectRequestBody, AddProjectRequestBodySchema } from './types';
 import { hash } from 'bcrypt';
 import { generatePortalSlug, generateSecurePassword } from '@/packages/lib/helpers/project-portals';
-import { CalendarEventStatus, CalendarEventType } from '@prisma/client';
+import { CalendarEventStatus, CalendarEventType, Client } from '@prisma/client';
 import { encrypt } from '@/packages/lib/utils/encryption';
 import { UpdateProjectMetrics } from '@/packages/lib/helpers/analytics/project/project-metrics';
 import { createInvoiceCheckout, createConnectInvoiceCheckout } from '@/packages/lib/stripe/invoice-checkout';
@@ -241,7 +241,7 @@ export async function POST(request: Request) {
                 amount: invoice.amount ? `$${parseFloat(invoice.amount).toFixed(2)}` : '$0.00',
                 dueDate: invoice.dueDate ? format(new Date(invoice.dueDate), 'MMMM d, yyyy') : 'Upon receipt',
                 paymentLink: checkoutUrl,
-                companyName: 'name' in currentUser ? (currentUser as any).name : 'Your Service Provider',
+                companyName: 'name' in result.client ? (result.client as Client).name : 'Your Service Provider',
                 clientName: result.client.name || 'Valued Client',
                 notes: invoice.notes || undefined
               });
@@ -250,7 +250,6 @@ export async function POST(request: Request) {
               await db.invoice.update({
                 where: { id: invoice.id },
                 data: { 
-                  // @ts-ignore - Add these fields to your Invoice model if needed
                   notificationSent: true, 
                   notificationSentAt: new Date() 
                 }
@@ -280,12 +279,7 @@ export async function POST(request: Request) {
     return handleError({ 
       message: 'Failed to create project', 
       err: {
-        message: errorMessage,
-        ...(err instanceof Error && {
-          name: err.name,
-          stack: err.stack,
-          ...(err as any).code && { code: (err as any).code }
-        })
+        message: errorMessage
       }
     });
   }

@@ -95,7 +95,6 @@ export async function POST(request: Request) {
           await db.invoice.update({
             where: { id: invoice.id },
             data: { 
-              // @ts-ignore - Add these fields to your Invoice model if needed
               notificationSent: true, 
               notificationSentAt: new Date() 
             }

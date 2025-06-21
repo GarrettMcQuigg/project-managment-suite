@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
           } 
         });
       } catch (stripeErr) {
+        console.error('Failed to retrieve Stripe account:', stripeErr);
         // TODO : Continue to create a new account
       }
     }
@@ -66,6 +67,7 @@ export async function GET(request: NextRequest) {
         }
       });
     } catch (err) {
+      console.error('Failed to update user with Stripe account ID:', err);
       // TODO : Don't return an error here, try to continue with account link creation
     }
 
@@ -94,10 +96,10 @@ export async function GET(request: NextRequest) {
         status: 'PENDING'
       } 
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleError({ 
       message: 'Failed to connect Stripe account. Please try again later.',
-      err: err.message || String(err)
+      err: err instanceof Error ? err.message : String(err)
     });
   }
 }

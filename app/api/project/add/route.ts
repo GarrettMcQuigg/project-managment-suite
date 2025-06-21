@@ -8,6 +8,8 @@ import { CalendarEventStatus, CalendarEventType } from '@prisma/client';
 import { encrypt } from '@/packages/lib/utils/encryption';
 import { UpdateProjectMetrics } from '@/packages/lib/helpers/analytics/project/project-metrics';
 import { createInvoiceCheckout, createConnectInvoiceCheckout } from '@/packages/lib/stripe/invoice-checkout';
+import EmailService from '@/packages/lib/utils/email-service';
+import { format } from 'date-fns';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
@@ -220,13 +222,53 @@ export async function POST(request: Request) {
 
       const checkoutResults = await Promise.all(checkoutPromises);
       
-      // Attach checkout URLs to the response
-      result.invoiceCheckouts = checkoutResults.map((checkout, index) => ({
-        invoiceId: result.invoices[index].id,
-        checkoutUrl: checkout.content?.checkoutUrl || null,
-        sessionId: checkout.content?.sessionId || null,
-        isConnectCheckout: !!checkout.content?.isConnectCheckout
-      }));
+      // Attach checkout URLs to the response and send emails if notifyClient is true
+      result.invoiceCheckouts = await Promise.all(
+        checkoutResults.map(async (checkout, index) => {
+          const invoice = result.invoices[index];
+          const checkoutUrl = checkout.content?.checkoutUrl || null;
+          const sessionId = checkout.content?.sessionId || null;
+          const isConnectCheckout = !!checkout.content?.isConnectCheckout;
+
+          // Send email notification if notifyClient is true and we have a checkout URL
+          if (invoice.notifyClient && checkoutUrl && result.client?.email) {
+            try {
+              const emailService = new EmailService();
+              await emailService.sendInvoicePaymentEmail({
+                to: result.client.email,
+                invoiceNumber: invoice.invoiceNumber,
+                projectName: result.project?.name || 'Your Project',
+                amount: invoice.amount ? `$${parseFloat(invoice.amount).toFixed(2)}` : '$0.00',
+                dueDate: invoice.dueDate ? format(new Date(invoice.dueDate), 'MMMM d, yyyy') : 'Upon receipt',
+                paymentLink: checkoutUrl,
+                companyName: 'name' in currentUser ? (currentUser as any).name : 'Your Service Provider',
+                clientName: result.client.name || 'Valued Client',
+                notes: invoice.notes || undefined
+              });
+              
+              // Update the invoice to mark that notification was sent
+              await db.invoice.update({
+                where: { id: invoice.id },
+                data: { 
+                  // @ts-ignore - Add these fields to your Invoice model if needed
+                  notificationSent: true, 
+                  notificationSentAt: new Date() 
+                }
+              });
+            } catch (error) {
+              console.error('Failed to send invoice notification email:', error);
+              // Don't fail the whole request if email sending fails
+            }
+          }
+
+          return {
+            invoiceId: invoice.id,
+            checkoutUrl,
+            sessionId,
+            isConnectCheckout
+          };
+        })
+      );
     }
 
     await UpdateProjectMetrics(currentUser.id);

@@ -324,6 +324,10 @@ model Invoice {
   stripePaid        Boolean   @default(false)
   stripePaidAt      DateTime?
 
+  // Notification fields
+  notificationSent    Boolean   @default(false)
+  notificationSentAt  DateTime?
+
   // Calendar fields
   calendarEvent CalendarEvent[]
 

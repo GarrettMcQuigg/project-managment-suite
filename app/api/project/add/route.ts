@@ -7,6 +7,7 @@ import { generatePortalSlug, generateSecurePassword } from '@/packages/lib/helpe
 import { CalendarEventStatus, CalendarEventType } from '@prisma/client';
 import { encrypt } from '@/packages/lib/utils/encryption';
 import { UpdateProjectMetrics } from '@/packages/lib/helpers/analytics/project/project-metrics';
+import { createInvoiceCheckout, createConnectInvoiceCheckout } from '@/packages/lib/stripe/invoice-checkout';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
@@ -164,46 +165,68 @@ export async function POST(request: Request) {
     });
 
     if ('invoices' in result && result.invoices.length > 0) {
-      if (result.invoices.length > 0) {
-        // Check user's Stripe account status
-        const user = await db.user.findUnique({
-          where: { id: currentUser.id },
-          select: { stripeAccountId: true, stripeAccountStatus: true }
-        });
+      // Check user's Stripe account status
+      const user = await db.user.findUnique({
+        where: { id: currentUser.id },
+        select: { stripeAccountId: true, stripeAccountStatus: true }
+      });
 
-        // Create checkout sessions in parallel
-        const checkoutPromises = result.invoices.map(async (invoice) => {
+      const origin = request.url.split('/api/')[0];
+
+      // Create checkout sessions in parallel
+      const checkoutPromises = result.invoices.map(async (invoice) => {
+        try {
           // If user has a verified Stripe account, create invoice on their account
           if (user?.stripeAccountId && user.stripeAccountStatus === 'VERIFIED') {
-            const response = await fetch(`${request.url.split('/api/')[0]}/api/stripe/invoice/connect-checkout`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Cookie: request.headers.get('cookie') || '',
-                Authorization: request.headers.get('authorization') || ''
-              },
-              body: JSON.stringify({ 
-                invoiceId: invoice.id,
-                stripeAccountId: user.stripeAccountId 
-              })
-            });
-
-            return await response.json();
-          } 
-        });
-
-        if(checkoutPromises.length > 0) {
-          const checkoutResults = await Promise.all(checkoutPromises);
-          
-          // Attach checkout URLs to the response
-          result.invoiceCheckouts = checkoutResults.map((checkout, index) => ({
-            invoiceId: result.invoices[index].id,
-            checkoutUrl: checkout.content?.checkoutUrl || null,
-            sessionId: checkout.content?.sessionId || null,
-            isConnectCheckout: !!checkout.content?.isConnectCheckout
-          }));
+            const checkout = await createConnectInvoiceCheckout(
+              invoice.id,
+              currentUser.id,
+              user.stripeAccountId,
+              origin
+            );
+            return {
+              content: {
+                checkoutUrl: checkout.checkoutUrl,
+                sessionId: checkout.sessionId,
+                isConnectCheckout: true
+              }
+            };
+          } else {
+            // Use regular checkout
+            const checkout = await createInvoiceCheckout(
+              invoice.id,
+              currentUser.id,
+              origin
+            );
+            return {
+              content: {
+                checkoutUrl: checkout.checkoutUrl,
+                sessionId: checkout.sessionId,
+                isConnectCheckout: false
+              }
+            };
+          }
+        } catch (error) {
+          console.error('Error creating checkout for invoice:', invoice.id, error);
+          return {
+            content: {
+              checkoutUrl: null,
+              sessionId: null,
+              isConnectCheckout: false
+            }
+          };
         }
-      }
+      });
+
+      const checkoutResults = await Promise.all(checkoutPromises);
+      
+      // Attach checkout URLs to the response
+      result.invoiceCheckouts = checkoutResults.map((checkout, index) => ({
+        invoiceId: result.invoices[index].id,
+        checkoutUrl: checkout.content?.checkoutUrl || null,
+        sessionId: checkout.content?.sessionId || null,
+        isConnectCheckout: !!checkout.content?.isConnectCheckout
+      }));
     }
 
     await UpdateProjectMetrics(currentUser.id);
@@ -211,6 +234,17 @@ export async function POST(request: Request) {
     return handleSuccess({ message: 'Successfully created project', content: result });
   } catch (err: unknown) {
     console.error('Project creation error:', err);
-    return handleError({ message: 'Failed to create project', err });
+    const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+    return handleError({ 
+      message: 'Failed to create project', 
+      err: {
+        message: errorMessage,
+        ...(err instanceof Error && {
+          name: err.name,
+          stack: err.stack,
+          ...(err as any).code && { code: (err as any).code }
+        })
+      }
+    });
   }
 }

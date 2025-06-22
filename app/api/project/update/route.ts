@@ -1,51 +1,8 @@
 import { db } from '@packages/lib/prisma/client';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { CalendarEventStatus, CalendarEventType, Phase, Invoice } from '@prisma/client';
+import { CalendarEventStatus, CalendarEventType, Phase } from '@prisma/client';
 import { UpdateProjectRequestBody, UpdateProjectRequestBodySchema } from './types';
-
-interface ProjectWithRelations {
-  id: string;
-  name: string;
-  description: string | null;
-  type: string;
-  status: string;
-  startDate: Date | null;
-  endDate: Date | null;
-  client: {
-    id: string;
-    name: string;
-    email: string | null;
-    phone: string | null;
-  };
-  phases: Array<{
-    id: string;
-    name: string;
-    description: string | null;
-    status: string;
-    startDate: Date;
-    endDate: Date;
-  }>;
-  invoices: Array<{
-    id: string;
-    invoiceNumber: string;
-    amount: string;
-    status: string;
-    dueDate: Date | null;
-    notes: string | null;
-    stripeCheckoutUrl: string | null;
-    stripeCheckoutId: string | null;
-  }>;
-}
-
-interface TransactionResult {
-  updatedProject: ProjectWithRelations;
-  updatedInvoices: Array<{
-    id: string;
-    stripeCheckoutUrl: string | null;
-    stripeCheckoutId: string | null;
-  }>;
-}
 
 export async function PUT(request: Request) {
   const currentUser = await getCurrentUser();
@@ -63,8 +20,6 @@ export async function PUT(request: Request) {
   }
 
   try {
-    // First, perform all database updates in a transaction
-    // First, perform all database updates in a transaction
     const transactionResult = await db.$transaction(async (tx) => {
       // Update client
       const clientRecord = requestBody.client.id

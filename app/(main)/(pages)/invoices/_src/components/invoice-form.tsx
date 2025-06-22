@@ -37,7 +37,6 @@ const defaultInvoice: FormDataWithStringAmount = {
 export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceFormProps) {
   const isEditMode = !!invoice;
   const { stripeAccount, isLoading, connectStripeAccount } = useStripeAccount();
-  const hasStripeAccount = stripeAccount?.status === 'VERIFIED';
   const [formData, setFormData] = useState<FormDataWithStringAmount>({
     invoiceNumber: '',
     type: InvoiceType.STANDARD,

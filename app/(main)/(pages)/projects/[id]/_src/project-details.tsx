@@ -7,7 +7,8 @@ import { redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { format } from 'date-fns';
-import { Calendar, Clock, Users, Pencil, Eye, EyeOff, KeyRound } from 'lucide-react';
+import { Calendar, Clock, Users, Pencil, Eye, EyeOff, KeyRound, Copy, ExternalLink } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { DeleteProjectButton } from './delete-project';
 import { Card } from '@/packages/lib/components/card';
 
@@ -37,6 +38,11 @@ export default function ProjectDetails({ projectId, onEditClick }: ProjectDetail
   if (!project) {
     return <div>Project not found or access denied.</div>;
   }
+
+  const handleCopyToClipboard = (text: string, message: string = 'Copied to clipboard!') => {
+    navigator.clipboard.writeText(text);
+    toast.success(message);
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -127,6 +133,87 @@ export default function ProjectDetails({ projectId, onEditClick }: ProjectDetail
           </div>
         </div>
       </div>
+
+      {project.invoices && project.invoices.length > 0 && (
+        <div className="mt-8">
+          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Invoices</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Invoice #
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Due Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Payment Link
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-[#0F1A1C] divide-y divide-gray-200 dark:divide-gray-700">
+                {project.invoices.map((invoice) => (
+                  <tr key={invoice.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                      {invoice.invoiceNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                      ${invoice.amount ? Number(invoice.amount).toFixed(2) : '0.00'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                      {format(new Date(invoice.dueDate), 'MMM d, yyyy')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span 
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          invoice.status === 'PAID' 
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                            : invoice.status === 'SENT' || invoice.status === 'DRAFT'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' 
+                              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                        }`}
+                      >
+                        {invoice.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                      {invoice.stripeCheckoutUrl ? (
+                        <div className="flex items-center space-x-2">
+                          <a 
+                            href={invoice.stripeCheckoutUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-1" />
+                            Open
+                          </a>
+                          <button
+                            onClick={() => handleCopyToClipboard(invoice.stripeCheckoutUrl!, 'Payment link copied to clipboard!')}
+                            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            title="Copy payment link"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 dark:text-gray-500">No payment link</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }

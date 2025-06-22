@@ -4,12 +4,11 @@ import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { AddProjectRequestBody, AddProjectRequestBodySchema } from './types';
 import { hash } from 'bcrypt';
 import { generatePortalSlug, generateSecurePassword } from '@/packages/lib/helpers/project-portals';
-import { CalendarEventStatus, CalendarEventType, Client } from '@prisma/client';
+import { CalendarEventStatus, CalendarEventType } from '@prisma/client';
 import { encrypt } from '@/packages/lib/utils/encryption';
 import { UpdateProjectMetrics } from '@/packages/lib/helpers/analytics/project/project-metrics';
 import { createInvoiceCheckout, createConnectInvoiceCheckout } from '@/packages/lib/stripe/invoice-checkout';
-import EmailService from '@/packages/lib/utils/email-service';
-import { format } from 'date-fns';
+// import EmailService from '@/packages/lib/utils/email-service';
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();

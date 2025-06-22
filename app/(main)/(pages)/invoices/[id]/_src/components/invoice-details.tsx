@@ -1,8 +1,9 @@
 'use client';
 
-import { Pencil } from 'lucide-react';
+import { Pencil, ExternalLink, Copy } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/packages/lib/components/card';
+import { toast } from 'react-toastify';
 import { swrFetcher } from '@/packages/lib/helpers/fetcher';
 import useSWR from 'swr';
 import { useEffect, useState } from 'react';
@@ -22,6 +23,11 @@ export default function InvoiceDetails({ invoiceId, showEditControls = false, on
   const endpoint = API_INVOICE_GET_BY_ID_ROUTE + invoiceId;
   const { data, error, isLoading } = useSWR(endpoint, swrFetcher);
   const [invoice, setInvoice] = useState<InvoiceWithMetadata | null>(null);
+
+  const handleCopyToClipboard = (text: string, message: string = 'Copied to clipboard!') => {
+    navigator.clipboard.writeText(text);
+    toast.success(message);
+  };
 
   useEffect(() => {
     if (data) {
@@ -93,6 +99,29 @@ export default function InvoiceDetails({ invoiceId, showEditControls = false, on
           <div className="mt-4">
             <h3 className="font-semibold">Notes</h3>
             <p>{invoice.notes}</p>
+          </div>
+        )}
+        {invoice.stripeCheckoutUrl && (
+          <div className="mt-4">
+            <h3 className="font-semibold mb-2">Payment Link</h3>
+            <div className="flex items-center space-x-2">
+              <a 
+                href={invoice.stripeCheckoutUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center"
+              >
+                <ExternalLink className="h-4 w-4 mr-1" />
+                Open Payment Link
+              </a>
+              <button
+                onClick={() => handleCopyToClipboard(invoice.stripeCheckoutUrl!, 'Payment link copied to clipboard!')}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                title="Copy payment link"
+              >
+                <Copy className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         )}
       </CardContent>

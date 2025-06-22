@@ -77,28 +77,30 @@ export async function POST(request: Request) {
         }
 
         if (checkoutUrl) {
+          // TODO: Implement email notification when ProtonMail is added
+          console.log('sending email notification');
           // Send email notification
-          const emailService = new EmailService();
-          await emailService.sendInvoicePaymentEmail({
-            to: invoice.client?.email || '',
-            invoiceNumber: invoice.invoiceNumber,
-            projectName: invoice.project?.name || undefined,
-            amount: invoice.amount ? `$${parseFloat(invoice.amount).toFixed(2)}` : '$0.00',
-            dueDate: invoice.dueDate ? format(new Date(invoice.dueDate), 'MMMM d, yyyy') : 'Upon receipt',
-            paymentLink: checkoutUrl,
-            companyName: user ? `${user.firstname || ''} ${user.lastname || ''}`.trim() || 'Your Service Provider' : 'Your Service Provider',
-            clientName: invoice.client?.name || 'Valued Client',
-            notes: invoice.notes || undefined
-          });
+          // const emailService = new EmailService();
+          // await emailService.sendInvoicePaymentEmail({
+          //   to: invoice.client?.email || '',
+          //   invoiceNumber: invoice.invoiceNumber,
+          //   projectName: invoice.project?.name || undefined,
+          //   amount: invoice.amount ? `$${parseFloat(invoice.amount).toFixed(2)}` : '$0.00',
+          //   dueDate: invoice.dueDate ? format(new Date(invoice.dueDate), 'MMMM d, yyyy') : 'Upon receipt',
+          //   paymentLink: checkoutUrl,
+          //   companyName: user ? `${user.firstname || ''} ${user.lastname || ''}`.trim() || 'Your Service Provider' : 'Your Service Provider',
+          //   clientName: invoice.client?.name || 'Valued Client',
+          //   notes: invoice.notes || undefined
+          // });
 
           // Update the invoice to mark that notification was sent
-          await db.invoice.update({
-            where: { id: invoice.id },
-            data: { 
-              notificationSent: true, 
-              notificationSentAt: new Date() 
-            }
-          });
+          // await db.invoice.update({
+          //   where: { id: invoice.id },
+          //   data: { 
+          //     notificationSent: true, 
+          //     notificationSentAt: new Date() 
+          //   }
+          // });
         }
       } catch (error) {
         console.error('Failed to send invoice notification email:', error);

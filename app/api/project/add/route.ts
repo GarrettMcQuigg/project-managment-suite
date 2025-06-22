@@ -233,27 +233,29 @@ export async function POST(request: Request) {
           // Send email notification if notifyClient is true and we have a checkout URL
           if (invoice.notifyClient && checkoutUrl && result.client?.email) {
             try {
-              const emailService = new EmailService();
-              await emailService.sendInvoicePaymentEmail({
-                to: result.client.email,
-                invoiceNumber: invoice.invoiceNumber,
-                projectName: result.project?.name || 'Your Project',
-                amount: invoice.amount ? `$${parseFloat(invoice.amount).toFixed(2)}` : '$0.00',
-                dueDate: invoice.dueDate ? format(new Date(invoice.dueDate), 'MMMM d, yyyy') : 'Upon receipt',
-                paymentLink: checkoutUrl,
-                companyName: 'name' in result.client ? (result.client as Client).name : 'Your Service Provider',
-                clientName: result.client.name || 'Valued Client',
-                notes: invoice.notes || undefined
-              });
+              // TODO: Implement email notification when ProtonMail is added
+              console.log('sending email notification');
+              // const emailService = new EmailService();
+              // await emailService.sendInvoicePaymentEmail({
+              //   to: result.client.email,
+              //   invoiceNumber: invoice.invoiceNumber,
+              //   projectName: result.project?.name || 'Your Project',
+              //   amount: invoice.amount ? `$${parseFloat(invoice.amount).toFixed(2)}` : '$0.00',
+              //   dueDate: invoice.dueDate ? format(new Date(invoice.dueDate), 'MMMM d, yyyy') : 'Upon receipt',
+              //   paymentLink: checkoutUrl,
+              //   companyName: 'name' in result.client ? (result.client as Client).name : 'Your Service Provider',
+              //   clientName: result.client.name || 'Valued Client',
+              //   notes: invoice.notes || undefined
+              // });
               
               // Update the invoice to mark that notification was sent
-              await db.invoice.update({
-                where: { id: invoice.id },
-                data: { 
-                  notificationSent: true, 
-                  notificationSentAt: new Date() 
-                }
-              });
+              // await db.invoice.update({
+              //   where: { id: invoice.id },
+              //   data: { 
+              //     notificationSent: true, 
+              //     notificationSentAt: new Date() 
+              //   }
+              // });
             } catch (error) {
               console.error('Failed to send invoice notification email:', error);
               // Don't fail the whole request if email sending fails

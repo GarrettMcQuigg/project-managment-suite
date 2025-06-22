@@ -1,8 +1,51 @@
 import { db } from '@packages/lib/prisma/client';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { CalendarEventStatus, CalendarEventType, Phase } from '@prisma/client';
+import { CalendarEventStatus, CalendarEventType, Phase, Invoice } from '@prisma/client';
 import { UpdateProjectRequestBody, UpdateProjectRequestBodySchema } from './types';
+
+interface ProjectWithRelations {
+  id: string;
+  name: string;
+  description: string | null;
+  type: string;
+  status: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  client: {
+    id: string;
+    name: string;
+    email: string | null;
+    phone: string | null;
+  };
+  phases: Array<{
+    id: string;
+    name: string;
+    description: string | null;
+    status: string;
+    startDate: Date;
+    endDate: Date;
+  }>;
+  invoices: Array<{
+    id: string;
+    invoiceNumber: string;
+    amount: string;
+    status: string;
+    dueDate: Date | null;
+    notes: string | null;
+    stripeCheckoutUrl: string | null;
+    stripeCheckoutId: string | null;
+  }>;
+}
+
+interface TransactionResult {
+  updatedProject: ProjectWithRelations;
+  updatedInvoices: Array<{
+    id: string;
+    stripeCheckoutUrl: string | null;
+    stripeCheckoutId: string | null;
+  }>;
+}
 
 export async function PUT(request: Request) {
   const currentUser = await getCurrentUser();
@@ -20,7 +63,9 @@ export async function PUT(request: Request) {
   }
 
   try {
-    const result = await db.$transaction(async (tx) => {
+    // First, perform all database updates in a transaction
+    // First, perform all database updates in a transaction
+    const transactionResult = await db.$transaction(async (tx) => {
       // Update client
       const clientRecord = requestBody.client.id
         ? await tx.client.update({
@@ -54,28 +99,97 @@ export async function PUT(request: Request) {
         }
       });
 
-      // Update invoices
-      await tx.invoice.deleteMany({
-        where: { projectId: requestBody.id }
+      // Get existing invoices for this project
+      const existingInvoices = await tx.invoice.findMany({
+        where: { projectId: requestBody.id },
+        select: {
+          id: true,
+          invoiceNumber: true,
+          type: true,
+          amount: true,
+          status: true,
+          dueDate: true,
+          notes: true,
+          phaseId: true,
+          stripeCheckoutUrl: true,
+          stripeCheckoutId: true
+        }
       });
 
-      await Promise.all(
-        requestBody.invoices.map((invoice) =>
-          tx.invoice.create({
-            data: {
-              userId: currentUser.id,
-              projectId: requestBody.id,
-              invoiceNumber: invoice.invoiceNumber,
-              type: invoice.type,
-              amount: invoice.amount.toString(),
-              status: invoice.status,
-              dueDate: invoice.dueDate,
-              notes: invoice.notes,
-              phaseId: invoice.phaseId
+      // Process invoice updates
+      const invoiceUpdates = await Promise.all(
+        requestBody.invoices.map(async (invoice) => {
+          const existingInvoice = existingInvoices.find(
+            (inv) => inv.id === invoice.id
+          );
+
+          const updateData = {
+            invoiceNumber: invoice.invoiceNumber,
+            type: invoice.type,
+            amount: invoice.amount.toString(),
+            status: invoice.status,
+            dueDate: invoice.dueDate,
+            notes: invoice.notes || undefined,
+            phaseId: invoice.phaseId || undefined,
+            updatedAt: new Date()
+          };
+
+          // If invoice exists, update it
+          if (existingInvoice) {
+            // Check if any invoice data has changed
+            const hasChanges = Object.entries(updateData).some(
+              ([key, value]) => {
+                // Skip checking these fields when determining if there are changes
+                if (key === 'stripeCheckoutUrl' || key === 'stripeCheckoutId' || key === 'updatedAt') {
+                  return false;
+                }
+                return existingInvoice[key as keyof typeof existingInvoice] !== value;
+              }
+            );
+
+            // Only update if there are changes
+            if (hasChanges) {
+              // For existing invoices with changes, we'll create a new checkout session
+              // after the transaction completes
+              return tx.invoice.update({
+                where: { id: invoice.id },
+                data: {
+                  ...updateData,
+                  // Clear the checkout URL/ID since we'll create a new one
+                  stripeCheckoutUrl: null,
+                  stripeCheckoutId: null
+                }
+              });
             }
-          })
-        )
+            return existingInvoice;
+          } else {
+            // Create new invoice
+            return tx.invoice.create({
+              data: {
+                userId: currentUser.id,
+                projectId: requestBody.id,
+                clientId: clientRecord.id,
+                ...updateData,
+                amount: updateData.amount.toString() // Ensure amount is a string
+              }
+            });
+          }
+        })
       );
+
+      // Delete invoices that were removed
+      const incomingInvoiceIds = requestBody.invoices
+        .map((inv) => inv.id)
+        .filter(Boolean);
+      const invoicesToDelete = existingInvoices.filter(
+        (inv) => !incomingInvoiceIds.includes(inv.id)
+      );
+
+      if (invoicesToDelete.length > 0) {
+        await tx.invoice.deleteMany({
+          where: { id: { in: invoicesToDelete.map((inv) => inv.id) } }
+        });
+      }
 
       // Handle phases
       if (requestBody.phases && requestBody.phases.length > 0) {
@@ -158,13 +272,100 @@ export async function PUT(request: Request) {
         }
       });
 
-      return completeProject;
+      return { updatedProject: completeProject, updatedInvoices: invoiceUpdates };
     });
 
-    return handleSuccess({
-      message: 'Successfully updated project',
-      content: result
-    });
+    const { updatedProject, updatedInvoices } = transactionResult;
+
+    // After transaction completes successfully, handle Stripe checkout sessions
+    try {
+      // Get user's Stripe account status
+      const user = await db.user.findUnique({
+        where: { id: currentUser.id },
+        select: { stripeAccountId: true, stripeAccountStatus: true }
+      });
+
+      const origin = request.url.split('/api/')[0];
+      const { createConnectInvoiceCheckout, createInvoiceCheckout } = await import('@/packages/lib/stripe/invoice-checkout');
+
+      // Process each updated invoice that needs a new checkout session
+      for (const invoice of updatedInvoices || []) {
+        // Only create checkout for invoices that were just created or had changes
+        // (existing invoices with no changes will have their original checkout URLs preserved)
+        if (!invoice.stripeCheckoutUrl) {
+          try {
+            let checkoutUrl: string | null = null;
+            let checkoutId: string | null = null;
+
+            // Create appropriate checkout session based on user's Stripe account status
+            if (user?.stripeAccountId && user.stripeAccountStatus === 'VERIFIED') {
+              const checkout = await createConnectInvoiceCheckout(
+                invoice.id,
+                currentUser.id,
+                user.stripeAccountId,
+                origin
+              );
+              checkoutUrl = checkout.checkoutUrl;
+              checkoutId = checkout.sessionId;
+            } else {
+              const checkout = await createInvoiceCheckout(
+                invoice.id,
+                currentUser.id,
+                origin
+              );
+              checkoutUrl = checkout.checkoutUrl;
+              checkoutId = checkout.sessionId;
+            }
+
+            // Update the invoice with the new checkout URL and ID
+            if (checkoutUrl && checkoutId) {
+              await db.invoice.update({
+                where: { id: invoice.id },
+                data: {
+                  stripeCheckoutUrl: checkoutUrl,
+                  stripeCheckoutId: checkoutId
+                }
+              });
+            }
+          } catch (error) {
+            console.error(`Failed to create checkout session for invoice ${invoice.id}:`, error);
+            // Continue with other invoices even if one fails
+          }
+        }
+      }
+
+
+        if (!updatedProject) {
+        throw new Error('Failed to update project');
+      }
+
+      // Refresh the project data to include any updated invoice URLs
+      const completeProject = await db.project.findUnique({
+        where: { id: updatedProject.id },
+        include: {
+          client: true,
+          phases: true,
+          invoices: true
+        }
+      });
+
+      if (!completeProject) {
+        throw new Error('Failed to fetch updated project');
+      }
+
+      return handleSuccess({
+        message: 'Successfully updated project',
+        content: completeProject
+      });
+    } catch (error) {
+      console.error('Error creating checkout sessions:', error);
+      // Even if checkout session creation fails, we still return success since the project was updated
+      // The checkout URLs can be regenerated later if needed
+      return handleSuccess({
+        message: 'Project updated, but there was an issue updating payment links',
+        content: updatedProject
+      });
+    }
   } catch (err: unknown) {
     console.error('Project update error:', err);
     return handleError({ message: 'Failed to update project', err });

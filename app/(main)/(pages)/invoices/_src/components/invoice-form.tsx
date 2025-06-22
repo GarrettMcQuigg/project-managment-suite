@@ -8,8 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/packages/lib/components/button';
 import { Textarea } from '@/packages/lib/components/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/packages/lib/components/dialog';
+import { Card } from '@/packages/lib/components/card';
 import { InvoiceStatus, InvoiceType } from '@prisma/client';
 import { fetchUniqueInvoiceNumber, generateTemporaryInvoiceNumber } from '@/packages/lib/helpers/generate-invoice-number';
+import { useStripeAccount } from '@/packages/lib/hooks/use-stripe-account';
+import { Loader2, Link2 } from 'lucide-react';
 
 interface FormDataWithStringAmount extends Omit<Partial<InvoiceWithMetadata>, 'amount'> {
   amount?: string;
@@ -33,6 +36,8 @@ const defaultInvoice: FormDataWithStringAmount = {
 
 export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceFormProps) {
   const isEditMode = !!invoice;
+  const { stripeAccount, isLoading, connectStripeAccount } = useStripeAccount();
+  const hasStripeAccount = stripeAccount?.status === 'VERIFIED';
   const [formData, setFormData] = useState<FormDataWithStringAmount>({
     invoiceNumber: '',
     type: InvoiceType.STANDARD,
@@ -97,6 +102,50 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
+        {isLoading ? (
+          <div className="flex items-center justify-center p-8">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : stripeAccount.status !== 'VERIFIED' ? (
+          <Card className="p-4 bg-yellow-50 border-yellow-200 mb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Link2 className="w-6 h-6 text-yellow-600" />
+                <div>
+                  <p className="text-sm font-medium text-yellow-800">
+                    {stripeAccount.status === 'NOT_CONNECTED'
+                      ? 'Connect your Stripe account to create invoices'
+                      : 'Complete your Stripe account setup'}
+                  </p>
+                  <p className="text-xs text-yellow-700">
+                    {stripeAccount.status === 'NOT_CONNECTED'
+                      ? 'You need to link a Stripe account to generate invoices'
+                      : 'Your account is currently pending verification'}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  connectStripeAccount();
+                }}
+                disabled={isLoading}
+                variant="outline"
+                className="border-yellow-300 text-yellow-800 hover:bg-yellow-100"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  'Connect Stripe'
+                )}
+              </Button>
+            </div>
+          </Card>
+        ) : null}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="invoiceNumber">Invoice Number</Label>

@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
       status: project.status,
       phases: project.phases,
       client: project.client,
+      invoices: project.invoices,
       portalPassEncryption: project.portalPassEncryption
     };
 

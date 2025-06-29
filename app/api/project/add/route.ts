@@ -16,6 +16,7 @@ export async function POST(request: Request) {
 
   let requestBody: AddProjectRequestBody = await request.json();
 
+  // TODO : This doesnt do anything... right?
   if (requestBody.client && (requestBody.client.id === '' || requestBody.client.id === undefined)) {
     const { ...clientWithoutId } = requestBody.client;
     requestBody = {

@@ -75,10 +75,11 @@ export function HeroSection() {
           </div>
 
           {/* Right Column - Image (remaining width) */}
+          {/* TODO: Update this with something better */}
           <div className="lg:w-[40%] relative">
             <div className="relative z-10">
               <Image
-                src="/placeholder.svg?height=500&width=500"
+                src="/images/landing/landing-page-stock-img.jpg"
                 alt="Dashboard Preview"
                 width={500}
                 height={500}

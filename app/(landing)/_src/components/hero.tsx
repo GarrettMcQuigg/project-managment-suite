@@ -91,7 +91,7 @@ export function HeroSection() {
       </div>
 
       {/* Bouncing down arrow */}
-      <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
         <div className="flex flex-col items-center gap-2">
           <ChevronDown className="w-6 h-6 text-primary" />
         </div>

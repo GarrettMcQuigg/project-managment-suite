@@ -21,7 +21,7 @@ const tiers = [
     id: '47bedb8d-0629-4420-b040-5866a776529e',
     price: 'Free',
     description: 'Perfect for getting started',
-    features: ['Create up to 2 projects', 'Basic task management', 'Simple client communication'],
+    features: ['Create 1 project', 'Basic task management', 'Simple client communication', 'File sharing up to 1GB'],
     priceId: null // No Stripe price ID for free tier
   },
   {
@@ -29,7 +29,7 @@ const tiers = [
     price: '$19.99',
     id: 'c00dc490-55fa-4a73-9551-68cf31c901cf',
     description: 'Ideal for growing creatives',
-    features: ['Create up to 10 projects', 'Advanced task management', 'Enhanced client communication', 'Basic analytics', 'File sharing up to 5GB'],
+    features: ['Create up to 6 projects', 'Advanced task management', 'Enhanced client communication', 'Basic analytics', 'File sharing up to 5GB'],
     priceId: 'price_1RAbGAPRJugMRQ0g7Zz1nc5K'
   },
   {
@@ -37,7 +37,7 @@ const tiers = [
     price: '$49.99',
     id: 'fa89af33-fe5e-494b-a217-eece2b906a86',
     description: 'For established creative professionals',
-    features: ['Unlimited projects', 'Advanced analytics', 'Team collaboration tools', 'Custom branding', 'File sharing up to 50GB', 'Priority support'],
+    features: ['Create up to 12 projects', 'Advanced analytics', 'Team collaboration tools', 'File sharing up to 50GB', 'Priority support'],
     priceId: 'price_1RAbGRPRJugMRQ0gO9pfqXu4'
   },
   {
@@ -45,7 +45,7 @@ const tiers = [
     price: '$99.99',
     id: '47a892e6-2067-44e5-872d-1139d624576c',
     description: 'For creative agencies and large teams',
-    features: ['All Innovator features', 'Unlimited file sharing', 'Advanced team management', 'API access', 'Dedicated account manager', 'Custom integrations'],
+    features: ['Unlimited projects', 'Advanced analytics', 'Advanced collaboration tools', 'Unlimited file sharing', 'Priority support'],
     priceId: 'price_1RAbGfPRJugMRQ0gB62ByWwk'
   }
 ];
@@ -141,7 +141,7 @@ export default function PricingComponent({ currentUser }: PricingComponentProps)
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-foreground sm:text-4xl">Pricing Plans</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Choose the perfect plan for your creative journey - No hidden fees, ever.</p>
+        <p className="mt-2 text-sm text-muted-foreground">Choose the perfect plan for your journey - No hidden fees, ever.</p>
       </div>
 
       <div className="mt-12">

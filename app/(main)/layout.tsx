@@ -1,6 +1,6 @@
 import { Unauth } from './_src/unauth';
 import HUD from './_src/hud';
-import SubtleBackground from '@/packages/lib/components/subtle-background';
+import InternalBackground from '@/packages/lib/components/subtle-background';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
 import { redirect } from 'next/navigation';
 import { AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
@@ -19,7 +19,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   if (sessionContext.type === 'user') {
     return (
       <>
-        <SubtleBackground />
+        <InternalBackground />
         <HUD currentUser={sessionContext.user}>{children}</HUD>
       </>
     );

@@ -1,12 +1,11 @@
 import React from 'react';
-import SubtleBackground from '@/packages/lib/components/subtle-background';
 import { Users, BarChart3, Briefcase, MessageSquare, FileStack, Palette, Shield } from 'lucide-react';
+import { LandingBackground } from '@/packages/lib/components/custom-background';
 
 export default function Features() {
   return (
     <div className="min-h-screen">
-      <SubtleBackground />
-
+      <LandingBackground />
       <div className="relative pt-24 px-4 pb-16">
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}

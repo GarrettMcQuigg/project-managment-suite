@@ -1,10 +1,10 @@
 import React from 'react';
-import SubtleBackground from '@/packages/lib/components/subtle-background';
+import InternalBackground from '@/packages/lib/components/subtle-background';
 
 export default function TermsOfService() {
   return (
     <div className="min-h-screen">
-      <SubtleBackground />
+      <InternalBackground />
 
       <div className="relative pt-24 px-4 pb-16">
         <div className="max-w-3xl mx-auto">

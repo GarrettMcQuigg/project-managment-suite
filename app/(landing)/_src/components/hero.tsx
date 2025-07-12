@@ -81,8 +81,8 @@ export function HeroSection() {
               <Image
                 src="/images/landing/landing-page-stock-img.jpg"
                 alt="Dashboard Preview"
-                width={500}
-                height={500}
+                width={400}
+                height={400}
                 className="rounded-2xl shadow-2xl border border-border/50"
                 priority
               />

@@ -1,4 +1,4 @@
-import SubtleBackground from '@/packages/lib/components/subtle-background';
+import InternalBackground from '@/packages/lib/components/subtle-background';
 import { DASHBOARD_ROUTE } from '@/packages/lib/routes';
 import { getCurrentUser } from '@packages/lib/helpers/get-current-user';
 import { redirect } from 'next/navigation';
@@ -13,7 +13,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
 
   return (
     <>
-      <SubtleBackground />
+      <InternalBackground />
 
       <div className="w-full -mt-16">
         <AuthClientWrapper>{children}</AuthClientWrapper>

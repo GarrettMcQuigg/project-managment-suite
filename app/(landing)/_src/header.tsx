@@ -50,7 +50,7 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
             <Rocket className="h-4 w-4" />
           </Link>
 
-          {mounted && (
+          {/* {mounted && ( */}
             <button
               type="button"
               className="bg-transparent cursor-pointer sm:block hidden"
@@ -65,7 +65,7 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
                 )}
               </div>
             </button>
-          )}
+          {/* )} */}
         </div>
       </div>
     </header>

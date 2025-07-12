@@ -10,8 +10,8 @@ export default function Features() {
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}
           <div className="mb-16">
-            <h1 className="text-5xl font-bold">Features</h1>
-            <p className="text-xl text-muted-foreground mt-4">Discover how Solira CRM empowers your creative workflow with powerful, intuitive features.</p>
+            <h1 className="text-5xl font-bold text-primary">Features</h1>
+            <p className="text-xl text-muted-foreground mt-4">Discover how Solira enhances your creative workflow with intuitive and thoughtfully designed features.</p>
           </div>
 
           {/* Features Grid */}
@@ -22,12 +22,12 @@ export default function Features() {
                 <Briefcase className="h-6 w-6 flex-shrink-0" />
                 Project Management
               </h2>
-              <p className="text-md text-muted-foreground mb-2">Streamline your creative projects with:</p>
+              <p className="text-md text-muted-foreground mb-2">Streamline your projects with:</p>
               <div className="space-y-2 text-sm text-muted-foreground">
-                <p className="ml-2">• Visual project boards and timelines</p>
-                <p className="ml-2">• Customizable workflow templates</p>
-                <p className="ml-2">• Task dependencies and milestone tracking</p>
-                <p className="ml-2">• Resource allocation and scheduling</p>
+                <p className="ml-2">• Comprehensive project details and client association</p>
+                <p className="ml-2">• Integrated invoice management for each project</p>
+                <p className="ml-2">• Client-shareable project timelines</p>
+                <p className="ml-2">• Visual milestone tracking and progress updates</p>
               </div>
             </div>
 
@@ -52,12 +52,10 @@ export default function Features() {
                 <FileStack className="h-6 w-6 flex-shrink-0" />
                 File Management
               </h2>
-              <p className="text-md text-muted-foreground mb-2">Organize your creative assets with:</p>
+              <p className="text-md text-muted-foreground mb-2">Organize your project assets with:</p>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <p className="ml-2">• Cloud storage integration</p>
-                <p className="ml-2">• Asset categorization and tagging</p>
                 <p className="ml-2">• File sharing and collaboration tools</p>
-                <p className="ml-2">• Version history and recovery</p>
               </div>
             </div>
 
@@ -92,7 +90,7 @@ export default function Features() {
             </div>
 
             {/* Customization */}
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
                 <Palette className="h-6 w-6 flex-shrink-0" />
                 Customization
@@ -104,7 +102,7 @@ export default function Features() {
                 <p className="ml-2">• Custom fields and forms</p>
                 <p className="ml-2">• API access for integrations</p>
               </div>
-            </div>
+            </div> */}
 
             {/* Security */}
             <div className="space-y-3">
@@ -114,10 +112,10 @@ export default function Features() {
               </h2>
               <p className="text-md text-muted-foreground mb-2">Rest easy with:</p>
               <div className="space-y-2 text-sm text-muted-foreground">
-                <p className="ml-2">• Enterprise-grade security</p>
-                <p className="ml-2">• 24/7 priority support</p>
-                <p className="ml-2">• Regular backups and recovery</p>
-                <p className="ml-2">• Compliance certifications</p>
+                <p className="ml-2">• Encrypted data storage</p>
+                <p className="ml-2">• Dedicated support ticket system</p>
+                <p className="ml-2">• Regular backups and data recovery</p>
+                <p className="ml-2">• Transparent privacy practices</p>
               </div>
             </div>
           </div>

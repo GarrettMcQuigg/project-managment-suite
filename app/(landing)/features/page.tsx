@@ -10,7 +10,7 @@ export default function Features() {
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}
           <div className="mb-16">
-            <h1 className="text-5xl font-bold text-primary">Features</h1>
+            <h1 className="text-5xl font-bold">Features</h1>
             <p className="text-xl text-muted-foreground mt-4">Discover how Solira enhances your creative workflow with intuitive and thoughtfully designed features.</p>
           </div>
 
@@ -19,7 +19,7 @@ export default function Features() {
             {/* Project Management */}
             <div className="space-y-3">
               <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-                <Briefcase className="h-6 w-6 flex-shrink-0" />
+                <Briefcase className="h-6 w-6 flex-shrink-0 text-primary" />
                 Project Management
               </h2>
               <p className="text-md text-muted-foreground mb-2">Streamline your projects with:</p>
@@ -34,7 +34,7 @@ export default function Features() {
             {/* Client Communication */}
             <div className="space-y-3">
               <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-                <MessageSquare className="h-6 w-6 flex-shrink-0" />
+                <MessageSquare className="h-6 w-6 flex-shrink-0 text-primary" />
                 Client Communication
               </h2>
               <p className="text-md text-muted-foreground mb-2">Keep clients in the loop with:</p>
@@ -49,7 +49,7 @@ export default function Features() {
             {/* File Management */}
             <div className="space-y-3">
               <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-                <FileStack className="h-6 w-6 flex-shrink-0" />
+                <FileStack className="h-6 w-6 flex-shrink-0 text-primary" />
                 File Management
               </h2>
               <p className="text-md text-muted-foreground mb-2">Organize your project assets with:</p>
@@ -62,7 +62,7 @@ export default function Features() {
             {/* Analytics and Reporting */}
             <div className="space-y-3">
               <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-                <BarChart3 className="h-6 w-6 flex-shrink-0" />
+                <BarChart3 className="h-6 w-6 flex-shrink-0 text-primary" />
                 Analytics and Reporting
               </h2>
               <p className="text-md text-muted-foreground mb-2">Make data-driven decisions with:</p>
@@ -77,7 +77,7 @@ export default function Features() {
             {/* Team Collaboration */}
             <div className="space-y-3">
               <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-                <Users className="h-6 w-6 flex-shrink-0" />
+                <Users className="h-6 w-6 flex-shrink-0 text-primary" />
                 Team Collaboration
               </h2>
               <p className="text-md text-muted-foreground mb-2">Work better together with:</p>
@@ -107,7 +107,7 @@ export default function Features() {
             {/* Security */}
             <div className="space-y-3">
               <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-                <Shield className="h-6 w-6 flex-shrink-0" />
+                <Shield className="h-6 w-6 flex-shrink-0 text-primary" />
                 Security and Support
               </h2>
               <p className="text-md text-muted-foreground mb-2">Rest easy with:</p>

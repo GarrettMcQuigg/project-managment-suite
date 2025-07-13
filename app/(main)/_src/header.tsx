@@ -11,7 +11,7 @@ import { FileText, Users, Receipt, Settings, Calendar, Clock, Star, Briefcase, A
 import { DialogTitle } from '@/packages/lib/components/dialog';
 import { DASHBOARD_ROUTE } from '@/packages/lib/routes';
 
-export function Header({ currentUser, setSidebarOpen }: { currentUser: User; setSidebarOpen: (open: boolean) => void }) {
+export function Header({ currentUser, setSidebarOpen, sidebarOpen }: { currentUser: User; setSidebarOpen: (open: boolean) => void; sidebarOpen: boolean }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -33,15 +33,15 @@ export function Header({ currentUser, setSidebarOpen }: { currentUser: User; set
   }, []);
 
   return (
-    <header className="flex h-header lg:ml-64 items-center justify-between border-b border-white/[0.08] bg-gradient-to-r from-[#e8f7f7] to-white dark:from-[#021111] dark:to-black sm:px-8">
+    <header className="flex h-header items-center justify-between border-b border-border/40 dark:border-white/[0.08] bg-white dark:bg-[#0a1a1a] px-4 sm:px-6 transition-all duration-300">
       <div className="flex items-center gap-2">
         {/* Mobile hamburger menu */}
-        <Button variant="ghost" size="icon" className="lg:hidden mx-2 sm:mx-0" onClick={() => setSidebarOpen(true)}>
+        <Button variant="ghost" size="icon" className="mr-2" onClick={() => setSidebarOpen(!sidebarOpen)}>
           <Menu className="h-5 w-5" />
-          <span className="sr-only">Open sidebar</span>
+          <span className="sr-only">{sidebarOpen ? 'Close' : 'Open'} sidebar</span>
         </Button>
 
-        <Button variant="ghost" className="w-48 xs:w-72 justify-start text-muted-foreground hover:bg-foreground/10 hover:text-foreground" onClick={() => setOpen(true)}>
+        <Button variant="ghost" className="w-48 xs:w-64 justify-start text-muted-foreground hover:bg-foreground/5 hover:text-foreground" onClick={() => setOpen(true)}>
           <Search className="mr-2 h-4 w-4" />
           Search <span className="xs:block hidden">your universe...</span>
           <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1 rounded border border-foreground/20 bg-muted px-1.5 text-[10px] font-medium text-muted-foreground opacity-100 xs:ml-auto xs:flex hidden">

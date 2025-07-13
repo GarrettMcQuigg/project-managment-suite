@@ -15,9 +15,9 @@ export default function HUD({ children, currentUser }: { children: React.ReactNo
         <AppSidebar setSidebarOpen={setSidebarOpen} />
       </SidebarLayout>
 
-      <div className="flex flex-col flex-1">
-        <Header currentUser={currentUser} setSidebarOpen={setSidebarOpen} />
-        <main className="flex-1 min-h-0 lg:ml-64 transition-all duration-300">{children}</main>
+      <div className="flex flex-col flex-1 w-full">
+        <Header currentUser={currentUser} setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} />
+        <main className="flex-1 min-h-0">{children}</main>
       </div>
     </div>
   );

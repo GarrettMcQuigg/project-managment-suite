@@ -75,10 +75,10 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
       <li className="mb-1">
         <Link href={href} onClick={handleClick}>
           <div
-            className={`flex w-full items-center rounded-lg p-2 text-sm transition-all duration-200 ${
+            className={`flex w-full items-center p-2 text-sm transition-all duration-200 ${
               isActive
-                ? 'bg-primary/10 dark:bg-white/10 text-primary dark:text-white font-medium'
-                : 'text-muted-foreground hover:bg-primary/5 hover:text-primary dark:hover:bg-white/[0.06] dark:hover:text-white'
+                ? 'text-primary dark:text-white font-medium'
+                : 'text-muted-foreground hover:text-primary dark:hover:text-white'
             }`}
           >
             <Icon className="mr-2 h-4 w-4" />
@@ -91,20 +91,20 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
 
   return (
     <>
-      <div className="flex flex-col h-full w-full border-r border-border dark:border-white/[0.08] bg-gradient-to-b from-[#e8f7f7] to-white dark:from-[#021111] dark:to-black">
+      <div className="flex flex-col h-full w-full border-r border-border dark:border-white/[0.08] bg-white dark:bg-[#0a1a1a]">
         {/* Header */}
-        <div className="border-b border-border dark:border-white/[0.08] p-4 h-header shrink-0">
-          <Button onClick={() => setIsOpen(true)} disabled={loading} className="transition-all duration-300 group/button lg:w-full">
+        <div className="p-4 h-header shrink-0 flex items-center">
+          <div className="font-semibold text-lg mr-auto">Creatives CRM</div>
+          <Button onClick={() => setIsOpen(true)} disabled={loading} className="transition-all duration-300 group/button ml-auto">
             <Plus className="h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" />
-            New Project
           </Button>
         </div>
 
         {/* Main content area */}
-        <div className="flex flex-col px-2 flex-grow overflow-y-auto space-y-6">
+        <div className="flex flex-col px-4 flex-grow overflow-y-auto space-y-6 mt-4">
           {/* MAIN Section */}
           <div className="my-4">
-            <div className="px-2 mb-2 text-xs font-medium text-foreground/70 dark:text-white/90">MAIN</div>
+            <div className="mb-2 text-xs font-medium text-foreground/70 dark:text-white/90">MAIN</div>
             <ul className="space-y-1">
               {renderMenuItem(DASHBOARD_ROUTE, LayoutDashboard, 'Dashboard')}
               {renderMenuItem(PROJECTS_ROUTE, FolderKanban, 'Projects')}
@@ -115,7 +115,7 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
 
           {/* UTILITIES Section */}
           <div className="mb-6">
-            <div className="px-2 mb-2 text-xs font-medium text-foreground/70 dark:text-white/90">UTILITIES</div>
+            <div className="mb-2 text-xs font-medium text-foreground/70 dark:text-white/90">UTILITIES</div>
             <ul>
               {renderMenuItem(CALENDAR_ROUTE, Calendar, 'Calendar')}
               {renderMenuItem(PROJECT_BOARD_ROUTE, Trello, 'Project Board')}
@@ -124,7 +124,7 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
         </div>
 
         {/* Bottom Section - Fixed at bottom */}
-        <div className="mt-auto px-2 pb-4">
+        <div className="mt-auto px-4 py-4 border-t border-border/30 dark:border-white/[0.08]">
           <ul>
             {renderMenuItem(SUPPORT_ROUTE, Users, 'Support')}
             {renderMenuItem(SETTINGS_ROUTE, Settings, 'Settings')}

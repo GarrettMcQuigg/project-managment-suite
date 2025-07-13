@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from '@/packages/lib/components/input-otp';
 import { Button } from '@/packages/lib/components/button';
-import { AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
+import { ROOT_ROUTE } from '@/packages/lib/routes';
 import { useRouter } from 'next/navigation';
 
 export const VerificationFormSchema = z.object({
@@ -89,7 +89,7 @@ const VerificationForm: React.FC<VerificationFormProps> = ({ form, loading, onSu
             <Button className="w-full" type="submit" disabled={loading} loading={loading}>
               {loading ? 'Verifying...' : 'Verify'}
             </Button>
-            <Button variant="outline" onClick={() => router.push(AUTH_CHECKPOINT_ROUTE)} type="button" className="w-full mt-6" disabled={loading}>
+            <Button variant="outline" onClick={() => router.push(ROOT_ROUTE)} type="button" className="w-full mt-6" disabled={loading}>
               Back
             </Button>
           </form>

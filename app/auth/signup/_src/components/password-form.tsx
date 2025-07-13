@@ -15,7 +15,12 @@ export const usePasswordForm = () => {
 
 export const PasswordFormSchema = z
   .object({
-    password: z.string().min(1, 'Password is required'),
+    password: z.string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*[$&+,:;=?@#|'<>.^*()%!-])(?=.*[0-9]).{8,}$/,
+        'Password must include uppercase, lowercase, special character, and number'
+      ),
     confirmPassword: z.string().min(1, 'Confirm password is required')
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -46,7 +51,13 @@ export const PasswordForm: React.FC<PasswordFormProps> = ({ form, loading, onSub
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>Password</FormLabel>
-                    <Input {...field} autoFocus type="password" required disabled={loading} />
+                    <Input 
+                      {...field} 
+                      autoFocus 
+                      type="password" 
+                      required 
+                      disabled={loading} 
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

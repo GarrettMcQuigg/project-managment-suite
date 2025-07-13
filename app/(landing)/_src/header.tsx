@@ -1,6 +1,6 @@
 'use client';
 
-import { ABOUT_US_ROUTE, AUTH_CHECKPOINT_ROUTE, DASHBOARD_ROUTE, FEATURES_ROUTE, PRICING_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
+import { ABOUT_US_ROUTE, AUTH_SIGNIN_ROUTE, DASHBOARD_ROUTE, FEATURES_ROUTE, PRICING_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
 import { MoonIcon, Palette, Rocket, SunIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
@@ -30,7 +30,7 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
         <div className="flex items-center space-x-8">
           <Link
             className="flex items-center gap-2 bg-foreground text-background text-sm px-4 py-2 rounded-3xl hover:opacity-90 transition-opacity"
-            href={currentUser ? DASHBOARD_ROUTE : AUTH_CHECKPOINT_ROUTE}
+            href={currentUser ? DASHBOARD_ROUTE : AUTH_SIGNIN_ROUTE}
           >
             <span>
               {currentUser ? (

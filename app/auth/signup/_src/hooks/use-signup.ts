@@ -75,9 +75,6 @@ export const useSignup = () => {
     setLoading(true);
     try {
       const { email, phone } = personalInfoForm.getValues();
-      // if (phone !== '+16236328385' && phone !== '+19132231730') {
-      //   throw new Error('Registration is currently invite-only.');
-      // }
       await checkAvailability(email, phone);
 
       setCurrentStep(STEPS.PASSWORD);
@@ -95,6 +92,13 @@ export const useSignup = () => {
   const handlePasswordStep = async () => {
     setLoading(true);
     try {
+      // First validate the form using the schema
+      const result = await passwordForm.trigger();
+      if (!result) {
+        // If validation fails, don't proceed
+        return;
+      }
+      
       const { password, confirmPassword } = passwordForm.getValues();
       if (password !== confirmPassword) {
         throw new Error('Passwords must match.');

@@ -4,7 +4,7 @@ export const SignupRequestBodySchema = Joi.object({
   firstname: Joi.string().min(2).max(30).required(),
   lastname: Joi.string().min(2).max(30).required(),
   email: Joi.string().email().required(),
-  phone: Joi.string().min(10).max(15).required(),
+  phone: Joi.string().min(10).max(20).required(),
   password: Joi.string()
     .pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[$&+,:;=?@#|'<>.^*()%!-])(?=.*[0-9]).{8,}$/)
     .required()

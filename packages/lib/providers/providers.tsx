@@ -11,7 +11,7 @@ import { ThemeProvider } from 'next-themes';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
       <SpeedInsights />
       <LoadingProvider>
         <NextTopLoader color="#09AA9C" initialPosition={0.08} showSpinner={false} height={4} shadow="0 0 10px #09AA9C,0 0 5px #09AA9C" />

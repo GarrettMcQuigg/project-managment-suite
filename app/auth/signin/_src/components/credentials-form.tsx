@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/packages/lib/components/form';
 import { Input } from '@/packages/lib/components/input';
 import { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { AUTH_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
+import { AUTH_SIGNUP_ROUTE } from '@/packages/lib/routes';
 import { Button } from '@/packages/lib/components/button';
 import { useRouter } from 'next/navigation';
 
@@ -34,12 +34,6 @@ interface CredentialsFormProps {
 
 const CredentialsForm: React.FC<CredentialsFormProps> = ({ form, loading, onSubmit }) => {
   const router = useRouter();
-  useEffect(() => {
-    const storedEmail = localStorage.getItem('email');
-    if (storedEmail) {
-      form.setValue('email', storedEmail);
-    }
-  }, [form]);
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -98,8 +92,8 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({ form, loading, onSubm
             <Button className="w-full" type="submit" disabled={loading} loading={loading}>
               {loading ? 'Signing in...' : 'Sign in'}
             </Button>
-            <Button variant="outline" onClick={() => router.push(AUTH_CHECKPOINT_ROUTE)} type="button" className="w-full mt-6" disabled={loading}>
-              Back
+            <Button variant="outline" onClick={() => router.push(AUTH_SIGNUP_ROUTE)} type="button" className="w-full mt-6" disabled={loading}>
+              Create an account
             </Button>
           </form>
         </Form>

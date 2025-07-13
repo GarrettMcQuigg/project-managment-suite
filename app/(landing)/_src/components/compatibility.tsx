@@ -4,7 +4,7 @@ import { User } from "@prisma/client"
 import { ExternalLink } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { AUTH_CHECKPOINT_ROUTE, DASHBOARD_ROUTE } from "@/packages/lib/routes"
+import { AUTH_SIGNIN_ROUTE, DASHBOARD_ROUTE } from "@/packages/lib/routes"
 
 export function CompatibilitySection({ currentUser }: { currentUser: User | null }) {
   return (
@@ -22,9 +22,9 @@ export function CompatibilitySection({ currentUser }: { currentUser: User | null
               app. Manage your team, track your operations, and keep your
               clients happy.
             </p>
-            <Link href={currentUser ? DASHBOARD_ROUTE : AUTH_CHECKPOINT_ROUTE}>
+            <Link href={currentUser ? DASHBOARD_ROUTE : AUTH_SIGNIN_ROUTE}>
               <Button variant="outline" className="group mt-4">
-                <span>{currentUser ? 'Launch app' : 'Sign Up'}</span>
+                <span>{currentUser ? 'Launch app' : 'Sign In'}</span>
                 <ExternalLink className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>

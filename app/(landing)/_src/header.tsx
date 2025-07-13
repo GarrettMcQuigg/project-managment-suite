@@ -5,15 +5,9 @@ import { MoonIcon, Palette, Rocket, SunIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { User } from '@prisma/client';
-import { useEffect, useState } from 'react';
 
 export default function LandingHeader({ currentUser }: { currentUser: User | null }) {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <header className="sticky top-0 z-50">
@@ -50,8 +44,7 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
             <Rocket className="h-4 w-4" />
           </Link>
 
-          {/* {mounted && ( */}
-            <button
+          <button
               type="button"
               className="bg-transparent cursor-pointer sm:block hidden"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -65,7 +58,6 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
                 )}
               </div>
             </button>
-          {/* )} */}
         </div>
       </div>
     </header>

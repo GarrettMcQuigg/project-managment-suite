@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
-import { ArrowRight, Mail, CheckCircle } from "lucide-react"
+import { ArrowRight, CheckCircle } from "lucide-react"
 import { Input } from "@/packages/lib/components/input"
 import { Button } from "@/packages/lib/components/button"
 import { Badge } from "@/packages/lib/components/badge"

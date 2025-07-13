@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, BarChart3, Briefcase, MessageSquare, FileStack, Palette, Shield } from 'lucide-react';
+import { Users, BarChart3, Briefcase, MessageSquare, FileStack, Shield } from 'lucide-react';
 import { LandingBackground } from '@/packages/lib/components/custom-background';
 
 export default function Features() {

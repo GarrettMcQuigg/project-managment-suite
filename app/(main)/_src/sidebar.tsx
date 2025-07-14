@@ -94,8 +94,8 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
       <div className="flex flex-col h-full w-full border-r border-border dark:border-white/[0.08] bg-white dark:bg-[#0a1a1a]">
         {/* Header */}
         <div className="p-4 h-header shrink-0 flex items-center">
-          <div className="font-semibold text-lg mr-auto">Creatives CRM</div>
-          <Button onClick={() => setIsOpen(true)} disabled={loading} className="transition-all duration-300 group/button ml-auto">
+          <Button onClick={() => setIsOpen(true)} disabled={loading} className="transition-all duration-300 group/button min-w-44">
+            <div>New Project</div>
             <Plus className="h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" />
           </Button>
         </div>

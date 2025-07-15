@@ -22,27 +22,23 @@ export default async function DashboardPage() {
   console.log('User Analytics:', userAnalytics);
 
   return (
-    <div className="flex min-h-screen-minus-header bg-gradient-to-br from-foreground/5 via-background to-background">
-      <div className="flex min-h-screen-minus-header">
-        <main className="space-y-8 p-8">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          </div>
-          <div className="space-y-8">
-            <OverviewCards userAnalytics={userAnalytics} totalMessages={totalMessages} currentMonthRevenue={currentMonthRevenue} />
-            {/* <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7"> */}
-            <div className="grid gap-8">
-              <div className="md:col-span-2 lg:col-span-4">
-                <ProjectStats userAnalytics={userAnalytics} />
-              </div>
-              {/* <div className="md:col-span-2 lg:col-span-3">
-                <ClientEngagement />
-              </div> */}
-            </div>
-            <RevenueChart className="md:col-span-2 lg:col-span-7" />
-          </div>
-        </main>
+    <main className="space-y-8 py-8 max-w-7xl mx-auto min-h-screen-minus-header">
+      <div className="flex items-center justify-between space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
       </div>
-    </div>
+      <div className="space-y-8">
+        <OverviewCards userAnalytics={userAnalytics} totalMessages={totalMessages} currentMonthRevenue={currentMonthRevenue} />
+        {/* <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7"> */}
+        <div className="grid gap-8">
+          <div className="md:col-span-2 lg:col-span-4">
+            <ProjectStats userAnalytics={userAnalytics} />
+          </div>
+          {/* <div className="md:col-span-2 lg:col-span-3">
+            <ClientEngagement />
+          </div> */}
+        </div>
+        <RevenueChart className="md:col-span-2 lg:col-span-7" />
+      </div>
+    </main>
   );
 }

@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db } from '@/packages/lib/prisma/client';
 
 /**
  * Creates performance metrics for a user if they don't already exist

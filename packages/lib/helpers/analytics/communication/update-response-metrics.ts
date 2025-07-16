@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db } from "@/packages/lib/prisma/client";
 
 /**
  * Updates the response rate and average response time metrics

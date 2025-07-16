@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db } from '@/packages/lib/prisma/client';
 import { CreatePerformanceMetrics } from './create-performance-metrics';
 
 /**
@@ -134,10 +134,10 @@ async function UpdateOverallPerformanceMetrics(userId: string): Promise<void> {
 
     // Calculate average project profitability
     const totalProfit = projects.reduce((sum, project) => {
-      return sum + (project.revenue - project.actualCost);
+      return sum + (Number(project.revenue) - Number(project.actualCost));
     }, 0);
     
-    const totalRevenue = projects.reduce((sum, project) => sum + project.revenue, 0);
+    const totalRevenue = projects.reduce((sum, project) => sum + Number(project.revenue), 0);
     const avgProfitability = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
 
     // Calculate on-time delivery rate

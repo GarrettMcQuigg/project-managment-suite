@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db } from '@/packages/lib/prisma/client';
 
 /**
  * Creates a new time tracking entry for a project

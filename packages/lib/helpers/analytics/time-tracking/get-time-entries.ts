@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db } from '@/packages/lib/prisma/client';
 
 /**
  * Gets time tracking entries for a user, optionally filtered by project and date range

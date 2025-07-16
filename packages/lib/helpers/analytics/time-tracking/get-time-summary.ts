@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db } from '@/packages/lib/prisma/client';
 import { Prisma } from '@prisma/client';
 
 type TimeSummary = {

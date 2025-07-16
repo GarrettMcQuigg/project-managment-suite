@@ -36,28 +36,28 @@ export function LandingBackground() {
             {/* Base grid lines with increased spacing */}
             <path
               d="M0,120 L1200,120 M0,240 L1200,240 M0,360 L1200,360 M0,480 L1200,480 M0,600 L1200,600 M0,720 L1200,720 M0,840 L1200,840 M0,960 L1200,960 M0,1080 L1200,1080"
-              stroke={isDark ? "rgba(24, 178, 170, 0.12)" : "rgba(24, 178, 170, 0.04)"}
+              stroke={isDark ? "rgba(24, 178, 170, 0.15)" : "rgba(190, 202, 202, 0.25)"}
               strokeWidth="1"
               fill="none"
             />
             <path
               d="M120,0 L120,1200 M240,0 L240,1200 M360,0 L360,1200 M480,0 L480,1200 M600,0 L600,1200 M720,0 L720,1200 M840,0 L840,1200 M960,0 L960,1200 M1080,0 L1080,1200"
-              stroke={isDark ? "rgba(24, 178, 170, 0.12)" : "rgba(24, 178, 170, 0.04)"}
+              stroke={isDark ? "rgba(24, 178, 170, 0.15)" : "rgba(190, 202, 202, 0.25)"}
               strokeWidth="1"
               fill="none"
             />
             
             {/* Filled squares (10% of 100 squares in the 10x10 grid) */}
-            <rect x="0" y="0" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.03)" : "rgba(180, 180, 180, 0.06)"} />
-            <rect x="360" y="120" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.03)" : "rgba(180, 180, 180, 0.06)"} />
-            <rect x="840" y="120" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.03)" : "rgba(180, 180, 180, 0.06)"} />
-            <rect x="120" y="360" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.03)" : "rgba(180, 180, 180, 0.06)"} />
-            <rect x="600" y="360" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.03)" : "rgba(180, 180, 180, 0.06)"} />
-            <rect x="240" y="600" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.03)" : "rgba(180, 180, 180, 0.06)"} />
-            <rect x="960" y="600" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.03)" : "rgba(180, 180, 180, 0.06)"} />
-            <rect x="480" y="840" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.03)" : "rgba(180, 180, 180, 0.06)"} />
-            <rect x="720" y="960" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.03)" : "rgba(180, 180, 180, 0.06)"} />
-            <rect x="1080" y="1080" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.03)" : "rgba(180, 180, 180, 0.06)"} />
+            <rect x="0" y="0" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.06)" : "rgba(180, 180, 180, 0.12)"} />
+            <rect x="360" y="120" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.06)" : "rgba(180, 180, 180, 0.12)"} />
+            <rect x="840" y="120" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.06)" : "rgba(180, 180, 180, 0.12)"} />
+            <rect x="120" y="360" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.06)" : "rgba(180, 180, 180, 0.12)"} />
+            <rect x="600" y="360" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.06)" : "rgba(180, 180, 180, 0.12)"} />
+            <rect x="240" y="600" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.06)" : "rgba(180, 180, 180, 0.12)"} />
+            <rect x="960" y="600" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.06)" : "rgba(180, 180, 180, 0.12)"} />
+            <rect x="480" y="840" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.06)" : "rgba(180, 180, 180, 0.12)"} />
+            <rect x="720" y="960" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.06)" : "rgba(180, 180, 180, 0.12)"} />
+            <rect x="1080" y="1080" width="120" height="120" fill={isDark ? "rgba(24, 178, 170, 0.06)" : "rgba(180, 180, 180, 0.12)"} />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#gridWithFilledSquares)" />

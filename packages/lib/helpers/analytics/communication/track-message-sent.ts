@@ -13,7 +13,6 @@ export async function TrackMessageSent(
   messageContent?: string
 ): Promise<void> {
   try {
-    // Get user analytics
     const userAnalytics = await db.analytics.findUnique({
       where: {
         userId: userId
@@ -27,13 +26,21 @@ export async function TrackMessageSent(
       throw new Error('User analytics not found');
     }
 
-    // Create communication analytics if they don't exist
     if (!userAnalytics.communicationAnalytics) {
       await CreateCommunicationAnalytics(userId);
       return TrackMessageSent(userId, clientId, messageContent);
     }
 
-    // Update message count
+    const currentAnalytics = await db.communicationAnalytics.findUnique({
+      where: {
+        id: userAnalytics.communicationAnalytics.id
+      }
+    });
+
+    if (!currentAnalytics) {
+      throw new Error('Communication analytics not found');
+    }
+
     await db.communicationAnalytics.update({
       where: {
         id: userAnalytics.communicationAnalytics.id
@@ -45,7 +52,6 @@ export async function TrackMessageSent(
       }
     });
 
-    // Check if client interaction exists
     const clientInteraction = await db.clientInteraction.findUnique({
       where: {
         communicationAnalyticsId_clientId: {
@@ -58,7 +64,6 @@ export async function TrackMessageSent(
     const now = new Date();
 
     if (clientInteraction) {
-      // Update existing client interaction
       await db.clientInteraction.update({
         where: {
           id: clientInteraction.id
@@ -71,7 +76,6 @@ export async function TrackMessageSent(
         }
       });
     } else {
-      // Create new client interaction
       await db.clientInteraction.create({
         data: {
           communicationAnalyticsId: userAnalytics.communicationAnalytics.id,
@@ -82,8 +86,6 @@ export async function TrackMessageSent(
       });
     }
 
-    // TODO: Implement sentiment analysis if needed in the future
-    // This would require an external API or library
   } catch (error: unknown) {
     console.error('Failed to track message sent:', error);
   }

@@ -1,4 +1,5 @@
 import { db } from "@/packages/lib/prisma/client";
+import { CalculateAverageResponseTime } from "./calculate-avg-response-time";
 
 /**
  * Updates the response rate and average response time metrics
@@ -45,12 +46,28 @@ export async function UpdateResponseMetrics(
       }
     });
 
-    // Update communication analytics with the average response time
-    // This would be calculated based on the actual message timestamps
-    // For now, we'll use a placeholder implementation
+    // Calculate and update the average response time
+    await CalculateAverageResponseTime(userId);
     
-    // TODO: Implement actual average response time calculation
-    // when message model with timestamps is available
+    // Store the current avgResponseTime as previousAvgResponseTime when updating
+    // This will help track changes over time for the dashboard
+    const updatedAnalytics = await db.analytics.findUnique({
+      where: { userId },
+      include: { communicationAnalytics: true }
+    });
+    
+    // If we have a new average response time calculated, store the current one as previous
+    if (updatedAnalytics?.communicationAnalytics?.avgResponseTime) {
+      await db.communicationAnalytics.update({
+        where: { id: updatedAnalytics.communicationAnalytics.id },
+        data: {
+          // Store the previous response time for historical tracking
+          previousAvgResponseTime: updatedAnalytics.communicationAnalytics.avgResponseTime
+        }
+      }).catch(error => {
+        console.error('Failed to update previous response time:', error);
+      });
+    }
   } catch (error: unknown) {
     console.error('Failed to update response metrics:', error);
   }

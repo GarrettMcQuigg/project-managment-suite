@@ -18,7 +18,8 @@ export async function getProjectList(): Promise<ProjectWithMetadata[] | null> {
         user: true,
         attachments: true,
         messages: true,
-        portalViews: true
+        portalViews: true,
+        calendarEvent: true
       },
       orderBy: {
         createdAt: 'desc'

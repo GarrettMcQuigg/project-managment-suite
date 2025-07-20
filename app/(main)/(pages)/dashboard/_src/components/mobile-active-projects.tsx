@@ -10,9 +10,10 @@ import { PROJECT_DETAILS_ROUTE, routeWithParam } from "@/packages/lib/routes"
 
 interface MobileActiveProjectsProps {
     projects: ProjectWithMetadata[]
+    statusColors?: Record<ProjectStatus, string>
 }
 
-export function MobileActiveProjects({ projects }: MobileActiveProjectsProps) {
+export function MobileActiveProjects({ projects, statusColors }: MobileActiveProjectsProps) {
     const router = useRouter()
     
     const sortedProjects = [...projects]
@@ -50,8 +51,12 @@ export function MobileActiveProjects({ projects }: MobileActiveProjectsProps) {
                         <h4 className="font-medium dark:text-foreground text-gray-900">{project.name}</h4>
                         <p className="text-muted-foreground">{project.client?.name || "No client"}</p>
                       </div>
-                      <Badge variant={project.status === ProjectStatus.ACTIVE ? "default" : "secondary"} className="text-xs">
-                        {project.status}
+                      <Badge 
+                        className="text-xs capitalize"
+                        style={statusColors ? { backgroundColor: statusColors[project.status], color: '#ffffff' } : {}}
+                        variant={!statusColors && project.status === ProjectStatus.ACTIVE ? "default" : "secondary"}
+                      >
+                        {project.status.toLowerCase()}
                       </Badge>
                     </div>
                     <div className="space-y-1">

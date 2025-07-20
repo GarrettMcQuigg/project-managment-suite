@@ -5,6 +5,7 @@ import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context
 import { User } from '@prisma/client';
 import { put } from '@vercel/blob';
 import { UpdateMessageMetrics } from '@/packages/lib/helpers/analytics/messages/message-metrics';
+import { TrackMessageSent, TrackMessageReceived } from '@/packages/lib/helpers/analytics/communication';
 
 export async function POST(request: Request) {
   try {
@@ -66,6 +67,16 @@ export async function POST(request: Request) {
         return handleNotFound({ message: 'User not found' });
       }
 
+      // Get client associated with this project
+      const projectWithClient = await db.project.findUnique({
+        where: { id: projectId },
+        include: { client: true }
+      });
+
+      if (!projectWithClient?.client) {
+        return handleNotFound({ message: 'Client not found for this project' });
+      }
+
       newMessage = await db.projectMessage.create({
         data: {
           projectId: projectId,
@@ -74,9 +85,35 @@ export async function POST(request: Request) {
         }
       });
 
-      await UpdateMessageMetrics(currentUser.id);
+      // Track both message metrics and communication analytics
+      await Promise.all([
+        // Response rate calculation
+        UpdateMessageMetrics(currentUser.id),
+        
+        // Communication analytics tracking
+        TrackMessageSent(
+          currentUser.id, 
+          projectWithClient.client.id,
+          text || ''
+        )
+      ]);
+      
+      console.log(`Message sent by user ${currentUser.id} to client ${projectWithClient.client.id}`);
     } else if (context.type === 'portal') {
       const portalVisitor = currentUser as PortalVisitor;
+      
+      // Get the project owner and client info
+      const projectWithDetails = await db.project.findUnique({
+        where: { id: projectId },
+        include: { 
+          client: true,
+          user: true
+        }
+      });
+      
+      if (!projectWithDetails?.user || !projectWithDetails?.client) {
+        return handleNotFound({ message: 'Project details not found' });
+      }
 
       newMessage = await db.projectMessage.create({
         data: {
@@ -86,7 +123,21 @@ export async function POST(request: Request) {
         }
       });
 
-      await UpdateMessageMetrics(currentUser.id);
+      // Track both message metrics and communication analytics
+      await Promise.all([
+        // Response rate calculation
+        UpdateMessageMetrics(projectWithDetails.userId),
+        
+        // Communication analytics tracking - client sending message to user
+        TrackMessageReceived(
+          projectWithDetails.userId, 
+          projectWithDetails.client.id,
+          text || '',
+          undefined // responseToMessageId is not tracked in this UI
+        )
+      ]);
+      
+      console.log(`Message received by user ${projectWithDetails.userId} from client ${projectWithDetails.client.id}`);
     }
 
     if (!newMessage) {

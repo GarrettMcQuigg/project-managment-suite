@@ -97,7 +97,8 @@ const config: Config = {
         'float-slow': 'float-slow 8s ease-in-out infinite',
         'float-medium': 'float-medium 6s ease-in-out infinite',
         'float-fast': 'float-fast 4s ease-in-out infinite',
-        'shimmer': 'shimmer 2s infinite linear'
+        'shimmer': 'shimmer 2s infinite linear',
+        'spin-slow': 'spin 3s linear infinite'
       }
     }
   },

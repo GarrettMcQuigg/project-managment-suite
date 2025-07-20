@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { db } from '../prisma/client';
 import { TOKEN_COOKIE_KEY, USER_COOKIE_KEY } from '../constants/cookie-keys';
 import { UserWithMetadata } from '@/packages/lib/prisma/types';
+import { serializePrismaModel } from './serialization';
 
 export async function getCurrentUser(): Promise<UserWithMetadata | null> {
   const cookieStore = await cookies();
@@ -40,7 +41,7 @@ export async function getCurrentUser(): Promise<UserWithMetadata | null> {
       }
     });
 
-    return user;
+    return serializePrismaModel(user);
   } catch (error) {
     console.error('Error verifying user token:', error);
     return null;

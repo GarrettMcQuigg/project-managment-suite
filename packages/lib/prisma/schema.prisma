@@ -699,6 +699,7 @@ model CommunicationAnalytics {
   analytics             Analytics @relation(fields: [analyticsId], references: [id])
   analyticsId           String    @unique
   avgResponseTime       Int?      // Average response time in minutes
+  previousAvgResponseTime Int?    // Previous average response time for tracking changes
   messagesSent          Int       @default(0)
   messagesReceived      Int       @default(0)
   totalResponseTimeMinutes Int    @default(0) // Total minutes for calculating average

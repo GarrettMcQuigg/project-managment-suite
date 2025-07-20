@@ -1,12 +1,3 @@
-import { CalculateAverageResponseTime } from "@/packages/lib/helpers/analytics/communication"
-
-import {
-  ActiveProjectsCard,
-  ActiveProjectsWidget,
-  ProjectStatusChart,
-  ResponseTimeCard,
-  RevenueCard,
-} from "./_src/components"
 import {
   Calendar,
   AlertCircle,
@@ -14,31 +5,46 @@ import {
   Timer,
 } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/packages/lib/components/card"
-import { Progress } from "@radix-ui/react-progress"
 import { Badge } from "@/packages/lib/components/badge"
 import { getCurrentUser } from "@/packages/lib/helpers/get-current-user"
 import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import { getProjectList } from '@/packages/lib/helpers/get-project-list';
-import { API_ANALYTICS_COMMUNICATION_ROUTE } from "@/packages/lib/routes";
-import { TimeTracking } from "./_src/components/time-tracking"
-import { MobileActiveProjects } from "./_src/components/mobile-active-projects"
-import { fetcher } from "@/packages/lib/helpers/fetcher"
+import { ActiveProjectsWidget } from "./_src/components/active-projects-widget";
+import { ActiveProjectsCard } from "./_src/components/active-projects-card";
+import { RevenueCard } from "./_src/components/revenue-card";
+import { ProjectStatusChart } from "./_src/components/project-status-chart";
+import { ResponseTimeCard } from "./_src/components/response-time-card";
+import { TimeTracking } from "./_src/components/time-tracking";
+import { MobileActiveProjects } from "./_src/components/mobile-active-projects";
+import { CalculateAverageResponseTime } from '@/packages/lib/helpers/analytics/communication/calculate-avg-response-time';
+import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
+import { ProjectStatus } from "@prisma/client";
 
-const revenueData = [
-  { month: "Jan", revenue: 12500, expenses: 8200 },
-  { month: "Feb", revenue: 15200, expenses: 9100 },
-  { month: "Mar", revenue: 18900, expenses: 11200 },
-  { month: "Apr", revenue: 16800, expenses: 10500 },
-  { month: "May", revenue: 22100, expenses: 12800 },
-  { month: "Jun", revenue: 25400, expenses: 14200 },
-]
+// Status color mapping for consistent colors across components
+export const statusColors: Record<ProjectStatus, string> = {
+  'ACTIVE': '#3b82f6', // Blue
+  'COMPLETED': '#10b981', // Green
+  'PAUSED': '#f59e0b', // Amber
+  'PREPARATION': '#8b5cf6', // Purple
+  'DRAFT': '#fffb00', // Yellow
+  'ARCHIVED': '#6b7280', // Gray
+  'DELETED': '#ef4444', // Red
+} as Record<ProjectStatus, string>;
 
-const projectStatusData = [
-  { status: "Active", count: 12, color: "#10b981" },
-  { status: "Completed", count: 28, color: "#3b82f6" },
-  { status: "On Hold", count: 3, color: "#f59e0b" },
-  { status: "Planning", count: 5, color: "#8b5cf6" },
-]
+function getProjectStatusData(projects: ProjectWithMetadata[]) {
+  const statusCounts: Record<string, number> = {};
+  
+  projects.forEach(project => {
+    const status = project.status || 'Unknown';
+    statusCounts[status] = (statusCounts[status] || 0) + 1;
+  });
+  
+  return Object.entries(statusCounts).map(([status, count]) => ({
+    status,
+    count,
+    color: statusColors[status as ProjectStatus] || '#6b7280'
+  }));
+}
 
 const timeTrackingData = [
   { day: "Mon", billable: 6.5, nonBillable: 1.5 },
@@ -46,41 +52,6 @@ const timeTrackingData = [
   { day: "Wed", billable: 5.8, nonBillable: 2.2 },
   { day: "Thu", billable: 8.1, nonBillable: 0.9 },
   { day: "Fri", billable: 6.9, nonBillable: 1.1 },
-]
-
-const recentProjects = [
-  {
-    name: "Brand Identity for TechCorp",
-    client: "TechCorp Inc.",
-    progress: 85,
-    status: "Active",
-    dueDate: "Jan 15",
-    priority: "high",
-  },
-  {
-    name: "Website Redesign",
-    client: "StartupXYZ",
-    progress: 100,
-    status: "Completed",
-    dueDate: "Jan 10",
-    priority: "medium",
-  },
-  {
-    name: "Logo Design Package",
-    client: "Local Business",
-    progress: 60,
-    status: "Active",
-    dueDate: "Jan 20",
-    priority: "low",
-  },
-  {
-    name: "Marketing Campaign",
-    client: "E-commerce Co.",
-    progress: 35,
-    status: "Active",
-    dueDate: "Jan 25",
-    priority: "high",
-  },
 ]
 
 const upcomingDeadlines = [
@@ -95,37 +66,17 @@ const recentInvoices = [
   { number: "INV-2024-003", client: "Local Business", amount: 1800, status: "Sent", date: "Jan 12" },
 ]
 
-async function getResponseTimeMetrics() {
+async function getResponseTimeMetrics(userId: string) {
   try {
-    const response: any = await fetcher({
-      url: API_ANALYTICS_COMMUNICATION_ROUTE,
-    });
-    
-    if (!response) {
-      // TODO: ThreatLevel
-      return { avgResponseTime: 0 };
+    if (userId) {
+      try {
+        await CalculateAverageResponseTime(userId);
+      } catch (updateError) {
+        console.error('Error updating response metrics:', updateError);
+      }
     }
-    
-    return {
-      avgResponseTime: response.avgResponseTime || 0,
-    };
   } catch (error) {
     console.error('Error fetching response time metrics:', error);
-    return { avgResponseTime: 0 };
-  }
-}
-
-function calculateResponseTimeChange(avgResponseTime: number): number {
-  if (!avgResponseTime) {
-    return 5;
-  }
-  
-  if (avgResponseTime < 10) {
-    return Math.floor(5 + Math.random() * 10);
-  } else if (avgResponseTime < 30) {
-    return Math.floor(Math.random() * 5);
-  } else {
-    return Math.floor(Math.random() * 5) * -1;
   }
 }
 
@@ -137,48 +88,36 @@ export default async function Dashboard() {
     return handleUnauthorized();
   }
   
-  const { avgResponseTime } = await getResponseTimeMetrics();
-  const responseTimeChange = calculateResponseTimeChange(avgResponseTime);
+  await getResponseTimeMetrics(currentUser.id);
   const monthlyRevenue = 0;
   const revenueChange = 0;
   
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-        {/* Welcome Section */}
         <div>
           <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
-          {/* <p className="text-gray-600 mt-1">Here's your business overview for today</p> */}
         </div>
 
-        {/* Main Grid Layout */}
         <div className="sm:flex sm:space-y-0 space-y-6 gap-6">
-          <span className="md:block hidden w-full"><ActiveProjectsWidget projects={projects || []} /></span>
+          <span className="md:block hidden w-full"><ActiveProjectsWidget projects={projects || []} statusColors={statusColors} /></span>
           <span className="md:hidden block min-w-[45%]">
-            <MobileActiveProjects projects={projects || []} />
+            <MobileActiveProjects projects={projects || []} statusColors={statusColors} />
           </span>
 
-          {/* Key Metrics - Vertical Stack */}
           <div className="flex flex-col gap-6 min-w-[45%] md:min-w-max">
             <RevenueCard monthlyRevenue={monthlyRevenue} revenueChange={revenueChange} />
             <ActiveProjectsCard projects={projects || []} />
-            <ResponseTimeCard avgResponseTime={avgResponseTime} responseTimeChange={responseTimeChange} />
+            <ResponseTimeCard />
           </div>
         </div>
 
-        {/* Second Row */}
         <div className="grid md:gap-6 lg:grid-cols-12">
-          {/* Project Status Chart */}
-          <ProjectStatusChart projectStatusData={projectStatusData} />
-
-          {/* Time Tracking */}
+          <ProjectStatusChart projectStatusData={getProjectStatusData(projects || [])} />
           <TimeTracking timeTrackingData={timeTrackingData} />
         </div>
 
-        {/* Third Row */}
         <div className="grid gap-6 lg:grid-cols-3">
-
-          {/* Upcoming Deadlines */}
           <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">Upcoming Deadlines</CardTitle>
@@ -207,7 +146,6 @@ export default async function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Recent Invoices */}
           <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">Recent Invoices</CardTitle>

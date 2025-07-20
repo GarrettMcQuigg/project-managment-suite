@@ -63,7 +63,7 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-border/40 dark:border-white/[0.08] bg-white/80 dark:bg-[#0a1a1a]/80 backdrop-blur-xl px-2 sm:px-6 transition-all duration-300">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-6">
         {/* Mobile hamburger menu */}
         <Button
           variant="ghost"

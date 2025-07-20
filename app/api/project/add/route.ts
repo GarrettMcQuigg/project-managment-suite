@@ -234,7 +234,6 @@ export async function POST(request: Request) {
           if (invoice.notifyClient && checkoutUrl && result.client?.email) {
             try {
               // TODO: Implement email notification when ProtonMail is added
-              console.log('sending email notification');
               // const emailService = new EmailService();
               // await emailService.sendInvoicePaymentEmail({
               //   to: result.client.email,

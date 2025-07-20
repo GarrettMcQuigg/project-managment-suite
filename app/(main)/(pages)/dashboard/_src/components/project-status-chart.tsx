@@ -21,7 +21,7 @@ export function ProjectStatusChart({ projectStatusData }: ProjectStatusChartProp
         <CardDescription>Current project status breakdown</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[200px]">
+        <div className="h-[120px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie data={projectStatusData} dataKey="count" nameKey="status" cx="50%" cy="50%" outerRadius={60}>
@@ -37,7 +37,7 @@ export function ProjectStatusChart({ projectStatusData }: ProjectStatusChartProp
           {projectStatusData.map((item) => (
             <div key={item.status} className="flex items-center">
               <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }} />
-              <span className="text-sm text-gray-600">{item.status}: {item.count}</span>
+              <span className="text-sm text-gray-600 capitalize">{item.status.toLowerCase()}: {item.count}</span>
             </div>
           ))}
         </div>

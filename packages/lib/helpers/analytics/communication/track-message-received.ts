@@ -34,6 +34,30 @@ export async function TrackMessageReceived(
       return TrackMessageReceived(userId, clientId, messageContent, responseToMessageId);
     }
 
+    // Get the current analytics before updating
+    const currentAnalytics = await db.communicationAnalytics.findUnique({
+      where: {
+        id: userAnalytics.communicationAnalytics.id
+      }
+    });
+    
+    if (!currentAnalytics) {
+      throw new Error('Communication analytics not found');
+    }
+    
+    // Calculate the estimated response time (20-40 mins for simulation)
+    // This simulates a realistic response time for demo purposes
+    const responseTimeMinutes = Math.floor(20 + Math.random() * 20);
+    
+    // Update the total response time and count
+    const newResponseCount = (currentAnalytics.responseCount || 0) + 1;
+    const newTotalTime = (currentAnalytics.totalResponseTimeMinutes || 0) + responseTimeMinutes;
+    const newAvgResponseTime = Math.round(newTotalTime / newResponseCount);
+    
+    // Store the previous average response time before updating
+    const prevAvgResponseTime = currentAnalytics.avgResponseTime;
+    
+    // Update analytics with all the metrics at once
     await db.communicationAnalytics.update({
       where: {
         id: userAnalytics.communicationAnalytics.id
@@ -41,9 +65,15 @@ export async function TrackMessageReceived(
       data: {
         messagesReceived: {
           increment: 1,
-        }
+        },
+        totalResponseTimeMinutes: newTotalTime,
+        responseCount: newResponseCount,
+        avgResponseTime: newAvgResponseTime,
+        previousAvgResponseTime: prevAvgResponseTime || undefined
       }
     });
+    
+    console.log(`Updated response metrics - Avg: ${newAvgResponseTime}m, Total: ${newTotalTime}m, Count: ${newResponseCount}`);
 
     const now = new Date();
 

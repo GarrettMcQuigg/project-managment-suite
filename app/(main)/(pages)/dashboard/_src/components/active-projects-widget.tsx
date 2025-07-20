@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/lib/components/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/packages/lib/components/card"
 import { Badge } from "@/packages/lib/components/badge"
 import {
   Archive,
@@ -10,7 +10,6 @@ import {
   Pause,
   Pencil,
   Trash,
-  User,
   Calendar,
   MessageSquare,
 } from "lucide-react"
@@ -25,24 +24,26 @@ import { PROJECT_DETAILS_ROUTE, routeWithParam } from "@/packages/lib/routes"
 
 interface ActiveProjectsWidgetProps {
   projects: ProjectWithMetadata[]
+  statusColors?: Record<ProjectStatus, string>
 }
 
 const getProjectStatusBadgeClasses = (status: ProjectStatus) => {
   switch (status) {
     case ProjectStatus.COMPLETED:
-      return "bg-green-100 text-green-800 hover:bg-green-200"
+      return "bg-green-100 text-white hover:bg-green-200"
     case ProjectStatus.ACTIVE:
-      return "bg-blue-100 text-blue-800 hover:bg-blue-200"
+      return "bg-blue-100 text-white hover:bg-blue-200"
     case ProjectStatus.PAUSED:
-      return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+      return "bg-yellow-100 text-black hover:bg-yellow-200"
     case ProjectStatus.DRAFT:
+      return "bg-gray-100 text-black hover:bg-gray-200"
     case ProjectStatus.PREPARATION:
-      return "bg-gray-100 text-gray-800 hover:bg-gray-200"
+      return "bg-gray-100 text-white hover:bg-gray-200"
     case ProjectStatus.ARCHIVED:
     case ProjectStatus.DELETED:
-      return "bg-red-100 text-red-800 hover:bg-red-200"
+      return "bg-red-100 text-white hover:bg-red-200"
     default:
-      return "bg-gray-100 text-gray-800 hover:bg-gray-200"
+      return "bg-gray-100 text-white hover:bg-gray-200"
   }
 }
 
@@ -67,7 +68,7 @@ const getProjectStatusIcon = (status: ProjectStatus) => {
   }
 }
 
-export function ActiveProjectsWidget({ projects }: ActiveProjectsWidgetProps) {
+export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsWidgetProps) {
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 3
@@ -156,7 +157,10 @@ export function ActiveProjectsWidget({ projects }: ActiveProjectsWidgetProps) {
                         <p className="text-xs text-muted-foreground">{project.client.name}</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge className={`capitalize ${getProjectStatusBadgeClasses(project.status)} bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-200`}>
+                        <Badge 
+                          className={`capitalize ${getProjectStatusBadgeClasses(project.status)} transition-all duration-200`}
+                          style={statusColors ? { backgroundColor: statusColors[project.status] } : {}}
+                        >
                           {getProjectStatusIcon(project.status)}
                           {project.status.toLowerCase()}
                         </Badge>

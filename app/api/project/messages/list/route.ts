@@ -3,6 +3,7 @@ import { PortalVisitor } from '@/packages/lib/helpers/get-portal-user';
 import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
 import { User } from '@prisma/client';
+import { CalculateAverageResponseTime } from '@/packages/lib/helpers/analytics/communication';
 
 export async function GET(request: Request) {
   try {
@@ -48,6 +49,18 @@ export async function GET(request: Request) {
         createdAt: 'asc'
       }
     });
+    
+    // If user is viewing messages, update response time analytics
+    if (context.type === 'user') {
+      try {
+        // Update response time calculations when a user views messages
+        // This helps keep the average response time metric current
+        await CalculateAverageResponseTime(currentUser.id);
+      } catch (error) {
+        // Don't fail the request if analytics update fails
+        console.error('Error updating response analytics:', error);
+      }
+    }
 
     return handleSuccess({ content: messages });
   } catch (error) {

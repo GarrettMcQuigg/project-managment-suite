@@ -52,11 +52,14 @@ export function MobileActiveProjects({ projects, statusColors }: MobileActivePro
                         <p className="text-muted-foreground">{project.client?.name || "No client"}</p>
                       </div>
                       <Badge 
-                        className="text-xs capitalize"
-                        style={statusColors ? { backgroundColor: statusColors[project.status], color: '#ffffff' } : {}}
+                        className="text-xs capitalize flex items-center space-x-1 transition-all duration-300"
+                        style={statusColors ? { backgroundColor: statusColors[project.status], color: project.status === ProjectStatus.DRAFT ? '#000000' : '#ffffff' } : {}}
                         variant={!statusColors && project.status === ProjectStatus.ACTIVE ? "default" : "secondary"}
                       >
-                        {project.status.toLowerCase()}
+                        <span className="relative w-2 h-2 rounded-full overflow-hidden">
+                          <div className="absolute inset-0 bg-white/20 w-full h-full transform -translate-x-full animate-shimmer" />
+                        </span>
+                        <span>{project.status.toLowerCase()}</span>
                       </Badge>
                     </div>
                     <div className="space-y-1">

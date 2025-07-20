@@ -147,7 +147,7 @@ export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsW
               return (
                 <Card
                   key={project.id}
-                  className="relative overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md cursor-pointer p-4"
+                  className="relative overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all hover:shadow-lg dark:hover:bg-foreground/5 cursor-pointer p-4"
                   onClick={() => handleViewDetails(project)}
                 >
                   <CardHeader className="p-0">

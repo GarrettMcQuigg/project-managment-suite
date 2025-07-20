@@ -19,6 +19,9 @@ import { MobileActiveProjects } from "./_src/components/mobile-active-projects";
 import { CalculateAverageResponseTime } from '@/packages/lib/helpers/analytics/communication/calculate-avg-response-time';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { ProjectStatus } from "@prisma/client";
+import { UpcomingDeadlines } from "./_src/components";
+import { MissedDeadlines } from "./_src/components/missed-deadlines";
+import { RecentInvoices } from "./_src/components/recent-invoices";
 
 // Status color mapping for consistent colors across components
 export const statusColors: Record<ProjectStatus, string> = {
@@ -94,7 +97,7 @@ export default async function Dashboard() {
   
   return (
     <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
         </div>
@@ -112,86 +115,22 @@ export default async function Dashboard() {
           </div>
         </div>
 
-        <div className="grid md:gap-6 lg:grid-cols-12">
+        <div className="sm:grid md:space-y-0 space-y-6 md:space-x-3 gap-6 md:gap-3 lg:grid-cols-12">
           <ProjectStatusChart projectStatusData={getProjectStatusData(projects || [])} />
           <TimeTracking timeTrackingData={timeTrackingData} />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Upcoming Deadlines</CardTitle>
-              <CardDescription>Projects requiring attention</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {upcomingDeadlines.map((deadline, index) => (
-                <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
-                  <div
-                    className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                      deadline.daysLeft <= 5 ? "bg-red-100" : "bg-yellow-100"
-                    }`}
-                  >
-                    <Calendar className={`h-4 w-4 ${deadline.daysLeft <= 5 ? "text-red-600" : "text-yellow-600"}`} />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900 text-sm">{deadline.project}</p>
-                    <p className="text-xs text-gray-500">{deadline.client}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-medium text-gray-900">{deadline.daysLeft} days</p>
-                    <p className="text-xs text-gray-500">{deadline.dueDate}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Recent Invoices</CardTitle>
-              <CardDescription>Latest billing activity</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentInvoices.map((invoice, index) => (
-                <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                        invoice.status === "Paid"
-                          ? "bg-green-100"
-                          : invoice.status === "Overdue"
-                            ? "bg-red-100"
-                            : "bg-yellow-100"
-                      }`}
-                    >
-                      {invoice.status === "Paid" ? (
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                      ) : invoice.status === "Overdue" ? (
-                        <AlertCircle className="h-4 w-4 text-red-600" />
-                      ) : (
-                        <Timer className="h-4 w-4 text-yellow-600" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900 text-sm">{invoice.number}</p>
-                      <p className="text-xs text-gray-500">{invoice.client}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-gray-900 text-sm">${invoice.amount.toLocaleString()}</p>
-                    <Badge
-                      variant={
-                        invoice.status === "Paid" ? "default" : invoice.status === "Overdue" ? "destructive" : "outline"
-                      }
-                      className="text-xs"
-                    >
-                      {invoice.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+        <div className="sm:flex md:space-y-0 space-y-6 md:space-x-3 gap-6 md:gap-3 w-full">
+          <UpcomingDeadlines projects={projects || []} />
+          <MissedDeadlines projects={projects || []} />
+          <RecentInvoices invoices={
+            projects?.flatMap(project => 
+              project.invoices.map(invoice => ({
+                ...invoice,
+                clientName: project.client.name
+              }))
+            ) || []
+          } />  
         </div>
       </div>
     </div>

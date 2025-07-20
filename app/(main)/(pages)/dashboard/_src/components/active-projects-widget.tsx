@@ -105,7 +105,7 @@ export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsW
   }
 
   return (
-    <Card className="lg:col-span-8 border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group">
+    <Card className="lg:col-span-8 border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group">
       <div className="flex justify-between px-6 pt-3 pb-3">
         <div>
           <CardTitle className="text-xl font-semibold">Active Projects</CardTitle>

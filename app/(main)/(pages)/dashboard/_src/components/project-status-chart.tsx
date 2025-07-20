@@ -26,7 +26,7 @@ export function ProjectStatusChart({ projectStatusData }: ProjectStatusChartProp
   }
 
   return (
-    <Card className="lg:col-span-4 border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group w-full">
+    <Card className="lg:col-span-4 border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group w-full">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Project Distribution</CardTitle>
         <CardDescription>Current project status breakdown</CardDescription>

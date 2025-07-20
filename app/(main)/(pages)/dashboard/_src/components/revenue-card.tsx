@@ -10,7 +10,7 @@ interface RevenueCardProps {
 
 export function RevenueCard({ monthlyRevenue, revenueChange }: RevenueCardProps) {
   return (
-    <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group">
+    <Card className="border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>

@@ -13,7 +13,7 @@ interface TimeTrackingProps {
 
 export function TimeTracking({ timeTrackingData }: TimeTrackingProps) {
     return (
-      <Card className="lg:col-span-8 border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group">
+      <Card className="lg:col-span-8 border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Weekly Time Tracking</CardTitle>
           <CardDescription>Billable vs non-billable hours breakdown</CardDescription>

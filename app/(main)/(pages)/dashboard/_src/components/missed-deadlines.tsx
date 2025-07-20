@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/lib/components/card";
 import { ProjectWithMetadata } from "@/packages/lib/prisma/types";
-import { Calendar } from "lucide-react";
+import { Calendar, Skull } from "lucide-react";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { routeWithPath } from "@/packages/lib/routes";
@@ -35,7 +35,7 @@ export function MissedDeadlines({ projects }: MissedDeadlinesProps) {
   }, [projects]);
 
   return (
-    <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group w-full">
+    <Card className="border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group w-full">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Missed Deadlines</CardTitle>
         <CardDescription>Projects that have passed their deadline</CardDescription>
@@ -44,11 +44,9 @@ export function MissedDeadlines({ projects }: MissedDeadlinesProps) {
         {projectsWithDaysLeft.map((project, index) => (
           <div key={index} className="flex items-center justify-between p-2 rounded-lg border hover:border-border/80 hover:shadow-md hover:bg-foreground/5 transition-all duration-200 group cursor-pointer" onClick={() => router.push(routeWithPath(PROJECTS_ROUTE, project.id))}>
             <div
-              className={`hidden sm:flex h-8 w-8 rounded-full flex items-center justify-center sm:mr-2 ${
-                project.daysRemaining >= 5 ? "bg-red-100" : "bg-yellow-100"
-              }`}
+              className="hidden sm:flex h-8 w-8 rounded-full flex items-center justify-center sm:mr-2 bg-gray-700 dark:bg-gray-300"
             >
-              <Calendar className={`h-4 w-4 ${project.daysRemaining >= 5 ? "text-red-600" : "text-yellow-600"}`} />
+              <Skull className="h-5 w-5 text-white dark:text-black" />
             </div>
             <div className="flex-1">
               <p className="font-medium text-foreground sm:text-sm text-xs">{project.name}</p>

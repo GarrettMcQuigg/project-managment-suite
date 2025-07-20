@@ -36,7 +36,7 @@ export function ResponseTimeCard() {
   const isFasterResponse = responseTimeChange > 0;
   
   return (
-    <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group">
+    <Card className="border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">

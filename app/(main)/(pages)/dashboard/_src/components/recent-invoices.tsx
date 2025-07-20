@@ -37,7 +37,7 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
     }, [invoices]);
 
   return (
-    <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group w-full">
+    <Card className="border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group w-full">
         <CardHeader>
             <CardTitle className="text-lg font-semibold">Recent Invoices</CardTitle>
             <CardDescription>Latest billing activity</CardDescription>

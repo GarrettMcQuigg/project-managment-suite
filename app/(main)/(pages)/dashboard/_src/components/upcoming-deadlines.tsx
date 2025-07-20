@@ -4,12 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/pac
 import { ProjectWithMetadata } from "@/packages/lib/prisma/types";
 import { Calendar } from "lucide-react";
 import { useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { PROJECT_DETAILS_ROUTE, routeWithPath } from "@/packages/lib/routes";
 
 interface UpcomingDeadlinesProps {
   projects: ProjectWithMetadata[];
 }
 
 export function UpcomingDeadlines({ projects }: UpcomingDeadlinesProps) {
+  const router = useRouter()
   const projectsWithDaysLeft = useMemo(() => {
     return projects
       .map(project => {
@@ -31,16 +34,16 @@ export function UpcomingDeadlines({ projects }: UpcomingDeadlinesProps) {
   }, [projects]);
 
   return (
-    <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group w-full">
+    <Card className="border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group w-full">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Upcoming Deadlines</CardTitle>
         <CardDescription>Projects requiring attention</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {projectsWithDaysLeft.map((project, index) => (
-          <div key={index} className="flex items-center justify-between p-2 rounded-lg border hover:border-border/80 hover:shadow-md hover:bg-foreground/5 transition-all duration-200 group cursor-pointer">
+          <div key={index} className="flex items-center justify-between p-2 rounded-lg border hover:border-border/80 hover:shadow-md hover:bg-foreground/5 transition-all duration-200 group cursor-pointer" onClick={() => router.push(routeWithPath(PROJECT_DETAILS_ROUTE, project.id))}>
             <div
-              className={`hidden sm:flex h-8 w-8 rounded-full flex items-center justify-center ${
+              className={`hidden sm:flex h-8 w-8 rounded-full flex items-center justify-center sm:mr-2 ${
                 project.daysRemaining <= 5 ? "bg-red-100" : "bg-yellow-100"
               }`}
             >

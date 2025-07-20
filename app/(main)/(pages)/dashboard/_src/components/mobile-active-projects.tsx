@@ -29,7 +29,7 @@ export function MobileActiveProjects({ projects, statusColors }: MobileActivePro
     }
     
     return (
-        <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group md:hidden">
+        <Card className="border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group md:hidden">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">Active Projects</CardTitle>
               <CardDescription>Current project progress</CardDescription>

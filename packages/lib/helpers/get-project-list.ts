@@ -1,7 +1,8 @@
 import { db } from '../prisma/client';
+import { ProjectWithMetadata } from '../prisma/types';
 import { getCurrentUser } from './get-current-user';
 
-export async function getProjectList() {
+export async function getProjectList(): Promise<ProjectWithMetadata[] | null> {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
@@ -13,7 +14,11 @@ export async function getProjectList() {
       include: {
         client: true,
         phases: true,
-        invoices: true
+        invoices: true,
+        user: true,
+        attachments: true,
+        messages: true,
+        portalViews: true
       },
       orderBy: {
         createdAt: 'desc'
@@ -25,7 +30,7 @@ export async function getProjectList() {
         }
       }
     });
-    return projects;
+    return projects as ProjectWithMetadata[];
   } catch (error: unknown) {
     console.error('Failed to fetch projects:', error);
     return null;

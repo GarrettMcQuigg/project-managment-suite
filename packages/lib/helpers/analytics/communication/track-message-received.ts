@@ -15,7 +15,6 @@ export async function TrackMessageReceived(
   responseToMessageId?: string
 ): Promise<void> {
   try {
-    // Get user analytics
     const userAnalytics = await db.analytics.findUnique({
       where: {
         userId: userId
@@ -35,21 +34,19 @@ export async function TrackMessageReceived(
       return TrackMessageReceived(userId, clientId, messageContent, responseToMessageId);
     }
 
-    // Update message count
     await db.communicationAnalytics.update({
       where: {
         id: userAnalytics.communicationAnalytics.id
       },
       data: {
         messagesReceived: {
-          increment: 1
+          increment: 1,
         }
       }
     });
 
     const now = new Date();
 
-    // Check if client interaction exists
     const clientInteraction = await db.clientInteraction.findUnique({
       where: {
         communicationAnalyticsId_clientId: {
@@ -60,7 +57,6 @@ export async function TrackMessageReceived(
     });
 
     if (clientInteraction) {
-      // Update existing client interaction
       await db.clientInteraction.update({
         where: {
           id: clientInteraction.id
@@ -73,7 +69,6 @@ export async function TrackMessageReceived(
         }
       });
     } else {
-      // Create new client interaction
       await db.clientInteraction.create({
         data: {
           communicationAnalyticsId: userAnalytics.communicationAnalytics.id,
@@ -86,12 +81,71 @@ export async function TrackMessageReceived(
 
     // If this is a response to a previous message, calculate response time
     if (responseToMessageId) {
-      // This would require a message model with timestamps
-      // For now, we'll implement a placeholder
-      // In a real implementation, you would look up the original message timestamp
-      // and calculate the difference
-      
-      // TODO: Implement response time tracking when message model is available
+      try {
+        const originalMessage = await db.projectMessage.findUnique({
+          where: {
+            id: responseToMessageId
+          }
+        });
+        
+        if (originalMessage) {
+          // Calculate response time in minutes
+          const responseTimeMinutes = Math.round(
+            (now.getTime() - originalMessage.createdAt.getTime()) / (1000 * 60)
+          );
+          
+          const updatedAnalytics = await db.communicationAnalytics.findUnique({
+            where: {
+              id: userAnalytics.communicationAnalytics.id
+            }
+          });
+
+          if (!updatedAnalytics) {
+            return;
+          }
+          
+          if (updatedAnalytics.responseCount > 0) {
+            const newResponseCount = updatedAnalytics.responseCount + 1;
+            const newTotalTime = updatedAnalytics.totalResponseTimeMinutes + responseTimeMinutes;
+            
+            await db.communicationAnalytics.update({
+              where: {
+                id: userAnalytics.communicationAnalytics.id
+              },
+              data: {
+                totalResponseTimeMinutes: newTotalTime,
+                responseCount: newResponseCount,
+                avgResponseTime: Math.round(newTotalTime / newResponseCount)
+              }
+            });
+          }
+          
+          const clientInteraction = await db.clientInteraction.findUnique({
+            where: {
+              communicationAnalyticsId_clientId: {
+                communicationAnalyticsId: userAnalytics.communicationAnalytics.id,
+                clientId: clientId
+              }
+            }
+          });
+          
+          if (clientInteraction) {
+            const currentAvg = clientInteraction.averageResponseTime || 0;
+            const currentCount = clientInteraction.interactionCount || 0;
+            
+            const newAvg = currentCount > 1 
+              ? Math.round((currentAvg * (currentCount - 1) + responseTimeMinutes) / currentCount)
+              : responseTimeMinutes;
+              
+            await db.clientInteraction.update({
+              where: { id: clientInteraction.id },
+              data: { averageResponseTime: newAvg }
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to calculate response time:', error);
+      }
     }
 
     // TODO: Implement sentiment analysis if needed in the future

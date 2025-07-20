@@ -85,6 +85,10 @@ const config: Config = {
         'accordion-up': {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' }
+        },
+        'shimmer': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' }
         }
       },
       animation: {
@@ -92,7 +96,8 @@ const config: Config = {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'float-slow': 'float-slow 8s ease-in-out infinite',
         'float-medium': 'float-medium 6s ease-in-out infinite',
-        'float-fast': 'float-fast 4s ease-in-out infinite'
+        'float-fast': 'float-fast 4s ease-in-out infinite',
+        'shimmer': 'shimmer 2s infinite linear'
       }
     }
   },

@@ -1,14 +1,18 @@
 import { db } from "@/packages/lib/prisma/client";
+import { CreateUserMetrics } from "../user/user-metrics";
+import { it } from "node:test";
 
 /**
  * Creates communication analytics for a user if they don't already exist
  * @param userId - The ID of the user
  */
 export async function CreateCommunicationAnalytics(
-  userId: string
+  userId: string,
+  iteration?: number
 ): Promise<void> {
   try {
-    // Check if user analytics exist
+    iteration = iteration || 0;
+
     const userAnalytics = await db.analytics.findUnique({
       where: {
         userId: userId
@@ -18,23 +22,26 @@ export async function CreateCommunicationAnalytics(
       }
     });
 
-    if (!userAnalytics) {
-      throw new Error('User analytics not found');
+    if (!userAnalytics && iteration < 3) {
+      iteration++;
+      CreateUserMetrics(userId);
+      return CreateCommunicationAnalytics(userId, iteration);
     }
 
-    // If communication analytics already exist, do nothing
-    if (userAnalytics.communicationAnalytics) {
+    if (userAnalytics?.communicationAnalytics) {
       return;
     }
 
-    // Create communication analytics
-    await db.communicationAnalytics.create({
-      data: {
-        analyticsId: userAnalytics.id,
-        messagesSent: 0,
-        messagesReceived: 0
-      }
-    });
+    if(userAnalytics) {
+      await db.communicationAnalytics.create({
+        data: {
+          analyticsId: userAnalytics.id,
+          messagesSent: 0,
+          messagesReceived: 0,
+          avgResponseTime: 0,
+        }
+      });
+    }
   } catch (error: unknown) {
     console.error('Failed to create communication analytics:', error);
   }

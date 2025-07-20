@@ -62,7 +62,7 @@ export function Header({
   }, [])
 
   return (
-    <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-border/40 dark:border-white/[0.08] bg-white/80 dark:bg-[#0a1a1a]/80 backdrop-blur-xl px-4 sm:px-6 transition-all duration-300">
+    <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-border/40 dark:border-white/[0.08] bg-white/80 dark:bg-[#0a1a1a]/80 backdrop-blur-xl px-2 sm:px-6 transition-all duration-300">
       <div className="flex items-center gap-3">
         {/* Mobile hamburger menu */}
         <Button
@@ -76,7 +76,7 @@ export function Header({
         </Button>
 
         <div
-          className="flex items-center gap-2 text-2xl font-bold cursor-pointer hover:opacity-80 transition-opacity duration-200"
+          className="hidden sm:flex items-center gap-2 text-2xl font-bold cursor-pointer hover:opacity-80 transition-opacity duration-200"
           onClick={() => router.push(DASHBOARD_ROUTE)}
         >
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
@@ -89,7 +89,7 @@ export function Header({
       </div>
 
       {/* Enhanced Search Bar */}
-      <div className="flex-1 max-w-2xl mx-8">
+      <div className="flex-1 max-w-2xl sm:mx-8 mr-6 ml-3">
         <Button
           variant="ghost"
           className="w-full h-10 justify-start text-muted-foreground bg-gradient-to-r from-muted/50 to-muted/30 dark:from-gray-800/50 dark:to-gray-700/30 hover:from-muted/70 hover:to-muted/50 dark:hover:from-gray-800/70 dark:hover:to-gray-700/50 border border-border/50 hover:border-border/80 hover:text-foreground rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group"
@@ -296,7 +296,7 @@ export function Header({
         </CommandList>
       </CommandDialog>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center sm:gap-4 gap-2">
         {/* Enhanced Notification Button */}
         <div className="relative">
           <Button

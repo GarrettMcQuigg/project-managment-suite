@@ -27,7 +27,16 @@ export async function getCurrentUser(): Promise<UserWithMetadata | null> {
         email: decodedUser.email
       },
       include: {
-        subscription: true
+        projects: true,
+        subscription: true,
+        analytics: {
+          include: {
+            communicationAnalytics: true  
+          }
+        },
+        calendarEvent: true,
+        userActivity: true,
+        pageView: true
       }
     });
 

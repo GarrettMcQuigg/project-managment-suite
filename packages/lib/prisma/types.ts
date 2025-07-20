@@ -1,7 +1,18 @@
 import { Prisma } from '@prisma/client';
 
 export type UserWithMetadata = Prisma.UserGetPayload<{
-  include: { subscription: true };
+  include: { 
+    projects: true;
+    subscription: true; 
+    analytics: {
+      include: {
+        communicationAnalytics: true
+      }
+    }; 
+    calendarEvent: true; 
+    userActivity: true; 
+    pageView: true 
+  };
 }>;
 
 export type ClientWithMetadata = Prisma.ClientGetPayload<{
@@ -9,7 +20,7 @@ export type ClientWithMetadata = Prisma.ClientGetPayload<{
 }>;
 
 export type ProjectWithMetadata = Prisma.ProjectGetPayload<{
-  include: { client: true; invoices: true; phases: true; portalViews: true };
+  include: { client: true; invoices: true; phases: true; portalViews: true; attachments: true; messages: true; };
 }>;
 
 export type CalendarEventWithMetadata = Prisma.CalendarEventGetPayload<{

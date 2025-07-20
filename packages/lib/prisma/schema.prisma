@@ -198,14 +198,19 @@ enum ProjectStatus {
 }
 
 model ProjectMessage {
-  id          String                     @id @default(uuid())
-  project     Project                    @relation(fields: [projectId], references: [id])
-  projectId   String
-  sender      String?
-  text        String
-  attachments ProjectMessageAttachment[]
-  createdAt   DateTime                   @default(now())
-  messageRead MessageRead[] // TODO : implement later
+  id                String                     @id @default(uuid())
+  project           Project                    @relation(fields: [projectId], references: [id])
+  projectId         String
+  sender            String?
+  text              String
+  attachments       ProjectMessageAttachment[]
+  createdAt         DateTime                   @default(now())
+  messageRead       MessageRead[] // TODO : implement later
+  
+  // Response tracking fields
+  responseToMessage ProjectMessage?             @relation("MessageResponses", fields: [responseToMessageId], references: [id], onDelete: SetNull)
+  responseToMessageId String?                   
+  responses         ProjectMessage[]           @relation("MessageResponses")
 }
 
 model ProjectParticipant {
@@ -690,16 +695,18 @@ model TimeTracking {
 }
 
 model CommunicationAnalytics {
-  id                String    @id @default(uuid())
-  analytics         Analytics @relation(fields: [analyticsId], references: [id])
-  analyticsId       String    @unique
-  avgResponseTime   Int?      // Average response time in minutes
-  messagesSent      Int       @default(0)
-  messagesReceived  Int       @default(0)
-  clientInteractions ClientInteraction[]
+  id                    String    @id @default(uuid())
+  analytics             Analytics @relation(fields: [analyticsId], references: [id])
+  analyticsId           String    @unique
+  avgResponseTime       Int?      // Average response time in minutes
+  messagesSent          Int       @default(0)
+  messagesReceived      Int       @default(0)
+  totalResponseTimeMinutes Int    @default(0) // Total minutes for calculating average
+  responseCount         Int       @default(0) // Number of responses for calculating average
+  clientInteractions    ClientInteraction[]
   
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }
 
 model ClientInteraction {

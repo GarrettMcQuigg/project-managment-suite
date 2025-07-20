@@ -1,41 +1,29 @@
-"use client"
+import { CalculateAverageResponseTime } from "@/packages/lib/helpers/analytics/communication"
 
 import {
-  Area,
-  AreaChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Bar,
-  BarChart,
-  Pie,
-  PieChart,
-  Cell,
-  Tooltip,
-  TooltipProps
-} from "recharts"
+  ActiveProjectsCard,
+  ActiveProjectsWidget,
+  ProjectStatusChart,
+  ResponseTimeCard,
+  RevenueCard,
+} from "./_src/components"
 import {
-  ArrowUpRight,
-  ArrowDownRight,
-  DollarSign,
-  FolderOpen,
-  Clock,
-  TrendingUp,
   Calendar,
-  Bell,
-  Search,
   AlertCircle,
   CheckCircle,
   Timer,
 } from "lucide-react"
-import { Button } from "@/packages/lib/components/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/packages/lib/components/avatar"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/packages/lib/components/card"
 import { Progress } from "@radix-ui/react-progress"
 import { Badge } from "@/packages/lib/components/badge"
+import { getCurrentUser } from "@/packages/lib/helpers/get-current-user"
+import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { getProjectList } from '@/packages/lib/helpers/get-project-list';
+import { API_ANALYTICS_COMMUNICATION_ROUTE } from "@/packages/lib/routes";
+import { TimeTracking } from "./_src/components/time-tracking"
+import { MobileActiveProjects } from "./_src/components/mobile-active-projects"
+import { fetcher } from "@/packages/lib/helpers/fetcher"
 
-// Mock data
 const revenueData = [
   { month: "Jan", revenue: 12500, expenses: 8200 },
   { month: "Feb", revenue: 15200, expenses: 9100 },
@@ -107,266 +95,91 @@ const recentInvoices = [
   { number: "INV-2024-003", client: "Local Business", amount: 1800, status: "Sent", date: "Jan 12" },
 ]
 
-const clientActivity = [
-  { name: "Sarah Johnson", company: "TechCorp", avatar: "SJ", lastContact: "2 hours ago", status: "active" },
-  { name: "Mike Chen", company: "StartupXYZ", avatar: "MC", lastContact: "1 day ago", status: "active" },
-  { name: "Emma Davis", company: "Local Biz", avatar: "ED", lastContact: "3 days ago", status: "pending" },
-  { name: "Alex Rivera", company: "E-commerce", avatar: "AR", lastContact: "5 days ago", status: "active" },
-]
+async function getResponseTimeMetrics() {
+  try {
+    const response: any = await fetcher({
+      url: API_ANALYTICS_COMMUNICATION_ROUTE,
+    });
+    
+    if (!response) {
+      // TODO: ThreatLevel
+      return { avgResponseTime: 0 };
+    }
+    
+    return {
+      avgResponseTime: response.avgResponseTime || 0,
+    };
+  } catch (error) {
+    console.error('Error fetching response time metrics:', error);
+    return { avgResponseTime: 0 };
+  }
+}
 
-export default function Dashboard() {
+function calculateResponseTimeChange(avgResponseTime: number): number {
+  if (!avgResponseTime) {
+    return 5;
+  }
+  
+  if (avgResponseTime < 10) {
+    return Math.floor(5 + Math.random() * 10);
+  } else if (avgResponseTime < 30) {
+    return Math.floor(Math.random() * 5);
+  } else {
+    return Math.floor(Math.random() * 5) * -1;
+  }
+}
+
+export default async function Dashboard() {
+  const currentUser = await getCurrentUser();
+  const projects = await getProjectList();
+  
+  if (!currentUser) {
+    return handleUnauthorized();
+  }
+  
+  const { avgResponseTime } = await getResponseTimeMetrics();
+  const responseTimeChange = calculateResponseTimeChange(avgResponseTime);
+  const monthlyRevenue = 0;
+  const revenueChange = 0;
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50/20">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* Welcome Section */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+          <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
           {/* <p className="text-gray-600 mt-1">Here's your business overview for today</p> */}
         </div>
 
         {/* Main Grid Layout */}
-        <div className="grid gap-6 lg:grid-cols-12">
-          {/* Revenue Chart - Large */}
-          <Card className="lg:col-span-8 border-border/50 hover:shadow-lg transition-all duration-200 group">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-lg font-semibold">Revenue & Expenses</CardTitle>
-                <CardDescription>Monthly comparison over the last 6 months</CardDescription>
-              </div>
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-cyan-500"></div>
-                  <span>Revenue</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-gray-400"></div>
-                  <span>Expenses</span>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[280px] w-full">
-                <ResponsiveContainer width="100%" height={280}>
-                  <AreaChart data={revenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(175, 90%, 35%)" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="hsl(175, 90%, 35%)" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="expensesGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(0, 0%, 60%)" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="hsl(0, 0%, 60%)" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="month" stroke="#666" />
-                    <YAxis stroke="#666" />
-                    <Tooltip
-                      contentStyle={{
-                        background: 'white',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        padding: '8px'
-                      }}
-                      formatter={(value: number, name: string) => [
-                        `$${value.toLocaleString()}`,
-                        name === 'revenue' ? 'Revenue' : 'Expenses'
-                      ]}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="expenses"
-                      stroke="hsl(0, 0%, 60%)"
-                      strokeWidth={2}
-                      fill="url(#expensesGradient)"
-                      name="expenses"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="hsl(175, 90%, 35%)"
-                      strokeWidth={3}
-                      fill="url(#revenueGradient)"
-                      name="revenue"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="sm:flex sm:space-y-0 space-y-6 gap-6">
+          <span className="md:block hidden w-full"><ActiveProjectsWidget projects={projects || []} /></span>
+          <span className="md:hidden block min-w-[45%]">
+            <MobileActiveProjects projects={projects || []} />
+          </span>
 
           {/* Key Metrics - Vertical Stack */}
-          <div className="lg:col-span-4 space-y-6">
-            <Card className="border-border/50 hover:shadow-lg transition-all duration-200 group">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Monthly Revenue</p>
-                    <p className="text-2xl font-bold text-gray-900">$25,400</p>
-                    <div className="flex items-center text-sm text-green-600 mt-1">
-                      <ArrowUpRight className="h-4 w-4 mr-1" />
-                      <span>+14.9% from last month</span>
-                    </div>
-                  </div>
-                  <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center">
-                    <DollarSign className="h-6 w-6 text-green-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/50 hover:shadow-lg transition-all duration-200 group">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Active Projects</p>
-                    <p className="text-2xl font-bold text-gray-900">12</p>
-                    <div className="flex items-center text-sm text-blue-600 mt-1">
-                      <ArrowUpRight className="h-4 w-4 mr-1" />
-                      <span>+2 new this week</span>
-                    </div>
-                  </div>
-                  <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <FolderOpen className="h-6 w-6 text-blue-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/50 hover:shadow-lg transition-all duration-200 group">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">This Week</p>
-                    <p className="text-2xl font-bold text-gray-900">34.5h</p>
-                    <div className="flex items-center text-sm text-orange-600 mt-1">
-                      <ArrowDownRight className="h-4 w-4 mr-1" />
-                      <span>-2.1h from last week</span>
-                    </div>
-                  </div>
-                  <div className="h-12 w-12 rounded-xl bg-orange-100 flex items-center justify-center">
-                    <Clock className="h-6 w-6 text-orange-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="flex flex-col gap-6 min-w-[45%] md:min-w-max">
+            <RevenueCard monthlyRevenue={monthlyRevenue} revenueChange={revenueChange} />
+            <ActiveProjectsCard projects={projects || []} />
+            <ResponseTimeCard avgResponseTime={avgResponseTime} responseTimeChange={responseTimeChange} />
           </div>
         </div>
 
         {/* Second Row */}
-        <div className="grid gap-6 lg:grid-cols-12">
+        <div className="grid md:gap-6 lg:grid-cols-12">
           {/* Project Status Chart */}
-          <Card className="lg:col-span-4 border-border/50 hover:shadow-lg transition-all duration-200 group">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Project Distribution</CardTitle>
-              <CardDescription>Current project status breakdown</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={projectStatusData} dataKey="count" nameKey="status" cx="50%" cy="50%" outerRadius={60}>
-                      {projectStatusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        background: 'white',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        padding: '8px'
-                      }}
-                      formatter={(value: number, name: string, props: any) => [
-                        `${value} projects`,
-                        props.payload.status
-                      ]}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-4 space-y-2">
-                {projectStatusData.map((item) => (
-                  <div key={item.status} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span>{item.status}</span>
-                    </div>
-                    <span className="font-medium">{item.count}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <ProjectStatusChart projectStatusData={projectStatusData} />
 
           {/* Time Tracking */}
-          <Card className="lg:col-span-8 border-border/50 hover:shadow-lg transition-all duration-200 group">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Weekly Time Tracking</CardTitle>
-              <CardDescription>Billable vs non-billable hours breakdown</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[180px] w-full">
-                <ResponsiveContainer width="100%" height={180}>
-                  <BarChart data={timeTrackingData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="day" stroke="#666" />
-                    <YAxis stroke="#666" />
-                    <Tooltip
-                      contentStyle={{
-                        background: 'white',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        padding: '8px'
-                      }}
-                      formatter={(value: number, name: string) => [
-                        `${value} hours`,
-                        name === 'billable' ? 'Billable Hours' : 'Non-billable Hours'
-                      ]}
-                    />
-                    <Bar dataKey="billable" fill="hsl(175, 90%, 35%)" radius={[2, 2, 0, 0]} name="billable" />
-                    <Bar dataKey="nonBillable" fill="hsl(0, 0%, 60%)" radius={[2, 2, 0, 0]} name="nonBillable" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+          <TimeTracking timeTrackingData={timeTrackingData} />
         </div>
 
         {/* Third Row */}
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Active Projects */}
-          <Card className="border-border/50 hover:shadow-lg transition-all duration-200 group">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Active Projects</CardTitle>
-              <CardDescription>Current project progress</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentProjects.slice(0, 3).map((project, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 text-sm">{project.name}</h4>
-                      <p className="text-xs text-gray-500">{project.client}</p>
-                    </div>
-                    <Badge variant={project.status === "Active" ? "default" : "secondary"} className="text-xs">
-                      {project.status}
-                    </Badge>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">Progress</span>
-                      <span className="font-medium">{project.progress}%</span>
-                    </div>
-                    <Progress value={project.progress} className="h-1.5" />
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
 
           {/* Upcoming Deadlines */}
-          <Card className="border-border/50 hover:shadow-lg transition-all duration-200 group">
+          <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">Upcoming Deadlines</CardTitle>
               <CardDescription>Projects requiring attention</CardDescription>
@@ -395,7 +208,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Recent Invoices */}
-          <Card className="border-border/50 hover:shadow-lg transition-all duration-200 group">
+          <Card className="border-border/40 hover:border-border/80 hover:shadow-md transition-all duration-200 group">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">Recent Invoices</CardTitle>
               <CardDescription>Latest billing activity</CardDescription>

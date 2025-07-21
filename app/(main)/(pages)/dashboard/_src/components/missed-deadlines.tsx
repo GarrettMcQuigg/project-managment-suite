@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/lib/components/card";
 import { ProjectWithMetadata } from "@/packages/lib/prisma/types";
-import { Calendar, Skull } from "lucide-react";
+import { Skull } from "lucide-react";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { routeWithPath } from "@/packages/lib/routes";

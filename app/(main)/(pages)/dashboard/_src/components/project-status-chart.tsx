@@ -17,7 +17,7 @@ interface ProjectStatusChartProps {
 export function ProjectStatusChart({ projectStatusData }: ProjectStatusChartProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
-  const handlePieEnter = (_: any, index: number) => {
+  const handlePieEnter = (_: unknown, index: number) => {
     setActiveIndex(index)
   }
 

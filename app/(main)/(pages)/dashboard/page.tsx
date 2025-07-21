@@ -1,11 +1,3 @@
-import {
-  Calendar,
-  AlertCircle,
-  CheckCircle,
-  Timer,
-} from "lucide-react"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/packages/lib/components/card"
-import { Badge } from "@/packages/lib/components/badge"
 import { getCurrentUser } from "@/packages/lib/helpers/get-current-user"
 import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import { getProjectList } from '@/packages/lib/helpers/get-project-list';
@@ -19,20 +11,10 @@ import { MobileActiveProjects } from "./_src/components/mobile-active-projects";
 import { CalculateAverageResponseTime } from '@/packages/lib/helpers/analytics/communication/calculate-avg-response-time';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { ProjectStatus } from "@prisma/client";
+import { statusColors } from "./_src/utils/status-colors";
 import { UpcomingDeadlines } from "./_src/components";
 import { MissedDeadlines } from "./_src/components/missed-deadlines";
 import { RecentInvoices } from "./_src/components/recent-invoices";
-
-// Status color mapping for consistent colors across components
-export const statusColors: Record<ProjectStatus, string> = {
-  'ACTIVE': '#3b82f6', // Blue
-  'COMPLETED': '#10b981', // Green
-  'PAUSED': '#f59e0b', // Amber
-  'PREPARATION': '#8b5cf6', // Purple
-  'DRAFT': '#fffb00', // Yellow
-  'ARCHIVED': '#6b7280', // Gray
-  'DELETED': '#ef4444', // Red
-} as Record<ProjectStatus, string>;
 
 function getProjectStatusData(projects: ProjectWithMetadata[]) {
   const statusCounts: Record<string, number> = {};
@@ -55,18 +37,6 @@ const timeTrackingData = [
   { day: "Wed", billable: 5.8, nonBillable: 2.2 },
   { day: "Thu", billable: 8.1, nonBillable: 0.9 },
   { day: "Fri", billable: 6.9, nonBillable: 1.1 },
-]
-
-const upcomingDeadlines = [
-  { project: "TechCorp Brand Identity", client: "TechCorp Inc.", dueDate: "Jan 15", daysLeft: 3 },
-  { project: "Logo Package", client: "Local Business", dueDate: "Jan 20", daysLeft: 8 },
-  { project: "Marketing Campaign", client: "E-commerce Co.", dueDate: "Jan 25", daysLeft: 13 },
-]
-
-const recentInvoices = [
-  { number: "INV-2024-001", client: "TechCorp Inc.", amount: 5500, status: "Paid", date: "Jan 10" },
-  { number: "INV-2024-002", client: "StartupXYZ", amount: 3200, status: "Overdue", date: "Jan 5" },
-  { number: "INV-2024-003", client: "Local Business", amount: 1800, status: "Sent", date: "Jan 12" },
 ]
 
 async function getResponseTimeMetrics(userId: string) {

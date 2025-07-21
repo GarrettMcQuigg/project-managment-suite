@@ -1,7 +1,7 @@
 "use client";
 
-import { ArrowUpRight, ArrowDownRight, Timer, MessageCircle, Clock, ArrowDownNarrowWide, ArrowLeftRight, ArrowRightLeftIcon, ArrowLeft, ArrowRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardDescription, CardTitle } from "@/packages/lib/components/card";
+import { ArrowUpRight, ArrowDownRight, Timer, Clock, ArrowRight } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/packages/lib/components/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/packages/lib/components/tooltip";
 import { API_ANALYTICS_COMMUNICATION_ROUTE } from "@/packages/lib/routes";
 import useSWR from "swr";

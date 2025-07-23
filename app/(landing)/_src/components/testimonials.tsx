@@ -65,7 +65,7 @@ export function TestimonialsSection() {
           {testimonials.map((testimonial, index) => (
             <Card
               key={index}
-              className="relative overflow-hidden border-border/50 hover:shadow-lg transition-all duration-300 group"
+              className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20"
             >
               <CardContent className="p-6 space-y-4">
                 {/* Quote Icon */}

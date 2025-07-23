@@ -6,7 +6,7 @@ import { AUTH_SIGNUP_ROUTE } from "@/packages/lib/routes"
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-start md:items-center justify-center px-4 pt-16 md:pt-8 pb-12 mb-12">
+    <section className="relative min-h-[90vh] flex items-start md:items-center justify-center px-4 pt-24 md:pt-20 pb-12 mb-12">
       <div className="container mx-auto max-w-7xl mb-24">
         <div className="flex flex-col lg:flex-row gap-12 items-center">
           <div className="lg:w-[60%] space-y-8">

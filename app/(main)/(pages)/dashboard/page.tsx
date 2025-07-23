@@ -66,42 +66,40 @@ export default async function Dashboard() {
   const revenueChange = 0;
   
   return (
-    <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
-        </div>
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-6 min-h-screen">
+      <div>
+        <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
+      </div>
 
-        <div className="sm:flex sm:space-y-0 space-y-6 gap-6">
-          <span className="md:block hidden w-full"><ActiveProjectsWidget projects={projects || []} statusColors={statusColors} /></span>
-          <span className="md:hidden block min-w-[45%]">
-            <MobileActiveProjects projects={projects || []} statusColors={statusColors} />
-          </span>
+      <div className="sm:flex sm:space-y-0 space-y-6 gap-6">
+        <span className="md:block hidden w-full"><ActiveProjectsWidget projects={projects || []} statusColors={statusColors} /></span>
+        <span className="md:hidden block min-w-[45%]">
+          <MobileActiveProjects projects={projects || []} statusColors={statusColors} />
+        </span>
 
-          <div className="flex flex-col gap-6 min-w-[45%] md:min-w-max">
-            <RevenueCard monthlyRevenue={monthlyRevenue} revenueChange={revenueChange} />
-            <ActiveProjectsCard projects={projects || []} />
-            <ResponseTimeCard />
-          </div>
+        <div className="flex flex-col gap-6 min-w-[45%] md:min-w-max">
+          <RevenueCard monthlyRevenue={monthlyRevenue} revenueChange={revenueChange} />
+          <ActiveProjectsCard projects={projects || []} />
+          <ResponseTimeCard />
         </div>
+      </div>
 
-        <div className="sm:grid md:space-y-0 space-y-6 md:space-x-3 gap-6 md:gap-3 lg:grid-cols-12">
-          <ProjectStatusChart projectStatusData={getProjectStatusData(projects || [])} />
-          <TimeTracking timeTrackingData={timeTrackingData} />
-        </div>
+      <div className="sm:grid md:space-y-0 space-y-6 md:space-x-3 gap-6 md:gap-3 lg:grid-cols-12">
+        <ProjectStatusChart projectStatusData={getProjectStatusData(projects || [])} />
+        <TimeTracking timeTrackingData={timeTrackingData} />
+      </div>
 
-        <div className="sm:flex md:space-y-0 space-y-6 md:space-x-3 gap-6 md:gap-3 w-full">
-          <UpcomingDeadlines projects={projects || []} />
-          <MissedDeadlines projects={projects || []} />
-          <RecentInvoices invoices={
-            projects?.flatMap(project => 
-              project.invoices.map(invoice => ({
-                ...invoice,
-                clientName: project.client.name
-              }))
-            ) || []
-          } />  
-        </div>
+      <div className="sm:flex md:space-y-0 space-y-6 md:space-x-3 gap-6 md:gap-3 w-full">
+        <UpcomingDeadlines projects={projects || []} />
+        <MissedDeadlines projects={projects || []} />
+        <RecentInvoices invoices={
+          projects?.flatMap(project => 
+            project.invoices.map(invoice => ({
+              ...invoice,
+              clientName: project.client.name
+            }))
+          ) || []
+        } />  
       </div>
     </div>
   )

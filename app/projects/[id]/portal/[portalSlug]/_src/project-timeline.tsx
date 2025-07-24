@@ -8,7 +8,6 @@ import { API_AUTH_PORTAL_GET_BY_ID_ROUTE, PROJECTS_ROUTE, API_PROJECT_UPDATE_PHA
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
 import { CheckCircle, Clock, Circle } from 'lucide-react';
-import { Card } from '@/packages/lib/components/card';
 import { Button } from '@/packages/lib/components/button';
 import { Input } from '@/packages/lib/components/input';
 import { Phase, PhaseStatus } from '@prisma/client';

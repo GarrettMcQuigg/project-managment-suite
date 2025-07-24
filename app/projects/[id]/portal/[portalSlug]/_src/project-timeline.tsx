@@ -94,7 +94,7 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
   }
 
   return (
-    <Card className="bg-white dark:bg-[#0F1A1C] p-6">
+    <div className="p-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Project Timeline</h2>
         <div className="mt-4 space-y-2">
@@ -148,7 +148,7 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   );
 }
 

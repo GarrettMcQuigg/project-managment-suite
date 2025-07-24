@@ -66,30 +66,28 @@ export default async function Dashboard() {
   const revenueChange = 0;
   
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 space-y-6 min-h-screen">
-      <div>
-        <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
-      </div>
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen">
+      <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
 
-      <div className="sm:flex sm:space-y-0 space-y-6 gap-6">
+      <div className="sm:flex sm:space-y-0 space-y-8 gap-8">
         <span className="md:block hidden w-full"><ActiveProjectsWidget projects={projects || []} statusColors={statusColors} /></span>
         <span className="md:hidden block min-w-[45%]">
           <MobileActiveProjects projects={projects || []} statusColors={statusColors} />
         </span>
 
-        <div className="flex flex-col gap-6 min-w-[45%] md:min-w-max">
+        <div className="flex flex-col gap-8 min-w-[45%] md:min-w-max">
           <RevenueCard monthlyRevenue={monthlyRevenue} revenueChange={revenueChange} />
           <ActiveProjectsCard projects={projects || []} />
           <ResponseTimeCard />
         </div>
       </div>
 
-      <div className="sm:grid md:space-y-0 space-y-6 md:space-x-3 gap-6 md:gap-3 lg:grid-cols-12">
+      <div className="sm:grid md:space-y-0 space-y-8 gap-8 md:gap-8 lg:grid-cols-12">
         <ProjectStatusChart projectStatusData={getProjectStatusData(projects || [])} />
         <TimeTracking timeTrackingData={timeTrackingData} />
       </div>
 
-      <div className="sm:flex md:space-y-0 space-y-6 md:space-x-3 gap-6 md:gap-3 w-full">
+      <div className="sm:flex md:space-y-0 space-y-8 gap-8 md:gap-8 w-full">
         <UpcomingDeadlines projects={projects || []} />
         <MissedDeadlines projects={projects || []} />
         <RecentInvoices invoices={

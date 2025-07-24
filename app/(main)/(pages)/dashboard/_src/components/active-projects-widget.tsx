@@ -138,7 +138,7 @@ export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsW
       </div>
       <CardContent>
         <div className="space-y-4">
-          <div className="space-y-2">
+          <div className="space-y-3">
             {paginatedProjects.map((project) => {
               const phases = project.phases || []
               const completedCount = phases.filter((phase) => phase.status === PhaseStatus.COMPLETED).length

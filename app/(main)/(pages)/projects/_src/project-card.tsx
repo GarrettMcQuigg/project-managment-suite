@@ -1,95 +1,130 @@
-'use client';
+'use client'
 
-import type React from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
 import { Calendar, ExternalLink, Eye } from 'lucide-react';
-import type { ProjectStatus } from '@prisma/client';
-import { useRouter } from 'next/navigation';
-import { PROJECT_DETAILS_ROUTE, PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import { PROJECTS_ROUTE, routeWithPath, routeWithParam, PROJECT_PORTAL_ROUTE } from '@/packages/lib/routes';
 import Link from 'next/link';
-import { Button } from '@/packages/lib/components/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/packages/lib/components/tooltip';
 
 interface ProjectCardProps {
   project: {
     id: string;
     name: string;
     description: string;
-    status: ProjectStatus;
+    status: 'DRAFT' | 'PREPARATION' | 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'ARCHIVED' | 'DELETED';
     startDate: Date;
     endDate: Date;
     portalSlug: string;
+    progress: number;
+    team: string[];
+    priority: 'low' | 'medium' | 'high';
   };
 }
 
-const statusColors: Record<ProjectStatus, string> = {
-  DRAFT: 'bg-muted text-muted-foreground',
-  PREPARATION: 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200',
-  ACTIVE: 'bg-primary text-primary-foreground',
-  PAUSED: 'bg-orange-200 text-orange-800 dark:bg-orange-800 dark:text-orange-200',
-  COMPLETED: 'bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200',
-  ARCHIVED: 'bg-secondary text-secondary-foreground',
-  DELETED: 'bg-destructive text-destructive-foreground'
+const statusConfig = {
+  DRAFT: { color: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
+  PREPARATION: { color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800' },
+  ACTIVE: { color: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' },
+  PAUSED: { color: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800' },
+  COMPLETED: { color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' },
+  ARCHIVED: { color: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700' },
+  DELETED: { color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800' }
 };
 
-// Motion button variants
-const buttonMotion = {
-  hover: { scale: 1.02 },
-  tap: { scale: 0.98 }
-};
-
-const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
-  const router = useRouter();
-
-  const handleViewDetails = () => {
-    router.push(routeWithParam(PROJECT_DETAILS_ROUTE, { id: project.id }));
-  };
-
-  const clientPortalUrl = routeWithParam(PROJECT_PORTAL_ROUTE, { id: project.id, portalSlug: project.portalSlug });
-
+const FloatingProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   return (
-    <motion.div
-      key={project.id}
-      initial={{ opacity: 0, y: 0 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="group relative overflow-hidden rounded-lg bg-card shadow-md transition-all duration-300 hover:shadow-lg dark:shadow-lg dark:shadow-primary/5 dark:hover:shadow-primary/10 cursor-default"
-    >
-      <div className="relative z-10 p-6">
-        <h2 className="mb-2 text-2xl font-semibold text-card-foreground">{project.name}</h2>
-        <p className="mb-4 text-sm text-muted-foreground line-clamp-3">{project.description}</p>
-
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[project.status]}`}>{project.status.replace('_', ' ')}</span>
-          <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-            <Calendar className="h-4 w-4" />
-            <span>
-              {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
-            </span>
+    <div className="relative group perspective-1000">
+      <div className="relative bg-card dark:bg-card/80 rounded-2xl shadow-lg hover:shadow-2xl shadow-primary/10 group-hover:shadow-primary/40 group-hover:shadow-xl transition-all duration-500 transform group-hover:-translate-y-1 group-hover:rotate-[0.5deg] border border-border">
+        {/* Floating status badge */}
+        <div className="absolute -top-3 -right-3 z-10">
+          <div className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold ${statusConfig[project.status].color} backdrop-blur-sm`}>
+            {project.status}
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-end gap-3">
-          <Link href={clientPortalUrl} rel="noopener noreferrer">
-            <motion.div whileHover={buttonMotion.hover} whileTap={buttonMotion.tap} className="inline-block">
-              <Button variant="outline" className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90">
-                <ExternalLink className="h-4 w-4" />
-                Client Portal
-              </Button>
-            </motion.div>
-          </Link>
+        <div className="p-8">
+          {/* Header with gradient background */}
+          <div className="relative -m-8 mb-6 p-8 bg-gradient-to-br from-primary/5 to-secondary/10 dark:from-primary/10 dark:to-secondary/20 rounded-t-2xl backdrop-blur-[1px]">
+            <h3 className="text-xl font-bold text-foreground mb-2">{project.name}</h3>
+            <p className="text-foreground/70 text-sm">{project.description}</p>
+            
+            {/* Floating progress circle */}
+            <div className="absolute -bottom-6 right-8">
+              <div className="relative w-12 h-12 bg-card dark:bg-card/90 rounded-full shadow-lg dark:shadow-black/30 flex items-center justify-center overflow-hidden group-hover:animate-card-shimmer">
+                <svg className="w-10 h-10 transform -rotate-90" viewBox="0 0 36 36">
+                  <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="var(--primary)" />
+                      <stop offset="100%" stopColor="var(--secondary)" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="m18,2.0845 a 15.9155,15.9155 0 0,1 0,31.831 a 15.9155,15.9155 0 0,1 0,-31.831"
+                    fill="none"
+                    stroke="currentColor" 
+                    className="stroke-primary/15"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="m18,2.0845 a 15.9155,15.9155 0 0,1 0,31.831 a 15.9155,15.9155 0 0,1 0,-31.831"
+                    fill="none"
+                    stroke="currentColor"
+                    className='stroke-primary'
+                    strokeWidth="3"
+                    strokeDasharray={`${project.progress}, 100`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-bold">{project.progress}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <motion.div whileHover={buttonMotion.hover} whileTap={buttonMotion.tap} className="inline-block" onClick={handleViewDetails}>
-            <Button className="flex items-center rounded-md border bg-primary dark:bg-transparent border-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors dark:hover:bg-primary/30 hover:bg-primary/90">
-              <Eye className="mr-2 h-4 w-4" />
-              View Details
-            </Button>
-          </motion.div>
+          {/* Content */}
+          <div className="flex items-center justify-between mt-12">
+            {/* Timeline */}
+            <div className="flex items-center text-sm text-foreground/70">
+              <Calendar className="w-4 h-4 mr-2 text-primary/70" />
+              <span>{project.startDate.toLocaleDateString()} - {project.endDate.toLocaleDateString()}</span>
+            </div>
+            
+            {/* Actions */}
+            <div className="flex space-x-2">
+              <Link href={routeWithParam(PROJECT_PORTAL_ROUTE, { id: project.id, portalSlug: project.portalSlug })} className="inline-block">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="p-3 rounded-xl bg-muted hover:bg-muted/80 hover:text-primary transition-colors cursor-pointer group/portal relative">
+                        <ExternalLink className="w-4 h-4 text-foreground/70" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>View client portal</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </Link>
+              <Link href={routeWithPath(PROJECTS_ROUTE, project.id)} className="inline-block">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="p-3 rounded-xl bg-gradient-to-r from-primary to-primary/50 hover:opacity-90 transition-all duration-200 text-primary-foreground shadow-lg hover:shadow-xl cursor-pointer group/details relative">
+                        <Eye className="w-4 h-4" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>View project details</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-primary/60 via-primary/80 to-accent/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-    </motion.div>
+    </div>
   );
 };
 
-export default ProjectCard;
+export default FloatingProjectCard;

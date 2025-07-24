@@ -1,6 +1,7 @@
 import { getProjectList } from '@/packages/lib/helpers/get-project-list';
 import ProjectCard from './_src/project-card';
 import { NewProjectButton } from './_src/add-project';
+import { PhaseStatus } from '@prisma/client';
 
 export default async function ProjectsPage() {
   const projects = await getProjectList();
@@ -14,12 +15,12 @@ export default async function ProjectsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 space-y-6 min-h-screen">
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Projects</h1>
+        <h2 className="text-2xl font-bold text-foreground">Projects</h2>
         <NewProjectButton />
       </div>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
         {projects.map((project) => (
           <div key={project.id} className="transition-transform hover:scale-[1.02]">
             <ProjectCard
@@ -29,8 +30,11 @@ export default async function ProjectsPage() {
                 description: project.description || '',
                 status: project.status,
                 startDate: project.startDate,
+                progress: project.phases && project.phases.length > 0 ? Math.round(project.phases.reduce((acc, phase) => acc + (phase.status === PhaseStatus.COMPLETED ? 1 : 0), 0) / project.phases.length * 100) : 0,
                 endDate: project.endDate,
-                portalSlug: project.portalSlug
+                portalSlug: project.portalSlug,
+                team: [],
+                priority: 'low'
               }}
             />
           </div>

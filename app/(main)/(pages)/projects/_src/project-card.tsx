@@ -45,8 +45,8 @@ const FloatingProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         <div className="p-8">
           {/* Header with gradient background */}
           <div className="relative -m-8 mb-6 p-8 bg-gradient-to-br from-primary/5 to-secondary/10 dark:from-primary/10 dark:to-secondary/20 rounded-t-2xl backdrop-blur-[1px]">
-            <h3 className="text-xl font-bold text-foreground mb-2">{project.name}</h3>
-            <p className="text-foreground/70 text-sm">{project.description}</p>
+            <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2 break-words">{project.name}</h3>
+            <p className="text-foreground/70 text-sm line-clamp-2 break-words">{project.description}</p>
             
             {/* Floating progress circle */}
             <div className="absolute -bottom-6 right-8">

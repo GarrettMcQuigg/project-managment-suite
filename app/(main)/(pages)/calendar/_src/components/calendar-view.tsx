@@ -166,6 +166,7 @@ export default function CalendarView({ events }: CalendarViewProps) {
   };
 
   const components = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     toolbar: (props: any) => <CustomToolbar {...props} onNavigate={handleNavigate} onView={handleViewChange} date={date} view={view} />,
     event: CustomEvent,
     month: {
@@ -203,10 +204,17 @@ export default function CalendarView({ events }: CalendarViewProps) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const CustomToolbar = (toolbar: any) => {
+interface CustomToolbarProps {
+  date: Date;
+  view: string;
+  label: string;
+  onNavigate: (date: Date) => void;
+  onView: (view: string) => void;
+}
+
+const CustomToolbar = (toolbar: CustomToolbarProps) => {
   const handlePrevious = () => {
-    let newDate = new Date(toolbar.date);
+    const newDate = new Date(toolbar.date);
     if (toolbar.view === 'month') {
       newDate.setMonth(newDate.getMonth() - 1);
     } else if (toolbar.view === 'week') {
@@ -218,7 +226,7 @@ const CustomToolbar = (toolbar: any) => {
   };
 
   const handleNext = () => {
-    let newDate = new Date(toolbar.date);
+    const newDate = new Date(toolbar.date);
     if (toolbar.view === 'month') {
       newDate.setMonth(newDate.getMonth() + 1);
     } else if (toolbar.view === 'week') {

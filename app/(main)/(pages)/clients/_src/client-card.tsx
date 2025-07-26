@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { Calendar, Mail, Phone, Eye, User } from 'lucide-react';
+import { Calendar, Eye, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/packages/lib/components/tooltip';
 

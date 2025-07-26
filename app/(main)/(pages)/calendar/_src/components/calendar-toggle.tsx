@@ -6,11 +6,12 @@ import CalendarView from './calendar-view';
 import MobileCalendarView from './mobile-calendar-view';
 import EventList from './event-list';
 import { AddEventButton } from './add-event-button';
+import { CalendarEventWithMetadata } from '@/packages/lib/prisma/types';
 
 type ViewMode = 'calendar' | 'events';
 
 interface CalendarToggleProps {
-  events: any[];
+  events: CalendarEventWithMetadata[];
 }
 
 export function CalendarToggle({ events }: CalendarToggleProps) {

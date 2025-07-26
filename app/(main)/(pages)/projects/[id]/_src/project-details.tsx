@@ -2,7 +2,7 @@
 
 import { swrFetcher } from '@/packages/lib/helpers/fetcher';
 import type { ProjectWithMetadata } from '@/packages/lib/prisma/types';
-import { API_PROJECT_GET_BY_ID_ROUTE, INVOICE_DETAILS_ROUTE, INVOICES_ROUTE, PROJECTS_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import { API_PROJECT_GET_BY_ID_ROUTE, INVOICE_DETAILS_ROUTE, PROJECTS_ROUTE, routeWithParam } from '@/packages/lib/routes';
 import { redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';

@@ -87,7 +87,7 @@ export default async function Dashboard() {
         <TimeTracking timeTrackingData={timeTrackingData} />
       </div>
 
-      <div className="sm:flex md:space-y-0 space-y-8 gap-8 md:gap-8 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-3 md:space-y-0 space-y-8 gap-8 w-full">
         <UpcomingDeadlines projects={projects || []} />
         <MissedDeadlines projects={projects || []} />
         <RecentInvoices invoices={

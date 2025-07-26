@@ -49,9 +49,9 @@ export function UpcomingDeadlines({ projects }: UpcomingDeadlinesProps) {
             >
               <Calendar className={`h-4 w-4 ${project.daysRemaining <= 5 ? "text-red-600" : "text-yellow-600"}`} />
             </div>
-            <div className="flex-1">
-              <p className="font-medium text-foreground sm:text-sm text-xs">{project.name}</p>
-              <p className="text-xs text-gray-500">{project.client.name}</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-foreground sm:text-sm text-xs line-clamp-2 break-words">{project.name}</p>
+              <p className="text-xs text-gray-500 truncate">{project.client.name}</p>
             </div>
             <div className="text-right">
               <p className="text-xs font-medium text-foreground">Due in {project.daysRemaining} days</p>

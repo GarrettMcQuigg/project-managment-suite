@@ -63,9 +63,9 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
                         <Timer className="h-4 w-4 text-yellow-600" />
                     )}
                     </div>
-                    <div>
-                        <p className="font-medium text-foreground sm:text-sm text-xs">{invoice.invoiceNumber}</p>
-                        <p className="text-xs text-gray-500">{invoice.clientName}</p>
+                    <div className="min-w-0 flex-1">
+                        <p className="font-medium text-foreground sm:text-sm text-xs line-clamp-2 break-words">{invoice.invoiceNumber}</p>
+                        <p className="text-xs text-gray-500 truncate">{invoice.clientName}</p>
                     </div>
                 </div>
                 <div className="text-right">

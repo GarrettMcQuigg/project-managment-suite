@@ -5,9 +5,15 @@ import { MoonIcon, Palette, Rocket, SunIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { User } from '@prisma/client';
+import { useState, useEffect } from 'react';
 
 export default function LandingHeader({ currentUser }: { currentUser: User | null }) {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50">
@@ -48,10 +54,10 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
               type="button"
               className="bg-transparent cursor-pointer sm:block hidden"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label={mounted && theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               <div className="transition-all duration-200 hover:scale-110">
-                {theme === 'dark' ? (
+                {mounted && theme === 'dark' ? (
                   <MoonIcon className="h-5 w-5 text-white hover:text-gray-200 transition-colors duration-200" aria-hidden="true" />
                 ) : (
                   <SunIcon className="h-5 w-5 text-black hover:text-gray-800 transition-colors duration-200" aria-hidden="true" />

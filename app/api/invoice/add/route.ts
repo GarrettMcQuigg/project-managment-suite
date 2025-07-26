@@ -2,7 +2,7 @@ import { db } from '@packages/lib/prisma/client';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { AddInvoiceRequestBody, AddInvoiceRequestBodySchema } from './types';
-import { InvoiceStatus, InvoiceType, PaymentMethod } from '@prisma/client';
+import { InvoiceStatus, InvoiceType, PaymentMethod, CalendarEventType, CalendarEventStatus } from '@prisma/client';
 import { createInvoiceCheckout, createConnectInvoiceCheckout } from '@/packages/lib/stripe/invoice-checkout';
 // import EmailService from '@/packages/lib/utils/email-service';
 // import { format } from 'date-fns';
@@ -19,27 +19,48 @@ export async function POST(request: Request) {
   }
 
   try {
-    const invoice = await db.invoice.create({
-      data: {
-        userId: currentUser.id,
-        invoiceNumber: requestBody.invoiceNumber,
-        type: requestBody.type as InvoiceType,
-        status: requestBody.status as InvoiceStatus,
-        dueDate: new Date(requestBody.dueDate) ?? new Date(),
-        notes: requestBody.notes || '',
-        paymentMethod: (requestBody.paymentMethod as PaymentMethod) ?? null,
-        amount: requestBody.amount,
-        notifyClient: requestBody.notifyClient || false,
-        projectId: requestBody.projectId || null,
-        clientId: requestBody.clientId || null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      include: {
-        client: true,
-        project: true
-      }
+    const result = await db.$transaction(async (tx) => {
+      const invoice = await tx.invoice.create({
+        data: {
+          userId: currentUser.id,
+          invoiceNumber: requestBody.invoiceNumber,
+          type: requestBody.type as InvoiceType,
+          status: requestBody.status as InvoiceStatus,
+          dueDate: new Date(requestBody.dueDate) ?? new Date(),
+          notes: requestBody.notes || '',
+          paymentMethod: (requestBody.paymentMethod as PaymentMethod) ?? null,
+          amount: requestBody.amount,
+          notifyClient: requestBody.notifyClient || false,
+          projectId: requestBody.projectId || null,
+          clientId: requestBody.clientId || null,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        include: {
+          client: true,
+          project: true
+        }
+      });
+
+      // Create calendar event for the invoice
+      await tx.calendarEvent.create({
+        data: {
+          title: `Invoice Due: ${invoice.invoiceNumber}`,
+          description: `Invoice${invoice.project ? ` for ${invoice.project.name}` : ''} - $${invoice.amount}`,
+          type: CalendarEventType.INVOICE_DUE,
+          startDate: invoice.dueDate,
+          endDate: invoice.dueDate,
+          projectId: invoice.projectId,
+          invoiceId: invoice.id,
+          userId: currentUser.id,
+          status: CalendarEventStatus.SCHEDULED
+        }
+      });
+
+      return invoice;
     });
+
+    const invoice = result;
 
     // If notifyClient is true, create a checkout session and send email
     if (requestBody.notifyClient && invoice.client) {

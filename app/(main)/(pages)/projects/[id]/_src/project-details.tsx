@@ -2,11 +2,12 @@
 
 import { swrFetcher } from '@/packages/lib/helpers/fetcher';
 import type { ProjectWithMetadata } from '@/packages/lib/prisma/types';
-import { API_PROJECT_GET_BY_ID_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
+import { API_PROJECT_GET_BY_ID_ROUTE, INVOICE_DETAILS_ROUTE, INVOICES_ROUTE, PROJECTS_ROUTE, routeWithParam } from '@/packages/lib/routes';
 import { redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { format } from 'date-fns';
+import Link from 'next/link';
 import { Calendar, Clock, Users, Pencil, Eye, EyeOff, KeyRound, Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { DeleteProjectButton } from './delete-project';
@@ -141,42 +142,30 @@ export default function ProjectDetails({ projectId, onEditClick }: ProjectDetail
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Invoice #
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Due Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Payment Link
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Invoice #</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Due Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Payment Link</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#0F1A1C] divide-y divide-gray-200 dark:divide-gray-700">
                 {project.invoices.map((invoice) => (
                   <tr key={invoice.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                      {invoice.invoiceNumber}
+                      <Link href={routeWithParam(INVOICE_DETAILS_ROUTE, { id: invoice.id })} className="text-primary hover:underline">
+                        {invoice.invoiceNumber}
+                      </Link>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      ${invoice.amount ? Number(invoice.amount).toFixed(2) : '0.00'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      {format(new Date(invoice.dueDate), 'MMM d, yyyy')}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">${invoice.amount ? Number(invoice.amount).toFixed(2) : '0.00'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{format(new Date(invoice.dueDate), 'MMM d, yyyy')}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span 
+                      <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          invoice.status === 'PAID' 
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                          invoice.status === 'PAID'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                             : invoice.status === 'SENT' || invoice.status === 'DRAFT'
-                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' 
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                               : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                         }`}
                       >
@@ -186,9 +175,9 @@ export default function ProjectDetails({ projectId, onEditClick }: ProjectDetail
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                       {invoice.stripeCheckoutUrl ? (
                         <div className="flex items-center space-x-2">
-                          <a 
-                            href={invoice.stripeCheckoutUrl} 
-                            target="_blank" 
+                          <a
+                            href={invoice.stripeCheckoutUrl}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center"
                           >

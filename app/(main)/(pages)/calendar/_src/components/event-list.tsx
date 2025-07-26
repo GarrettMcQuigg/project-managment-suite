@@ -1,52 +1,65 @@
 import { CalendarEvent } from '@prisma/client';
 import { format } from 'date-fns';
-import { Calendar } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 
 interface EventListProps {
   events: CalendarEvent[];
 }
 
+const statusConfig = {
+  SCHEDULED: { color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800' },
+  IN_PROGRESS: { color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800' },
+  COMPLETED: { color: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' },
+  CANCELLED: { color: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700' }
+};
+
 export default function EventList({ events }: EventListProps) {
-  const sortedEvents = [...events].sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+  const sortedEvents = [...events].sort((a, b) => (a.endDate?.getTime() || 0) - (b.endDate?.getTime() || 0));
 
   return (
-    <div className="group relative overflow-hidden rounded-lg bg-card shadow-md transition-all duration-300 hover:shadow-lg dark:shadow-lg dark:shadow-primary/5 dark:hover:shadow-primary/10">
-      <div className="absolute inset-0 rounded-lg border border-border/50" />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 transition-colors duration-300 group-hover:from-primary/10 group-hover:to-accent/10 dark:from-primary/10 dark:via-transparent dark:to-accent/10 dark:group-hover:from-primary/15 dark:group-hover:to-accent/15" />
-
-      <div className="relative z-10 p-6">
-        <h2 className="text-2xl font-semibold text-card-foreground mb-4">Upcoming Events</h2>
-        <div className="space-y-4">
-          {sortedEvents.map((event) => (
-            <div key={event.id} className="group/event relative overflow-hidden rounded-lg border border-border/50 bg-background/50 p-4 transition-colors hover:bg-accent/10">
-              <h3 className="font-medium text-card-foreground">{event.title}</h3>
-              <div className="mt-2 flex items-center space-x-2 text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span>
-                  {format(event.startDate, 'PPP')} at {format(event.startDate, 'p')}
-                </span>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedEvents.map((event) => (
+          <div key={event.id} className="relative group perspective-1000">
+            <div className="relative bg-card dark:bg-card/80 rounded-2xl shadow-lg hover:shadow-2xl shadow-primary/10 group-hover:shadow-primary/40 group-hover:shadow-xl transition-all duration-500 transform group-hover:-translate-y-1 group-hover:rotate-[0.5deg] border border-border">
+              {/* Floating status badge */}
+              <div className="absolute -top-3 -right-3 z-10">
+                <div
+                  className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold ${statusConfig[event.status as keyof typeof statusConfig]?.color || statusConfig.SCHEDULED.color} backdrop-blur-sm`}
+                >
+                  {event.status}
+                </div>
               </div>
-              {event.description && <p className="mt-2 text-sm text-muted-foreground">{event.description}</p>}
-              <span
-                className={`mt-2 inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium
-                  ${
-                    event.status === 'SCHEDULED'
-                      ? 'bg-primary/20 text-primary-foreground'
-                      : event.status === 'IN_PROGRESS'
-                      ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200'
-                      : event.status === 'COMPLETED'
-                      ? 'bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200'
-                      : 'bg-secondary text-secondary-foreground'
-                  }`}
-              >
-                {event.status}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
 
-      <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-primary/60 via-primary/80 to-accent/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <div className="p-8">
+                <div className="relative -m-8 mb-6 p-8 bg-gradient-to-br from-primary/5 to-secondary/10 dark:from-primary/10 dark:to-secondary/20 rounded-t-2xl backdrop-blur-[1px]">
+                  <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2 break-words">{event.title}</h3>
+                  <p className="text-foreground/70 text-sm line-clamp-2 break-words">{event.description || 'No description provided'}</p>
+                </div>
+
+                {/* Content */}
+                <div className="flex items-center justify-between mt-12">
+                  {/* Date and Time */}
+                  <div className="flex justify-between w-full text-sm text-foreground/70">
+                    <div className="flex items-center mb-1">
+                      <Calendar className="w-4 h-4 mr-2 text-primary/70" />
+                      <span>
+                        Start Date: <b>{format(event.startDate, 'MMM dd, yyyy')}</b>
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-2 text-primary/70" />
+                      <span>
+                        End Date: <b>{event.endDate && format(event.endDate, 'MMM dd, yyyy')}</b>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

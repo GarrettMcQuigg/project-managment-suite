@@ -19,8 +19,14 @@ export async function DELETE(request: Request) {
   const { id } = requestBody;
 
   try {
-    await db.invoice.delete({
-      where: { id }
+    await db.$transaction(async (tx) => {
+      await tx.calendarEvent.deleteMany({
+        where: { invoiceId: id }
+      });
+
+      await tx.invoice.delete({
+        where: { id }
+      });
     });
 
     return handleSuccess({

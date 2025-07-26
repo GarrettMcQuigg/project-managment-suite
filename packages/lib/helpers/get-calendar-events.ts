@@ -25,6 +25,8 @@ export async function getCalendarEvents() {
         userId: currentUser.id
       }
     });
+
+    console.log('Calendar events:', events);
     return events;
   } catch (error: unknown) {
     console.error('Failed to fetch events:', error);

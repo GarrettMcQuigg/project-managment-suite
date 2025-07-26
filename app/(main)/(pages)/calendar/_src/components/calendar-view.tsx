@@ -5,6 +5,7 @@ import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import '../calendar-dark-theme.css';
 import { Button } from '@/packages/lib/components/button';
 import { CalendarEventDialog } from './calendar-event-dialog';
 import { CalendarEventWithMetadata } from '@/packages/lib/prisma/types';
@@ -18,17 +19,48 @@ interface CalendarViewProps {
 
 export default function CalendarView({ events }: CalendarViewProps) {
   const [view, setView] = useState('month');
+  const [date, setDate] = useState(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEventWithMetadata | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null);
 
-  const eventStyleGetter = () => {
+  const eventStyleGetter = (event: CalendarEventWithMetadata) => {
+    const startDate = new Date(event.startDate);
+    const endDate = event.endDate ? new Date(event.endDate) : startDate;
+    const duration = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    const getEventColor = () => {
+      if (event.color && event.color !== '#000000') return event.color;
+      switch (event.type) {
+        case 'PROJECT_TIMELINE':
+          return '#3b82f6';
+        case 'PHASE_DEADLINE':
+          return '#f59e0b';
+        case 'INVOICE_DUE':
+          return '#ef4444';
+        case 'CUSTOM':
+          return '#8b5cf6';
+        default:
+          return 'hsl(var(--primary))';
+      }
+    };
+
     return {
       style: {
-        backgroundColor: 'hsl(var(--primary))',
-        borderRadius: '0.375rem',
-        color: 'hsl(var(--primary-foreground))',
-        border: 'none'
+        backgroundColor: getEventColor(),
+        borderRadius: '0.25rem',
+        color: 'white',
+        border: 'none',
+        fontSize: duration > 7 ? '0.65rem' : '0.75rem',
+        fontWeight: '600',
+        padding: duration > 7 ? '1px 4px' : '2px 6px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.1)',
+        height: duration > 7 ? '16px' : '20px',
+        lineHeight: duration > 7 ? '14px' : '16px',
+        opacity: duration > 7 ? 0.9 : 1
       }
     };
   };
@@ -95,26 +127,72 @@ export default function CalendarView({ events }: CalendarViewProps) {
     return undefined;
   };
 
+  const CustomEvent = ({ event }: { event: CalendarEventWithMetadata }) => {
+    const startDate = new Date(event.startDate);
+    const endDate = event.endDate ? new Date(event.endDate) : startDate;
+    const duration = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    return (
+      <div className="flex items-center gap-1 w-full">
+        <div className="w-2 h-2 rounded-full bg-white/80 flex-shrink-0" />
+        <span className="truncate">{duration > 1 ? `${event.title} (${duration}d)` : event.title}</span>
+      </div>
+    );
+  };
+
+  const handleNavigate = (newDate: Date) => {
+    setDate(newDate);
+  };
+
+  const handleViewChange = (newView: string) => {
+    setView(newView);
+  };
+
+  // Custom date header component for current day styling
+  const CustomDateHeader = ({ date, label }: { date: Date; label: string }) => {
+    const today = new Date();
+    const isToday = date.toDateString() === today.toDateString();
+    
+    return (
+      <div className="flex justify-end items-center h-full pr-2 py-1">
+        {isToday ? (
+          <div 
+            className="w-7 h-7 rounded-md flex items-center justify-center text-white font-semibold"
+            style={{ backgroundColor: 'hsl(var(--primary))' }}
+          >
+            {label}
+          </div>
+        ) : (
+          <span className="py-1">{label}</span>
+        )}
+      </div>
+    );
+  };
+
   const components = {
-    toolbar: CustomToolbar
+    toolbar: (props: any) => <CustomToolbar {...props} onNavigate={handleNavigate} onView={handleViewChange} date={date} view={view} />,
+    event: CustomEvent,
+    month: {
+      dateHeader: CustomDateHeader
+    }
   };
 
   return (
     <>
-      <div className="group relative overflow-hidden rounded-lg bg-card shadow-md transition-all duration-300 hover:shadow-lg dark:shadow-lg dark:shadow-primary/5 dark:hover:shadow-primary/10">
-        <div className="absolute inset-0 rounded-lg border border-border/50" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 transition-colors duration-300 group-hover:from-primary/10 group-hover:to-accent/10 dark:from-primary/10 dark:via-transparent dark:to-accent/10 dark:group-hover:from-primary/15 dark:group-hover:to-accent/15" />
-        <div className="relative z-10 [&_.rbc-header]:!bg-muted/50 [&_.rbc-header]:!text-muted-foreground [&_.rbc-header]:!border-border/50 [&_.rbc-month-view]:!border-border/50 [&_.rbc-month-view]:!bg-card [&_.rbc-off-range-bg]:!bg-muted/30 [&_.rbc-today]:!bg-accent/30 [&_.rbc-calendar]:!text-card-foreground [&_.rbc-time-content]:!border-border/50 [&_.rbc-time-header]:!border-border/50 [&_.rbc-time-header-content]:!border-border/50 [&_.rbc-timeslot-group]:!border-border/50 [&_.rbc-time-slot]:!text-muted-foreground">
+      <div className="relative bg-card dark:bg-card/80 rounded-2xl shadow-lg border border-border">
+        <div className="relative z-10">
           <BigCalendar
             localizer={localizer}
             events={events}
             startAccessor="startDate"
             endAccessor="endDate"
-            style={{ height: 600 }}
+            style={{ height: 800 }}
             views={['month', 'week', 'day']}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             view={view as any}
-            onView={(newView) => setView(newView)}
+            date={date}
+            onView={handleViewChange}
+            onNavigate={handleNavigate}
             eventPropGetter={eventStyleGetter}
             components={components}
             selectable
@@ -122,7 +200,6 @@ export default function CalendarView({ events }: CalendarViewProps) {
             onSelectSlot={handleSelectSlot}
           />
         </div>
-        <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-primary/60 via-primary/80 to-accent/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
 
       <CalendarEventDialog open={isDialogOpen} onOpenChange={handleCloseDialog} mode={selectedEvent ? 'edit' : 'create'} defaultValues={getDefaultValues()} />
@@ -132,16 +209,44 @@ export default function CalendarView({ events }: CalendarViewProps) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomToolbar = (toolbar: any) => {
+  const handlePrevious = () => {
+    let newDate = new Date(toolbar.date);
+    if (toolbar.view === 'month') {
+      newDate.setMonth(newDate.getMonth() - 1);
+    } else if (toolbar.view === 'week') {
+      newDate.setDate(newDate.getDate() - 7);
+    } else if (toolbar.view === 'day') {
+      newDate.setDate(newDate.getDate() - 1);
+    }
+    toolbar.onNavigate(newDate);
+  };
+
+  const handleNext = () => {
+    let newDate = new Date(toolbar.date);
+    if (toolbar.view === 'month') {
+      newDate.setMonth(newDate.getMonth() + 1);
+    } else if (toolbar.view === 'week') {
+      newDate.setDate(newDate.getDate() + 7);
+    } else if (toolbar.view === 'day') {
+      newDate.setDate(newDate.getDate() + 1);
+    }
+    toolbar.onNavigate(newDate);
+  };
+
+  const handleToday = () => {
+    toolbar.onNavigate(new Date());
+  };
+
   return (
     <div className="flex items-center justify-between p-4 border-b border-border/50">
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={() => toolbar.onNavigate('PREV')}>
+        <Button variant="ghost" size="icon" onClick={handlePrevious}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => toolbar.onNavigate('NEXT')}>
+        <Button variant="ghost" size="icon" onClick={handleNext}>
           <ChevronRight className="h-4 w-4" />
         </Button>
-        <Button variant="secondary" onClick={() => toolbar.onNavigate('TODAY')}>
+        <Button variant="secondary" onClick={handleToday}>
           Today
         </Button>
       </div>

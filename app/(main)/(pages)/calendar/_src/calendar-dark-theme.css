@@ -1,0 +1,59 @@
+/* Hate this solution, but react-big-calendar doesn't work with tailwind dark mode */
+
+.dark .rbc-off-range-bg {
+  background-color: hsl(var(--background)) !important;
+}
+
+.dark .rbc-off-range {
+  color: hsl(var(--muted-foreground) / 0.4) !important;
+}
+
+.dark .rbc-month-view {
+  background-color: transparent !important;
+}
+
+.dark .rbc-date-cell {
+  background-color: transparent !important;
+}
+
+.dark .rbc-month-row {
+  background-color: transparent !important;
+}
+
+.dark .rbc-today {
+  background-color: hsl(var(--primary) / 0.1) !important;
+}
+
+.dark .rbc-button-link {
+  color: hsl(var(--foreground)) !important;
+}
+
+.rbc-today .rbc-button-link {
+  background-color: hsl(var(--primary)) !important;
+  color: white !important;
+  border-radius: 50% !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 600 !important;
+}
+
+.dark .rbc-today .rbc-button-link {
+  background-color: hsl(var(--primary)) !important;
+  color: white !important;
+}
+
+/* Calendar borders for dark mode */
+.dark .rbc-month-view,
+.dark .rbc-time-view {
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+.dark .rbc-month-row,
+.dark .rbc-date-cell,
+.dark .rbc-day-bg,
+.dark .rbc-time-slot {
+  border-color: hsl(var(--border)) !important;
+}

@@ -155,6 +155,21 @@ export async function POST(request: Request) {
         }))
       });
 
+      // 6. Create Calendar Events for Invoices
+      await tx.calendarEvent.createMany({
+        data: createdInvoices.map((invoice) => ({
+          title: `Invoice Due: ${invoice.invoiceNumber}`,
+          description: `Invoice for ${projectRecord.name} - $${invoice.amount}`,
+          type: CalendarEventType.INVOICE_DUE,
+          startDate: invoice.dueDate,
+          endDate: invoice.dueDate,
+          projectId: projectRecord.id,
+          invoiceId: invoice.id,
+          userId: currentUser.id,
+          status: CalendarEventStatus.SCHEDULED
+        }))
+      });
+
       return {
         project: projectRecord,
         phases: createdPhases,

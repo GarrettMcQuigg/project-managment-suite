@@ -19,7 +19,7 @@ export function CalendarToggle({ events }: CalendarToggleProps) {
 
   useEffect(() => {
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768); // md breakpoint
+      setIsMobile(window.innerWidth < 768);
     };
 
     checkIsMobile();
@@ -29,15 +29,11 @@ export function CalendarToggle({ events }: CalendarToggleProps) {
 
   return (
     <div className="space-y-6">
-      {/* Title */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">
-          {viewMode === 'calendar' ? 'Calendar' : 'Upcoming Events'}
-        </h1>
+        <h1 className="text-3xl font-bold">{viewMode === 'calendar' ? 'Calendar' : 'Upcoming Events'}</h1>
         <AddEventButton />
       </div>
 
-      {/* Toggle Buttons */}
       <div className="flex items-center justify-center">
         <div className="relative bg-muted rounded-lg p-1 flex">
           <button
@@ -47,7 +43,9 @@ export function CalendarToggle({ events }: CalendarToggleProps) {
             }`}
           >
             <Calendar className="w-4 h-4" />
-            Calendar View
+            <span className="flex items-center gap-1">
+              Calendar <span className="hidden md:block">View</span>
+            </span>
           </button>
           <button
             onClick={() => setViewMode('events')}
@@ -56,21 +54,14 @@ export function CalendarToggle({ events }: CalendarToggleProps) {
             }`}
           >
             <List className="w-4 h-4" />
-            Events View
+            <span className="flex items-center gap-1">
+              Events <span className="hidden md:block">View</span>
+            </span>
           </button>
         </div>
       </div>
 
-      {/* Conditional Content */}
-      {viewMode === 'calendar' ? (
-        isMobile ? (
-          <MobileCalendarView events={events} />
-        ) : (
-          <CalendarView events={events} />
-        )
-      ) : (
-        <EventList events={events} />
-      )}
+      {viewMode === 'calendar' ? isMobile ? <MobileCalendarView events={events} /> : <CalendarView events={events} /> : <EventList events={events} />}
     </div>
   );
 }

@@ -148,18 +148,14 @@ export default function CalendarView({ events }: CalendarViewProps) {
     setView(newView);
   };
 
-  // Custom date header component for current day styling
   const CustomDateHeader = ({ date, label }: { date: Date; label: string }) => {
     const today = new Date();
     const isToday = date.toDateString() === today.toDateString();
-    
+
     return (
       <div className="flex justify-end items-center h-full pr-2 py-1">
-        {isToday ? (
-          <div 
-            className="w-7 h-7 rounded-md flex items-center justify-center text-white font-semibold"
-            style={{ backgroundColor: 'hsl(var(--primary))' }}
-          >
+        {isToday && view === 'month' ? (
+          <div className="w-7 h-7 rounded-md flex items-center justify-center text-white font-semibold" style={{ backgroundColor: 'hsl(var(--primary))' }}>
             {label}
           </div>
         ) : (

@@ -14,15 +14,24 @@ const statusConfig = {
 };
 
 export default function EventList({ events }: EventListProps) {
-  const sortedEvents = [...events].sort((a, b) => (a.endDate?.getTime() || 0) - (b.endDate?.getTime() || 0));
+  const now = new Date();
+  const upcomingEvents = events
+    .filter((event) => {
+      const eventEndDate = event.endDate || event.startDate;
+      return eventEndDate > now;
+    })
+    .sort((a, b) => {
+      const aEndDate = a.endDate || a.startDate;
+      const bEndDate = b.endDate || b.startDate;
+      return aEndDate.getTime() - bEndDate.getTime();
+    });
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sortedEvents.map((event) => (
+        {upcomingEvents.map((event) => (
           <div key={event.id} className="relative group perspective-1000">
             <div className="relative bg-card dark:bg-card/80 rounded-2xl shadow-lg hover:shadow-2xl shadow-primary/10 group-hover:shadow-primary/40 group-hover:shadow-xl transition-all duration-500 transform group-hover:-translate-y-1 group-hover:rotate-[0.5deg] border border-border">
-              {/* Floating status badge */}
               <div className="absolute -top-3 -right-3 z-10">
                 <div
                   className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold ${statusConfig[event.status as keyof typeof statusConfig]?.color || statusConfig.SCHEDULED.color} backdrop-blur-sm`}
@@ -37,9 +46,7 @@ export default function EventList({ events }: EventListProps) {
                   <p className="text-foreground/70 text-sm line-clamp-2 break-words">{event.description || 'No description provided'}</p>
                 </div>
 
-                {/* Content */}
                 <div className="flex items-center justify-between mt-12">
-                  {/* Date and Time */}
                   <div className="flex justify-between w-full text-sm text-foreground/70">
                     <div className="flex items-center mb-1">
                       <Calendar className="w-4 h-4 mr-2 text-primary/70" />

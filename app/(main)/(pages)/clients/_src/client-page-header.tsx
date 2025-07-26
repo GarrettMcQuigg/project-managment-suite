@@ -11,7 +11,7 @@ export function ClientPageHeader() {
 
   return (
     <div className="flex items-center justify-between">
-      <h1 className="text-3xl font-bold">Clients</h1>
+      <h2 className="text-2xl font-bold text-foreground">Clients</h2>
       <Button onClick={() => setIsCreateDialogOpen(true)}>
         <Plus className="h-4 w-4" />
         New Client

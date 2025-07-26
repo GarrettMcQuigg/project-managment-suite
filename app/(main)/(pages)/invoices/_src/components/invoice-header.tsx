@@ -41,7 +41,7 @@ export function InvoiceHeader() {
 
   return (
     <div className="flex justify-between items-center">
-      <h1 className="font-bold text-3xl">Invoices</h1>
+      <h2 className="text-2xl font-bold text-foreground">Invoices</h2>
       <Button onClick={() => setIsCreateDialogOpen(true)}>
         <Plus className="h-4 w-4" />
         New Invoice

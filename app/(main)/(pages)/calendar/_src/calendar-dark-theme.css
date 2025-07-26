@@ -54,6 +54,27 @@
 .dark .rbc-month-row,
 .dark .rbc-date-cell,
 .dark .rbc-day-bg,
-.dark .rbc-time-slot {
+.dark .rbc-time-slot,
+.dark .rbc-time-header,
+.dark .rbc-time-content,
+.dark .rbc-header,
+.dark .rbc-time-gutter,
+.dark .rbc-timeslot-group {
   border-color: hsl(var(--border)) !important;
+}
+
+/* Week and Day view current day header styling */
+.rbc-header.rbc-today {
+  background-color: hsl(var(--primary)) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.dark .rbc-header.rbc-today {
+  background-color: hsl(var(--primary)) !important;
+  color: white !important;
 }

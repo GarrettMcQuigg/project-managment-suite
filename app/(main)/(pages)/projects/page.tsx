@@ -15,7 +15,7 @@ export default async function ProjectsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen">
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen-minus-header">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-foreground">Projects</h2>
         <NewProjectButton />
@@ -30,7 +30,10 @@ export default async function ProjectsPage() {
                 description: project.description || '',
                 status: project.status,
                 startDate: project.startDate,
-                progress: project.phases && project.phases.length > 0 ? Math.round(project.phases.reduce((acc, phase) => acc + (phase.status === PhaseStatus.COMPLETED ? 1 : 0), 0) / project.phases.length * 100) : 0,
+                progress:
+                  project.phases && project.phases.length > 0
+                    ? Math.round((project.phases.reduce((acc, phase) => acc + (phase.status === PhaseStatus.COMPLETED ? 1 : 0), 0) / project.phases.length) * 100)
+                    : 0,
                 endDate: project.endDate,
                 portalSlug: project.portalSlug,
                 team: [],

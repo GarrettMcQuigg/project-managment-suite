@@ -36,7 +36,7 @@ const ClientCard: React.FC<ClientCardProps> = ({ client }) => {
           {/* Header with gradient background */}
           <div className="relative -m-8 mb-6 p-8 bg-gradient-to-br from-primary/5 to-secondary/10 dark:from-primary/10 dark:to-secondary/20 rounded-t-2xl backdrop-blur-[1px]">
             <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2 break-words">{client.name}</h3>
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center justify-between">
               <p className="text-foreground/70 text-sm line-clamp-1 break-words">{client.email}</p>
               <p className="text-foreground/60 text-sm line-clamp-1 break-words">{client.phone}</p>
             </div>

@@ -7,8 +7,8 @@ export default async function InvoicesPage() {
 
   if (!invoices) {
     return (
-      <div className="space-y-8 p-8">
-        <h1 className="font-bold text-3xl">Invoices</h1>
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen">
+        <h2 className="text-2xl font-bold text-foreground">Invoices</h2>
         <div className="col-span-full text-center">
           <p className="text-lg text-gray-500">No invoices found</p>
         </div>
@@ -17,7 +17,7 @@ export default async function InvoicesPage() {
   }
 
   return (
-    <div className="space-y-8 p-8">
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen">
       <InvoiceHeader />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">

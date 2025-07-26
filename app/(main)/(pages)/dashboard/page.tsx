@@ -66,7 +66,7 @@ export default async function Dashboard() {
   const revenueChange = 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen">
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen-minus-header">
       <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
 
       <div className="sm:flex sm:space-y-0 space-y-8 gap-8">

@@ -50,7 +50,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice }) => {
           <div className="relative -m-8 mb-6 p-8 bg-gradient-to-br from-primary/5 to-secondary/10 dark:from-primary/10 dark:to-secondary/20 rounded-t-2xl backdrop-blur-[1px]">
             <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2 break-words">Invoice #{invoice.invoiceNumber}</h3>
             <p className="text-foreground/70 text-sm line-clamp-2 break-words">{invoice.projectName}</p>
-            
+
             {/* Type badge positioned to align with floating circle */}
             <div className="absolute -bottom-6 left-8">
               <span className="flex items-center gap-2 max-w-fit p-3 rounded-xl bg-muted hover:bg-muted/80 hover:text-primary transition-colors cursor-pointer group/type relative shadow-lg">

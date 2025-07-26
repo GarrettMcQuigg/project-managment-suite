@@ -9,7 +9,7 @@ export default async function CalendarPage() {
   }
 
   return (
-    <div className="space-y-8 p-8">
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen-minus-header">
       <CalendarToggle events={events} />
     </div>
   );

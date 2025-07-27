@@ -59,7 +59,7 @@ export function UpcomingDeadlines({ projects }: UpcomingDeadlinesProps) {
             </div>
           </div>
         ))}
-        {projectsWithDaysLeft.length === 0 && <p className="text-center text-foreground mt-20">No upcoming deadlines 🎉</p>}
+        {projectsWithDaysLeft.length === 0 && <p className="text-center text-foreground">No upcoming deadlines 🎉</p>}
       </CardContent>
     </Card>
   );

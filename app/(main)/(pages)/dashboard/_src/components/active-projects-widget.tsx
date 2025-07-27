@@ -1,117 +1,105 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/packages/lib/components/card"
-import { Badge } from "@/packages/lib/components/badge"
-import {
-  Archive,
-  CheckCircle,
-  Clock,
-  Paperclip,
-  Pause,
-  Pencil,
-  Trash,
-  Calendar,
-  MessageSquare,
-} from "lucide-react"
-import { Progress } from "@/packages/lib/components/progress"
-import { Button } from "@/packages/lib/components/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useState, useMemo } from "react"
-import { ProjectWithMetadata } from "@/packages/lib/prisma/types"
-import { PhaseStatus, ProjectStatus } from "@prisma/client"
-import { PROJECT_DETAILS_ROUTE, routeWithParam } from "@/packages/lib/routes"
+import { Card, CardContent, CardHeader, CardTitle } from '@/packages/lib/components/card';
+import { Badge } from '@/packages/lib/components/badge';
+import { Archive, CheckCircle, Clock, Paperclip, Pause, Pencil, Trash, Calendar, MessageSquare } from 'lucide-react';
+import { Progress } from '@/packages/lib/components/progress';
+import { Button } from '@/packages/lib/components/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState, useMemo } from 'react';
+import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
+import { PhaseStatus, ProjectStatus } from '@prisma/client';
+import { PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
 
 interface ActiveProjectsWidgetProps {
-  projects: ProjectWithMetadata[]
-  statusColors?: Record<ProjectStatus, string>
+  projects: ProjectWithMetadata[];
+  statusColors?: Record<ProjectStatus, string>;
 }
 
 const getProjectStatusBadgeClasses = (status: ProjectStatus) => {
   switch (status) {
     case ProjectStatus.COMPLETED:
-      return "bg-green-100 text-white hover:bg-green-200"
+      return 'bg-green-100 text-white hover:bg-green-200';
     case ProjectStatus.ACTIVE:
-      return "bg-blue-100 text-white hover:bg-blue-200"
+      return 'bg-blue-100 text-white hover:bg-blue-200';
     case ProjectStatus.PAUSED:
-      return "bg-yellow-100 text-black hover:bg-yellow-200"
+      return 'bg-yellow-100 text-black hover:bg-yellow-200';
     case ProjectStatus.DRAFT:
-      return "bg-gray-100 text-black hover:bg-gray-200"
+      return 'bg-gray-100 text-black hover:bg-gray-200';
     case ProjectStatus.PREPARATION:
-      return "bg-gray-100 text-white hover:bg-gray-200"
+      return 'bg-gray-100 text-white hover:bg-gray-200';
     case ProjectStatus.ARCHIVED:
     case ProjectStatus.DELETED:
-      return "bg-red-100 text-white hover:bg-red-200"
+      return 'bg-red-100 text-white hover:bg-red-200';
     default:
-      return "bg-gray-100 text-white hover:bg-gray-200"
+      return 'bg-gray-100 text-white hover:bg-gray-200';
   }
-}
+};
 
 const getProjectStatusIcon = (status: ProjectStatus) => {
   switch (status) {
     case ProjectStatus.COMPLETED:
-      return <CheckCircle className="h-3 w-3 mr-1" />
+      return <CheckCircle className="h-3 w-3 mr-1" />;
     case ProjectStatus.ACTIVE:
-      return <Clock className="h-3 w-3 mr-1" />
+      return <Clock className="h-3 w-3 mr-1" />;
     case ProjectStatus.PAUSED:
-      return <Pause className="h-3 w-3 mr-1" />
+      return <Pause className="h-3 w-3 mr-1" />;
     case ProjectStatus.DRAFT:
-      return <Paperclip className="h-3 w-3 mr-1" />
+      return <Paperclip className="h-3 w-3 mr-1" />;
     case ProjectStatus.PREPARATION:
-      return <Pencil className="h-3 w-3 mr-1" />
+      return <Pencil className="h-3 w-3 mr-1" />;
     case ProjectStatus.ARCHIVED:
-      return <Archive className="h-3 w-3 mr-1" />
+      return <Archive className="h-3 w-3 mr-1" />;
     case ProjectStatus.DELETED:
-      return <Trash className="h-3 w-3 mr-1" />
+      return <Trash className="h-3 w-3 mr-1" />;
     default:
-      return null
+      return null;
   }
-}
+};
 
 export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsWidgetProps) {
-  const router = useRouter()
-  const [currentPage, setCurrentPage] = useState(1)
-  const pageSize = 3
+  const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 3;
 
   const handleViewDetails = (project: ProjectWithMetadata) => {
-    router.push(routeWithParam(PROJECT_DETAILS_ROUTE, { id: project.id }))
-  }
+    router.push(routeWithParam(PROJECT_DETAILS_ROUTE, { id: project.id }));
+  };
 
   const sortedProjects = useMemo(() => {
     return [...projects].sort((a, b) => {
-      if (!a.endDate) return 1
-      if (!b.endDate) return -1
-      return new Date(a.endDate).getTime() - new Date(b.endDate).getTime()
-    })
-  }, [projects])
+      if (!a.endDate) return 1;
+      if (!b.endDate) return -1;
+      return new Date(a.endDate).getTime() - new Date(b.endDate).getTime();
+    });
+  }, [projects]);
 
   const paginatedProjects = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize
-    return sortedProjects.slice(startIndex, startIndex + pageSize)
-  }, [sortedProjects, currentPage, pageSize])
+    const startIndex = (currentPage - 1) * pageSize;
+    return sortedProjects.slice(startIndex, startIndex + pageSize);
+  }, [sortedProjects, currentPage, pageSize]);
 
-  const totalPages = Math.ceil(sortedProjects.length / pageSize)
+  const totalPages = Math.ceil(sortedProjects.length / pageSize);
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1)
+      setCurrentPage(currentPage - 1);
     }
-  }
+  };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1)
+      setCurrentPage(currentPage + 1);
     }
-  }
+  };
 
   return (
     <Card className="lg:col-span-8 border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group">
       <div className="flex justify-between px-6 pt-3 pb-3">
         <div>
           <CardTitle className="text-xl font-semibold">Active Projects</CardTitle>
-          <div className="text-muted-foreground text-sm ">
-            Current project progress
-          </div>
+          <div className="text-muted-foreground text-sm ">Current project progress</div>
         </div>
         <div className="flex space-x-2 mt-2">
           <Button
@@ -140,10 +128,10 @@ export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsW
         <div className="space-y-4">
           <div className="space-y-3">
             {paginatedProjects.map((project) => {
-              const phases = project.phases || []
-              const completedCount = phases.filter((phase) => phase.status === PhaseStatus.COMPLETED).length
-              const progressPercentage = phases.length > 0 ? Math.round((completedCount / phases.length) * 100) : 0
-  
+              const phases = project.phases || [];
+              const completedCount = phases.filter((phase) => phase.status === PhaseStatus.COMPLETED).length;
+              const progressPercentage = phases.length > 0 ? Math.round((completedCount / phases.length) * 100) : 0;
+
               return (
                 <Card
                   key={project.id}
@@ -157,7 +145,7 @@ export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsW
                         <p className="text-xs text-muted-foreground">{project.client.name}</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge 
+                        <Badge
                           className={`capitalize ${getProjectStatusBadgeClasses(project.status)} transition-all duration-200`}
                           style={statusColors ? { backgroundColor: statusColors[project.status] } : {}}
                         >
@@ -166,9 +154,7 @@ export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsW
                         </Badge>
                         <Badge variant="outline">
                           <Calendar className="mr-1 h-3 w-3" />
-                          <span>
-                            End Date: {project.endDate ? new Date(project.endDate).toLocaleDateString() : "No end date"}
-                          </span>
+                          <span>End Date: {project.endDate ? new Date(project.endDate).toLocaleDateString() : 'No end date'}</span>
                         </Badge>
                       </div>
                     </div>
@@ -201,15 +187,13 @@ export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsW
                     </div>
                   </CardContent>
                 </Card>
-              )
+              );
             })}
           </div>
 
-          {paginatedProjects.length === 0 && (
-            <div className="text-center p-8 text-muted-foreground">No active projects found</div>
-          )}
+          {paginatedProjects.length === 0 && <div className="text-center p-8 text-muted-foreground">No projects created yet</div>}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

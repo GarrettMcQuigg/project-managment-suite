@@ -48,7 +48,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
   const steps = ['Project', 'Timeline', 'Invoices', 'Client'];
 
   return (
-    <div className="flex items-center justify-center space-x-2 mb-6">
+    <div className="flex items-center justify-center space-x-2">
       {steps.map((step, index) => (
         <div key={step} className="flex items-center">
           <div

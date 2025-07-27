@@ -172,7 +172,10 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
     }
   };
   return (
-    <div className="space-y-6">
+    <div>
+      <span className="flex justify-center text-xs text-muted-foreground">
+        <i>This is an optional step. You can add phases later.</i>
+      </span>
       <div className="space-y-4">
         <div className="mb-6">
           <h3 className="text-lg font-medium">Project Phases</h3>

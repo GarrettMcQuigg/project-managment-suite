@@ -14,7 +14,7 @@ export async function getCalendarEvents() {
         client: true,
         project: true,
         user: true,
-        phase: true,
+        checkpoint: true,
         invoice: true,
         reminders: true
       },

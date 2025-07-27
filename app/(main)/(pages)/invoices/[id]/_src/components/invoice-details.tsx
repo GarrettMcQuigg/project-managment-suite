@@ -88,10 +88,10 @@ export default function InvoiceDetails({ invoiceId, showEditControls = false, on
             <h3 className="font-semibold">Payment Method</h3>
             <p>{invoice.paymentMethod || 'Not specified'}</p>
           </div>
-          {invoice.phaseId && (
+          {invoice.checkpointId && (
             <div>
-              <h3 className="font-semibold">Phase</h3>
-              <p>{invoice.phase?.name || 'Unknown'}</p>
+              <h3 className="font-semibold">Checkpoint</h3>
+              <p>{invoice.checkpoint?.name || 'Unknown'}</p>
             </div>
           )}
         </div>

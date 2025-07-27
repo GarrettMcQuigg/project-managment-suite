@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       },
       include: {
         client: true,
-        phases: true,
+        checkpoints: true,
         invoices: true
       }
     });
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       startDate: project.startDate,
       endDate: project.endDate,
       status: project.status,
-      phases: project.phases,
+      checkpoints: project.checkpoints,
       client: project.client,
       invoices: project.invoices,
       portalPassEncryption: project.portalPassEncryption

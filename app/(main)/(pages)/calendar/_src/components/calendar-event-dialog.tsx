@@ -37,7 +37,7 @@ const calendarEventSchema = z.object({
   type: z
     .enum([
       CalendarEventType.PROJECT_TIMELINE,
-      CalendarEventType.PHASE_DEADLINE,
+      CalendarEventType.CHECKPOINT_DEADLINE,
       CalendarEventType.INVOICE_DUE,
       CalendarEventType.CLIENT_ANNIVERSARY,
       CalendarEventType.PLATFORM_MILESTONE,
@@ -49,7 +49,7 @@ const calendarEventSchema = z.object({
     .default(CalendarEventStatus.SCHEDULED),
   color: z.string().optional(),
   projectId: z.string().optional(),
-  phaseId: z.string().optional(),
+  checkpointId: z.string().optional(),
   invoiceId: z.string().optional(),
   clientId: z.string().optional(),
   reminders: z

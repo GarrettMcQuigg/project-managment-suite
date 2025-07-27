@@ -1,7 +1,7 @@
 import { getProjectList } from '@/packages/lib/helpers/get-project-list';
 import ProjectCard from './_src/project-card';
 import { NewProjectButton } from './_src/add-project';
-import { PhaseStatus } from '@prisma/client';
+import { CheckpointStatus } from '@prisma/client';
 
 export default async function ProjectsPage() {
   const projects = await getProjectList();
@@ -31,8 +31,8 @@ export default async function ProjectsPage() {
                 status: project.status,
                 startDate: project.startDate,
                 progress:
-                  project.phases && project.phases.length > 0
-                    ? Math.round((project.phases.reduce((acc, phase) => acc + (phase.status === PhaseStatus.COMPLETED ? 1 : 0), 0) / project.phases.length) * 100)
+                  project.checkpoints && project.checkpoints.length > 0
+                    ? Math.round((project.checkpoints.reduce((acc, checkpoint) => acc + (checkpoint.status === CheckpointStatus.COMPLETED ? 1 : 0), 0) / project.checkpoints.length) * 100)
                     : 0,
                 endDate: project.endDate,
                 portalSlug: project.portalSlug,

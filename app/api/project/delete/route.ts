@@ -19,7 +19,7 @@ export async function DELETE(request: Request) {
     await db.$transaction(async (tx) => {
       const { id } = requestBody;
 
-      await tx.phase.deleteMany({
+      await tx.checkpoint.deleteMany({
         where: { projectId: id }
       });
 

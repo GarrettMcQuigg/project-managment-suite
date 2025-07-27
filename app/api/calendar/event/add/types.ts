@@ -22,7 +22,7 @@ export const AddCalendarEventRequestBodySchema = Joi.object({
     .required(),
   color: Joi.string().allow('', null),
   projectId: Joi.string().allow('', null),
-  phaseId: Joi.string().allow('', null),
+  checkpointId: Joi.string().allow('', null),
   invoiceId: Joi.string().allow('', null),
   clientId: Joi.string().allow('', null),
   reminders: Joi.array().items(
@@ -45,7 +45,7 @@ export interface AddCalendarEventRequestBody {
   status: CalendarEventStatus;
   color?: string;
   projectId?: string;
-  phaseId?: string;
+  checkpointId?: string;
   invoiceId?: string;
   clientId?: string;
   reminders: Reminder[];

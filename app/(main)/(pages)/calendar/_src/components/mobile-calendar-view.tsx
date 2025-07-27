@@ -32,7 +32,7 @@ export default function MobileCalendarView({ events }: MobileCalendarViewProps) 
     if (event.color && event.color !== '#000000') return event.color;
     switch (event.type) {
       case 'PROJECT_TIMELINE': return '#3b82f6';
-      case 'PHASE_DEADLINE': return '#f59e0b';
+      case 'CHECKPOINT_DEADLINE': return '#f59e0b';
       case 'INVOICE_DUE': return '#ef4444';
       case 'CUSTOM': return '#8b5cf6';
       default: return 'hsl(var(--primary))';
@@ -88,7 +88,7 @@ export default function MobileCalendarView({ events }: MobileCalendarViewProps) 
         status: selectedEvent.status,
         color: selectedEvent.color || '#000000',
         projectId: selectedEvent.projectId || undefined,
-        phaseId: selectedEvent.phaseId || undefined,
+        checkpointId: selectedEvent.checkpointId || undefined,
         invoiceId: selectedEvent.invoiceId || undefined,
         clientId: selectedEvent.clientId || undefined,
         reminders: selectedEvent.reminders.map((reminder) => ({

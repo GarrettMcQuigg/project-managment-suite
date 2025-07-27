@@ -1,8 +1,8 @@
 import Joi from 'joi';
-import { Phase, ProjectStatus, ProjectType, InvoiceStatus, InvoiceType } from '@prisma/client';
-import { PhaseSchema } from '../phases/add/types';
+import { Checkpoint, ProjectStatus, ProjectType, InvoiceStatus, InvoiceType } from '@prisma/client';
+import { CheckpointSchema } from '../checkpoints/add/types';
 
-export const PhaseSchemaExtended = PhaseSchema.keys({
+export const CheckpointSchemaExtended = CheckpointSchema.keys({
   isModified: Joi.boolean().optional()
 });
 
@@ -18,7 +18,7 @@ export const UpdateInvoiceSchema = Joi.object({
     .required(),
   dueDate: Joi.date().required(),
   notes: Joi.string().allow('', null),
-  phaseId: Joi.string().allow(null)
+  checkpointId: Joi.string().allow(null)
 }).unknown(true);
 
 export const UpdateProjectRequestBodySchema = Joi.object({
@@ -41,7 +41,7 @@ export const UpdateProjectRequestBodySchema = Joi.object({
     phone: Joi.string().min(1).required()
   }).required(),
 
-  phases: Joi.array().items(PhaseSchemaExtended).required(),
+  checkpoints: Joi.array().items(CheckpointSchemaExtended).required(),
   invoices: Joi.array().items(UpdateInvoiceSchema).required()
 });
 
@@ -59,7 +59,7 @@ export type UpdateProjectRequestBody = {
     email: string;
     phone: string;
   };
-  phases: Phase[];
+  checkpoints: Checkpoint[];
   invoices: {
     id: string;
     invoiceNumber: string;
@@ -68,7 +68,7 @@ export type UpdateProjectRequestBody = {
     status: InvoiceStatus;
     dueDate: Date;
     notes?: string | null;
-    phaseId?: string | null;
+    checkpointId?: string | null;
   }[];
 };
 
@@ -88,7 +88,7 @@ export type UpdateProjectResponse = {
       email: string;
       phone: string;
     };
-    phases: Phase[];
+    checkpoints: Checkpoint[];
     invoices: {
       id: string;
       invoiceNumber: string;
@@ -97,7 +97,7 @@ export type UpdateProjectResponse = {
       status: InvoiceStatus;
       dueDate: Date;
       notes?: string | null;
-      phaseId?: string | null;
+      checkpointId?: string | null;
     }[];
     createdAt: Date;
     updatedAt: Date;

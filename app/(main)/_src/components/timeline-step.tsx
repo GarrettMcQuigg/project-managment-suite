@@ -8,26 +8,26 @@ import { Textarea } from '@/packages/lib/components/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/packages/lib/components/popover';
 import { Calendar } from '@/packages/lib/components/calendar';
 import { Card } from '@/packages/lib/components/card';
-import { Phase, PhaseStatus, PhaseType } from '@prisma/client';
+import { Checkpoint, CheckpointStatus, CheckpointType } from '@prisma/client';
 import { DndContext, closestCenter, KeyboardSensor, useSensor, useSensors, DragEndEvent, MouseSensor, TouchSensor } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { CalendarIcon } from 'lucide-react';
 
 interface TimelineStepProps {
-  phases: Phase[];
-  onPhasesChange: (phases: Phase[]) => void;
+  checkpoints: Checkpoint[];
+  onCheckpointsChange: (checkpoints: Checkpoint[]) => void;
 }
 
-interface SortablePhaseItemProps {
-  phase: Phase;
-  onEdit: (e: React.MouseEvent, phase: Phase) => void;
-  onDelete: (e: React.MouseEvent, phaseId: string) => void;
+interface SortableCheckpointItemProps {
+  checkpoint: Checkpoint;
+  onEdit: (e: React.MouseEvent, checkpoint: Checkpoint) => void;
+  onDelete: (e: React.MouseEvent, checkpointId: string) => void;
 }
 
-function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) {
+function SortableCheckpointItem({ checkpoint, onEdit, onDelete }: SortableCheckpointItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: phase.id,
+    id: checkpoint.id,
     transition: {
       duration: 150,
       easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
@@ -42,14 +42,14 @@ function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) 
 
   return (
     <div ref={setNodeRef} style={style} className="relative group bg-background/50 border border-foreground/20 rounded-lg p-2 w-32 touch-none">
-      <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-medium z-10">{phase.order}</div>
+      <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-medium z-10">{checkpoint.order}</div>
 
       <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          onClick={(e) => onEdit(e, phase)}
+          onClick={(e) => onEdit(e, checkpoint)}
           className="h-6 w-6 bg-background rounded-medium text-muted-foreground hover:text-foreground shadow-sm"
         >
           <Pencil className="h-4 w-4" />
@@ -58,7 +58,7 @@ function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) 
           type="button"
           variant="ghost"
           size="icon"
-          onClick={(e) => onDelete(e, phase.id)}
+          onClick={(e) => onDelete(e, checkpoint.id)}
           className="h-6 w-6 bg-background rounded-medium text-red-500 hover:text-red-600 shadow-sm"
         >
           <Trash2 className="h-4 w-4" />
@@ -74,17 +74,17 @@ function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) 
       </div>
 
       <div className="flex flex-col items-start pt-2">
-        <span className="font-medium text-sm truncate w-full">{phase.type.replace('_', ' ')}</span>
-        {phase.name && <span className="text-muted-foreground text-xs truncate w-full">{phase.name}</span>}
+        <span className="font-medium text-sm truncate w-full">{checkpoint.type.replace('_', ' ')}</span>
+        {checkpoint.name && <span className="text-muted-foreground text-xs truncate w-full">{checkpoint.name}</span>}
       </div>
     </div>
   );
 }
 
-export default function TimelineStep({ phases, onPhasesChange }: TimelineStepProps) {
-  const [editingPhaseId, setEditingPhaseId] = useState<string | null>(null);
-  const [showAllPhases, setShowAllPhases] = useState(false);
-  const [activePhase, setActivePhase] = useState<Phase>(createEmptyPhase());
+export default function TimelineStep({ checkpoints, onCheckpointsChange }: TimelineStepProps) {
+  const [editingCheckpointId, setEditingCheckpointId] = useState<string | null>(null);
+  const [showAllCheckpoints, setShowAllCheckpoints] = useState(false);
+  const [activeCheckpoint, setActiveCheckpoint] = useState<Checkpoint>(createEmptyCheckpoint());
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -103,104 +103,104 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
     })
   );
 
-  function createEmptyPhase(): Phase & { isModified?: boolean } {
+  function createEmptyCheckpoint(): Checkpoint & { isModified?: boolean } {
     return {
       id: Date.now().toString(),
       projectId: '',
-      type: PhaseType.PREPARATION,
+      type: CheckpointType.PREPARATION,
       name: '',
       description: '',
       startDate: new Date(),
       endDate: new Date(),
-      status: PhaseStatus.PENDING,
-      order: phases.length + 1,
+      status: CheckpointStatus.PENDING,
+      order: checkpoints.length + 1,
       createdAt: new Date(),
       updatedAt: new Date(),
       isModified: true
     };
   }
 
-  const reorderPhases = (phaseList: Phase[]): Phase[] => {
-    return phaseList.map((phase, index) => ({
-      ...phase,
+  const reorderCheckpoints = (checkpointList: Checkpoint[]): Checkpoint[] => {
+    return checkpointList.map((checkpoint, index) => ({
+      ...checkpoint,
       order: index + 1
     }));
   };
 
-  const editPhase = (e: React.MouseEvent, phase: Phase) => {
+  const editCheckpoint = (e: React.MouseEvent, checkpoint: Checkpoint) => {
     e.preventDefault();
     e.stopPropagation();
-    const phaseWithDates = {
-      ...phase,
-      startDate: new Date(phase.startDate),
-      endDate: new Date(phase.endDate),
+    const checkpointWithDates = {
+      ...checkpoint,
+      startDate: new Date(checkpoint.startDate),
+      endDate: new Date(checkpoint.endDate),
       isModified: true
     };
-    setActivePhase(phaseWithDates);
-    setEditingPhaseId(phase.id);
+    setActiveCheckpoint(checkpointWithDates);
+    setEditingCheckpointId(checkpoint.id);
   };
 
-  const handlePhasePublish = (e: React.MouseEvent) => {
+  const handleCheckpointPublish = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    let updatedPhases: (Phase & { isModified?: boolean })[];
-    if (editingPhaseId) {
-      updatedPhases = reorderPhases(phases.map((p) => (p.id === editingPhaseId ? activePhase : p)));
+    let updatedCheckpoints: (Checkpoint & { isModified?: boolean })[];
+    if (editingCheckpointId) {
+      updatedCheckpoints = reorderCheckpoints(checkpoints.map((c) => (c.id === editingCheckpointId ? activeCheckpoint : c)));
     } else {
-      updatedPhases = reorderPhases([...phases, activePhase]);
+      updatedCheckpoints = reorderCheckpoints([...checkpoints, activeCheckpoint]);
     }
 
-    onPhasesChange(updatedPhases);
-    setActivePhase(createEmptyPhase());
-    setEditingPhaseId(null);
+    onCheckpointsChange(updatedCheckpoints);
+    setActiveCheckpoint(createEmptyCheckpoint());
+    setEditingCheckpointId(null);
   };
 
-  const updateActivePhase = (updates: Partial<Phase>) => {
-    setActivePhase({ ...activePhase, ...updates });
+  const updateActiveCheckpoint = (updates: Partial<Checkpoint>) => {
+    setActiveCheckpoint({ ...activeCheckpoint, ...updates });
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = phases.findIndex((phase) => phase.id === active.id);
-      const newIndex = phases.findIndex((phase) => phase.id === over.id);
+      const oldIndex = checkpoints.findIndex((checkpoint) => checkpoint.id === active.id);
+      const newIndex = checkpoints.findIndex((checkpoint) => checkpoint.id === over.id);
 
-      const reorderedPhases = reorderPhases(arrayMove(phases, oldIndex, newIndex));
-      onPhasesChange(reorderedPhases);
+      const reorderedCheckpoints = reorderCheckpoints(arrayMove(checkpoints, oldIndex, newIndex));
+      onCheckpointsChange(reorderedCheckpoints);
     }
   };
   return (
     <div>
       <span className="flex justify-center text-xs text-muted-foreground">
-        <i>This is an optional step. You can add phases later.</i>
+        <i>This is an optional step. You can add checkpoints later.</i>
       </span>
       <div className="space-y-4">
         <div className="mb-6">
-          <h3 className="text-lg font-medium">Project Phases</h3>
+          <h3 className="text-lg font-medium">Project Checkpoints</h3>
 
-          {phases.length > 0 && <div className="text-xs opacity-55">Hover over a phase to drag and reorder, edit, or delete the phase.</div>}
+          {checkpoints.length > 0 && <div className="text-xs opacity-55">Hover over a checkpoint to drag and reorder, edit, or delete the checkpoint.</div>}
         </div>
 
-        {phases.length > 0 && (
+        {checkpoints.length > 0 && (
           <>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={phases.map((phase) => phase.id)} strategy={rectSortingStrategy}>
+              <SortableContext items={checkpoints.map((checkpoint) => checkpoint.id)} strategy={rectSortingStrategy}>
                 <div className="grid grid-cols-4 gap-3 auto-rows-fr">
-                  {phases.slice(0, showAllPhases ? undefined : 4).map((phase) => (
-                    <SortablePhaseItem
-                      key={phase.id}
-                      phase={phase}
-                      onEdit={editPhase}
-                      onDelete={(e, phaseId) => {
+                  {checkpoints.slice(0, showAllCheckpoints ? undefined : 4).map((checkpoint) => (
+                    <SortableCheckpointItem
+                      key={checkpoint.id}
+                      checkpoint={checkpoint}
+                      onEdit={editCheckpoint}
+                      onDelete={(e, checkpointId) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        const updatedPhases = reorderPhases(phases.filter((p) => p.id !== phaseId));
-                        onPhasesChange(updatedPhases);
+                        const updatedCheckpoints = reorderCheckpoints(checkpoints.filter((c) => c.id !== checkpointId));
+                        onCheckpointsChange(updatedCheckpoints);
 
-                        if (updatedPhases.length <= 4) {
-                          setShowAllPhases(false);
+                        if (updatedCheckpoints.length <= 4) {
+                          setShowAllCheckpoints(false);
                         }
                       }}
                     />
@@ -209,9 +209,9 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
               </SortableContext>
             </DndContext>
 
-            {phases.length > 4 && (
-              <Button type="button" variant="ghost" size="sm" onClick={() => setShowAllPhases(!showAllPhases)} className="mt-2 text-xs flex justify-center w-full">
-                {showAllPhases ? 'Show Less' : `Show ${phases.length - 4} More`}
+            {checkpoints.length > 4 && (
+              <Button type="button" variant="ghost" size="sm" onClick={() => setShowAllCheckpoints(!showAllCheckpoints)} className="mt-2 text-xs flex justify-center w-full">
+                {showAllCheckpoints ? 'Show Less' : `Show ${checkpoints.length - 4} More`}
               </Button>
             )}
           </>
@@ -222,13 +222,13 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <FormLabel>Phase Type</FormLabel>
-              <Select value={activePhase.type} onValueChange={(value: PhaseType) => updateActivePhase({ type: value })}>
+              <FormLabel>Checkpoint Type</FormLabel>
+              <Select value={activeCheckpoint.type} onValueChange={(value: CheckpointType) => updateActiveCheckpoint({ type: value })}>
                 <SelectTrigger className="border-foreground/20">
-                  <SelectValue placeholder="Select phase type" />
+                  <SelectValue placeholder="Select checkpoint type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.values(PhaseType).map((type) => (
+                  {Object.values(CheckpointType).map((type) => (
                     <SelectItem key={type} value={type}>
                       {type.replace('_', ' ')}
                     </SelectItem>
@@ -238,18 +238,18 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
             </div>
 
             <div>
-              <FormLabel>Phase Name</FormLabel>
-              <Input value={activePhase.name} onChange={(e) => updateActivePhase({ name: e.target.value })} className="border-foreground/20" placeholder="Enter phase name" />
+              <FormLabel>Checkpoint Name</FormLabel>
+              <Input value={activeCheckpoint.name} onChange={(e) => updateActiveCheckpoint({ name: e.target.value })} className="border-foreground/20" placeholder="Enter checkpoint name" />
             </div>
           </div>
 
           <div>
             <FormLabel>Description</FormLabel>
             <Textarea
-              value={activePhase.description ?? ''}
-              onChange={(e) => updateActivePhase({ description: e.target.value })}
+              value={activeCheckpoint.description ?? ''}
+              onChange={(e) => updateActiveCheckpoint({ description: e.target.value })}
               className="border-foreground/20"
-              placeholder="Describe this phase"
+              placeholder="Describe this checkpoint"
             />
           </div>
 
@@ -260,14 +260,14 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
                 <PopoverTrigger asChild>
                   <Button type="button" variant="outline" className="w-full justify-start text-left font-normal border-foreground/20">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {activePhase.startDate instanceof Date ? activePhase.startDate.toLocaleDateString() : new Date(activePhase.startDate).toLocaleDateString()}
+                    {activeCheckpoint.startDate instanceof Date ? activeCheckpoint.startDate.toLocaleDateString() : new Date(activeCheckpoint.startDate).toLocaleDateString()}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={activePhase.startDate instanceof Date ? activePhase.startDate : new Date(activePhase.startDate)}
-                    onSelect={(date) => date && updateActivePhase({ startDate: date })}
+                    selected={activeCheckpoint.startDate instanceof Date ? activeCheckpoint.startDate : new Date(activeCheckpoint.startDate)}
+                    onSelect={(date) => date && updateActiveCheckpoint({ startDate: date })}
                     initialFocus
                   />
                 </PopoverContent>
@@ -280,14 +280,14 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
                 <PopoverTrigger asChild>
                   <Button type="button" variant="outline" className="w-full justify-start text-left font-normal border-foreground/20">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {activePhase.endDate instanceof Date ? activePhase.endDate.toLocaleDateString() : new Date(activePhase.endDate).toLocaleDateString()}
+                    {activeCheckpoint.endDate instanceof Date ? activeCheckpoint.endDate.toLocaleDateString() : new Date(activeCheckpoint.endDate).toLocaleDateString()}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={activePhase.endDate instanceof Date ? activePhase.endDate : new Date(activePhase.endDate)}
-                    onSelect={(date) => date && updateActivePhase({ endDate: date })}
+                    selected={activeCheckpoint.endDate instanceof Date ? activeCheckpoint.endDate : new Date(activeCheckpoint.endDate)}
+                    onSelect={(date) => date && updateActiveCheckpoint({ endDate: date })}
                     initialFocus
                   />
                 </PopoverContent>
@@ -296,8 +296,8 @@ export default function TimelineStep({ phases, onPhasesChange }: TimelineStepPro
           </div>
 
           <div className="flex justify-end mt-4">
-            <Button type="button" variant="outlinePrimary" onClick={handlePhasePublish} className="w-full sm:w-auto">
-              {editingPhaseId ? 'Update' : 'Add'} Phase
+            <Button type="button" variant="outlinePrimary" onClick={handleCheckpointPublish} className="w-full sm:w-auto">
+              {editingCheckpointId ? 'Update' : 'Add'} Checkpoint
             </Button>
           </div>
         </div>

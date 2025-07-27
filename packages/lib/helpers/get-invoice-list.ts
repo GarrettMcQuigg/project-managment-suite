@@ -15,7 +15,7 @@ export async function getInvoiceList() {
       },
       include: {
         project: true,
-        phase: true,
+        checkpoint: true,
         payments: true
       },
       orderBy: {

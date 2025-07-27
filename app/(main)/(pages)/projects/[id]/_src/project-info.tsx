@@ -3,7 +3,7 @@
 import { swrFetcher, fetcher } from '@/packages/lib/helpers/fetcher';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_PROJECT_GET_BY_ID_ROUTE, API_PROJECT_UPDATE_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
-import { Phase } from '@prisma/client';
+import { Checkpoint } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
@@ -86,7 +86,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
                 phone: project.client?.phone || ''
               }
             },
-            phases: project.phases as Phase[],
+            checkpoints: project.checkpoints as Checkpoint[],
             invoices: project.invoices || []
           }}
         />

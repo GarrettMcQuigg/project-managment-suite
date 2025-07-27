@@ -34,7 +34,7 @@ export default function CalendarView({ events }: CalendarViewProps) {
       switch (event.type) {
         case 'PROJECT_TIMELINE':
           return '#3b82f6';
-        case 'PHASE_DEADLINE':
+        case 'CHECKPOINT_DEADLINE':
           return '#f59e0b';
         case 'INVOICE_DUE':
           return '#ef4444';
@@ -96,7 +96,7 @@ export default function CalendarView({ events }: CalendarViewProps) {
         status: selectedEvent.status,
         color: selectedEvent.color || '#000000',
         projectId: selectedEvent.projectId || undefined,
-        phaseId: selectedEvent.phaseId || undefined,
+        checkpointId: selectedEvent.checkpointId || undefined,
         invoiceId: selectedEvent.invoiceId || undefined,
         clientId: selectedEvent.clientId || undefined,
         reminders: selectedEvent.reminders.map((reminder) => ({

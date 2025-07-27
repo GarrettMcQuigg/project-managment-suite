@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/pac
 import { Badge } from '@/packages/lib/components/badge';
 import { Progress } from '@/packages/lib/components/progress';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
-import { PhaseStatus, ProjectStatus } from '@prisma/client';
+import { CheckpointStatus, ProjectStatus } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
 
@@ -36,9 +36,9 @@ export function MobileActiveProjects({ projects, statusColors }: MobileActivePro
       </CardHeader>
       <CardContent className="space-y-4">
         {sortedProjects.map((project) => {
-          const phases = project.phases || [];
-          const completedCount = phases.filter((phase) => phase.status === PhaseStatus.COMPLETED).length;
-          const progressPercentage = phases.length > 0 ? Math.round((completedCount / phases.length) * 100) : 0;
+          const checkpoints = project.checkpoints || [];
+          const completedCount = checkpoints.filter((checkpoint) => checkpoint.status === CheckpointStatus.COMPLETED).length;
+          const progressPercentage = checkpoints.length > 0 ? Math.round((completedCount / checkpoints.length) * 100) : 0;
 
           return (
             <div
@@ -65,7 +65,7 @@ export function MobileActiveProjects({ projects, statusColors }: MobileActivePro
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">
-                    {completedCount} of {phases.length} phases
+                    {completedCount} of {checkpoints.length} checkpoints
                   </span>
                   <span className="font-medium">{progressPercentage}%</span>
                 </div>

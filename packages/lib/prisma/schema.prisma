@@ -84,7 +84,7 @@ model Project {
   description  String
   status       ProjectStatus        @default(PREPARATION)
   invoices     Invoice[] // Tracks actual invoices for the project
-  phases       Phase[]
+  checkpoints  Checkpoint[]
   attachments  ProjectAttachment[]
   messages     ProjectMessage[]
   participants ProjectParticipant[]
@@ -151,17 +151,17 @@ enum PaymentMethod {
   OTHER
 }
 
-model Phase {
-  id          String      @id @default(uuid())
-  project     Project     @relation(fields: [projectId], references: [id])
+model Checkpoint {
+  id          String           @id @default(uuid())
+  project     Project          @relation(fields: [projectId], references: [id])
   projectId   String
-  order       Int         @default(autoincrement())
-  type        PhaseType
+  order       Int              @default(autoincrement())
+  type        CheckpointType
   name        String
   description String?
   startDate   DateTime
   endDate     DateTime
-  status      PhaseStatus @default(PENDING)
+  status      CheckpointStatus @default(PENDING)
   invoice     Invoice[]
 
   // Calendar fields
@@ -171,7 +171,7 @@ model Phase {
   updatedAt DateTime @updatedAt
 }
 
-enum PhaseType {
+enum CheckpointType {
   PREPARATION
   DESIGN
   DEVELOPMENT
@@ -180,7 +180,7 @@ enum PhaseType {
   COMPLETED
 }
 
-enum PhaseStatus {
+enum CheckpointStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
@@ -318,8 +318,8 @@ model Invoice {
   projectId     String?
   client        Client?        @relation(fields: [clientId], references: [id])
   clientId      String?
-  phase         Phase?         @relation(fields: [phaseId], references: [id])
-  phaseId       String?        @unique // Only used for milestone payments
+  checkpoint    Checkpoint?    @relation(fields: [checkpointId], references: [id])
+  checkpointId  String?        @unique // Only used for milestone payments
   invoiceNumber String
   type          InvoiceType    @default(STANDARD)
   amount        String?
@@ -368,7 +368,7 @@ enum InvoiceStatus {
 enum PaymentType {
   DEPOSIT // Initial payment to start project
   INSTALLMENT // Regular partial payments
-  MILESTONE // Payments tied to project phases... maybe
+  MILESTONE // Payments tied to project checkpoints... maybe
   ADDITIONAL // Extra work/changes/bonuses
   FINAL // Final payment to complete project
   OTHER
@@ -415,16 +415,16 @@ model CalendarEvent {
   status      CalendarEventStatus @default(SCHEDULED)
   color       String? // For custom event coloring
 
-  project   Project? @relation(fields: [projectId], references: [id])
-  projectId String?
-  phase     Phase?   @relation(fields: [phaseId], references: [id])
-  phaseId   String?
-  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
-  invoiceId String?
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  client    Client?  @relation(fields: [clientId], references: [id])
-  clientId  String?
+  project      Project?    @relation(fields: [projectId], references: [id])
+  projectId    String?
+  checkpoint   Checkpoint? @relation(fields: [checkpointId], references: [id])
+  checkpointId String?
+  invoice      Invoice?    @relation(fields: [invoiceId], references: [id])
+  invoiceId    String?
+  user         User        @relation(fields: [userId], references: [id])
+  userId       String
+  client       Client?     @relation(fields: [clientId], references: [id])
+  clientId     String?
 
   // Reminder settings
   reminders EventReminder[]
@@ -452,7 +452,7 @@ model EventReminder {
 
 enum CalendarEventType {
   PROJECT_TIMELINE // Overall project duration
-  PHASE_DEADLINE // Individual phase deadlines
+  CHECKPOINT_DEADLINE // Individual checkpoint deadlines
   INVOICE_DUE // Invoice due dates
   CLIENT_ANNIVERSARY // Client relationship anniversaries
   PLATFORM_MILESTONE // Platform usage milestones
@@ -807,9 +807,9 @@ enum ActionType {
   DELETE_INVOICE
   SEND_MESSAGE
   VIEW_MESSAGE
-  CREATE_PHASE
-  UPDATE_PHASE
-  DELETE_PHASE
+  CREATE_CHECKPOINT
+  UPDATE_CHECKPOINT
+  DELETE_CHECKPOINT
   CREATE_ATTACHMENT
   DELETE_ATTACHMENT
   CREATE_EVENT

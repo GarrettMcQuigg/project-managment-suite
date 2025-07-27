@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       include: {
         project: true,
         client: true,
-        phase: true
+        checkpoint: true
       },
       orderBy: {
         createdAt: 'desc'

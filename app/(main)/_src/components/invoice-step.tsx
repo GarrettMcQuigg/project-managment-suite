@@ -24,7 +24,7 @@ type NewInvoice = {
   dueDate: Date;
   notifyClient: boolean;
   notes: string | null;
-  phaseId: string | null;
+  checkpointId: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -32,7 +32,7 @@ type NewInvoice = {
 interface InvoiceStepProps {
   invoices: Invoice[];
   onInvoicesChange: (invoices: Invoice[]) => void;
-  phases: Array<{ id: string; name: string }>;
+  checkpoints: Array<{ id: string; name: string }>;
 }
 
 interface InvoiceCardProps {
@@ -79,7 +79,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onEdit, onDelete }) 
   );
 };
 
-const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, phases }) => {
+const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, checkpoints }) => {
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
   const [activeInvoice, setActiveInvoice] = useState<NewInvoice>(createEmptyInvoice());
   const [isGeneratingNumber, setIsGeneratingNumber] = useState(false);
@@ -96,7 +96,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
       dueDate: new Date(),
       notifyClient: false,
       notes: '',
-      phaseId: null,
+      checkpointId: null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -294,20 +294,20 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, p
             </div>
 
             <div>
-              <FormLabel>Related Phase</FormLabel>
+              <FormLabel>Related Checkpoint</FormLabel>
               <Select 
-                value={activeInvoice.phaseId || '_none'} 
-                onValueChange={(value) => setActiveInvoice({ ...activeInvoice, phaseId: value === '_none' ? null : value })}
+                value={activeInvoice.checkpointId || '_none'} 
+                onValueChange={(value) => setActiveInvoice({ ...activeInvoice, checkpointId: value === '_none' ? null : value })}
                 disabled={stripeAccount.status !== 'VERIFIED'}
               >
                 <SelectTrigger className="border-foreground/20">
-                  <SelectValue placeholder="Select related phase" />
+                  <SelectValue placeholder="Select related checkpoint" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="_none">None</SelectItem>
-                  {phases.map((phase) => (
-                    <SelectItem key={phase.id} value={phase.id}>
-                      {phase.name}
+                  {checkpoints.map((checkpoint) => (
+                    <SelectItem key={checkpoint.id} value={checkpoint.id}>
+                      {checkpoint.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

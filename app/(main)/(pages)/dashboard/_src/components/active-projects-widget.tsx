@@ -9,7 +9,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
-import { PhaseStatus, ProjectStatus } from '@prisma/client';
+import { CheckpointStatus, ProjectStatus } from '@prisma/client';
 import { PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
 
 interface ActiveProjectsWidgetProps {
@@ -128,9 +128,9 @@ export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsW
         <div className="space-y-4">
           <div className="space-y-3">
             {paginatedProjects.map((project) => {
-              const phases = project.phases || [];
-              const completedCount = phases.filter((phase) => phase.status === PhaseStatus.COMPLETED).length;
-              const progressPercentage = phases.length > 0 ? Math.round((completedCount / phases.length) * 100) : 0;
+              const checkpoints = project.checkpoints || [];
+              const completedCount = checkpoints.filter((checkpoint) => checkpoint.status === CheckpointStatus.COMPLETED).length;
+              const progressPercentage = checkpoints.length > 0 ? Math.round((completedCount / checkpoints.length) * 100) : 0;
 
               return (
                 <Card
@@ -168,7 +168,7 @@ export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsW
                     </div>
                     <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
                       <span>
-                        {completedCount} of {phases.length} phases completed
+                        {completedCount} of {checkpoints.length} checkpoints completed
                       </span>
                       <div className="flex items-center space-x-3">
                         {project.attachments && project.attachments.length > 0 && (

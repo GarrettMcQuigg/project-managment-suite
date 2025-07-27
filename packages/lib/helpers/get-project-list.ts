@@ -13,7 +13,7 @@ export async function getProjectList(): Promise<ProjectWithMetadata[] | null> {
     const projects = await db.project.findMany({
       include: {
         client: true,
-        phases: true,
+        checkpoints: true,
         invoices: true,
         user: true,
         attachments: true,

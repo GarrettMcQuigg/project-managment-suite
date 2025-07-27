@@ -1,7 +1,7 @@
 import { db } from '@packages/lib/prisma/client';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { CalendarEventStatus, CalendarEventType, Phase } from '@prisma/client';
+import { CalendarEventStatus, CalendarEventType, Checkpoint } from '@prisma/client';
 import { UpdateProjectRequestBody, UpdateProjectRequestBodySchema } from './types';
 
 export async function PUT(request: Request) {
@@ -65,7 +65,7 @@ export async function PUT(request: Request) {
           status: true,
           dueDate: true,
           notes: true,
-          phaseId: true,
+          checkpointId: true,
           stripeCheckoutUrl: true,
           stripeCheckoutId: true
         }
@@ -85,7 +85,7 @@ export async function PUT(request: Request) {
             status: invoice.status,
             dueDate: invoice.dueDate,
             notes: invoice.notes || undefined,
-            phaseId: invoice.phaseId || undefined,
+            checkpointId: invoice.checkpointId || undefined,
             updatedAt: new Date()
           };
 
@@ -146,61 +146,61 @@ export async function PUT(request: Request) {
         });
       }
 
-      // Handle phases
-      if (requestBody.phases && requestBody.phases.length > 0) {
-        const modifiedPhases = requestBody.phases.filter((phase) => (phase as Phase & { isModified?: boolean }).isModified === true);
+      // Handle checkpoints
+      if (requestBody.checkpoints && requestBody.checkpoints.length > 0) {
+        const modifiedCheckpoints = requestBody.checkpoints.filter((checkpoint) => (checkpoint as Checkpoint & { isModified?: boolean }).isModified === true);
 
-        if (modifiedPhases.length > 0) {
-          const modifiedPhaseIds = modifiedPhases.map((phase) => phase.id);
+        if (modifiedCheckpoints.length > 0) {
+          const modifiedCheckpointIds = modifiedCheckpoints.map((checkpoint) => checkpoint.id);
 
-          for (const phaseId of modifiedPhaseIds) {
+          for (const checkpointId of modifiedCheckpointIds) {
             await tx.calendarEvent.deleteMany({
               where: {
-                phaseId: phaseId,
-                type: CalendarEventType.PHASE_DEADLINE
+                checkpointId: checkpointId,
+                type: CalendarEventType.CHECKPOINT_DEADLINE
               }
             });
           }
 
-          await tx.phase.deleteMany({
+          await tx.checkpoint.deleteMany({
             where: {
-              id: { in: modifiedPhaseIds },
+              id: { in: modifiedCheckpointIds },
               projectId: requestBody.id
             }
           });
 
           await Promise.all(
-            modifiedPhases.map(async (phase) => {
-              const { ...phaseData } = phase as Phase & { isModified?: boolean };
+            modifiedCheckpoints.map(async (checkpoint) => {
+              const { ...checkpointData } = checkpoint as Checkpoint & { isModified?: boolean };
 
-              const newPhase = await tx.phase.create({
+              const newCheckpoint = await tx.checkpoint.create({
                 data: {
                   projectId: requestBody.id,
-                  type: phaseData.type,
-                  name: phaseData.name,
-                  description: phaseData.description,
-                  startDate: new Date(phaseData.startDate),
-                  endDate: new Date(phaseData.endDate),
-                  status: phaseData.status,
-                  order: phaseData.order
+                  type: checkpointData.type,
+                  name: checkpointData.name,
+                  description: checkpointData.description,
+                  startDate: new Date(checkpointData.startDate),
+                  endDate: new Date(checkpointData.endDate),
+                  status: checkpointData.status,
+                  order: checkpointData.order
                 }
               });
 
               await tx.calendarEvent.create({
                 data: {
-                  title: `${updatedProject.name}: ${newPhase.name}`,
-                  description: newPhase.description || '',
-                  type: CalendarEventType.PHASE_DEADLINE,
-                  startDate: newPhase.startDate,
-                  endDate: newPhase.endDate,
+                  title: `${updatedProject.name}: ${newCheckpoint.name}`,
+                  description: newCheckpoint.description || '',
+                  type: CalendarEventType.CHECKPOINT_DEADLINE,
+                  startDate: newCheckpoint.startDate,
+                  endDate: newCheckpoint.endDate,
                   projectId: updatedProject.id,
-                  phaseId: newPhase.id,
+                  checkpointId: newCheckpoint.id,
                   userId: currentUser.id,
                   status: CalendarEventStatus.SCHEDULED
                 }
               });
 
-              return newPhase;
+              return newCheckpoint;
             })
           );
         }
@@ -222,7 +222,7 @@ export async function PUT(request: Request) {
         where: { id: requestBody.id },
         include: {
           client: true,
-          phases: true,
+          checkpoints: true,
           invoices: true
         }
       });
@@ -299,7 +299,7 @@ export async function PUT(request: Request) {
         where: { id: updatedProject.id },
         include: {
           client: true,
-          phases: true,
+          checkpoints: true,
           invoices: true
         }
       });

@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     return handleBadRequest({ message: error.message, err: error });
   }
 
-  const { client, name, description, type, status, startDate, endDate, phases, invoices } = requestBody;
+  const { client, name, description, type, status, startDate, endDate, checkpoints, invoices } = requestBody;
 
   try {
     const result = await db.$transaction(async (tx) => {
@@ -104,25 +104,25 @@ export async function POST(request: Request) {
               dueDate: invoice.dueDate,
               notifyClient: invoice.notifyClient,
               notes: invoice.notes,
-              phaseId: invoice.phaseId
+              checkpointId: invoice.checkpointId
             }
           })
         )
       );
 
-      // 4. Create phases
-      const createdPhases = await Promise.all(
-        phases.map((phase) =>
-          tx.phase.create({
+      // 4. Create checkpoints
+      const createdCheckpoints = await Promise.all(
+        checkpoints.map((checkpoint) =>
+          tx.checkpoint.create({
             data: {
               projectId: projectRecord.id,
-              type: phase.type,
-              name: phase.name,
-              description: phase.description,
-              startDate: new Date(phase.startDate),
-              endDate: new Date(phase.endDate),
-              status: phase.status,
-              order: phase.order
+              type: checkpoint.type,
+              name: checkpoint.name,
+              description: checkpoint.description,
+              startDate: new Date(checkpoint.startDate),
+              endDate: new Date(checkpoint.endDate),
+              status: checkpoint.status,
+              order: checkpoint.order
             }
           })
         )
@@ -142,14 +142,14 @@ export async function POST(request: Request) {
       });
 
       await tx.calendarEvent.createMany({
-        data: createdPhases.map((phase) => ({
-          title: `${projectRecord.name}: ${phase.name}`,
-          description: phase.description || '',
-          type: CalendarEventType.PHASE_DEADLINE,
-          startDate: phase.startDate,
-          endDate: phase.endDate,
+        data: createdCheckpoints.map((checkpoint) => ({
+          title: `${projectRecord.name}: ${checkpoint.name}`,
+          description: checkpoint.description || '',
+          type: CalendarEventType.CHECKPOINT_DEADLINE,
+          startDate: checkpoint.startDate,
+          endDate: checkpoint.endDate,
           projectId: projectRecord.id,
-          phaseId: phase.id,
+          checkpointId: checkpoint.id,
           userId: currentUser.id,
           status: CalendarEventStatus.SCHEDULED
         }))
@@ -172,7 +172,7 @@ export async function POST(request: Request) {
 
       return {
         project: projectRecord,
-        phases: createdPhases,
+        checkpoints: createdCheckpoints,
         invoices: createdInvoices,
         client: clientRecord,
         isNewClient: !client.id,

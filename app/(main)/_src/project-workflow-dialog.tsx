@@ -5,7 +5,7 @@ import { Button } from '@/packages/lib/components/button';
 import { Form } from '@/packages/lib/components/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { ProjectStatus, Phase, Invoice } from '@prisma/client';
+import { ProjectStatus, Checkpoint, Invoice } from '@prisma/client';
 import { projectFormSchema } from '../(pages)/projects/[id]/_src/types';
 import TimelineStep from './components/timeline-step';
 import ClientStep from './components/client-step';
@@ -19,11 +19,11 @@ interface StepIndicatorProps {
 interface UnifiedProjectWorkflowProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onComplete: (data: ProjectFormData & { phases: Phase[]; invoices: Invoice[] }) => void;
+  onComplete: (data: ProjectFormData & { checkpoints: Checkpoint[]; invoices: Invoice[] }) => void;
   mode?: 'create' | 'edit';
   defaultValues?: {
     project?: ProjectFormData;
-    phases?: Phase[];
+    checkpoints?: Checkpoint[];
     invoices?: Invoice[];
   };
   resetTrigger?: number;
@@ -67,7 +67,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
 
 export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ open, onOpenChange, onComplete, mode = 'create', defaultValues, resetTrigger = 0 }) => {
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [phases, setPhases] = useState<Phase[]>(defaultValues?.phases || []);
+  const [checkpoints, setCheckpoints] = useState<Checkpoint[]>(defaultValues?.checkpoints || []);
   const [invoices, setInvoices] = useState<Invoice[]>(defaultValues?.invoices || []);
   const [clientFormValid, setClientFormValid] = useState(true);
   const [isClientSelected, setIsClientSelected] = useState(false);
@@ -81,17 +81,17 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
   const resetWorkflow = useCallback(() => {
     if (mode === 'create') {
       form.reset(defaultFormValues);
-      setPhases([]);
+      setCheckpoints([]);
       setInvoices([]);
     } else {
       form.reset(defaultValues?.project);
-      setPhases(defaultValues?.phases || []);
+      setCheckpoints(defaultValues?.checkpoints || []);
       setInvoices(defaultValues?.invoices || []);
     }
     setCurrentStep(0);
     setIsClientSelected(false);
     setIsSubmitting(false);
-  }, [mode, form, defaultValues, setPhases, setInvoices, setCurrentStep, setIsClientSelected, setIsSubmitting]);
+  }, [mode, form, defaultValues, setCheckpoints, setInvoices, setCurrentStep, setIsClientSelected, setIsSubmitting]);
 
   useEffect(() => {
     if (open) {
@@ -112,14 +112,14 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
       component: <ProjectDetailsStep form={form} />
     },
     {
-      title: 'Timeline Phases',
+      title: 'Timeline Checkpoints',
       description: 'Create checkpoints to build a shareable timeline',
-      component: <TimelineStep phases={phases} onPhasesChange={setPhases} />
+      component: <TimelineStep checkpoints={checkpoints} onCheckpointsChange={setCheckpoints} />
     },
     {
       title: 'Invoice Details',
       description: 'Create and manage project invoices',
-      component: <InvoiceStep invoices={invoices} onInvoicesChange={setInvoices} phases={phases.map((phase) => ({ id: phase.id, name: phase.name }))} />
+      component: <InvoiceStep invoices={invoices} onInvoicesChange={setInvoices} checkpoints={checkpoints.map((checkpoint) => ({ id: checkpoint.id, name: checkpoint.name }))} />
     },
     {
       title: 'Client Details',
@@ -151,7 +151,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
       try {
         await onComplete({
           ...formData,
-          phases,
+          checkpoints,
           invoices
         });
       } catch (error) {

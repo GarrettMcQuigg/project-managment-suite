@@ -21,7 +21,7 @@ import {
 } from '@/packages/lib/routes';
 import UnifiedProjectWorkflow from './project-workflow-dialog';
 import { ProjectFormData } from './components/project-step';
-import { Phase, Invoice } from '@prisma/client';
+import { Checkpoint, Invoice } from '@prisma/client';
 import { mutate } from 'swr';
 
 export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean) => void }) {
@@ -31,7 +31,7 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
   const pathname = usePathname();
   const [resetTrigger, setResetTrigger] = useState(0);
 
-  const handleComplete = async (data: ProjectFormData & { phases: Phase[]; invoices: Invoice[] }) => {
+  const handleComplete = async (data: ProjectFormData & { checkpoints: Checkpoint[]; invoices: Invoice[] }) => {
     setLoading(true);
     try {
       const response = await fetcher({

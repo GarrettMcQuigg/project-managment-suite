@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         status: requestBody.status,
         color: requestBody.color,
         projectId: requestBody.projectId,
-        phaseId: requestBody.phaseId,
+        checkpointId: requestBody.checkpointId,
         invoiceId: requestBody.invoiceId,
         clientId: requestBody.clientId,
         userId: currentUser.id,

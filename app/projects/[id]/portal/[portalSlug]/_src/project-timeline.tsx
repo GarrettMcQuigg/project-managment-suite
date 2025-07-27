@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import { swrFetcher, fetcher } from '@/packages/lib/helpers/fetcher';
 import type { ProjectWithMetadata } from '@/packages/lib/prisma/types';
-import { API_AUTH_PORTAL_GET_BY_ID_ROUTE, PROJECTS_ROUTE, API_PROJECT_UPDATE_PHASE_STATUS_ROUTE } from '@/packages/lib/routes';
+import { API_AUTH_PORTAL_GET_BY_ID_ROUTE, PROJECTS_ROUTE, API_PROJECT_UPDATE_CHECKPOINT_STATUS_ROUTE } from '@/packages/lib/routes';
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
 import { CheckCircle, Clock, Circle } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
 import { Input } from '@/packages/lib/components/input';
-import { Phase, PhaseStatus } from '@prisma/client';
+import { Checkpoint, CheckpointStatus } from '@prisma/client';
 import { Progress } from '@/packages/lib/components/progress';
 import { toast } from 'react-toastify';
 
@@ -23,13 +23,13 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
 
   useEffect(() => {
     if (data) {
-      const projectWithSortedPhases = {
+      const projectWithSortedCheckpoints = {
         ...data.content,
-        phases: [...data.content.phases].sort((a, b) => a.order - b.order)
+        checkpoints: [...data.content.checkpoints].sort((a, b) => a.order - b.order)
       };
 
-      setProject(projectWithSortedPhases);
-      updateProgressPercentage(projectWithSortedPhases.phases);
+      setProject(projectWithSortedCheckpoints);
+      updateProgressPercentage(projectWithSortedCheckpoints.checkpoints);
     }
 
     if (error) {
@@ -38,51 +38,51 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
     }
   }, [data, error]);
 
-  const updateProgressPercentage = (phases: Phase[]) => {
-    if (!phases.length) return;
+  const updateProgressPercentage = (checkpoints: Checkpoint[]) => {
+    if (!checkpoints.length) return;
 
-    const completedCount = phases.filter((phase) => phase.status === PhaseStatus.COMPLETED).length;
-    const percentage = Math.round((completedCount / phases.length) * 100);
+    const completedCount = checkpoints.filter((checkpoint) => checkpoint.status === CheckpointStatus.COMPLETED).length;
+    const percentage = Math.round((completedCount / checkpoints.length) * 100);
     setProgressPercentage(percentage);
   };
 
-  const handleOnComplete = async (phaseId: string) => {
+  const handleOnComplete = async (checkpointId: string) => {
     if (!project || isUpdating) return;
 
     setIsUpdating(true);
 
     try {
-      const currentPhase = project.phases.find((p) => p.id === phaseId);
-      if (!currentPhase) {
-        toast.error('Phase not found');
+      const currentCheckpoint = project.checkpoints.find((c) => c.id === checkpointId);
+      if (!currentCheckpoint) {
+        toast.error('Checkpoint not found');
         setIsUpdating(false);
         return;
       }
 
-      const newStatus = currentPhase.status === PhaseStatus.COMPLETED ? PhaseStatus.IN_PROGRESS : PhaseStatus.COMPLETED;
+      const newStatus = currentCheckpoint.status === CheckpointStatus.COMPLETED ? CheckpointStatus.IN_PROGRESS : CheckpointStatus.COMPLETED;
 
-      console.log('Updating phase status:', newStatus, project.id, phaseId);
+      console.log('Updating checkpoint status:', newStatus, project.id, checkpointId);
 
       const response = await fetcher({
-        url: API_PROJECT_UPDATE_PHASE_STATUS_ROUTE,
+        url: API_PROJECT_UPDATE_CHECKPOINT_STATUS_ROUTE,
         requestBody: {
           projectId: project.id,
-          phaseId: phaseId,
+          checkpointId: checkpointId,
           newStatus
         }
       });
 
       if (response.err) {
-        toast.error('Failed to update phase status');
+        toast.error('Failed to update checkpoint status');
         setIsUpdating(false);
         return;
       }
 
       mutate(endpoint);
-      toast.success(`Phase ${newStatus === PhaseStatus.COMPLETED ? 'completed' : 'reopened'} successfully`);
+      toast.success(`Checkpoint ${newStatus === CheckpointStatus.COMPLETED ? 'completed' : 'reopened'} successfully`);
     } catch (error) {
-      console.error('Error updating phase status:', error);
-      toast.error('An error occurred while updating phase status');
+      console.error('Error updating checkpoint status:', error);
+      toast.error('An error occurred while updating checkpoint status');
     } finally {
       setIsUpdating(false);
     }
@@ -105,16 +105,16 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
         </div>
       </div>
       <div className="space-y-8">
-        {project.phases.map((phase, index) => (
-          <div key={phase.id} className="relative flex gap-6">
-            {index < project.phases.length - 1 && <div className="absolute left-[15px] top-[30px] h-[calc(100%+32px)] w-[2px] bg-gray-200 dark:bg-[#1A2729]" />}
+        {project.checkpoints.map((checkpoint, index) => (
+          <div key={checkpoint.id} className="relative flex gap-6">
+            {index < project.checkpoints.length - 1 && <div className="absolute left-[15px] top-[30px] h-[calc(100%+32px)] w-[2px] bg-gray-200 dark:bg-[#1A2729]" />}
 
             <div className="relative z-10">
-              {phase.status === PhaseStatus.COMPLETED ? (
+              {checkpoint.status === CheckpointStatus.COMPLETED ? (
                 <div className="rounded-full bg-gray-100 dark:bg-[#1A2729] p-1">
                   <CheckCircle className="h-6 w-6 text-emerald-600 dark:text-[#00b894]" />
                 </div>
-              ) : phase.status === PhaseStatus.IN_PROGRESS ? (
+              ) : checkpoint.status === CheckpointStatus.IN_PROGRESS ? (
                 <div className="rounded-full bg-gray-100 dark:bg-[#1A2729] p-1">
                   <Clock className="h-6 w-6 text-yellow-600 dark:text-[#b8a600]" />
                 </div>
@@ -129,18 +129,18 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
               <div className="rounded-lg bg-gray-100 dark:bg-[#1A2729] p-4">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <h3 className="font-medium text-gray-900 dark:text-white">{phase.name}</h3>
-                    <span className={`rounded-full px-3 py-1 text-sm ${getStatusStyle(phase.status)}`}>{getStatusText(phase.status)}</span>
+                    <h3 className="font-medium text-gray-900 dark:text-white">{checkpoint.name}</h3>
+                    <span className={`rounded-full px-3 py-1 text-sm ${getStatusStyle(checkpoint.status)}`}>{getStatusText(checkpoint.status)}</span>
                   </div>
                   {isOwner && (
-                    <Button onClick={() => handleOnComplete(phase.id)} variant="outline" disabled={isUpdating}>
-                      {isUpdating ? 'Updating...' : 'Mark Complete'} <Input type="checkbox" checked={phase.status === PhaseStatus.COMPLETED} readOnly />
+                    <Button onClick={() => handleOnComplete(checkpoint.id)} variant="outline" disabled={isUpdating}>
+                      {isUpdating ? 'Updating...' : 'Mark Complete'} <Input type="checkbox" checked={checkpoint.status === CheckpointStatus.COMPLETED} readOnly />
                     </Button>
                   )}
                 </div>
-                {phase.description && <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">{phase.description}</p>}
+                {checkpoint.description && <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">{checkpoint.description}</p>}
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {format(new Date(phase.startDate), 'MMM d, yyyy')} - {format(new Date(phase.endDate), 'MMM d, yyyy')}
+                  {format(new Date(checkpoint.startDate), 'MMM d, yyyy')} - {format(new Date(checkpoint.endDate), 'MMM d, yyyy')}
                 </div>
               </div>
             </div>
@@ -153,11 +153,11 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
 
 function getStatusStyle(status: string) {
   switch (status) {
-    case PhaseStatus.COMPLETED:
+    case CheckpointStatus.COMPLETED:
       return 'bg-emerald-100 text-emerald-600 dark:bg-[#1C3A33] dark:text-[#00b894]';
-    case PhaseStatus.IN_PROGRESS:
+    case CheckpointStatus.IN_PROGRESS:
       return 'bg-yellow-100 text-yellow-600 dark:bg-[#3A331C] dark:text-[#b8a600]';
-    case PhaseStatus.PENDING:
+    case CheckpointStatus.PENDING:
     default:
       return 'bg-gray-100 text-gray-600 dark:bg-[#1A2729] dark:text-gray-400';
   }
@@ -165,11 +165,11 @@ function getStatusStyle(status: string) {
 
 function getStatusText(status: string) {
   switch (status) {
-    case PhaseStatus.COMPLETED:
+    case CheckpointStatus.COMPLETED:
       return 'Completed';
-    case PhaseStatus.IN_PROGRESS:
+    case CheckpointStatus.IN_PROGRESS:
       return 'In Progress';
-    case PhaseStatus.PENDING:
+    case CheckpointStatus.PENDING:
     default:
       return 'Pending';
   }

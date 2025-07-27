@@ -1,6 +1,6 @@
 import Joi from 'joi';
-import { Phase, ProjectStatus, ProjectType, InvoiceStatus, InvoiceType } from '@prisma/client';
-import { PhaseSchema } from '../phases/add/types';
+import { Checkpoint, ProjectStatus, ProjectType, InvoiceStatus, InvoiceType } from '@prisma/client';
+import { CheckpointSchema } from '../checkpoints/add/types';
 
 export const NewInvoiceSchema = Joi.object({
   invoiceNumber: Joi.string().required(),
@@ -14,7 +14,7 @@ export const NewInvoiceSchema = Joi.object({
   dueDate: Joi.date().required(),
   notifyClient: Joi.boolean().optional(),
   notes: Joi.string().allow('', null),
-  phaseId: Joi.string().allow(null),
+  checkpointId: Joi.string().allow(null),
   id: Joi.string().optional(),
   projectId: Joi.string().allow('').optional(),
   createdAt: Joi.date().optional(),
@@ -40,7 +40,7 @@ export const AddProjectRequestBodySchema = Joi.object({
     phone: Joi.string().min(1).when('id', { is: '', then: Joi.required() })
   }).required(),
 
-  phases: Joi.array().items(PhaseSchema).required(),
+  checkpoints: Joi.array().items(CheckpointSchema).required(),
   invoices: Joi.array().items(NewInvoiceSchema).required()
 });
 
@@ -54,7 +54,7 @@ type NewInvoiceData = {
   dueDate: Date;
   notifyClient?: boolean;
   notes?: string | null;
-  phaseId?: string | null;
+  checkpointId?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -72,6 +72,6 @@ export type AddProjectRequestBody = {
     email?: string;
     phone?: string;
   };
-  phases: Phase[];
+  checkpoints: Checkpoint[];
   invoices: NewInvoiceData[];
 };

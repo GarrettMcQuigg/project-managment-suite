@@ -30,7 +30,7 @@ model User {
   invoices     Invoice[]
 
   // Stripe Connect fields
-  stripeAccountId     String?   @map("stripe_account_id")
+  stripeAccountId     String?             @map("stripe_account_id")
   stripeAccountStatus StripeAccountStatus @default(NOT_CONNECTED) @map("stripe_account_status")
 
   // Subscription fields
@@ -98,11 +98,11 @@ model Project {
 
   // Calendar fields
   calendarEvent CalendarEvent[]
-  
+
   // Analytics fields
-  timeTracking        TimeTracking[]
-  projectPerformance  ProjectPerformance[]
-  projectAllocation   ProjectAllocation[]
+  timeTracking       TimeTracking[]
+  projectPerformance ProjectPerformance[]
+  projectAllocation  ProjectAllocation[]
 
   startDate DateTime
   endDate   DateTime
@@ -131,6 +131,7 @@ enum ProjectType {
   EXHIBITION // Art shows, installations, gallery work
   CAMPAIGN // Multi-channel creative campaigns
   COLLABORATION // Joint creative projects
+  OTHER // Other project types
 }
 
 enum PaymentSchedule {
@@ -198,19 +199,19 @@ enum ProjectStatus {
 }
 
 model ProjectMessage {
-  id                String                     @id @default(uuid())
-  project           Project                    @relation(fields: [projectId], references: [id])
-  projectId         String
-  sender            String?
-  text              String
-  attachments       ProjectMessageAttachment[]
-  createdAt         DateTime                   @default(now())
-  messageRead       MessageRead[] // TODO : implement later
-  
+  id          String                     @id @default(uuid())
+  project     Project                    @relation(fields: [projectId], references: [id])
+  projectId   String
+  sender      String?
+  text        String
+  attachments ProjectMessageAttachment[]
+  createdAt   DateTime                   @default(now())
+  messageRead MessageRead[] // TODO : implement later
+
   // Response tracking fields
-  responseToMessage ProjectMessage?             @relation("MessageResponses", fields: [responseToMessageId], references: [id], onDelete: SetNull)
-  responseToMessageId String?                   
-  responses         ProjectMessage[]           @relation("MessageResponses")
+  responseToMessage   ProjectMessage?  @relation("MessageResponses", fields: [responseToMessageId], references: [id], onDelete: SetNull)
+  responseToMessageId String?
+  responses           ProjectMessage[] @relation("MessageResponses")
 }
 
 model ProjectParticipant {
@@ -336,8 +337,8 @@ model Invoice {
   stripePaidAt      DateTime?
 
   // Notification fields
-  notificationSent    Boolean   @default(false)
-  notificationSentAt  DateTime?
+  notificationSent   Boolean   @default(false)
+  notificationSentAt DateTime?
 
   // Calendar fields
   calendarEvent CalendarEvent[]
@@ -616,18 +617,18 @@ model Analytics {
   clientEngagement ClientEngagement[]
 
   // Message metrics
-  responseRate     Decimal? @db.Decimal(5, 2) // percentage
-  avgResponseTime  Int?     // in minutes
+  responseRate    Decimal? @db.Decimal(5, 2) // percentage
+  avgResponseTime Int? // in minutes
 
   // Time tracking metrics
   timeTracking TimeTracking[]
-  
+
   // Communication analytics
   communicationAnalytics CommunicationAnalytics?
-  
+
   // Performance metrics
   performanceMetrics PerformanceMetrics?
-  
+
   // Workload distribution
   workloadDistribution WorkloadDistribution[]
 
@@ -683,112 +684,112 @@ model TimeTracking {
   projectId   String
   startTime   DateTime
   endTime     DateTime?
-  duration    Int?      // Duration in minutes
+  duration    Int? // Duration in minutes
   description String?
   billable    Boolean   @default(true)
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([analyticsId, projectId])
   @@index([startTime, endTime])
 }
 
 model CommunicationAnalytics {
-  id                    String    @id @default(uuid())
-  analytics             Analytics @relation(fields: [analyticsId], references: [id])
-  analyticsId           String    @unique
-  avgResponseTime       Int?      // Average response time in minutes
-  previousAvgResponseTime Int?    // Previous average response time for tracking changes
-  messagesSent          Int       @default(0)
-  messagesReceived      Int       @default(0)
-  totalResponseTimeMinutes Int    @default(0) // Total minutes for calculating average
-  responseCount         Int       @default(0) // Number of responses for calculating average
-  clientInteractions    ClientInteraction[]
-  
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  id                       String              @id @default(uuid())
+  analytics                Analytics           @relation(fields: [analyticsId], references: [id])
+  analyticsId              String              @unique
+  avgResponseTime          Int? // Average response time in minutes
+  previousAvgResponseTime  Int? // Previous average response time for tracking changes
+  messagesSent             Int                 @default(0)
+  messagesReceived         Int                 @default(0)
+  totalResponseTimeMinutes Int                 @default(0) // Total minutes for calculating average
+  responseCount            Int                 @default(0) // Number of responses for calculating average
+  clientInteractions       ClientInteraction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ClientInteraction {
-  id                      String                @id @default(uuid())
-  communicationAnalytics  CommunicationAnalytics @relation(fields: [communicationAnalyticsId], references: [id])
+  id                       String                 @id @default(uuid())
+  communicationAnalytics   CommunicationAnalytics @relation(fields: [communicationAnalyticsId], references: [id])
   communicationAnalyticsId String
-  client                  Client                @relation(fields: [clientId], references: [id])
-  clientId                String
-  lastInteraction         DateTime
-  sentimentScore          Decimal?              @db.Decimal(3, 2) // -1.0 to 1.0 scale
-  interactionCount        Int                   @default(0)
-  averageResponseTime     Int?                  // In minutes
-  
-  createdAt               DateTime              @default(now())
-  updatedAt               DateTime              @updatedAt
-  
+  client                   Client                 @relation(fields: [clientId], references: [id])
+  clientId                 String
+  lastInteraction          DateTime
+  sentimentScore           Decimal?               @db.Decimal(3, 2) // -1.0 to 1.0 scale
+  interactionCount         Int                    @default(0)
+  averageResponseTime      Int? // In minutes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([communicationAnalyticsId, clientId])
 }
 
 model PerformanceMetrics {
-  id                    String    @id @default(uuid())
-  analytics             Analytics @relation(fields: [analyticsId], references: [id])
-  analyticsId           String    @unique
-  projectProfitability  Decimal   @default(0) @db.Decimal(10, 2) // Average profit margin
-  clientAcquisitionCost Decimal   @default(0) @db.Decimal(10, 2)
-  clientLifetimeValue   Decimal   @default(0) @db.Decimal(10, 2)
-  projectCompletionRate Decimal   @default(0) @db.Decimal(5, 2) // Percentage
-  onTimeDeliveryRate    Decimal   @default(0) @db.Decimal(5, 2) // Percentage
+  id                    String               @id @default(uuid())
+  analytics             Analytics            @relation(fields: [analyticsId], references: [id])
+  analyticsId           String               @unique
+  projectProfitability  Decimal              @default(0) @db.Decimal(10, 2) // Average profit margin
+  clientAcquisitionCost Decimal              @default(0) @db.Decimal(10, 2)
+  clientLifetimeValue   Decimal              @default(0) @db.Decimal(10, 2)
+  projectCompletionRate Decimal              @default(0) @db.Decimal(5, 2) // Percentage
+  onTimeDeliveryRate    Decimal              @default(0) @db.Decimal(5, 2) // Percentage
   projectDetails        ProjectPerformance[]
-  
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProjectPerformance {
-  id                  String            @id @default(uuid())
-  performanceMetrics  PerformanceMetrics @relation(fields: [performanceMetricsId], references: [id])
+  id                   String             @id @default(uuid())
+  performanceMetrics   PerformanceMetrics @relation(fields: [performanceMetricsId], references: [id])
   performanceMetricsId String
-  project             Project           @relation(fields: [projectId], references: [id])
-  projectId           String
-  estimatedHours      Int
-  actualHours         Int
-  estimatedCost       Decimal           @db.Decimal(10, 2)
-  actualCost          Decimal           @db.Decimal(10, 2)
-  revenue             Decimal           @db.Decimal(10, 2)
-  profitMargin        Decimal           @db.Decimal(5, 2) // Percentage
-  
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-  
+  project              Project            @relation(fields: [projectId], references: [id])
+  projectId            String
+  estimatedHours       Int
+  actualHours          Int
+  estimatedCost        Decimal            @db.Decimal(10, 2)
+  actualCost           Decimal            @db.Decimal(10, 2)
+  revenue              Decimal            @db.Decimal(10, 2)
+  profitMargin         Decimal            @db.Decimal(5, 2) // Percentage
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([performanceMetricsId, projectId])
 }
 
 model WorkloadDistribution {
-  id                String    @id @default(uuid())
-  analytics         Analytics @relation(fields: [analyticsId], references: [id])
+  id                String              @id @default(uuid())
+  analytics         Analytics           @relation(fields: [analyticsId], references: [id])
   analyticsId       String
-  date              DateTime  // Date for this workload snapshot
-  totalHours        Decimal   @default(0) @db.Decimal(5, 2)
-  billableHours     Decimal   @default(0) @db.Decimal(5, 2)
-  nonBillableHours  Decimal   @default(0) @db.Decimal(5, 2)
+  date              DateTime // Date for this workload snapshot
+  totalHours        Decimal             @default(0) @db.Decimal(5, 2)
+  billableHours     Decimal             @default(0) @db.Decimal(5, 2)
+  nonBillableHours  Decimal             @default(0) @db.Decimal(5, 2)
   projectAllocation ProjectAllocation[]
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([analyticsId, date])
 }
 
 model ProjectAllocation {
-  id                     String              @id @default(uuid())
+  id                     String               @id @default(uuid())
   workloadDistribution   WorkloadDistribution @relation(fields: [workloadDistributionId], references: [id])
   workloadDistributionId String
-  project                Project             @relation(fields: [projectId], references: [id])
+  project                Project              @relation(fields: [projectId], references: [id])
   projectId              String
-  hoursAllocated         Decimal             @default(0) @db.Decimal(5, 2)
-  percentageOfTotal      Decimal             @default(0) @db.Decimal(5, 2) // Percentage of total workload
-  
-  createdAt              DateTime            @default(now())
-  updatedAt              DateTime            @updatedAt
-  
+  hoursAllocated         Decimal              @default(0) @db.Decimal(5, 2)
+  percentageOfTotal      Decimal              @default(0) @db.Decimal(5, 2) // Percentage of total workload
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([workloadDistributionId, projectId])
 }
 

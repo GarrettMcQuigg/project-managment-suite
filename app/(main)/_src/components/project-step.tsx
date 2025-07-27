@@ -55,7 +55,6 @@ const ProjectDetailsStep: React.FC<ProjectDetailsStepProps> = ({ form }) => (
               ))}
             </SelectContent>
           </Select>
-          <FormMessage />
         </FormItem>
       )}
     />
@@ -69,7 +68,6 @@ const ProjectDetailsStep: React.FC<ProjectDetailsStepProps> = ({ form }) => (
           <FormControl>
             <Input placeholder="Enter project name" className="border-foreground/20" {...field} />
           </FormControl>
-          <FormMessage />
         </FormItem>
       )}
     />
@@ -83,7 +81,6 @@ const ProjectDetailsStep: React.FC<ProjectDetailsStepProps> = ({ form }) => (
           <FormControl>
             <Textarea placeholder="Describe your project" className="border-foreground/20 resize-none" {...field} />
           </FormControl>
-          <FormMessage />
         </FormItem>
       )}
     />
@@ -108,7 +105,6 @@ const ProjectDetailsStep: React.FC<ProjectDetailsStepProps> = ({ form }) => (
                 <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
               </PopoverContent>
             </Popover>
-            <FormMessage />
           </FormItem>
         )}
       />
@@ -132,7 +128,6 @@ const ProjectDetailsStep: React.FC<ProjectDetailsStepProps> = ({ form }) => (
                 <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus disabled={(date) => date < new Date()} />
               </PopoverContent>
             </Popover>
-            <FormMessage />
           </FormItem>
         )}
       />

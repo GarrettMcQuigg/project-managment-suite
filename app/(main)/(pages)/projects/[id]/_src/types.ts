@@ -76,6 +76,11 @@ export const projectTypes = {
     key: ProjectType.COLLABORATION,
     name: 'Collaboration',
     description: 'Joint creative projects'
+  },
+  Other: {
+    key: ProjectType.OTHER,
+    name: 'Other',
+    description: 'All other project types'
   }
 };
 

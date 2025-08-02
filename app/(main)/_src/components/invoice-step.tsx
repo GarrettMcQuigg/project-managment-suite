@@ -83,7 +83,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
   const [activeInvoice, setActiveInvoice] = useState<NewInvoice>(createEmptyInvoice());
   const [isGeneratingNumber, setIsGeneratingNumber] = useState(false);
-  const { stripeAccount, isLoading, connectStripeAccount, checkStripeAccount } = useStripeAccount();
+  const { stripeAccount, isLoading, connectStripeAccount } = useStripeAccount();
 
   function createEmptyInvoice(): NewInvoice {
     return {
@@ -196,7 +196,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
               onClick={async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                await checkStripeAccount();
+                // await checkStripeAccount();
                 connectStripeAccount();
               }}
               disabled={isLoading}

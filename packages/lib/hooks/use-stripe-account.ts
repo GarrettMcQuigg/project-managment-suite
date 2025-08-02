@@ -43,17 +43,20 @@ export function useStripeAccount() {
       const response = await fetch(API_STRIPE_CONNECT_ROUTE);
 
       if (!response.ok) {
-        // const errorData = await response.json().catch(() => ({}));
-        // throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-        return;
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
       }
 
       const data = await response.json();
 
-      if (data.content.accountLink) {
+      if (data.content && data.content.accountLink) {
+        // New account created, redirect to onboarding
         window.location.href = data.content.accountLink;
+      } else if (data.content && data.content.accountId && data.content.status) {
+        // Existing account found, update local state
+        setStripeAccount(data.content);
       } else {
-        throw new Error('No account link received');
+        throw new Error('Invalid response from Stripe connection');
       }
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to connect Stripe account';
@@ -67,19 +70,11 @@ export function useStripeAccount() {
     }
   };
 
-  // Only fetch when the user interacts with Stripe features
-  const checkStripeAccount = async () => {
-    if (!hasAttemptedFetch) {
-      await fetchStripeAccount();
-    }
-  };
-
   return {
     stripeAccount,
     isLoading,
     error,
     connectStripeAccount,
-    checkStripeAccount,
     refetch: fetchStripeAccount,
     hasAttemptedFetch
   };

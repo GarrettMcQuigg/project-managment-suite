@@ -60,10 +60,10 @@ export default async function middleware(request: NextRequest) {
       }
     }
 
-    // Redirect to login
-    const loginUrl = new URL('/auth/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
+    // Redirect to signin
+    const signinUrl = new URL('/auth/signin', request.url);
+    signinUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(signinUrl);
   }
 
   // User is authenticated, allow access

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_STRIPE_CONNECT_ROUTE } from '../routes';
 
 interface StripeAccountResponse {
   accountId?: string;
@@ -10,18 +11,21 @@ export function useStripeAccount() {
   const [stripeAccount, setStripeAccount] = useState<StripeAccountResponse>({
     status: 'NOT_CONNECTED'
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
 
   const fetchStripeAccount = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/stripe/connect');
-      
+      setHasAttemptedFetch(true);
+      const response = await fetch(API_STRIPE_CONNECT_ROUTE);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        // Keep default NOT_CONNECTED status for failed requests
+        return;
       }
-      
+
       const data = await response.json();
       setStripeAccount(data.content);
     } catch (err) {
@@ -35,15 +39,17 @@ export function useStripeAccount() {
   const connectStripeAccount = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/stripe/connect');
-      
+      setHasAttemptedFetch(true);
+      const response = await fetch(API_STRIPE_CONNECT_ROUTE);
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+        // const errorData = await response.json().catch(() => ({}));
+        // throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+        return;
       }
-      
+
       const data = await response.json();
-      
+
       if (data.content.accountLink) {
         window.location.href = data.content.accountLink;
       } else {
@@ -61,15 +67,20 @@ export function useStripeAccount() {
     }
   };
 
-  useEffect(() => {
-    fetchStripeAccount();
-  }, []);
+  // Only fetch when the user interacts with Stripe features
+  const checkStripeAccount = async () => {
+    if (!hasAttemptedFetch) {
+      await fetchStripeAccount();
+    }
+  };
 
   return {
     stripeAccount,
     isLoading,
     error,
     connectStripeAccount,
-    refetch: fetchStripeAccount
+    checkStripeAccount,
+    refetch: fetchStripeAccount,
+    hasAttemptedFetch
   };
 }

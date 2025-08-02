@@ -100,6 +100,7 @@ export const API_ANALYTICS_COMMUNICATION_ROUTE = `${API_ROUTE}/analytics/communi
 
 // Stripe API routes
 export const API_STRIPE_ROUTE = `${API_ROUTE}/stripe`;
+export const API_STRIPE_CONNECT_ROUTE = `${API_STRIPE_ROUTE}/connect`;
 export const API_STRIPE_CHECKOUT_ROUTE = `${API_STRIPE_ROUTE}/checkout`;
 export const API_STRIPE_WEBHOOK_ROUTE = `${API_STRIPE_ROUTE}/webhook`;
 

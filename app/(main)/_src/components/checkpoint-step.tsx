@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2, Pencil, GripVertical } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
 import { Input } from '@/packages/lib/components/input';
@@ -17,6 +17,8 @@ import { CalendarIcon } from 'lucide-react';
 interface TimelineStepProps {
   checkpoints: Checkpoint[];
   onCheckpointsChange: (checkpoints: Checkpoint[]) => void;
+  projectStartDate?: Date;
+  projectEndDate?: Date;
 }
 
 interface SortableCheckpointItemProps {
@@ -42,7 +44,9 @@ function SortableCheckpointItem({ checkpoint, onEdit, onDelete }: SortableCheckp
 
   return (
     <div ref={setNodeRef} style={style} className="relative group bg-background/50 border border-foreground/20 rounded-lg p-2 w-32 touch-none">
-      <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-medium z-10">{checkpoint.order}</div>
+      <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-medium z-10">
+        {checkpoint.order}
+      </div>
 
       <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
         <Button
@@ -81,7 +85,7 @@ function SortableCheckpointItem({ checkpoint, onEdit, onDelete }: SortableCheckp
   );
 }
 
-export default function TimelineStep({ checkpoints, onCheckpointsChange }: TimelineStepProps) {
+export default function TimelineStep({ checkpoints, onCheckpointsChange, projectStartDate, projectEndDate }: TimelineStepProps) {
   const [editingCheckpointId, setEditingCheckpointId] = useState<string | null>(null);
   const [showAllCheckpoints, setShowAllCheckpoints] = useState(false);
   const [activeCheckpoint, setActiveCheckpoint] = useState<Checkpoint>(createEmptyCheckpoint());
@@ -104,14 +108,48 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange }: Timel
   );
 
   function createEmptyCheckpoint(): Checkpoint & { isModified?: boolean } {
+    const getSmartDates = () => {
+      if (checkpoints.length === 0) {
+        // First checkpoint should start from project start date
+        const startDate = projectStartDate || new Date();
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 1);
+        return { startDate, endDate };
+      }
+
+      // Find the latest checkpoint end date
+      const sortedCheckpoints = [...checkpoints].sort((a, b) => a.order - b.order);
+      const lastCheckpoint = sortedCheckpoints[sortedCheckpoints.length - 1];
+      const lastEndDate = new Date(lastCheckpoint.endDate);
+      
+      // Calculate new dates based on previous checkpoint
+      const nextDay = new Date(lastEndDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      
+      const projectEnd = projectEndDate || new Date();
+      
+      if (nextDay < projectEnd) {
+        // New checkpoint starts 1 day after previous end date
+        const startDate = nextDay;
+        const endDate = new Date(nextDay);
+        endDate.setDate(endDate.getDate() + 1);
+        return { startDate, endDate };
+      } else {
+        // Use previous checkpoint's end date if we're at project end
+        return { startDate: lastEndDate, endDate: lastEndDate };
+      }
+    };
+
+    const { startDate, endDate } = getSmartDates();
+
     return {
       id: Date.now().toString(),
       projectId: '',
       type: CheckpointType.PREPARATION,
       name: '',
       description: '',
-      startDate: new Date(),
-      endDate: new Date(),
+      startDate,
+      endDate,
       status: CheckpointStatus.PENDING,
       order: checkpoints.length + 1,
       createdAt: new Date(),
@@ -152,7 +190,50 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange }: Timel
     }
 
     onCheckpointsChange(updatedCheckpoints);
-    setActiveCheckpoint(createEmptyCheckpoint());
+    
+    // Create the next empty checkpoint with dates based on the checkpoint we just added
+    const createNextEmptyCheckpoint = (): Checkpoint & { isModified?: boolean } => {
+      const getSmartDates = () => {
+        // Use the checkpoint we just added to calculate next dates
+        const lastEndDate = new Date(activeCheckpoint.endDate);
+        
+        // Calculate new dates based on the checkpoint we just added
+        const nextDay = new Date(lastEndDate);
+        nextDay.setDate(nextDay.getDate() + 1);
+        
+        const projectEnd = projectEndDate || new Date();
+        
+        if (nextDay < projectEnd) {
+          // New checkpoint starts 1 day after previous end date
+          const startDate = nextDay;
+          const endDate = new Date(nextDay);
+          endDate.setDate(endDate.getDate() + 1);
+          return { startDate, endDate };
+        } else {
+          // Use previous checkpoint's end date if we're at project end
+          return { startDate: lastEndDate, endDate: lastEndDate };
+        }
+      };
+
+      const { startDate, endDate } = getSmartDates();
+
+      return {
+        id: Date.now().toString(),
+        projectId: '',
+        type: CheckpointType.PREPARATION,
+        name: '',
+        description: '',
+        startDate,
+        endDate,
+        status: CheckpointStatus.PENDING,
+        order: updatedCheckpoints.length + 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isModified: true
+      };
+    };
+
+    setActiveCheckpoint(editingCheckpointId ? createEmptyCheckpoint() : createNextEmptyCheckpoint());
     setEditingCheckpointId(null);
   };
 
@@ -171,6 +252,34 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange }: Timel
       onCheckpointsChange(reorderedCheckpoints);
     }
   };
+
+  // Update checkpoint dates when project start date changes
+  useEffect(() => {
+    if (checkpoints.length > 0 && projectStartDate) {
+      const updatedCheckpoints = checkpoints.map((checkpoint, index) => {
+        if (index === 0) {
+          // First checkpoint should start from project start date
+          const newStartDate = new Date(projectStartDate);
+          const currentDuration = new Date(checkpoint.endDate).getTime() - new Date(checkpoint.startDate).getTime();
+          const newEndDate = new Date(newStartDate.getTime() + currentDuration);
+          
+          return {
+            ...checkpoint,
+            startDate: newStartDate,
+            endDate: newEndDate
+          };
+        }
+        return checkpoint;
+      });
+      
+      // Check if the first checkpoint actually changed
+      const firstCheckpoint = checkpoints[0];
+      const firstUpdated = updatedCheckpoints[0];
+      if (firstCheckpoint.startDate.getTime() !== firstUpdated.startDate.getTime()) {
+        onCheckpointsChange(updatedCheckpoints);
+      }
+    }
+  }, [projectStartDate]); // Only depend on projectStartDate to avoid infinite loops
   return (
     <div>
       <span className="flex justify-center text-xs text-muted-foreground">
@@ -218,7 +327,7 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange }: Timel
         )}
       </div>
 
-      <Card className="p-4">
+      <Card className="p-4 mt-4">
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -239,7 +348,12 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange }: Timel
 
             <div>
               <FormLabel>Checkpoint Name</FormLabel>
-              <Input value={activeCheckpoint.name} onChange={(e) => updateActiveCheckpoint({ name: e.target.value })} className="border-foreground/20" placeholder="Enter checkpoint name" />
+              <Input
+                value={activeCheckpoint.name}
+                onChange={(e) => updateActiveCheckpoint({ name: e.target.value })}
+                className="border-foreground/20"
+                placeholder="Enter checkpoint name"
+              />
             </div>
           </div>
 
@@ -268,6 +382,11 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange }: Timel
                     mode="single"
                     selected={activeCheckpoint.startDate instanceof Date ? activeCheckpoint.startDate : new Date(activeCheckpoint.startDate)}
                     onSelect={(date) => date && updateActiveCheckpoint({ startDate: date })}
+                    disabled={(date) => {
+                      if (projectStartDate && date < projectStartDate) return true;
+                      if (projectEndDate && date > projectEndDate) return true;
+                      return false;
+                    }}
                     initialFocus
                   />
                 </PopoverContent>
@@ -288,6 +407,12 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange }: Timel
                     mode="single"
                     selected={activeCheckpoint.endDate instanceof Date ? activeCheckpoint.endDate : new Date(activeCheckpoint.endDate)}
                     onSelect={(date) => date && updateActiveCheckpoint({ endDate: date })}
+                    disabled={(date) => {
+                      const startDate = activeCheckpoint.startDate instanceof Date ? activeCheckpoint.startDate : new Date(activeCheckpoint.startDate);
+                      if (date < startDate) return true;
+                      if (projectEndDate && date > projectEndDate) return true;
+                      return false;
+                    }}
                     initialFocus
                   />
                 </PopoverContent>

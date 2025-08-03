@@ -76,8 +76,8 @@ export async function GET(request: NextRequest) {
     try {
       accountLink = await stripe.accountLinks.create({
         account: account.id,
-        refresh_url: `${origin}/settings/payments`,
-        return_url: `${origin}/settings/payments/success`,
+        refresh_url: `${origin}/stripe/connect/success`,
+        return_url: `${origin}/stripe/connect/success`,
         type: 'account_onboarding'
       });
     } catch (linkError) {

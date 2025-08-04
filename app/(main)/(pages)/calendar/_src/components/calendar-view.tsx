@@ -132,6 +132,8 @@ export default function CalendarView({ events }: CalendarViewProps) {
     const endDate = event.endDate ? new Date(event.endDate) : startDate;
     const duration = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
+    console.log('event.title', event.title);
+
     return (
       <div className="flex items-center gap-1 w-full">
         <div className="w-2 h-2 rounded-full bg-white/80 flex-shrink-0" />

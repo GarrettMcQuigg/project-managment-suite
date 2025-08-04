@@ -143,7 +143,7 @@ export async function POST(request: Request) {
 
       await tx.calendarEvent.createMany({
         data: createdCheckpoints.map((checkpoint) => ({
-          title: `${projectRecord.name}: ${checkpoint.name}`,
+          title: checkpoint.name ? `${projectRecord.name}: ${checkpoint.name}` : `${projectRecord.name}: ${checkpoint.type}`,
           description: checkpoint.description || '',
           type: CalendarEventType.CHECKPOINT_DEADLINE,
           startDate: checkpoint.startDate,
@@ -195,12 +195,7 @@ export async function POST(request: Request) {
         try {
           // If user has a verified Stripe account, create invoice on their account
           if (user?.stripeAccountId && user.stripeAccountStatus === 'VERIFIED') {
-            const checkout = await createConnectInvoiceCheckout(
-              invoice.id,
-              currentUser.id,
-              user.stripeAccountId,
-              origin
-            );
+            const checkout = await createConnectInvoiceCheckout(invoice.id, currentUser.id, user.stripeAccountId, origin);
             return {
               content: {
                 checkoutUrl: checkout.checkoutUrl,
@@ -210,11 +205,7 @@ export async function POST(request: Request) {
             };
           } else {
             // Use regular checkout
-            const checkout = await createInvoiceCheckout(
-              invoice.id,
-              currentUser.id,
-              origin
-            );
+            const checkout = await createInvoiceCheckout(invoice.id, currentUser.id, origin);
             return {
               content: {
                 checkoutUrl: checkout.checkoutUrl,
@@ -236,7 +227,7 @@ export async function POST(request: Request) {
       });
 
       const checkoutResults = await Promise.all(checkoutPromises);
-      
+
       // Attach checkout URLs to the response and send emails if notifyClient is true
       result.invoiceCheckouts = await Promise.all(
         checkoutResults.map(async (checkout, index) => {
@@ -261,13 +252,12 @@ export async function POST(request: Request) {
               //   clientName: result.client.name || 'Valued Client',
               //   notes: invoice.notes || undefined
               // });
-              
               // Update the invoice to mark that notification was sent
               // await db.invoice.update({
               //   where: { id: invoice.id },
-              //   data: { 
-              //     notificationSent: true, 
-              //     notificationSentAt: new Date() 
+              //   data: {
+              //     notificationSent: true,
+              //     notificationSentAt: new Date()
               //   }
               // });
             } catch (error) {
@@ -292,8 +282,8 @@ export async function POST(request: Request) {
   } catch (err: unknown) {
     console.error('Project creation error:', err);
     const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
-    return handleError({ 
-      message: 'Failed to create project', 
+    return handleError({
+      message: 'Failed to create project',
       err: {
         message: errorMessage
       }

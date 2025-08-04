@@ -110,32 +110,27 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange, project
   function createEmptyCheckpoint(): Checkpoint & { isModified?: boolean } {
     const getSmartDates = () => {
       if (checkpoints.length === 0) {
-        // First checkpoint should start from project start date
         const startDate = projectStartDate || new Date();
         const endDate = new Date(startDate);
         endDate.setDate(endDate.getDate() + 1);
         return { startDate, endDate };
       }
 
-      // Find the latest checkpoint end date
       const sortedCheckpoints = [...checkpoints].sort((a, b) => a.order - b.order);
       const lastCheckpoint = sortedCheckpoints[sortedCheckpoints.length - 1];
       const lastEndDate = new Date(lastCheckpoint.endDate);
-      
-      // Calculate new dates based on previous checkpoint
+
       const nextDay = new Date(lastEndDate);
       nextDay.setDate(nextDay.getDate() + 1);
-      
+
       const projectEnd = projectEndDate || new Date();
-      
+
       if (nextDay < projectEnd) {
-        // New checkpoint starts 1 day after previous end date
         const startDate = nextDay;
         const endDate = new Date(nextDay);
         endDate.setDate(endDate.getDate() + 1);
         return { startDate, endDate };
       } else {
-        // Use previous checkpoint's end date if we're at project end
         return { startDate: lastEndDate, endDate: lastEndDate };
       }
     };
@@ -190,27 +185,22 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange, project
     }
 
     onCheckpointsChange(updatedCheckpoints);
-    
-    // Create the next empty checkpoint with dates based on the checkpoint we just added
+
     const createNextEmptyCheckpoint = (): Checkpoint & { isModified?: boolean } => {
       const getSmartDates = () => {
-        // Use the checkpoint we just added to calculate next dates
         const lastEndDate = new Date(activeCheckpoint.endDate);
-        
-        // Calculate new dates based on the checkpoint we just added
+
         const nextDay = new Date(lastEndDate);
         nextDay.setDate(nextDay.getDate() + 1);
-        
+
         const projectEnd = projectEndDate || new Date();
-        
+
         if (nextDay < projectEnd) {
-          // New checkpoint starts 1 day after previous end date
           const startDate = nextDay;
           const endDate = new Date(nextDay);
           endDate.setDate(endDate.getDate() + 1);
           return { startDate, endDate };
         } else {
-          // Use previous checkpoint's end date if we're at project end
           return { startDate: lastEndDate, endDate: lastEndDate };
         }
       };
@@ -253,16 +243,14 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange, project
     }
   };
 
-  // Update checkpoint dates when project start date changes
   useEffect(() => {
     if (checkpoints.length > 0 && projectStartDate) {
       const updatedCheckpoints = checkpoints.map((checkpoint, index) => {
         if (index === 0) {
-          // First checkpoint should start from project start date
           const newStartDate = new Date(projectStartDate);
           const currentDuration = new Date(checkpoint.endDate).getTime() - new Date(checkpoint.startDate).getTime();
           const newEndDate = new Date(newStartDate.getTime() + currentDuration);
-          
+
           return {
             ...checkpoint,
             startDate: newStartDate,
@@ -271,15 +259,15 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange, project
         }
         return checkpoint;
       });
-      
-      // Check if the first checkpoint actually changed
+
       const firstCheckpoint = checkpoints[0];
       const firstUpdated = updatedCheckpoints[0];
       if (firstCheckpoint.startDate.getTime() !== firstUpdated.startDate.getTime()) {
         onCheckpointsChange(updatedCheckpoints);
       }
     }
-  }, [projectStartDate]); // Only depend on projectStartDate to avoid infinite loops
+  }, [projectStartDate]);
+
   return (
     <div>
       <span className="flex justify-center text-xs text-muted-foreground">

@@ -60,7 +60,7 @@ function convertPlanNameToTierName(planName: string): SubscriptionTierName | nul
 
 export async function POST(req: NextRequest) {
   console.log('🔥 WEBHOOK ENDPOINT HIT! Method:', req.method, 'Time:', new Date().toISOString());
-  
+
   if (req.method !== 'POST') {
     console.log('❌ Wrong method:', req.method);
     return handleBadRequest({ message: 'Method not allowed' });
@@ -77,50 +77,26 @@ export async function POST(req: NextRequest) {
 
     const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
-    // Debug: Log all incoming webhook events
-    console.log('Webhook event received:', {
-      type: event.type,
-      id: event.id,
-      account: event.account || 'No account field',
-      data_object_id: (event.data?.object as any)?.id || 'No data object ID',
-      is_connect_event: !!event.account
-    });
-
-    // Handle the event
     switch (event.type) {
       case 'account.updated': {
         const account = event.data.object as Stripe.Account;
 
         try {
-          // Find user with this Stripe account ID
           const user = await db.user.findFirst({
             where: { stripeAccountId: account.id }
           });
 
           if (user) {
-            // Determine account status based on Stripe capabilities
             let stripeAccountStatus: StripeAccountStatus;
 
             if (account.charges_enabled && account.payouts_enabled) {
-              // Can accept payments AND receive payouts - fully verified
               stripeAccountStatus = StripeAccountStatus.VERIFIED;
             } else if (account.details_submitted && account.requirements?.currently_due?.length === 0) {
-              // Details submitted and no outstanding requirements, but still pending capabilities
               stripeAccountStatus = StripeAccountStatus.PENDING;
             } else {
-              // Still has requirements or hasn't submitted details
               stripeAccountStatus = StripeAccountStatus.PENDING;
             }
 
-            console.log(`Account ${account.id} status update:`, {
-              charges_enabled: account.charges_enabled,
-              payouts_enabled: account.payouts_enabled,
-              details_submitted: account.details_submitted,
-              currently_due: account.requirements?.currently_due?.length || 0,
-              status: stripeAccountStatus
-            });
-
-            // Update user's Stripe account status
             await db.user.update({
               where: { id: user.id },
               data: {
@@ -416,15 +392,6 @@ export async function POST(req: NextRequest) {
       }
 
       default: {
-        // Log unhandled Connect events (events with account field)
-        if (event.account) {
-          console.log('Unhandled Connect event:', {
-            type: event.type,
-            account_id: event.account,
-            data_object_id: (event.data?.object as any)?.id || 'No ID',
-            data_object_type: (event.data?.object as any)?.object || 'Unknown type'
-          });
-        }
         break;
       }
     }

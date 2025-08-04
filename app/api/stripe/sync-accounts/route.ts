@@ -1,19 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@packages/lib/stripe';
 import { getCurrentUser } from '@packages/lib/helpers/get-current-user';
 import { db } from '@packages/lib/prisma/client';
 import { handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { StripeAccountStatus } from '@prisma/client';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    // Verify user is authenticated
     const currentUser = await getCurrentUser();
     if (!currentUser) {
       return handleUnauthorized();
     }
 
-    // Only check current user's account if it's PENDING and has a Stripe account
     if (!currentUser.stripeAccountId) {
       return handleSuccess({
         message: 'No Stripe account connected',
@@ -24,7 +21,7 @@ export async function POST(request: NextRequest) {
     if (currentUser.stripeAccountStatus !== StripeAccountStatus.PENDING) {
       return handleSuccess({
         message: 'Account already verified or not pending',
-        content: { 
+        content: {
           status: currentUser.stripeAccountStatus,
           no_update_needed: true
         }
@@ -32,12 +29,10 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      // Retrieve account from Stripe
       const account = await stripe.accounts.retrieve(currentUser.stripeAccountId);
-      
-      // Determine correct status
+
       let newStatus: StripeAccountStatus;
-      
+
       if (account.charges_enabled && account.payouts_enabled) {
         newStatus = StripeAccountStatus.VERIFIED;
       } else if (account.details_submitted && account.requirements?.currently_due?.length === 0) {
@@ -46,7 +41,6 @@ export async function POST(request: NextRequest) {
         newStatus = StripeAccountStatus.PENDING;
       }
 
-      // Update if status changed
       if (currentUser.stripeAccountStatus !== newStatus) {
         await db.user.update({
           where: { id: currentUser.id },
@@ -74,7 +68,6 @@ export async function POST(request: NextRequest) {
           }
         });
       }
-
     } catch (error) {
       console.error(`Error syncing account for user ${currentUser.email}:`, error);
       return handleError({
@@ -82,7 +75,6 @@ export async function POST(request: NextRequest) {
         err: error instanceof Error ? error.message : 'Unknown error'
       });
     }
-
   } catch (error) {
     return handleError({
       message: 'Failed to sync Stripe account',

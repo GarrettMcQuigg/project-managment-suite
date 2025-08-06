@@ -86,8 +86,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
   const [activeInvoice, setActiveInvoice] = useState<NewInvoice>(createEmptyInvoice());
   const [isGeneratingNumber, setIsGeneratingNumber] = useState(false);
   const [stripeStatus, setStripeStatus] = useState<StripeAccountStatus>(StripeAccountStatus.NOT_CONNECTED);
-  const [isLoadingStripe, setIsLoadingStripe] = useState(true);
-  
+
   const { connectStripeAccount, isLoading } = useStripeAccount();
 
   function createEmptyInvoice(): NewInvoice {
@@ -141,8 +140,6 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
         }
       } catch (error) {
         console.error('Failed to fetch Stripe status:', error);
-      } finally {
-        setIsLoadingStripe(false);
       }
     };
 

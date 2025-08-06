@@ -1,11 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@packages/lib/helpers/get-current-user';
 import { handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const currentUser = await getCurrentUser();
-    
+
     if (!currentUser) {
       return handleUnauthorized();
     }
@@ -16,7 +15,6 @@ export async function GET(request: NextRequest) {
         status: currentUser.stripeAccountStatus
       }
     });
-
   } catch (error) {
     return handleError({
       message: 'Failed to get Stripe status',

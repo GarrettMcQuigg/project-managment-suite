@@ -11,7 +11,9 @@ import { InvoiceType, InvoiceStatus, Invoice } from '@prisma/client';
 import { Popover, PopoverContent, PopoverTrigger } from '@/packages/lib/components/popover';
 import { Calendar } from '@/packages/lib/components/calendar';
 import { fetchUniqueInvoiceNumber, generateTemporaryInvoiceNumber } from '@/packages/lib/helpers/generate-invoice-number';
+import { API_STRIPE_STATUS_ROUTE } from '@/packages/lib/routes';
 import { useStripeAccount } from '@/packages/lib/hooks/use-stripe-account';
+import { StripeAccountStatus } from '@prisma/client';
 import { Loader2 } from 'lucide-react';
 
 type NewInvoice = {
@@ -83,7 +85,10 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
   const [activeInvoice, setActiveInvoice] = useState<NewInvoice>(createEmptyInvoice());
   const [isGeneratingNumber, setIsGeneratingNumber] = useState(false);
-  const { stripeAccount, isLoading, connectStripeAccount } = useStripeAccount();
+  const [stripeStatus, setStripeStatus] = useState<StripeAccountStatus>(StripeAccountStatus.NOT_CONNECTED);
+  const [isLoadingStripe, setIsLoadingStripe] = useState(true);
+  
+  const { connectStripeAccount, isLoading } = useStripeAccount();
 
   function createEmptyInvoice(): NewInvoice {
     return {
@@ -121,6 +126,28 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingInvoiceId]);
+
+  // Fetch Stripe status when component mounts
+  useEffect(() => {
+    const fetchStripeStatus = async () => {
+      try {
+        const response = await fetch(API_STRIPE_STATUS_ROUTE, {
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setStripeStatus(data.content.status);
+        }
+      } catch (error) {
+        console.error('Failed to fetch Stripe status:', error);
+      } finally {
+        setIsLoadingStripe(false);
+      }
+    };
+
+    fetchStripeStatus();
+  }, []);
 
   const handleInvoicePublish = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -178,25 +205,24 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
 
   return (
     <div className="space-y-6">
-      {stripeAccount.status !== 'VERIFIED' && (
+      {stripeStatus !== 'VERIFIED' && (
         <Card className="p-4 bg-yellow-50 border-yellow-200 mb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Link2 className="w-6 h-6 text-yellow-600" />
               <div>
                 <p className="text-sm font-medium text-yellow-800">
-                  {stripeAccount.status === 'NOT_CONNECTED' ? 'Connect your Stripe account to create invoices' : 'Complete your Stripe account setup'}
+                  {stripeStatus === 'NOT_CONNECTED' ? 'Connect your Stripe account to create invoices' : 'Complete your Stripe account setup'}
                 </p>
                 <p className="text-xs text-yellow-700">
-                  {stripeAccount.status === 'NOT_CONNECTED' ? 'You need to link a Stripe account to generate invoices' : 'Your account is currently pending verification'}
+                  {stripeStatus === 'NOT_CONNECTED' ? 'You need to link a Stripe account to generate invoices' : 'Your account is currently pending verification'}
                 </p>
               </div>
             </div>
             <Button
-              onClick={async (e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // await checkStripeAccount();
                 connectStripeAccount();
               }}
               disabled={isLoading}
@@ -231,16 +257,12 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
         )}
       </div>
 
-      <Card className={`p-4 ${stripeAccount.status !== 'VERIFIED' ? 'opacity-50 pointer-events-none' : ''}`}>
+      <Card className={`p-4 ${stripeStatus !== 'VERIFIED' ? 'opacity-50 pointer-events-none' : ''}`}>
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <FormLabel>Invoice Type</FormLabel>
-              <Select
-                value={activeInvoice.type}
-                onValueChange={(value: InvoiceType) => setActiveInvoice({ ...activeInvoice, type: value })}
-                disabled={stripeAccount.status !== 'VERIFIED'}
-              >
+              <Select value={activeInvoice.type} onValueChange={(value: InvoiceType) => setActiveInvoice({ ...activeInvoice, type: value })} disabled={stripeStatus !== 'VERIFIED'}>
                 <SelectTrigger className="border-foreground/20">
                   <SelectValue placeholder="Select invoice type" />
                 </SelectTrigger>
@@ -263,7 +285,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
                   className="pl-8 border-foreground/20"
                   placeholder="0.00"
                   step="0.01"
-                  disabled={stripeAccount.status !== 'VERIFIED'}
+                  disabled={stripeStatus !== 'VERIFIED'}
                 />
               </div>
             </div>
@@ -274,12 +296,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
               <FormLabel>Due Date</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal border-foreground/20"
-                    disabled={stripeAccount.status !== 'VERIFIED'}
-                  >
+                  <Button type="button" variant="outline" className="w-full justify-start text-left font-normal border-foreground/20" disabled={stripeStatus !== 'VERIFIED'}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {new Date(activeInvoice.dueDate).toLocaleDateString()}
                   </Button>
@@ -295,7 +312,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
               <Select
                 value={activeInvoice.checkpointId || '_none'}
                 onValueChange={(value) => setActiveInvoice({ ...activeInvoice, checkpointId: value === '_none' ? null : value })}
-                disabled={stripeAccount.status !== 'VERIFIED'}
+                disabled={stripeStatus !== 'VERIFIED'}
               >
                 <SelectTrigger className="border-foreground/20">
                   <SelectValue placeholder="Select related checkpoint" />
@@ -313,8 +330,8 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
           </div>
 
           <div
-            className={`flex flex-col gap-2 max-w-fit ${stripeAccount.status === 'VERIFIED' ? 'cursor-pointer' : 'opacity-50 pointer-events-none'}`}
-            onClick={() => stripeAccount.status === 'VERIFIED' && toggleNotify()}
+            className={`flex flex-col gap-2 max-w-fit ${stripeStatus === 'VERIFIED' ? 'cursor-pointer' : 'opacity-50 pointer-events-none'}`}
+            onClick={() => stripeStatus === 'VERIFIED' && toggleNotify()}
           >
             <FormLabel htmlFor="notifyClient">Notify Client</FormLabel>
             <div className="flex items-center">
@@ -324,7 +341,7 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
                 checked={activeInvoice.notifyClient}
                 onChange={(e) => setActiveInvoice({ ...activeInvoice, notifyClient: e.target.checked })}
                 className="h-4 w-4 rounded border-foreground/20 text-primary focus:ring-primary"
-                disabled={isGeneratingNumber || stripeAccount.status !== 'VERIFIED'}
+                disabled={isGeneratingNumber || stripeStatus !== 'VERIFIED'}
               />
               <span className="ml-2 text-sm text-muted-foreground">Send email notification when invoice is created</span>
             </div>
@@ -337,18 +354,12 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
               onChange={(e) => setActiveInvoice({ ...activeInvoice, notes: e.target.value })}
               className="border-foreground/20"
               placeholder="Add any invoice-related notes here..."
-              disabled={stripeAccount.status !== 'VERIFIED'}
+              disabled={stripeStatus !== 'VERIFIED'}
             />
           </div>
 
           <div className="flex justify-end mt-4">
-            <Button
-              type="button"
-              variant="outlinePrimary"
-              onClick={handleInvoicePublish}
-              className="w-full sm:w-auto"
-              disabled={isGeneratingNumber || stripeAccount.status !== 'VERIFIED'}
-            >
+            <Button type="button" variant="outlinePrimary" onClick={handleInvoicePublish} className="w-full sm:w-auto" disabled={isGeneratingNumber || stripeStatus !== 'VERIFIED'}>
               {editingInvoiceId ? 'Update' : 'Add'} Invoice
               {isGeneratingNumber && !editingInvoiceId && ' (Generating Number...)'}
             </Button>

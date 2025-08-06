@@ -15,6 +15,7 @@ import { statusColors } from './_src/utils/status-colors';
 import { UpcomingDeadlines } from './_src/components';
 import { MissedDeadlines } from './_src/components/missed-deadlines';
 import { RecentInvoices } from './_src/components/recent-invoices';
+import StripeConnectionCard from './_src/components/stripe-connection-card';
 
 function getProjectStatusData(projects: ProjectWithMetadata[]) {
   const statusCounts: Record<string, number> = {};
@@ -68,6 +69,9 @@ export default async function Dashboard() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen-minus-header">
       <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
+      
+      {/* Stripe Connection Card - shows if not verified */}
+      <StripeConnectionCard stripeAccountStatus={currentUser.stripeAccountStatus} />
 
       <div className="sm:flex sm:space-y-0 space-y-8 gap-8">
         <span className="md:block hidden w-full">

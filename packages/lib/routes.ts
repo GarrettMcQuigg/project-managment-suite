@@ -103,6 +103,7 @@ export const API_STRIPE_ROUTE = `${API_ROUTE}/stripe`;
 export const API_STRIPE_CONNECT_ROUTE = `${API_STRIPE_ROUTE}/connect`;
 export const API_STRIPE_CHECKOUT_ROUTE = `${API_STRIPE_ROUTE}/checkout`;
 export const API_STRIPE_WEBHOOK_ROUTE = `${API_STRIPE_ROUTE}/webhook`;
+export const API_STRIPE_STATUS_ROUTE = `${API_STRIPE_ROUTE}/status`;
 
 // Helpers
 export function routeWithPath(route: string, path: string) {

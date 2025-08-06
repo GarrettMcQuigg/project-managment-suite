@@ -7,10 +7,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { ProjectStatus, Checkpoint, Invoice } from '@prisma/client';
 import { projectFormSchema } from '../(pages)/projects/[id]/_src/types';
-import TimelineStep from './components/checkpoint-step';
 import ClientStep from './components/client-step';
 import ProjectDetailsStep, { ProjectFormData } from './components/project-step';
 import InvoiceStep from './components/invoice-step';
+import TimelineStep from './components/checkpoint-step';
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -114,7 +114,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
     {
       title: 'Timeline Checkpoints',
       description: 'Create checkpoints to build a shareable timeline',
-      component: <TimelineStep checkpoints={checkpoints} onCheckpointsChange={setCheckpoints} projectStartDate={form.watch('startDate')} projectEndDate={form.watch('endDate')} />
+      component: <TimelineStep checkpoints={checkpoints} onCheckpointsChange={setCheckpoints} />
     },
     {
       title: 'Invoice Details',

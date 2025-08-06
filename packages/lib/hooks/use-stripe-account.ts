@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { API_STRIPE_CONNECT_ROUTE } from '../routes';
 
 interface StripeAccountResponse {
@@ -22,7 +22,6 @@ export function useStripeAccount() {
       const response = await fetch(API_STRIPE_CONNECT_ROUTE);
 
       if (!response.ok) {
-        // Keep default NOT_CONNECTED status for failed requests
         return;
       }
 

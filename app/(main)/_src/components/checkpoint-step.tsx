@@ -127,9 +127,15 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange, project
 
       if (nextDay < projectEnd) {
         const startDate = nextDay;
-        const endDate = new Date(nextDay);
+        const endDate = new Date(startDate);
         endDate.setDate(endDate.getDate() + 1);
-        return { startDate, endDate };
+        
+        // Check if startDate + 1 day is within project range
+        if (endDate <= projectEnd) {
+          return { startDate, endDate };
+        } else {
+          return { startDate, endDate: projectEnd };
+        }
       } else {
         return { startDate: lastEndDate, endDate: lastEndDate };
       }
@@ -197,9 +203,15 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange, project
 
         if (nextDay < projectEnd) {
           const startDate = nextDay;
-          const endDate = new Date(nextDay);
+          const endDate = new Date(startDate);
           endDate.setDate(endDate.getDate() + 1);
-          return { startDate, endDate };
+          
+          // Check if startDate + 1 day is within project range
+          if (endDate <= projectEnd) {
+            return { startDate, endDate };
+          } else {
+            return { startDate, endDate: projectEnd };
+          }
         } else {
           return { startDate: lastEndDate, endDate: lastEndDate };
         }

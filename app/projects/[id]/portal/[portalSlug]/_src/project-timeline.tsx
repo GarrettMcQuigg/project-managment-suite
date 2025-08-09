@@ -129,7 +129,7 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
               <div className="rounded-lg bg-gray-100 dark:bg-[#1A2729] p-4">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <h3 className="font-medium text-gray-900 dark:text-white">{checkpoint.name}</h3>
+                    <h3 className="font-medium text-gray-900 dark:text-white">{checkpoint.name ? checkpoint.name : 'Untitled'}</h3>
                     <span className={`rounded-full px-3 py-1 text-sm ${getStatusStyle(checkpoint.status)}`}>{getStatusText(checkpoint.status)}</span>
                   </div>
                   {isOwner && (

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { ArrowUpRight, DollarSign } from "lucide-react";
-import { Card, CardContent } from "@/packages/lib/components/card";
+import { ArrowUpRight, DollarSign } from 'lucide-react';
+import { Card, CardContent } from '@/packages/lib/components/card';
 
 interface RevenueCardProps {
   monthlyRevenue: number;
@@ -15,7 +15,7 @@ export function RevenueCard({ monthlyRevenue, revenueChange }: RevenueCardProps)
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-foreground">Monthly Revenue</p>
-            <p className="text-2xl font-bold text-foreground/70 mt-1">${monthlyRevenue.toLocaleString()}</p>
+            <p className="text-3xl font-bold mt-1">${monthlyRevenue.toLocaleString()}</p>
             <div className="flex items-center text-sm text-green-600 dark:text-green-400 mt-1">
               <ArrowUpRight className="h-4 w-4 mr-1" />
               <span>+{revenueChange}% from last month</span>

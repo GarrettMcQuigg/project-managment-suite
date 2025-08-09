@@ -1,27 +1,30 @@
-"use client";
+'use client';
 
-import { ArrowUpRight, FolderOpen } from "lucide-react";
-import { Card, CardContent } from "@/packages/lib/components/card";
-import { Project } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import { PROJECTS_ROUTE } from "@/packages/lib/routes";
+import { ArrowUpRight, FolderOpen } from 'lucide-react';
+import { Card, CardContent } from '@/packages/lib/components/card';
+import { Project } from '@prisma/client';
+import { useRouter } from 'next/navigation';
+import { PROJECTS_ROUTE } from '@/packages/lib/routes';
 
 interface ActiveProjectsCardProps {
   projects: Project[];
 }
 
 export function ActiveProjectsCard({ projects }: ActiveProjectsCardProps) {
-  const router = useRouter()
-  const activeProjects = projects.filter(project => project.createdAt < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)); // Projects created more than a week ago
-  const newProjects = projects.filter(project => project.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)); // Projects created in the last week
-  
+  const router = useRouter();
+  const activeProjects = projects.filter((project) => project.createdAt < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)); // Projects created more than a week ago
+  const newProjects = projects.filter((project) => project.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)); // Projects created in the last week
+
   return (
-    <Card className="border-border/40 hover:border-border/80 hover:shadow-lg dark:border-border/80 dark:hover:border-border/80 dark:hover:shadow-lg dark:hover:bg-foreground/5 transition-all duration-200 group cursor-pointer" onClick={() => router.push(PROJECTS_ROUTE)}>
+    <Card
+      className="border-border/40 hover:border-border/80 hover:shadow-lg dark:border-border/80 dark:hover:border-border/80 dark:hover:shadow-lg dark:hover:bg-foreground/5 transition-all duration-200 group cursor-pointer"
+      onClick={() => router.push(PROJECTS_ROUTE)}
+    >
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-foreground">Active Projects</p>
-            <p className="text-2xl font-bold text-foreground/70 mt-1">{activeProjects.length}</p>
+            <p className="text-3xl font-bold mt-1">{activeProjects.length}</p>
             <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 mt-1">
               <ArrowUpRight className="h-4 w-4 mr-1" />
               <span>+{newProjects.length} new this week</span>

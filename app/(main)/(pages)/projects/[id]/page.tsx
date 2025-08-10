@@ -16,7 +16,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen-minus-header">
       <div className="flex items-center gap-4 mb-8">
         <Breadcrumb href={PROJECTS_ROUTE} />
-        <h1 className="text-3xl font-bold ">Project Details</h1>
+        <h1 className="text-2xl font-bold ">Project Details</h1>
       </div>
       <ProjectInfo projectId={resolvedParams.id} />
     </div>

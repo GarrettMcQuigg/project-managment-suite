@@ -5,6 +5,7 @@ import { Folder, Calendar, Clock, ExternalLink, Users, Zap } from 'lucide-react'
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Button } from '@/packages/lib/components/button';
+import { PROJECTS_ROUTE, routeWithPath } from '@/packages/lib/routes';
 
 export function ClientProjectList({ projects }: { projects: Project[] }) {
   const getStatusColor = (status: string) => {
@@ -144,7 +145,7 @@ export function ClientProjectList({ projects }: { projects: Project[] }) {
                       {/* View Details Button */}
                       <div className="pt-2 flex justify-end">
                         <Button asChild className="transition-all duration-300 group/button">
-                          <Link href={`/projects/${project.id}`}>
+                          <Link href={routeWithPath(PROJECTS_ROUTE, project.id)}>
                             <ExternalLink className="h-4 w-4 transition-transform duration-300 group-hover/button:scale-110" />
                             <span>View Details</span>
                           </Link>

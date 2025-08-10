@@ -1,17 +1,17 @@
 import { Prisma } from '@prisma/client';
 
 export type UserWithMetadata = Prisma.UserGetPayload<{
-  include: { 
+  include: {
     projects: true;
-    subscription: true; 
+    subscription: true;
     analytics: {
       include: {
-        communicationAnalytics: true
-      }
-    }; 
-    calendarEvent: true; 
-    userActivity: true; 
-    pageView: true 
+        communicationAnalytics: true;
+      };
+    };
+    calendarEvent: true;
+    userActivity: true;
+    pageView: true;
   };
 }>;
 
@@ -20,7 +20,7 @@ export type ClientWithMetadata = Prisma.ClientGetPayload<{
 }>;
 
 export type ProjectWithMetadata = Prisma.ProjectGetPayload<{
-  include: { client: true; invoices: true; checkpoints: true; portalViews: true; attachments: true; messages: true; };
+  include: { client: true; invoices: true; checkpoints: true; portalViews: true; attachments: true; messages: true };
 }>;
 
 export type CalendarEventWithMetadata = Prisma.CalendarEventGetPayload<{
@@ -28,7 +28,7 @@ export type CalendarEventWithMetadata = Prisma.CalendarEventGetPayload<{
 }>;
 
 export type InvoiceWithMetadata = Prisma.InvoiceGetPayload<{
-  include: { project: true; payments: true; checkpoint: true };
+  include: { project: true; client: true; payments: true; checkpoint: true };
 }>;
 
 export type AnalyticsWithMetadata = Prisma.AnalyticsGetPayload<{

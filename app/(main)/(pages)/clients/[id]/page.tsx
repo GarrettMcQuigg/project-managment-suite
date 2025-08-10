@@ -16,7 +16,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen-minus-header">
       <div className="flex items-center gap-4 mb-8">
         <Breadcrumb href={CLIENTS_ROUTE} />
-        <h1 className="text-3xl font-bold">Client Details</h1>
+        <h1 className="text-2xl font-bold">Client Details</h1>
       </div>
       <ClientInfo clientId={resolvedParams.id} />
     </div>

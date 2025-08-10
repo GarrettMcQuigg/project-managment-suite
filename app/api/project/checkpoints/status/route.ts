@@ -1,9 +1,38 @@
 import { NextResponse } from 'next/server';
-import { CheckpointStatus } from '@prisma/client';
+import { CheckpointStatus, ProjectStatus } from '@prisma/client';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { handleBadRequest, handleNotFound, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import { db } from '@/packages/lib/prisma/client';
 import { UpdateProjectCheckpointStatusRequestBody, UpdateProjectCheckpointStatusRequestBodySchema } from './types';
+
+// Determine project status based on checkpoint completion
+function determineProjectStatus(checkpoints: any[]): ProjectStatus {
+  const totalCheckpoints = checkpoints.length;
+  const completedCheckpoints = checkpoints.filter(cp => cp.status === CheckpointStatus.COMPLETED).length;
+  
+  // If no checkpoints, keep current status
+  if (totalCheckpoints === 0) {
+    return ProjectStatus.PREPARATION;
+  }
+  
+  // If all checkpoints are completed, project is completed
+  if (completedCheckpoints === totalCheckpoints) {
+    return ProjectStatus.COMPLETED;
+  }
+  
+  // If no checkpoints are completed, check the first checkpoint type
+  if (completedCheckpoints === 0) {
+    const firstCheckpoint = checkpoints.find(cp => cp.order === 1);
+    if (firstCheckpoint && firstCheckpoint.type === 'PREPARATION') {
+      return ProjectStatus.PREPARATION;
+    }
+    // If first checkpoint is not PREPARATION or COMPLETED, start as ACTIVE
+    return ProjectStatus.ACTIVE;
+  }
+  
+  // If some checkpoints are completed but not all, project is ACTIVE
+  return ProjectStatus.ACTIVE;
+}
 
 export async function POST(request: Request) {
   try {
@@ -46,7 +75,7 @@ export async function POST(request: Request) {
 
     const currentCheckpoint = project.checkpoints[checkpointIndex];
     const isMarkingAsCompleted = newStatus === CheckpointStatus.COMPLETED;
-    const updatedCheckpoints = [];
+    const updatedCheckpoints: { id: string; status: CheckpointStatus }[] = [];
 
     if (isMarkingAsCompleted) {
       // Mark current checkpoint as COMPLETED
@@ -86,15 +115,34 @@ export async function POST(request: Request) {
       }
     }
 
-    // Update all checkpoints in a transaction
-    await db.$transaction(
-      updatedCheckpoints.map((checkpoint) =>
-        db.checkpoint.update({
-          where: { id: checkpoint.id },
-          data: { status: checkpoint.status }
-        })
-      )
-    );
+    // Update all checkpoints in a transaction and update project status
+    await db.$transaction(async (tx) => {
+      // Update checkpoints
+      await Promise.all(
+        updatedCheckpoints.map((checkpoint) =>
+          tx.checkpoint.update({
+            where: { id: checkpoint.id },
+            data: { status: checkpoint.status }
+          })
+        )
+      );
+
+      // Calculate new project status based on checkpoint completion
+      const updatedCheckpointsWithStatus = project.checkpoints.map(cp => {
+        const updatedCheckpoint = updatedCheckpoints.find(ucp => ucp.id === cp.id);
+        return {
+          ...cp,
+          status: updatedCheckpoint ? updatedCheckpoint.status : cp.status
+        };
+      });
+
+      const newProjectStatus = determineProjectStatus(updatedCheckpointsWithStatus);
+      
+      await tx.project.update({
+        where: { id: projectId },
+        data: { status: newProjectStatus }
+      });
+    });
 
     return handleSuccess({ message: 'Checkpoint status updated successfully' });
   } catch (error) {

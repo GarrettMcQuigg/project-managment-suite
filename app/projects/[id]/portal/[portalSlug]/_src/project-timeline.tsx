@@ -9,7 +9,6 @@ import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
 import { CheckCircle, Clock, Circle, Calendar, Target, Zap, TrendingUp, X } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
-import { Input } from '@/packages/lib/components/input';
 import { Checkpoint, CheckpointStatus } from '@prisma/client';
 import { Progress } from '@/packages/lib/components/progress';
 import { toast } from 'react-toastify';

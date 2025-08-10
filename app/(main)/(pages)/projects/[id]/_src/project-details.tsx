@@ -145,20 +145,23 @@ export default function ProjectDetails({ projectId, onEditClick }: ProjectDetail
                 <p className="text-sm text-muted-foreground">Project Duration</p>
               </div>
             </div>
-            <div className="flex gap-4 items-center justify-between relative">
+            {/* Horizontal layout for larger screens */}
+            <div className="hidden min-[415px]:flex gap-4 items-center justify-between relative">
               <p className="text-sm font-medium text-foreground">
                 <span className="text-sm text-muted-foreground">Start:</span> {format(new Date(project.startDate), 'MMM d, yyyy')}
               </p>
 
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden min-[415px]:block">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                 <div
-                  className={`relative w-16 h-16 rounded-full shadow-lg dark:shadow-black/30 flex items-center justify-center overflow-hidden group-hover:animate-card-shimmer ${
-                    isPastDue ? 'bg-red-500 dark:bg-red-600' : 'bg-card dark:bg-card/90'
+                  className={`relative w-16 h-16 rounded-full shadow-lg dark:shadow-black/30 flex items-center justify-center overflow-hidden group-hover:animate-card-shimmer border-2 ${
+                    isPastDue ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
                   }`}
                 >
                   <div className="flex flex-col items-center">
-                    <span className={`text-xs font-bold ${isPastDue ? 'text-white' : 'text-foreground'}`}>{Math.abs(daysRemaining)}</span>
-                    <span className={`text-[12px] ${isPastDue ? 'text-white/80' : 'text-muted-foreground'}`}>{isPastDue ? 'overdue' : 'days left'}</span>
+                    <span className={`text-xs font-bold ${isPastDue ? 'text-red-700 dark:text-red-300' : 'text-blue-700 dark:text-blue-300'}`}>{Math.abs(daysRemaining)}</span>
+                    <span className={`text-[10px] ${isPastDue ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`}>
+                      {isPastDue ? 'overdue' : 'days left'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -166,6 +169,41 @@ export default function ProjectDetails({ projectId, onEditClick }: ProjectDetail
               <p className="text-sm font-medium text-foreground">
                 <span className="text-sm text-muted-foreground">End:</span> {format(new Date(project.endDate), 'MMM d, yyyy')}
               </p>
+            </div>
+
+            {/* Vertical layout for smaller screens */}
+            <div className="flex min-[415px]:hidden flex-col space-y-4 relative">
+              <div className="flex items-center justify-center gap-2">
+                <Calendar className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Start:</span>
+                  <span className="text-foreground ml-1 font-medium">{format(new Date(project.startDate), 'MMM d, yyyy')}</span>
+                </div>
+              </div>
+
+              {/* Floating days remaining circle - vertical center */}
+              <div className="flex justify-center py-2">
+                <div
+                  className={`relative w-16 h-16 rounded-full shadow-lg dark:shadow-black/30 flex items-center justify-center overflow-hidden group-hover:animate-card-shimmer border-2 ${
+                    isPastDue ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                  }`}
+                >
+                  <div className="flex flex-col items-center">
+                    <span className={`text-xs font-bold ${isPastDue ? 'text-red-700 dark:text-red-300' : 'text-blue-700 dark:text-blue-300'}`}>{Math.abs(daysRemaining)}</span>
+                    <span className={`text-[10px] ${isPastDue ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`}>
+                      {isPastDue ? 'overdue' : 'days left'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-2">
+                <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                <div className="text-sm">
+                  <span className="text-muted-foreground">End:</span>
+                  <span className="text-foreground ml-1 font-medium">{format(new Date(project.endDate), 'MMM d, yyyy')}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

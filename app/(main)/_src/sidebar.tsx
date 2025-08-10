@@ -76,9 +76,7 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
         <Link href={href} onClick={handleClick}>
           <div
             className={`flex w-full items-center p-2 text-sm transition-all duration-200 rounded-[4px] ${
-              isActive
-                ? 'text-primary dark:text-white font-medium'
-                : 'text-muted-foreground hover:text-primary hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800'
+              isActive ? 'text-primary dark:text-white font-medium' : 'text-muted-foreground hover:text-primary hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800'
             }`}
           >
             <Icon className="mr-2 h-4 w-4" />
@@ -95,8 +93,8 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
         {/* Header */}
         <div className="p-4 h-header shrink-0 flex items-center">
           <Button onClick={() => setIsOpen(true)} disabled={loading} className="transition-all duration-300 group/button w-3/4 mt-1">
-            <div>New Project</div>
             <Plus className="h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" />
+            <div>New Project</div>
           </Button>
         </div>
 

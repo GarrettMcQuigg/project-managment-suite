@@ -1,7 +1,7 @@
 'use client';
 
 import { Project } from '@prisma/client';
-import { Folder, Calendar, Clock, ExternalLink, Users, Zap } from 'lucide-react';
+import { Folder, Calendar, Clock, ExternalLink, Users } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Button } from '@/packages/lib/components/button';

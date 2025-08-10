@@ -7,7 +7,7 @@ import type { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_AUTH_PORTAL_GET_BY_ID_ROUTE, PROJECTS_ROUTE, API_PROJECT_UPDATE_CHECKPOINT_STATUS_ROUTE, API_PROJECT_GET_BY_ID_ROUTE } from '@/packages/lib/routes';
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
-import { CheckCircle, Clock, Circle, Calendar, Target, Zap, TrendingUp, X } from 'lucide-react';
+import { CheckCircle, Clock, Circle, Calendar, Target, Zap, TrendingUp } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
 import { Checkpoint, CheckpointStatus } from '@prisma/client';
 import { Progress } from '@/packages/lib/components/progress';
@@ -76,7 +76,6 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
       }
 
       mutate(endpoint);
-      // Also mutate both project details endpoints to update project status
       mutate(API_AUTH_PORTAL_GET_BY_ID_ROUTE + project.id);
       mutate(API_PROJECT_GET_BY_ID_ROUTE + project.id);
       toast.success(`Checkpoint ${newStatus === CheckpointStatus.COMPLETED ? 'completed' : 'reopened'} successfully`);
@@ -265,28 +264,4 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
       </div>
     </div>
   );
-}
-
-function getStatusStyleNew(status: string) {
-  switch (status) {
-    case CheckpointStatus.COMPLETED:
-      return 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-white border-emerald-300';
-    case CheckpointStatus.IN_PROGRESS:
-      return 'bg-gradient-to-r from-amber-500 to-amber-400 text-white border-amber-300';
-    case CheckpointStatus.PENDING:
-    default:
-      return 'bg-gradient-to-r from-muted to-muted-foreground/70 text-foreground border-muted-foreground/20';
-  }
-}
-
-function getStatusText(status: string) {
-  switch (status) {
-    case CheckpointStatus.COMPLETED:
-      return 'Completed';
-    case CheckpointStatus.IN_PROGRESS:
-      return 'In Progress';
-    case CheckpointStatus.PENDING:
-    default:
-      return 'Pending';
-  }
 }

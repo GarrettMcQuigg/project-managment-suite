@@ -1,35 +1,35 @@
 import { NextResponse } from 'next/server';
-import { CheckpointStatus, ProjectStatus } from '@prisma/client';
+import { Checkpoint, CheckpointStatus, ProjectStatus } from '@prisma/client';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { handleBadRequest, handleNotFound, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import { db } from '@/packages/lib/prisma/client';
 import { UpdateProjectCheckpointStatusRequestBody, UpdateProjectCheckpointStatusRequestBodySchema } from './types';
 
 // Determine project status based on checkpoint completion
-function determineProjectStatus(checkpoints: any[]): ProjectStatus {
+function determineProjectStatus(checkpoints: Checkpoint[]): ProjectStatus {
   const totalCheckpoints = checkpoints.length;
-  const completedCheckpoints = checkpoints.filter(cp => cp.status === CheckpointStatus.COMPLETED).length;
-  
+  const completedCheckpoints = checkpoints.filter((cp) => cp.status === CheckpointStatus.COMPLETED).length;
+
   // If no checkpoints, keep current status
   if (totalCheckpoints === 0) {
     return ProjectStatus.PREPARATION;
   }
-  
+
   // If all checkpoints are completed, project is completed
   if (completedCheckpoints === totalCheckpoints) {
     return ProjectStatus.COMPLETED;
   }
-  
+
   // If no checkpoints are completed, check the first checkpoint type
   if (completedCheckpoints === 0) {
-    const firstCheckpoint = checkpoints.find(cp => cp.order === 1);
+    const firstCheckpoint = checkpoints.find((cp) => cp.order === 1);
     if (firstCheckpoint && firstCheckpoint.type === 'PREPARATION') {
       return ProjectStatus.PREPARATION;
     }
     // If first checkpoint is not PREPARATION or COMPLETED, start as ACTIVE
     return ProjectStatus.ACTIVE;
   }
-  
+
   // If some checkpoints are completed but not all, project is ACTIVE
   return ProjectStatus.ACTIVE;
 }
@@ -128,8 +128,8 @@ export async function POST(request: Request) {
       );
 
       // Calculate new project status based on checkpoint completion
-      const updatedCheckpointsWithStatus = project.checkpoints.map(cp => {
-        const updatedCheckpoint = updatedCheckpoints.find(ucp => ucp.id === cp.id);
+      const updatedCheckpointsWithStatus = project.checkpoints.map((cp) => {
+        const updatedCheckpoint = updatedCheckpoints.find((ucp) => ucp.id === cp.id);
         return {
           ...cp,
           status: updatedCheckpoint ? updatedCheckpoint.status : cp.status
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
       });
 
       const newProjectStatus = determineProjectStatus(updatedCheckpointsWithStatus);
-      
+
       await tx.project.update({
         where: { id: projectId },
         data: { status: newProjectStatus }

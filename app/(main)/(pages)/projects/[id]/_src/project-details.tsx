@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import { Calendar, Clock, Users, Pencil, Eye, EyeOff, KeyRound, Copy, ExternalLink, DollarSign, FileText, Zap } from 'lucide-react';
+import { Calendar, Clock, Users, Pencil, Eye, EyeOff, KeyRound, Copy, ExternalLink, FileText } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { DeleteProjectButton } from './delete-project';
 

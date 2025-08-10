@@ -278,7 +278,7 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange, project
         onCheckpointsChange(updatedCheckpoints);
       }
     }
-  }, [projectStartDate]);
+  }, [projectStartDate, checkpoints, onCheckpointsChange]);
 
   return (
     <div>

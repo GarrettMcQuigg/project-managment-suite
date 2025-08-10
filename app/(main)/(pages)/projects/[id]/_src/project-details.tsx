@@ -62,7 +62,7 @@ export default function ProjectDetails({ projectId, onEditClick }: ProjectDetail
         <div className="relative bg-gradient-to-br from-primary/5 via-card to-secondary/10 dark:from-primary/10 dark:via-card/80 dark:to-secondary/20 rounded-xl shadow-lg shadow-primary/10 group-hover:shadow-primary/20 transition-all duration-500 overflow-hidden border border-border">
           {/* Floating Status Badge */}
           <div className="absolute z-20">
-            <div className="px-3 py-2 rounded-br-lg shadow-xl text-sm font-semibold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground backdrop-blur-sm transform group-hover:scale-105 transition-transform duration-300">
+            <div className="px-3 py-2 rounded-br-lg shadow-xl text-sm font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 text-white backdrop-blur-sm transform transition-transform duration-300">
               {project.status}
             </div>
           </div>
@@ -81,8 +81,8 @@ export default function ProjectDetails({ projectId, onEditClick }: ProjectDetail
             <div className="space-y-6">
               {/* Project Title */}
               <div>
-                <h1 className="text-xl sm:text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">{project.name}</h1>
-                <p className="text-sm sm:text-lg text-muted-foreground leading-relaxed max-w-3xl">{project.description}</p>
+                <h1 className="text-md sm:text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">{project.name}</h1>
+                <p className="text-sm sm:text-lg text-muted-foreground leading-relaxed max-w-3xl mt-2">{project.description}</p>
               </div>
             </div>
           </div>

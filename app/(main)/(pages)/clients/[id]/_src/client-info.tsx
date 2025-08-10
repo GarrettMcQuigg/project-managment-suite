@@ -9,7 +9,7 @@ import { API_CLIENT_GET_BY_ID_ROUTE, API_CLIENT_UPDATE_ROUTE, CLIENTS_ROUTE } fr
 import { Skeleton } from '@/packages/lib/components/skeleton';
 import { ClientWithMetadata } from '@/packages/lib/prisma/types';
 import { redirect } from 'next/navigation';
-import { Pencil, Users, Mail, Phone, Calendar, Archive, Clock } from 'lucide-react';
+import { Pencil, Users, Mail, Phone, Calendar, Clock } from 'lucide-react';
 import { DeleteClientButton } from './delete-client';
 import { ClientFormDialog } from './client-form-dialog';
 import { format } from 'date-fns';
@@ -86,8 +86,8 @@ export function ClientInfo({ clientId }: { clientId: string }) {
               <div className="space-y-6">
                 {/* Client Title */}
                 <div>
-                  <h1 className="text-xl sm:text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">{client.name}</h1>
-                  <p className="text-sm sm:text-lg text-muted-foreground leading-relaxed max-w-3xl">Client information and project overview</p>
+                  <h1 className="text-md sm:text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">{client.name}</h1>
+                  <p className="text-sm sm:text-lg text-muted-foreground leading-relaxed max-w-3xl mt-2">Client information and project overview</p>
                 </div>
               </div>
             </div>

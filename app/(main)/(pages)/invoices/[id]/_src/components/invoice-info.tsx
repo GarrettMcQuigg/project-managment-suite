@@ -11,7 +11,7 @@ import { HttpMethods } from '@/packages/lib/constants/http-methods';
 import { InvoiceTimeline } from './invoice-timeline';
 import { InvoiceForm } from '../../../_src/components/invoice-form';
 import { Skeleton } from '@/packages/lib/components/skeleton';
-import { Pencil, Receipt, DollarSign, Calendar, Clock, CreditCard, User, Building2, FileText, CheckCircle, XCircle, AlertCircle, Zap } from 'lucide-react';
+import { Pencil, DollarSign, Calendar, User, Building2, FileText } from 'lucide-react';
 import { DeleteInvoiceButton } from './delete-invoice';
 import { format } from 'date-fns';
 
@@ -83,35 +83,6 @@ export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status.toUpperCase()) {
-      case 'PAID':
-        return <CheckCircle className="h-4 w-4" />;
-      case 'SENT':
-        return <Zap className="h-4 w-4" />;
-      case 'DRAFT':
-        return <FileText className="h-4 w-4" />;
-      case 'OVERDUE':
-        return <AlertCircle className="h-4 w-4" />;
-      case 'CANCELLED':
-      case 'VOID':
-        return <XCircle className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type.toUpperCase()) {
-      case 'MILESTONE':
-        return 'text-purple-600 dark:text-purple-400';
-      case 'ADDITIONAL':
-        return 'text-orange-600 dark:text-orange-400';
-      default:
-        return 'text-blue-600 dark:text-blue-400';
-    }
-  };
-
   if (error) {
     router.push(INVOICES_ROUTE);
     return null;
@@ -157,7 +128,6 @@ export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
                 <div
                   className={`px-3 py-2 rounded-br-lg shadow-xl text-sm font-semibold backdrop-blur-sm transform transition-transform duration-300 ${getStatusColor(invoice.status)} flex items-center gap-2`}
                 >
-                  {getStatusIcon(invoice.status)}
                   {invoice.status.replace('_', ' ')}
                 </div>
               </div>
@@ -172,19 +142,10 @@ export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
                 </div>
               </div>
 
-              <div className="p-4 sm:p-8 pt-12">
-                <div className="space-y-6">
-                  {/* Invoice Title */}
-                  <div className="flex items-center gap-2 sm:gap-3 mb-4 mt-2">
-                    <Receipt className="h-6 sm:h-8 w-6 sm:w-8 text-primary" />
-                    <h1 className="text-md sm:text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-                      Invoice #{invoice.invoiceNumber}
-                    </h1>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <span className={`text-md font-medium ${getTypeColor(invoice.type)} capitalize`}>{invoice.type.toLowerCase()} Invoice</span>
-                  </div>
-                </div>
+              <div className="p-4 sm:p-8 mt-4">
+                {/* Invoice Title */}
+                <h1 className="text-md sm:text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">Invoice #{invoice.invoiceNumber}</h1>
+                <div className="text-sm sm:text-lg text-muted-foreground leading-relaxed max-w-3xl capitalize mt-2">{invoice.type.toLowerCase()} Invoice</div>
               </div>
             </div>
           </div>

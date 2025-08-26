@@ -83,7 +83,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
       <PortalHeader projectStatus={project.status} isOwner={isOwner} visitorName={visitorName} projectId={resolvedParams.id} portalSlug={resolvedParams.portalSlug} />
 
       <main className={`${effectiveIsOwner ? 'mb-4' : ''} md:container md:mx-auto sm:px-4 lg:w-3/4 py-8`}>
-        <div className="sm:grid gap-8">
+        <div className="sm:grid gap-16">
           {context.type !== 'none' && (
             <>
               <ProjectDetails projectId={resolvedParams.id} isOwner={effectiveIsOwner} />

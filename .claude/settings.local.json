@@ -6,6 +6,8 @@
       "Bash(npx prisma db push:*)",
       "Read(C:\\Users\\Garrett\\Development\\temp-images/**)",
       "Read(C:\\Users\\Garrett\\Development\\temp-images/**)",
+      "Read(C:\\Users\\Garrett\\Development\\temp-images/**)",
+      "Read(C:\\Users\\Garrett\\Development\\temp-images/**)",
       "Read(C:\\Users\\Garrett\\Development\\temp-images/**)"
     ],
     "deny": []

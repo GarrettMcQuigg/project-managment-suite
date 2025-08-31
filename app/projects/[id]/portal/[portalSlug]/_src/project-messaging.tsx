@@ -518,13 +518,13 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
 
       {/* Input */}
       <div className="relative z-10 bg-gradient-to-r from-card to-secondary/10 border-t border-border/50 px-2 sm:px-6 py-4">
-        <form onSubmit={handleSubmit} className="flex items-center space-x-3">
+        <form onSubmit={handleSubmit} className="flex items-center">
           <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
 
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex-shrink-0 p-3 text-muted-foreground hover:text-primary transition-colors hover:bg-secondary rounded-xl hover:scale-105 transition-transform duration-200"
+            className="flex-shrink-0 p-3 text-muted-foreground hover:text-primary border border-border rounded-xl hover:scale-105 transition-transform duration-200 mr-3"
           >
             <Paperclip className="h-5 w-5" />
           </button>
@@ -546,7 +546,7 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
           <button
             type="submit"
             disabled={isSubmitting || (!message.trim() && files.length === 0)}
-            className="flex-shrink-0 p-4 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 disabled:from-muted disabled:to-muted text-primary-foreground disabled:text-muted-foreground rounded-2xl transition-all hover:scale-105 disabled:scale-100 shadow-lg disabled:shadow-none"
+            className="flex-shrink-0 p-3 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 disabled:from-muted disabled:to-muted text-primary-foreground disabled:text-muted-foreground rounded-xl transition-all hover:scale-105 disabled:scale-100 shadow-md disabled:shadow-none ml-3"
           >
             <Send className="h-5 w-5" />
           </button>

@@ -228,11 +228,6 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
                                       <Circle className="h-5 w-5 drop-shadow-sm" />
                                     )}
                                   </div>
-
-                                  {/* Subtle pulse animation for incomplete tasks */}
-                                  {checkpoint.status !== CheckpointStatus.COMPLETED && !isUpdating && (
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-400/20 to-purple-400/20 animate-pulse opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                                  )}
                                 </button>
                               </div>
 
@@ -242,7 +237,7 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
                                   onClick={() => handleOnComplete(checkpoint.id)}
                                   disabled={isUpdating}
                                   className={`
-                                    relative px-6 py-3 rounded-xl font-semibold text-sm
+                                    relative px-4 p-2 rounded-md font-semibold text-sm
                                     transform hover:scale-105 active:scale-95 transition-all duration-300
                                     disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
                                     shadow-sm hover:shadow-md
@@ -276,18 +271,18 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
                                 >
                                   <div className="relative z-10 flex items-center gap-3">
                                     {isUpdating ? (
-                                      <div className="flex items-center gap-2 px-[0px]">
+                                      <div className="flex items-center gap-2">
                                         <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                                         <span className="tracking-wide">Updating...</span>
                                       </div>
                                     ) : checkpoint.status === CheckpointStatus.COMPLETED ? (
-                                      <div className="flex items-center gap-2 px-[0px]">
+                                      <div className="flex items-center gap-2">
                                         <CheckCircle className="h-4 w-4 drop-shadow-sm" />
                                         <span className="tracking-wide">Completed</span>
                                         <div className="w-2 h-2 rounded-full bg-white/60 animate-pulse"></div>
                                       </div>
                                     ) : (
-                                      <div className="flex items-center gap-2 px-[0px]">
+                                      <div className="flex items-center gap-2">
                                         <Circle className="h-4 w-4 drop-shadow-sm group-hover:rotate-180 transition-transform duration-500" />
                                         <span className="tracking-wide">Mark Complete</span>
                                         <Zap className="h-3 w-3 opacity-60 group-hover:opacity-100 group-hover:text-indigo-600 transition-all duration-300" />

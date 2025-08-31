@@ -3,7 +3,10 @@
     "allow": [
       "Bash(mv:*)",
       "Bash(robocopy:*)",
-      "Bash(npx prisma db push:*)"
+      "Bash(npx prisma db push:*)",
+      "Read(C:\\Users\\Garrett\\Development\\temp-images/**)",
+      "Read(C:\\Users\\Garrett\\Development\\temp-images/**)",
+      "Read(C:\\Users\\Garrett\\Development\\temp-images/**)"
     ],
     "deny": []
   }

@@ -247,7 +247,20 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
                                   href={invoice.stripeCheckoutUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary/20 to-primary/10 text-primary hover:from-primary/30 hover:to-primary/20 rounded-lg transition-all duration-200 border border-primary/20"
+                                  className="flex items-center gap-2 px-4 p-2 rounded-md font-semibold text-sm
+                                    transform hover:scale-105 active:scale-95 transition-all duration-300
+                                    disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
+                                    shadow-sm hover:shadow-md
+                                    before:absolute before:inset-0 before:rounded-xl before:transition-all before:duration-300
+                                    after:absolute after:inset-0 after:rounded-xl after:transition-all after:duration-500
+                                    overflow-hidden group bg-gradient-to-r from-primary/90 via-primary/80 to-primary/80
+                                    hover:from-primary/95 hover:via-primary/90 hover:to-primary/85
+                                    text-white border border-primary/30
+                                    before:bg-gradient-to-r before:from-white/0 before:via-white/20 before:to-white/0
+                                    hover:before:from-white/10 hover:before:via-white/30 hover:before:to-white/10
+                                    after:bg-gradient-to-r after:from-primary/0 after:via-primary/50 after:to-primary/0
+                                    after:translate-x-[-100%] hover:after:translate-x-[100%]
+                                    shadow-primary/25 hover:shadow-primary/40"
                                 >
                                   <ExternalLink className="h-4 w-4" />
                                   Pay Now

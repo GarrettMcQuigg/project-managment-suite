@@ -24,11 +24,6 @@ class EmailService {
       auth: {
         user: process.env.SMTP_AUTH_USER,
         pass: process.env.SMTP_AUTH_PASS
-      },
-      dkim: {
-        domainName: 'solira.io', // TODO : update this to your domain name
-        keySelector: 'default',
-        privateKey: process.env.DKIM_PRIVATE_KEY!
       }
     });
   }
@@ -54,14 +49,14 @@ class EmailService {
   async sendInvoicePaymentEmail(params: SendInvoicePaymentEmailParams): Promise<Error | null> {
     try {
       const { subject, text, html } = getInvoicePaymentEmail(params);
-      
+
       // Use the SMTP auth user as the sender email
       const from = `"${params.companyName}" <${process.env.SMTP_AUTH_USER}>`;
-      
+
       console.log(`Sending invoice payment email to: ${params.to}`);
       console.log(`Invoice #: ${params.invoiceNumber}`);
       console.log(`Payment Link: ${params.paymentLink}`);
-      
+
       return await this.send(from, params.to, subject, text, html);
     } catch (err: any) {
       console.error('Error in sendInvoicePaymentEmail:', err);

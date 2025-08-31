@@ -12,10 +12,9 @@ import { toast } from 'react-toastify';
 
 interface ProjectDetailsProps {
   projectId: string;
-  isOwner: boolean;
 }
 
-export default function ProjectDetails({ projectId, isOwner }: ProjectDetailsProps) {
+export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
   const endpoint = API_AUTH_PORTAL_GET_BY_ID_ROUTE + projectId;
   const { data, error } = useSWR(endpoint, swrFetcher);
   const [project, setProject] = useState<ProjectWithMetadata | null>(null);
@@ -77,7 +76,7 @@ export default function ProjectDetails({ projectId, isOwner }: ProjectDetailsPro
       </div>
 
       {/* Info Cards Grid */}
-      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         {/* Client Card */}
         <div className="relative group">
           <div className="bg-gradient-to-br from-card to-secondary/5 dark:from-card/80 dark:to-secondary/10 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform border border-border">
@@ -222,9 +221,9 @@ export default function ProjectDetails({ projectId, isOwner }: ProjectDetailsPro
                         <th className="px-6 py-4 text-left text-xs font-semibold text-foreground uppercase tracking-wider">Payment Link</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border">
+                    <tbody>
                       {project.invoices.map((invoice, index) => (
-                        <tr key={invoice.id} className={`hover:bg-muted/30 transition-colors ${index % 2 === 0 ? 'bg-card/50' : 'bg-transparent'}`}>
+                        <tr key={invoice.id} className={`hover:bg-muted/30 transition-colors text-xs ${index % 2 === 0 ? 'bg-card/50' : 'bg-transparent'}`}>
                           <td className="px-6 py-4 whitespace-nowrap text-foreground font-medium">{invoice.invoiceNumber}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-foreground font-semibold">${invoice.amount ? Number(invoice.amount).toFixed(2) : '0.00'}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{format(new Date(invoice.dueDate), 'MMM d, yyyy')}</td>

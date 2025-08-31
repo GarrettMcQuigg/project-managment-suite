@@ -86,7 +86,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
         <div className="sm:grid gap-16">
           {context.type !== 'none' && (
             <>
-              <ProjectDetails projectId={resolvedParams.id} isOwner={effectiveIsOwner} />
+              <ProjectDetails projectId={resolvedParams.id} />
               <ProjectTimeline projectId={resolvedParams.id} isOwner={effectiveIsOwner} />
               <ProjectMessaging projectId={resolvedParams.id} isOwner={effectiveIsOwner} context={context} />
             </>

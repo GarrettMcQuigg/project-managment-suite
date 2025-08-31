@@ -8,7 +8,6 @@ import { API_AUTH_PORTAL_GET_BY_ID_ROUTE, PROJECTS_ROUTE, API_PROJECT_UPDATE_CHE
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
 import { CheckCircle, Clock, Circle, Calendar, Target, Zap, TrendingUp } from 'lucide-react';
-import { Button } from '@/packages/lib/components/button';
 import { Checkpoint, CheckpointStatus } from '@prisma/client';
 import { Progress } from '@/packages/lib/components/progress';
 import { toast } from 'react-toastify';

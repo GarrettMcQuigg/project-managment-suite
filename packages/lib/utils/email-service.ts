@@ -18,9 +18,9 @@ class EmailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.protonmail.ch',
-      port: 587, // usually 587 for TLS/STARTTLS
-      secure: false, // true for 465, false for other ports
+      host: '127.0.0.1',
+      port: 1025,
+      secure: false, // STARTTLS over port 1025
       auth: {
         user: process.env.SMTP_AUTH_USER,
         pass: process.env.SMTP_AUTH_PASS

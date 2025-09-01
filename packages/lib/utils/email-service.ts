@@ -1,4 +1,3 @@
-import nodemailer from 'nodemailer';
 import { getInvoicePaymentEmail } from './templates/client-invoice.template';
 
 interface SendInvoicePaymentEmailParams {
@@ -14,29 +13,51 @@ interface SendInvoicePaymentEmailParams {
 }
 
 class EmailService {
-  private transporter: nodemailer.Transporter;
+  private apiKey: string;
+  private domain: string;
+  private baseUrl: string;
 
   constructor() {
-    this.transporter = nodemailer.createTransport({
-      host: '127.0.0.1',
-      port: 1025,
-      secure: false, // STARTTLS over port 1025
-      auth: {
-        user: process.env.SMTP_AUTH_USER,
-        pass: process.env.SMTP_AUTH_PASS
-      }
-    });
+    this.apiKey = process.env.MAILGUN_API_KEY!;
+    this.domain = process.env.MAILGUN_DOMAIN || process.env.MAILGUN_SANDBOX_DOMAIN!;
+    this.baseUrl = process.env.MAILGUN_BASE_URL!;
   }
 
   async send(from: string, to: string, subject: string, text: string, html: string): Promise<Error | null> {
     try {
-      await this.transporter.sendMail({
-        from,
-        to,
-        subject,
-        text,
-        html
+      console.log('Mailgun config:', {
+        baseUrl: this.baseUrl,
+        domain: this.domain,
+        hasApiKey: !!this.apiKey
       });
+
+      const url = `${this.baseUrl}/v3/${this.domain}/messages`;
+      console.log('Sending to URL:', url);
+
+      const formData = new FormData();
+      formData.append('from', from);
+      formData.append('to', to);
+      formData.append('subject', subject);
+      formData.append('text', text);
+      formData.append('html', html);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${Buffer.from(`api:${this.apiKey}`).toString('base64')}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Mailgun response:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText
+        });
+        throw new Error(`Mailgun API error: ${response.status} ${errorText}`);
+      }
 
       return null;
     } catch (err: any) {
@@ -45,13 +66,13 @@ class EmailService {
     }
   }
 
-  // TODO : Test this once ProtonMail is set up
+  // TODO : Test this once Mailgun is set up
   async sendInvoicePaymentEmail(params: SendInvoicePaymentEmailParams): Promise<Error | null> {
     try {
       const { subject, text, html } = getInvoicePaymentEmail(params);
 
-      // Use the SMTP auth user as the sender email
-      const from = `"${params.companyName}" <${process.env.SMTP_AUTH_USER}>`;
+      // Use a no-reply email from your Mailgun domain
+      const from = `"${params.companyName}" <noreply@${this.domain}>`;
 
       console.log(`Sending invoice payment email to: ${params.to}`);
       console.log(`Invoice #: ${params.invoiceNumber}`);

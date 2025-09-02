@@ -22,7 +22,8 @@ export async function setAuthCookies(user: User): Promise<Error | null> {
       httpOnly: true,
       maxAge: MAX_AGE,
       path: ROOT_ROUTE,
-      secure: false, // This has to be false otherwise we run into issues with Safari.
+      // TODO : Test on Safari
+      // secure: false, // This has to be false otherwise we run into issues with Safari.
       sameSite: 'strict'
     }
   );
@@ -32,7 +33,8 @@ export async function setAuthCookies(user: User): Promise<Error | null> {
     httpOnly: false,
     maxAge: MAX_AGE,
     path: ROOT_ROUTE,
-    secure: false, // This has to be false otherwise we run into issues with Safari.
+    // TODO : Test on Safari
+    // secure: false, // This has to be false otherwise we run into issues with Safari.
     sameSite: 'strict'
   });
 

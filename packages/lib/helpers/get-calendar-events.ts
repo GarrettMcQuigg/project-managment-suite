@@ -26,7 +26,6 @@ export async function getCalendarEvents() {
       }
     });
 
-    console.log('Calendar events:', events);
     return events;
   } catch (error: unknown) {
     console.error('Failed to fetch events:', error);

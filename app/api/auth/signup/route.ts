@@ -119,7 +119,7 @@ export async function POST(request: Request) {
 
 async function createNewUser(requestBody: SignupRequestBody): Promise<{ user: User | null; error: Error | null }> {
   try {
-    const hashedPassword = await bcrypt.hash(requestBody.password, 10);
+    const hashedPassword = await bcrypt.hash(requestBody.password, 12);
     const user = await db.user.create({
       data: {
         firstname: requestBody.firstname,

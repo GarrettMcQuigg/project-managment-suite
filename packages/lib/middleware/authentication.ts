@@ -126,10 +126,19 @@ async function isUserAuthenticated(req: NextRequest): Promise<boolean> {
     return false;
   }
 
+  if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET environment variable not set');
+    return false;
+  }
+
   try {
-    // Basic token validation
-    const tokenParts = tokenCookie.value.split('.');
-    if (tokenParts.length !== 3) {
+    // Import jwt here to avoid issues in middleware
+    const jwt = require('jsonwebtoken');
+    
+    // Properly verify JWT token with signature and expiration
+    const decoded = jwt.verify(tokenCookie.value, process.env.JWT_SECRET) as { userId: string };
+    
+    if (!decoded.userId) {
       return false;
     }
 
@@ -139,8 +148,14 @@ async function isUserAuthenticated(req: NextRequest): Promise<boolean> {
       return false;
     }
 
+    // Verify the user ID in the token matches the user cookie
+    if (decoded.userId !== user.id) {
+      return false;
+    }
+
     return true;
   } catch (error) {
+    // JWT verification will throw an error for invalid/expired tokens
     console.error('Error checking auth:', error);
     return false;
   }

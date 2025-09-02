@@ -106,16 +106,37 @@ function isUserAuthenticated(request: NextRequest): boolean {
     return false;
   }
 
+  if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET environment variable not set');
+    return false;
+  }
+
   try {
-    // We can't fully verify the token in middleware, but we can check basic structure
-    const tokenParts = tokenCookie.value.split('.');
-    if (tokenParts.length !== 3) {
+    // Parse JWT payload (base64 decode the middle part)
+    const parts = tokenCookie.value.split('.');
+    if (parts.length !== 3) {
       return false;
     }
 
-    // Do basic check on user cookie
+    const payload = JSON.parse(atob(parts[1]));
+    
+    // Check expiration
+    if (payload.exp && payload.exp < Date.now() / 1000) {
+      return false;
+    }
+    
+    if (!payload.userId) {
+      return false;
+    }
+
+    // Check user cookie structure
     const user = JSON.parse(userCookie.value);
     if (!user.id || !user.email) {
+      return false;
+    }
+
+    // Verify the user ID in the token matches the user cookie
+    if (payload.userId !== user.id) {
       return false;
     }
 

@@ -3,14 +3,16 @@ import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { AddClientRequestBody, AddClientRequestBodySchema } from './types';
 import { UpdateClientMetrics } from '@/packages/lib/helpers/analytics/client/client-metrics';
+import { NextRequest } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const currentUser = await getCurrentUser();
-  const requestBody: AddClientRequestBody = await request.json();
-
+  
   if (!currentUser) return handleUnauthorized();
 
-  const { error } = AddClientRequestBodySchema.validate(requestBody);
+  const body: AddClientRequestBody = await request.json();
+
+  const { error } = AddClientRequestBodySchema.validate(body);
   if (error) {
     return handleBadRequest({ message: error.message, err: error });
   }
@@ -19,9 +21,9 @@ export async function POST(request: Request) {
     const client = await db.client.create({
       data: {
         userId: currentUser.id,
-        name: requestBody.name,
-        email: requestBody.email || '',
-        phone: requestBody.phone || '',
+        name: body.name,
+        email: body.email || '',
+        phone: body.phone || '',
         isArchived: false
       }
     });

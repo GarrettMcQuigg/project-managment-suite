@@ -9,9 +9,14 @@ export const AddInvoiceRequestBodySchema = Joi.object({
   status: Joi.string().required(),
   dueDate: Joi.date().required(),
   notes: Joi.string().allow('', null).optional(),
-  paymentMethod: Joi.string().allow('', null).optional(),
   amount: Joi.string().required(),
-  notifyClient: Joi.boolean().default(false).optional()
+  notifyClient: Joi.boolean().default(false).optional(),
+  client: Joi.object({
+    id: Joi.string().optional(),
+    name: Joi.string().required(),
+    email: Joi.string().email().required(),
+    phone: Joi.string().required()
+  }).optional()
 });
 
 export type AddInvoiceRequestBody = {
@@ -23,7 +28,12 @@ export type AddInvoiceRequestBody = {
   status: string;
   dueDate: Date;
   notes?: string;
-  paymentMethod?: string;
   amount: string;
   notifyClient?: boolean;
+  client?: {
+    id?: string;
+    name: string;
+    email: string;
+    phone: string;
+  };
 };

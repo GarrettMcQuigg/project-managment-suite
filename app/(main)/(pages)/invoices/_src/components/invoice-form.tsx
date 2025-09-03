@@ -31,7 +31,8 @@ const defaultInvoice: FormDataWithStringAmount = {
   status: InvoiceStatus.DRAFT,
   dueDate: new Date(),
   notes: '',
-  paymentMethod: null
+  amount: '',
+  notifyClient: false
 };
 
 export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceFormProps) {
@@ -44,7 +45,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
     status: InvoiceStatus.DRAFT,
     dueDate: new Date(),
     notes: '',
-    paymentMethod: null
+    notifyClient: false
   });
   const [isLoadingNumber, setIsLoadingNumber] = useState(false);
 
@@ -81,7 +82,30 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'amount') {
+      // Remove all non-digit and non-decimal characters
+      let cleanValue = value.replace(/[^\d.]/g, '');
+
+      // Ensure only one decimal point
+      const parts = cleanValue.split('.');
+      if (parts.length > 2) {
+        cleanValue = parts[0] + '.' + parts.slice(1).join('');
+      }
+
+      // Limit to 2 decimal places
+      if (cleanValue.includes('.')) {
+        const [whole, decimal] = cleanValue.split('.');
+        cleanValue = whole + '.' + decimal.slice(0, 2);
+      }
+
+      // Add dollar sign if there's a value
+      const formattedValue = cleanValue ? '$' + cleanValue : '';
+
+      setFormData((prev) => ({ ...prev, [name]: formattedValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -90,7 +114,14 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+
+    // Strip formatting from amount for API submission
+    const submitData = {
+      ...formData,
+      amount: formData.amount ? formData.amount.replace(/[^\d.]/g, '') : ''
+    };
+
+    onSubmit(submitData);
   };
 
   const dialogTitle = isEditMode ? 'Edit Invoice' : 'Create New Invoice';
@@ -112,14 +143,10 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
                 <Link2 className="w-6 h-6 text-yellow-600" />
                 <div>
                   <p className="text-sm font-medium text-yellow-800">
-                    {stripeAccount.status === 'NOT_CONNECTED'
-                      ? 'Connect your Stripe account to create invoices'
-                      : 'Complete your Stripe account setup'}
+                    {stripeAccount.status === 'NOT_CONNECTED' ? 'Connect your Stripe account to create invoices' : 'Complete your Stripe account setup'}
                   </p>
                   <p className="text-xs text-yellow-700">
-                    {stripeAccount.status === 'NOT_CONNECTED'
-                      ? 'You need to link a Stripe account to generate invoices'
-                      : 'Your account is currently pending verification'}
+                    {stripeAccount.status === 'NOT_CONNECTED' ? 'You need to link a Stripe account to generate invoices' : 'Your account is currently pending verification'}
                   </p>
                 </div>
               </div>
@@ -158,56 +185,70 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
               required
             />
           </div>
-          <div>
-            <Label htmlFor="type">Type</Label>
-            <Select name="type" value={formData.type} onValueChange={(value) => handleSelectChange('type', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select invoice type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={InvoiceType.STANDARD}>Standard</SelectItem>
-                <SelectItem value={InvoiceType.MILESTONE}>Milestone</SelectItem>
-                <SelectItem value="RECURRING">Recurring</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Label htmlFor="type">Type</Label>
+              <Select name="type" value={formData.type} onValueChange={(value) => handleSelectChange('type', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select invoice type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={InvoiceType.STANDARD}>Standard</SelectItem>
+                  <SelectItem value={InvoiceType.MILESTONE}>Milestone</SelectItem>
+                  <SelectItem value="RECURRING">Recurring</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="status">Status</Label>
+              <Select name="status" value={formData.status} onValueChange={(value) => handleSelectChange('status', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select invoice status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={InvoiceStatus.DRAFT}>Draft</SelectItem>
+                  <SelectItem value={InvoiceStatus.SENT}>Sent</SelectItem>
+                  <SelectItem value={InvoiceStatus.PAID}>Paid</SelectItem>
+                  <SelectItem value={InvoiceStatus.OVERDUE}>Overdue</SelectItem>
+                  <SelectItem value={InvoiceStatus.CANCELLED}>Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div>
-            <Label htmlFor="amount">Amount</Label>
-            <Input id="amount" name="amount" type="number" step="0.01" value={formData.amount} onChange={handleChange} required />
-          </div>
-          <div>
-            <Label htmlFor="status">Status</Label>
-            <Select name="status" value={formData.status} onValueChange={(value) => handleSelectChange('status', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select invoice status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={InvoiceStatus.DRAFT}>Draft</SelectItem>
-                <SelectItem value={InvoiceStatus.SENT}>Sent</SelectItem>
-                <SelectItem value={InvoiceStatus.PAID}>Paid</SelectItem>
-                <SelectItem value={InvoiceStatus.OVERDUE}>Overdue</SelectItem>
-                <SelectItem value={InvoiceStatus.CANCELLED}>Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="dueDate">Due Date</Label>
-            <Input
-              id="dueDate"
-              name="dueDate"
-              type="date"
-              value={formData.dueDate ? new Date(formData.dueDate).toISOString().split('T')[0] : ''}
-              onChange={handleChange}
-              required
-            />
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Label htmlFor="amount">Amount</Label>
+              <Input id="amount" name="amount" type="text" placeholder="$0.00" value={formData.amount || ''} onChange={handleChange} required />
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="dueDate">Due Date</Label>
+              <Input
+                id="dueDate"
+                name="dueDate"
+                type="date"
+                value={formData.dueDate ? new Date(formData.dueDate).toISOString().split('T')[0] : ''}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
           <div>
             <Label htmlFor="notes">Notes</Label>
             <Textarea id="notes" name="notes" value={formData.notes || ''} onChange={handleChange} />
           </div>
-          <div>
-            <Label htmlFor="paymentMethod">Payment Method</Label>
-            <Input id="paymentMethod" name="paymentMethod" value={formData.paymentMethod || ''} onChange={handleChange} />
+          <div className="flex flex-col">
+            <Label htmlFor="notifyClient">Notify Client</Label>
+            <div className="flex items-center cursor-pointer" onClick={() => setFormData((prev) => ({ ...prev, notifyClient: !prev.notifyClient }))}>
+              <input
+                id="notifyClient"
+                name="notifyClient"
+                type="checkbox"
+                className="cursor-pointer"
+                checked={formData.notifyClient || false}
+                onChange={(e) => setFormData((prev) => ({ ...prev, notifyClient: e.target.checked }))}
+              />
+              <span className="ml-2 text-sm text-muted-foreground">Send email notification when invoice is created</span>
+            </div>
           </div>
           <DialogFooter className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onCancel}>

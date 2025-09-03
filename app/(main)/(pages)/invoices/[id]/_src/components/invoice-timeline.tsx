@@ -82,15 +82,25 @@ export function InvoiceTimeline({ invoice }: { invoice: InvoiceWithMetadata }) {
   return (
     <div className="relative group">
       <div className="">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 rounded-full bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/20">
-            <Calendar className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-foreground">Invoice Timeline</h3>
-            <p className="text-sm text-muted-foreground">Key events and milestones</p>
+        {/* Status Summary */}
+        <div className="mt-8 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 dark:from-primary/10 dark:to-secondary/10 rounded-lg border border-primary/20 w-full">
+          <div className="flex items-center gap-3">
+            {invoice.status === 'PAID' ? (
+              <CheckCircle className="h-5 w-5 text-emerald-600" />
+            ) : invoice.status === 'OVERDUE' ? (
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+            ) : (
+              <Zap className="h-5 w-5 text-primary" />
+            )}
+            <div>
+              <div className="font-semibold text-foreground">Current Status: {invoice.status.replace('_', ' ')}</div>
+              <div className="text-sm text-muted-foreground">
+                {invoice.status === 'PAID' ? 'This invoice has been fully paid' : invoice.status === 'OVERDUE' ? 'Payment is past due' : 'Awaiting payment from client'}
+              </div>
+            </div>
           </div>
         </div>
+        <div className="flex items-center gap-3 mb-6"></div>
 
         <div className="space-y-6">
           {timelineEvents.map((event, index) => (
@@ -126,25 +136,6 @@ export function InvoiceTimeline({ invoice }: { invoice: InvoiceWithMetadata }) {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Status Summary */}
-        <div className="mt-8 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 dark:from-primary/10 dark:to-secondary/10 rounded-lg border border-primary/20">
-          <div className="flex items-center gap-3">
-            {invoice.status === 'PAID' ? (
-              <CheckCircle className="h-5 w-5 text-emerald-600" />
-            ) : invoice.status === 'OVERDUE' ? (
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-            ) : (
-              <Zap className="h-5 w-5 text-primary" />
-            )}
-            <div>
-              <div className="font-semibold text-foreground">Current Status: {invoice.status.replace('_', ' ')}</div>
-              <div className="text-sm text-muted-foreground">
-                {invoice.status === 'PAID' ? 'This invoice has been fully paid' : invoice.status === 'OVERDUE' ? 'Payment is past due' : 'Awaiting payment from client'}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -16,19 +16,53 @@ export async function PUT(request: Request) {
   }
 
   try {
-    await db.invoice.update({
-      where: { id: requestBody.id },
-      data: {
-        invoiceNumber: requestBody.invoiceNumber,
-        type: requestBody.type as InvoiceType,
-        status: requestBody.status as InvoiceStatus,
-        dueDate: new Date(requestBody.dueDate) ?? new Date(),
-        notes: requestBody.notes || '',
-        paymentMethod: (requestBody.paymentMethod as PaymentMethod) ?? null,
-        amount: requestBody.amount,
-        createdAt: new Date(),
-        updatedAt: new Date()
+    await db.$transaction(async (tx) => {
+      let clientId: string | null = null;
+
+      // Handle client data if provided
+      if (requestBody.client) {
+        if (requestBody.client.id) {
+          // Update existing client
+          await tx.client.update({
+            where: { id: requestBody.client.id },
+            data: {
+              name: requestBody.client.name,
+              email: requestBody.client.email,
+              phone: requestBody.client.phone,
+              updatedAt: new Date()
+            }
+          });
+          clientId = requestBody.client.id;
+        } else {
+          // Create new client
+          const newClient = await tx.client.create({
+            data: {
+              name: requestBody.client.name,
+              email: requestBody.client.email,
+              phone: requestBody.client.phone,
+              userId: currentUser.id,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
+          });
+          clientId = newClient.id;
+        }
       }
+
+      await tx.invoice.update({
+        where: { id: requestBody.id },
+        data: {
+          invoiceNumber: requestBody.invoiceNumber,
+          type: requestBody.type as InvoiceType,
+          status: requestBody.status as InvoiceStatus,
+          dueDate: new Date(requestBody.dueDate) ?? new Date(),
+          notes: requestBody.notes || '',
+          paymentMethod: null,
+          amount: requestBody.amount,
+          clientId: clientId,
+          updatedAt: new Date()
+        }
+      });
     });
 
     return handleSuccess({

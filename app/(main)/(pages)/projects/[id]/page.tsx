@@ -1,15 +1,15 @@
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { ProjectInfo } from './_src/project-info';
 import { Breadcrumb } from '@/packages/lib/components/breadcrumb';
-import { PROJECTS_ROUTE } from '@/packages/lib/routes';
-import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { PROJECTS_ROUTE, AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
+import { redirect } from 'next/navigation';
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const currentUser = getCurrentUser();
   const resolvedParams = await params;
 
   if (!currentUser) {
-    return handleUnauthorized();
+    redirect(AUTH_SIGNIN_ROUTE);
   }
 
   return (

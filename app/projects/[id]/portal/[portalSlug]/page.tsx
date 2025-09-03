@@ -2,12 +2,11 @@ import PortalHeader from './_src/portal-header';
 import ProjectTimeline from './_src/project-timeline';
 import ProjectMessaging from './_src/project-messaging';
 import ProjectDetails from './_src/project-details';
-import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import { db } from '@/packages/lib/prisma/client';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
-import { PROJECT_DETAILS_ROUTE, API_AUTH_PORTAL_ROUTE, routeWithParam, PROJECT_PORTAL_ROUTE } from '@/packages/lib/routes';
+import { PROJECT_DETAILS_ROUTE, API_AUTH_PORTAL_ROUTE, routeWithParam, PROJECT_PORTAL_ROUTE, AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
 
 export default async function ProjectPortalPage({ params, searchParams }: { params: Promise<{ id: string; portalSlug: string }>; searchParams: Promise<{ preview?: string }> }) {
   const resolvedParams = await params;
@@ -32,7 +31,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
   });
 
   if (!project) {
-    return handleUnauthorized();
+    redirect(AUTH_SIGNIN_ROUTE);
   }
 
   const hasPortalAccess = !!portalAccessCookie;

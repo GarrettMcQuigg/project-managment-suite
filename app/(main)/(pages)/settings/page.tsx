@@ -1,6 +1,7 @@
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import PersonalSettings from './_src/components/personal-settings';
-import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { redirect } from 'next/navigation';
+import { AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/packages/lib/components/tabs';
 import { Suspense } from 'react';
 import { SubscriptionSkeleton } from './_src/components/subscription-skeleton';
@@ -10,7 +11,7 @@ export default async function SettingsPage() {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
-    return handleUnauthorized();
+    redirect(AUTH_SIGNIN_ROUTE);
   }
 
   return (

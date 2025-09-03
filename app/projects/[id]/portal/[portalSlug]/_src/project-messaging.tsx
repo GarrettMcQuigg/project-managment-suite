@@ -474,7 +474,7 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
                   {isImage && previewUrl ? (
                     <div className="relative" onClick={() => setPreviewFile(file)}>
                       <div className="relative group/img">
-                        <img src={previewUrl} alt={file.name} className="w-20 h-20 object-cover rounded-t-xl" />
+                        <Image src={previewUrl} alt={file.name} className="w-20 h-20 object-cover rounded-t-xl" width={80} height={80} />
                         {/* Hover overlay */}
                         <div className="absolute inset-0 bg-black/30 rounded-t-xl opacity-0 group-hover/img:opacity-100 transition-opacity duration-200"></div>
                       </div>
@@ -600,7 +600,7 @@ export default function ProjectMessaging({ projectId, isOwner = false, context }
             <div className="p-6 max-h-[calc(90vh-80px)] overflow-auto">
               {previewFile.type.startsWith('image/') ? (
                 <div className="flex items-center justify-center">
-                  <img src={URL.createObjectURL(previewFile)} alt={previewFile.name} className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg" />
+                  <Image src={URL.createObjectURL(previewFile)} alt={previewFile.name} className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg" width={800} height={600} />
                 </div>
               ) : previewFile.type.startsWith('video/') ? (
                 <div className="flex items-center justify-center">

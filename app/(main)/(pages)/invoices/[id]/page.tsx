@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { Breadcrumb } from '@/packages/lib/components/breadcrumb';
-import { INVOICES_ROUTE } from '@/packages/lib/routes';
-import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { INVOICES_ROUTE, AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
+import { redirect } from 'next/navigation';
 import { InvoiceInfo } from './_src/components/invoice-info';
 
 export default async function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -9,7 +9,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
   const resolvedParams = await params;
 
   if (!currentUser) {
-    return handleUnauthorized();
+    redirect(AUTH_SIGNIN_ROUTE);
   }
 
   return (

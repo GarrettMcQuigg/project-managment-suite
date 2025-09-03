@@ -1,5 +1,5 @@
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
-import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { redirect } from 'next/navigation';
 import { getProjectList } from '@/packages/lib/helpers/get-project-list';
 import { ActiveProjectsWidget } from './_src/components/active-projects-widget';
 import { ActiveProjectsCard } from './_src/components/active-projects-card';
@@ -16,6 +16,7 @@ import { UpcomingDeadlines } from './_src/components';
 import { MissedDeadlines } from './_src/components/missed-deadlines';
 import { RecentInvoices } from './_src/components/recent-invoices';
 import StripeConnectionCard from './_src/components/stripe-connection-card';
+import { AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
 
 function getProjectStatusData(projects: ProjectWithMetadata[]) {
   const statusCounts: Record<string, number> = {};
@@ -59,7 +60,7 @@ export default async function Dashboard() {
   const projects = await getProjectList();
 
   if (!currentUser) {
-    return handleUnauthorized();
+    redirect(AUTH_SIGNIN_ROUTE);
   }
 
   await getResponseTimeMetrics(currentUser.id);
@@ -69,7 +70,7 @@ export default async function Dashboard() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 min-h-screen-minus-header">
       <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
-      
+
       {/* Stripe Connection Card - shows if not verified */}
       <StripeConnectionCard stripeAccountStatus={currentUser.stripeAccountStatus} />
 

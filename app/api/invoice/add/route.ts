@@ -68,9 +68,9 @@ export async function POST(request: Request) {
         // Get user's Stripe account status and name
         const user = await db.user.findUnique({
           where: { id: currentUser.id },
-          select: { 
-            stripeAccountId: true, 
-            stripeAccountStatus: true, 
+          select: {
+            stripeAccountId: true,
+            stripeAccountStatus: true,
             firstname: true,
             lastname: true
           }
@@ -81,24 +81,15 @@ export async function POST(request: Request) {
 
         // Create checkout session
         if (user?.stripeAccountId && user.stripeAccountStatus === 'VERIFIED') {
-          const checkout = await createConnectInvoiceCheckout(
-            invoice.id,
-            currentUser.id,
-            user.stripeAccountId,
-            origin
-          );
+          const checkout = await createConnectInvoiceCheckout(invoice.id, currentUser.id, user.stripeAccountId, origin);
           checkoutUrl = checkout.checkoutUrl;
         } else {
-          const checkout = await createInvoiceCheckout(
-            invoice.id,
-            currentUser.id,
-            origin
-          );
+          const checkout = await createInvoiceCheckout(invoice.id, currentUser.id, origin);
           checkoutUrl = checkout.checkoutUrl;
         }
 
         if (checkoutUrl) {
-          // TODO: Implement email notification when ProtonMail is added
+          // TODO: Implement email notification when MailGun is added
           console.log('sending email notification');
           // Send email notification
           // const emailService = new EmailService();
@@ -117,9 +108,9 @@ export async function POST(request: Request) {
           // Update the invoice to mark that notification was sent
           // await db.invoice.update({
           //   where: { id: invoice.id },
-          //   data: { 
-          //     notificationSent: true, 
-          //     notificationSentAt: new Date() 
+          //   data: {
+          //     notificationSent: true,
+          //     notificationSentAt: new Date()
           //   }
           // });
         }
@@ -135,9 +126,9 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     console.error('Error creating invoice:', err);
-    return handleError({ 
-      message: 'Failed to create invoice', 
-      err: err instanceof Error ? err : new Error('An unknown error occurred') 
+    return handleError({
+      message: 'Failed to create invoice',
+      err: err instanceof Error ? err : new Error('An unknown error occurred')
     });
   }
 }

@@ -3,7 +3,7 @@ import Joi from 'joi';
 export const SigninRequestBodySchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(8).max(30).required(),
-  smsMFACode: Joi.string().min(0).max(10)
+  smsMFACode: Joi.string().min(0).max(10).optional()
 });
 
 export type SigninRequestBody = {

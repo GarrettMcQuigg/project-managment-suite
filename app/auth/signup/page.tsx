@@ -9,7 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
 
 export default function Signup() {
-  const { STEPS, loading, currentStep, personalInfoForm, passwordForm, verificationForm, nextStep, prevStep, handleSignup } = useSignup();
+  const { STEPS, loading, currentStep, personalInfoForm, passwordForm, nextStep, prevStep, handleSignup } = useSignup();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -23,8 +23,7 @@ export default function Signup() {
   return (
     <>
       {currentStep === STEPS.PERSONAL_INFO && <PersonalInfoForm form={personalInfoForm} loading={loading} onSubmit={nextStep} />}
-      {currentStep === STEPS.PASSWORD && <PasswordForm form={passwordForm} loading={loading} onSubmit={nextStep} onBack={prevStep} />}
-      {currentStep === STEPS.VERIFICATION && <VerificationForm form={verificationForm} loading={loading} onSubmit={handleSignup} onBack={prevStep} />}
+      {currentStep === STEPS.PASSWORD && <PasswordForm form={passwordForm} loading={loading} onSubmit={handleSignup} onBack={prevStep} />}
     </>
   );
 }

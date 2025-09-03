@@ -4,7 +4,7 @@ export const SignupRequestBodySchema = Joi.object({
   firstname: Joi.string().min(2).max(30).required(),
   lastname: Joi.string().min(2).max(30).required(),
   email: Joi.string().email().required(),
-  phone: Joi.string().min(10).max(20).required(),
+  phone: Joi.string().min(10).max(20).optional().allow(''),
   password: Joi.string()
     .pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[$&+,:;=?@#|'<>.^*()%!-])(?=.*[0-9]).{8,}$/)
     .required()
@@ -12,17 +12,17 @@ export const SignupRequestBodySchema = Joi.object({
       'string.pattern.base': '"password" does not meet requirements'
     }),
   confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
-  emailMFACode: Joi.string().min(6).max(6).required(),
-  smsMFACode: Joi.string().min(6).max(6).required()
+  emailMFACode: Joi.string().min(6).max(6).optional(),
+  smsMFACode: Joi.string().min(6).max(6).optional()
 });
 
 export type SignupRequestBody = {
   firstname: string;
   lastname: string;
   email: string;
-  phone: string;
+  phone?: string;
   password: string;
   confirmPassword: string;
-  emailMFACode: string;
-  smsMFACode: string;
+  emailMFACode?: string;
+  smsMFACode?: string;
 };

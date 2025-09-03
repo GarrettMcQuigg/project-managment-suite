@@ -2,15 +2,12 @@ import { db } from '@/packages/lib/prisma/client';
 import { SignupRequestBody, SignupRequestBodySchema } from './types';
 import * as bcrypt from 'bcrypt';
 // import { codeHasExpired } from '@packages/lib/services/email-service/templates/verify-email';
-// // import TwilioService from '@packages/lib/services/twilio-service/twilio-service';
 import { User } from '@prisma/client';
 import { handleBadRequest, handleConflict, handleError, handleSuccess } from '@packages/lib/helpers/api-response-handlers';
 import { setAuthCookies } from '@/packages/lib/helpers/cookies';
 import { CheckEmailAvailability } from '@/packages/lib/helpers/check-email-availability';
 import { CreateUserMetrics } from '@/packages/lib/helpers/analytics/user/user-metrics';
 import { CreateFreeTierSubscription } from '@/packages/lib/helpers/free-tier-subscription';
-
-// const twilioService = new TwilioService();
 
 export async function POST(request: Request) {
   const requestBody: SignupRequestBody = await request.json();
@@ -125,7 +122,7 @@ async function createNewUser(requestBody: SignupRequestBody): Promise<{ user: Us
         firstname: requestBody.firstname,
         lastname: requestBody.lastname,
         email: requestBody.email,
-        phone: requestBody.phone,
+        phone: requestBody.phone || '',
         password: hashedPassword
       }
     });

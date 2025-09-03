@@ -2,9 +2,6 @@ import { db } from '@packages/lib/prisma/client';
 import bcrypt from 'bcrypt';
 import { SigninRequestBody, SigninRequestBodySchema } from '../types';
 import { handleBadRequest, handleError, handleSuccess } from '@packages/lib/helpers/api-response-handlers';
-import TwilioService from '@/packages/lib/utils/twilio/twilio-service';
-
-const twilioService = new TwilioService();
 
 export async function POST(request: Request) {
   const requestBody: SigninRequestBody = await request.json();
@@ -33,11 +30,6 @@ export async function POST(request: Request) {
 
     if (!isValidPassword) {
       return handleBadRequest({ message: 'Invalid email or password' });
-    }
-
-    const err = await twilioService.sendVerificationCode(user.phone);
-    if (err) {
-      throw err;
     }
 
     return handleSuccess({ message: 'Verification code sent!' });

@@ -20,8 +20,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 const STEPS = {
   PERSONAL_INFO: 'personal-info',
-  PASSWORD: 'password',
-  VERIFICATION: 'verification'
+  PASSWORD: 'password'
 };
 
 export const useSignup = () => {
@@ -104,10 +103,8 @@ export const useSignup = () => {
         throw new Error('Passwords must match.');
       }
 
-      // const { email, phone } = personalInfoForm.getValues();
-      // await sendVerificationCodes(email, phone);
-
-      setCurrentStep(STEPS.VERIFICATION);
+      // Skip verification step and directly call signup
+      await executeSignup();
     } catch (error: Error | unknown) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -123,49 +120,56 @@ export const useSignup = () => {
     e.preventDefault();
     if (currentStep === STEPS.PERSONAL_INFO) {
       await handleRegistrationStep();
-    } else if (currentStep === STEPS.PASSWORD) {
-      await handlePasswordStep();
     }
   };
 
   const prevStep = () => {
     if (currentStep === STEPS.PASSWORD) {
       setCurrentStep(STEPS.PERSONAL_INFO);
-    } else if (currentStep === STEPS.VERIFICATION) {
-      verificationForm.reset();
-      setCurrentStep(STEPS.PASSWORD);
+    }
+  };
+
+  const executeSignup = async () => {
+    const emailMFACode = '000000';
+    const smsMFACode = '000000';
+    
+    const requestBody = {
+      ...personalInfoForm.getValues(),
+      password: passwordForm.getValues('password'),
+      confirmPassword: passwordForm.getValues('confirmPassword'),
+      emailMFACode,
+      smsMFACode
+    };
+    const response = await fetcher({ url: API_AUTH_SIGNUP_ROUTE, requestBody });
+    if (response.err) throw new Error(response.message);
+    localStorage.clear();
+
+    const returnToPricing = sessionStorage.getItem('returnToPricing');
+    if (returnToPricing) {
+      sessionStorage.removeItem('returnToPricing');
+      router.push(PRICING_ROUTE);
+    } else {
+      router.push(DASHBOARD_ROUTE);
     }
   };
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    // TODO : This is broken. sms and email codes are not being set correctly for sign up.
-    const emailMFACode = '000000';
-    const smsMFACode = '000000';
     e.preventDefault();
     setLoading(true);
     try {
-      const requestBody = {
-        ...personalInfoForm.getValues(),
-        password: passwordForm.getValues('password'),
-        confirmPassword: passwordForm.getValues('confirmPassword'),
-        emailMFACode,
-        smsMFACode
-        // emailMFACode: verificationForm.getValues('emailCode'),
-        // smsMFACode: verificationForm.getValues('smsCode')
-      };
-      const response = await fetcher({ url: API_AUTH_SIGNUP_ROUTE, requestBody });
-      if (response.err) throw new Error(response.message);
-      localStorage.clear();
-
-      const returnToPricing = sessionStorage.getItem('returnToPricing');
-      if (returnToPricing) {
-        sessionStorage.removeItem('returnToPricing');
-        router.push(PRICING_ROUTE);
-      } else {
-        router.push(DASHBOARD_ROUTE);
+      // First validate the form using the schema
+      const result = await passwordForm.trigger();
+      if (!result) {
+        return;
       }
+      
+      const { password, confirmPassword } = passwordForm.getValues();
+      if (password !== confirmPassword) {
+        throw new Error('Passwords must match.');
+      }
+
+      await executeSignup();
     } catch (error: Error | unknown) {
-      verificationForm.reset();
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
@@ -182,7 +186,6 @@ export const useSignup = () => {
     currentStep,
     personalInfoForm,
     passwordForm,
-    verificationForm,
     nextStep,
     prevStep,
     handleSignup

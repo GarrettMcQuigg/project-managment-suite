@@ -1,11 +1,16 @@
-import { API_AUTH_SIGNUP_AVAILABILITY_EMAIL_ROUTE } from '../routes';
-import { fetcher } from './fetcher';
+import { db } from '../prisma/client';
 
 export async function CheckEmailAvailability(email: string): Promise<boolean> {
-  const isEmailAvailable = await fetcher({
-    url: API_AUTH_SIGNUP_AVAILABILITY_EMAIL_ROUTE,
-    requestBody: { email }
-  });
+  try {
+    const existingUser = await db.user.findUnique({
+      where: {
+        email: email
+      }
+    });
 
-  return isEmailAvailable.err ? true : false;
+    return !existingUser; // true if email is available (no existing user)
+  } catch (error) {
+    console.error('Error checking email availability:', error);
+    return false;
+  }
 }

@@ -6,12 +6,9 @@ import CredentialsForm from './_src/components/credentials-form';
 import VerificationForm from './_src/components/verification-form';
 
 export default function Signin() {
-  const { STEPS, loading, currentStep, credentialsForm, verificationForm, signinPartOne, signinPartTwo } = useSignin();
+  const { loading, credentialsForm, handleSignin } = useSignin();
 
   return (
-    <>
-      {currentStep === STEPS.CREDENTIALS && <CredentialsForm form={credentialsForm} loading={loading} onSubmit={signinPartOne} />}
-      {currentStep === STEPS.VERIFICATION && <VerificationForm form={verificationForm} loading={loading} onSubmit={signinPartTwo} />}
-    </>
+    <CredentialsForm form={credentialsForm} loading={loading} onSubmit={handleSignin} />
   );
 }

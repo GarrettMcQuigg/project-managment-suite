@@ -1,5 +1,5 @@
 import { InvoiceWithMetadata } from '@/packages/lib/prisma/types';
-import { Calendar, Clock, DollarSign, CheckCircle, Zap, FileText, AlertTriangle } from 'lucide-react';
+import { Clock, DollarSign, CheckCircle, Zap, FileText, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 
 export function InvoiceTimeline({ invoice }: { invoice: InvoiceWithMetadata }) {

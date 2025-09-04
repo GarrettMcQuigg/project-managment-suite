@@ -28,7 +28,6 @@ export default function InvoiceClientStep({ form, onValidationChange, clearForms
   const clientName = form.watch('client.name');
   const clientEmail = form.watch('client.email');
   const clientPhone = form.watch('client.phone');
-  const clientId = form.watch('client.id');
 
   useEffect(() => {
     if (data) {

@@ -7,7 +7,7 @@ import { Input } from '@/packages/lib/components/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/packages/lib/components/select';
 import { Button } from '@/packages/lib/components/button';
 import { Textarea } from '@/packages/lib/components/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/packages/lib/components/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
 import { Card } from '@/packages/lib/components/card';
 import { InvoiceStatus, InvoiceType } from '@prisma/client';
 import { fetchUniqueInvoiceNumber, generateTemporaryInvoiceNumber } from '@/packages/lib/helpers/generate-invoice-number';

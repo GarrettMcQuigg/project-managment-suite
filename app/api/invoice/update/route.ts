@@ -2,7 +2,7 @@ import { db } from '@packages/lib/prisma/client';
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { UpdateInvoiceRequestBody, UpdateInvoiceRequestBodySchema } from './types';
-import { InvoiceStatus, InvoiceType, PaymentMethod } from '@prisma/client';
+import { InvoiceStatus, InvoiceType } from '@prisma/client';
 
 export async function PUT(request: Request) {
   const currentUser = await getCurrentUser();

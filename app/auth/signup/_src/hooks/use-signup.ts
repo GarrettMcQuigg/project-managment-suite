@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { fetcher } from '@packages/lib/helpers/fetcher';
 import { usePersonalInfoForm } from '../components/personal-info-form';
 import { usePasswordForm } from '../components/password-form';
-import { useVerificationForm } from '../components/verification-form';
+// import { useVerificationForm } from '../components/verification-form';
 import {
   // API_AUTH_SIGNUP_AVAILABILITY_EMAIL_ROUTE,
   // API_AUTH_SIGNUP_AVAILABILITY_PHONE_ROUTE,
@@ -28,7 +28,7 @@ export const useSignup = () => {
   const [currentStep, setCurrentStep] = useState(STEPS.PERSONAL_INFO);
   const personalInfoForm = usePersonalInfoForm();
   const passwordForm = usePasswordForm();
-  const verificationForm = useVerificationForm();
+  // const verificationForm = useVerificationForm();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -88,33 +88,33 @@ export const useSignup = () => {
     }
   };
 
-  const handlePasswordStep = async () => {
-    setLoading(true);
-    try {
-      // First validate the form using the schema
-      const result = await passwordForm.trigger();
-      if (!result) {
-        // If validation fails, don't proceed
-        return;
-      }
-      
-      const { password, confirmPassword } = passwordForm.getValues();
-      if (password !== confirmPassword) {
-        throw new Error('Passwords must match.');
-      }
+  // const handlePasswordStep = async () => {
+  //   setLoading(true);
+  //   try {
+  //     // First validate the form using the schema
+  //     const result = await passwordForm.trigger();
+  //     if (!result) {
+  //       // If validation fails, don't proceed
+  //       return;
+  //     }
 
-      // Skip verification step and directly call signup
-      await executeSignup();
-    } catch (error: Error | unknown) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        console.error('An error occurred. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const { password, confirmPassword } = passwordForm.getValues();
+  //     if (password !== confirmPassword) {
+  //       throw new Error('Passwords must match.');
+  //     }
+
+  //     // Skip verification step and directly call signup
+  //     await executeSignup();
+  //   } catch (error: Error | unknown) {
+  //     if (error instanceof Error) {
+  //       toast.error(error.message);
+  //     } else {
+  //       console.error('An error occurred. Please try again.');
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const nextStep = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -132,7 +132,7 @@ export const useSignup = () => {
   const executeSignup = async () => {
     const emailMFACode = '000000';
     const smsMFACode = '000000';
-    
+
     const requestBody = {
       ...personalInfoForm.getValues(),
       password: passwordForm.getValues('password'),
@@ -162,7 +162,7 @@ export const useSignup = () => {
       if (!result) {
         return;
       }
-      
+
       const { password, confirmPassword } = passwordForm.getValues();
       if (password !== confirmPassword) {
         throw new Error('Passwords must match.');

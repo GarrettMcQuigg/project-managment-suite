@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useSignup } from './_src/hooks/use-signup';
 import { PersonalInfoForm } from './_src/components/personal-info-form';
-import { VerificationForm } from './_src/components/verification-form';
+// import { VerificationForm } from './_src/components/verification-form';
 import { PasswordForm } from './_src/components/password-form';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';

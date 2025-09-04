@@ -14,7 +14,7 @@ import { Skeleton } from '@/packages/lib/components/skeleton';
 import { Pencil, DollarSign, Calendar, User, Building2, FileText } from 'lucide-react';
 import { DeleteInvoiceButton } from './delete-invoice';
 import { format } from 'date-fns';
-import { ClientFormValues } from '../../../clients/[id]/_src/types';
+import { ClientFormValues } from '@/app/(main)/(pages)/clients/[id]/_src/types';
 
 export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
   const router = useRouter();

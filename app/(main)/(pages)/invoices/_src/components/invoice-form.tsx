@@ -53,7 +53,7 @@ const defaultInvoice: FormDataWithStringAmount = {
 
 export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceFormProps) {
   const isEditMode = !!invoice;
-  const { stripeAccount, isLoading, connectStripeAccount } = useStripeAccount();
+  const { stripeAccount, isLoading, connectStripeAccount, refetch } = useStripeAccount();
   const [currentStep, setCurrentStep] = useState<'invoice' | 'client'>('invoice');
   const [formData, setFormData] = useState<FormDataWithStringAmount>({
     invoiceNumber: '',
@@ -66,6 +66,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
   });
   const [isLoadingNumber, setIsLoadingNumber] = useState(false);
   const [isClientStepValid, setIsClientStepValid] = useState(false);
+  const [clearClientForms, setClearClientForms] = useState(false);
 
   const clientForm = useForm<InvoiceWorkflowData>({
     defaultValues: {
@@ -79,6 +80,9 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
 
   useEffect(() => {
     if (isOpen) {
+      // Automatically fetch Stripe account status when dialog opens
+      refetch();
+
       setCurrentStep('invoice');
       if (isEditMode && invoice) {
         setFormData({
@@ -149,6 +153,8 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
 
   const handleBack = () => {
     setCurrentStep('invoice');
+    setClearClientForms(true);
+    setTimeout(() => setClearClientForms(false), 0);
   };
 
   const handleFinalSubmit = (e: React.FormEvent) => {
@@ -173,6 +179,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
   };
 
   const dialogTitle = getDialogTitle();
+  const isFormDisabled = stripeAccount.status !== 'VERIFIED' && !isEditMode;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
@@ -229,7 +236,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
                 name="invoiceNumber"
                 value={formData.invoiceNumber}
                 onChange={handleChange}
-                disabled
+                disabled={true}
                 placeholder={isLoadingNumber ? 'Generating unique invoice number...' : ''}
                 required
               />
@@ -237,7 +244,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
             <div className="flex gap-4">
               <div className="flex-1">
                 <Label htmlFor="type">Type</Label>
-                <Select name="type" value={formData.type} onValueChange={(value) => handleSelectChange('type', value)}>
+                <Select name="type" value={formData.type} onValueChange={(value) => handleSelectChange('type', value)} disabled={isFormDisabled}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select invoice type" />
                   </SelectTrigger>
@@ -250,7 +257,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
               </div>
               <div className="flex-1">
                 <Label htmlFor="status">Status</Label>
-                <Select name="status" value={formData.status} onValueChange={(value) => handleSelectChange('status', value)}>
+                <Select name="status" value={formData.status} onValueChange={(value) => handleSelectChange('status', value)} disabled={isFormDisabled}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select invoice status" />
                   </SelectTrigger>
@@ -269,7 +276,17 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
                 <Label htmlFor="amount">Amount</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">$</span>
-                  <Input id="amount" name="amount" type="text" placeholder="0.00" value={formData.amount || ''} onChange={handleChange} className="pl-7" required />
+                  <Input
+                    id="amount"
+                    name="amount"
+                    type="text"
+                    placeholder="0.00"
+                    value={formData.amount || ''}
+                    onChange={handleChange}
+                    className="pl-7"
+                    disabled={isFormDisabled}
+                    required
+                  />
                 </div>
               </div>
               <div className="flex-1">
@@ -280,24 +297,29 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
                   type="date"
                   value={formData.dueDate ? new Date(formData.dueDate).toISOString().split('T')[0] : ''}
                   onChange={handleChange}
+                  disabled={isFormDisabled}
                   required
                 />
               </div>
             </div>
             <div>
               <Label htmlFor="notes">Notes</Label>
-              <Textarea id="notes" name="notes" value={formData.notes || ''} onChange={handleChange} />
+              <Textarea id="notes" name="notes" value={formData.notes || ''} onChange={handleChange} disabled={isFormDisabled} />
             </div>
             <div className="flex flex-col">
               <Label htmlFor="notifyClient">Notify Client</Label>
-              <div className="flex items-center cursor-pointer" onClick={() => setFormData((prev) => ({ ...prev, notifyClient: !prev.notifyClient }))}>
+              <div
+                className={`flex items-center ${isFormDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                onClick={() => !isFormDisabled && setFormData((prev) => ({ ...prev, notifyClient: !prev.notifyClient }))}
+              >
                 <input
                   id="notifyClient"
                   name="notifyClient"
                   type="checkbox"
-                  className="cursor-pointer"
+                  className={`${isFormDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                   checked={formData.notifyClient || false}
                   onChange={(e) => setFormData((prev) => ({ ...prev, notifyClient: e.target.checked }))}
+                  disabled={isFormDisabled}
                 />
                 <span className="ml-2 text-sm text-muted-foreground">Send email notification when invoice is created</span>
               </div>
@@ -306,7 +328,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
               <Button type="button" variant="outline" onClick={onCancel}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={!isEditMode && isLoadingNumber}>
+              <Button type="submit" disabled={!isEditMode && (isLoadingNumber || isFormDisabled)}>
                 {isEditMode ? 'Save Changes' : 'Next Step'}
               </Button>
             </DialogFooter>
@@ -316,16 +338,13 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
         {currentStep === 'client' && (
           <Form {...clientForm}>
             <form onSubmit={handleFinalSubmit} className="space-y-4">
-              <InvoiceClientStep form={clientForm} onValidationChange={setIsClientStepValid} />
+              <InvoiceClientStep form={clientForm} onValidationChange={setIsClientStepValid} clearForms={clearClientForms} />
               <DialogFooter className="flex justify-between">
                 <Button type="button" variant="outline" onClick={handleBack}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
                 </Button>
                 <div className="space-x-2">
-                  <Button type="button" variant="outline" onClick={onCancel}>
-                    Cancel
-                  </Button>
                   <Button type="submit" disabled={!isClientStepValid}>
                     Create Invoice
                   </Button>

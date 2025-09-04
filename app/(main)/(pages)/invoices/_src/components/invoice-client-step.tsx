@@ -47,7 +47,7 @@ export default function InvoiceClientStep({ form, onValidationChange, clearForms
     } else {
       setActiveTab('new');
     }
-  }, []);
+  }, [form, clientForm]);
 
   useEffect(() => {
     if (clearForms) {

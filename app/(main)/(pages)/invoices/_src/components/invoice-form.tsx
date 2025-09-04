@@ -78,6 +78,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
     }
   });
 
+
   useEffect(() => {
     if (isOpen) {
       // Automatically fetch Stripe account status when dialog opens
@@ -128,6 +129,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
           });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, isEditMode, invoice, clientForm]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

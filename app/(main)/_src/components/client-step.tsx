@@ -21,9 +21,10 @@ interface ClientStepProps {
   mode?: 'create' | 'edit';
   onValidationChange?: (isValid: boolean) => void;
   onClientSelect?: () => void;
+  onClientClear?: () => void;
 }
 
-const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValidationChange, onClientSelect }) => {
+const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValidationChange, onClientSelect, onClientClear }) => {
   const [isNewClientForm, setIsNewClientForm] = useState(false);
   const [clientList, setClientList] = useState<Client[]>([]);
   const [currentClient, setCurrentClient] = useState<ClientFormValues>(form.getValues('client'));
@@ -83,6 +84,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
       };
       originalClientDataRef.current = { ...clientData };
       form.setValue('client', clientData);
+      form.trigger(['client.name', 'client.email', 'client.phone']);
       onClientSelect?.();
     }
   };
@@ -106,9 +108,34 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
     }
   };
 
+  const handleTabChange = (value: string) => {
+    if (value === 'edit') {
+      const currentClientId = form.getValues('client.id');
+      if (currentClientId && !isNewClientForm) {
+        form.setValue('client', {
+          id: undefined,
+          name: '',
+          email: '',
+          phone: ''
+        });
+        clientForm.reset({ id: '' });
+        setIsNewClientForm(true);
+        form.trigger(['client.name', 'client.email', 'client.phone']);
+        onClientClear?.();
+      }
+    }
+  };
+
+  const handleNewClientInput = () => {
+    clientForm.setValue('id', '');
+    form.setValue('client.id', undefined);
+    form.trigger(['client.name', 'client.email', 'client.phone']);
+    onClientClear?.();
+  };
+
   return (
     <div className="space-y-4">
-      <Tabs defaultValue="edit" className="w-full">
+      <Tabs defaultValue="edit" onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="edit">{mode === 'create' ? 'New Client' : 'Edit Client'}</TabsTrigger>
           <TabsTrigger value="existing">Existing Client</TabsTrigger>
@@ -142,7 +169,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
               <FormItem>
                 <FormLabel>Client Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter client name" className="border-foreground/20" {...field} />
+                  <Input placeholder="Enter client name" className="border-foreground/20" {...field} onFocus={handleNewClientInput} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -156,7 +183,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
               <FormItem>
                 <FormLabel>Client Email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="Enter client email" className="border-foreground/20" {...field} />
+                  <Input type="email" placeholder="Enter client email" className="border-foreground/20" {...field} onFocus={handleNewClientInput} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -170,7 +197,7 @@ const ClientStep: React.FC<ClientStepProps> = ({ form, mode = 'create', onValida
               <FormItem>
                 <FormLabel>Client Phone</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter client phone" className="border-foreground/20" {...field} />
+                  <Input placeholder="Enter client phone" className="border-foreground/20" {...field} onFocus={handleNewClientInput} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

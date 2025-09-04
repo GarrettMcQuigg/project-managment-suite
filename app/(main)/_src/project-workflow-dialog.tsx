@@ -135,6 +135,9 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
               createButton.focus();
             }
           }}
+          onClientClear={() => {
+            setIsClientSelected(false);
+          }}
         />
       )
     }
@@ -196,7 +199,7 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
                 type="submit"
                 variant={currentStep === 3 && isClientSelected ? 'default' : 'ghost'}
                 className={currentStep === 3 && isClientSelected ? 'bg-teal-500 hover:bg-teal-600 text-white transition-colors' : ''}
-                disabled={isSubmitting}
+                disabled={isSubmitting || (currentStep === 3 && !clientFormValid)}
               >
                 {isSubmitting ? 'Submitting...' : currentStep === steps.length - 1 ? (mode === 'create' ? 'Create' : 'Save') : 'Next'}
                 {!isSubmitting && <ArrowRight className="w-4 h-4 ml-2" />}

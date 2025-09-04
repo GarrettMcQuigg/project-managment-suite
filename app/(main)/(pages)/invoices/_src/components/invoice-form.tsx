@@ -12,7 +12,7 @@ import { Card } from '@/packages/lib/components/card';
 import { InvoiceStatus, InvoiceType } from '@prisma/client';
 import { fetchUniqueInvoiceNumber, generateTemporaryInvoiceNumber } from '@/packages/lib/helpers/generate-invoice-number';
 import { useStripeAccount } from '@/packages/lib/hooks/use-stripe-account';
-import { Loader2, Link2, ArrowLeft } from 'lucide-react';
+import { Loader2, Link2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/packages/lib/components/form';
 import { ClientFormValues } from '../../../clients/[id]/_src/types';
@@ -324,14 +324,15 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
                 <span className="ml-2 text-sm text-muted-foreground">Send email notification when invoice is created</span>
               </div>
             </div>
-            <DialogFooter className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={onCancel}>
+            <div className="flex justify-between mt-6">
+              <Button type="button" variant="ghost" onClick={onCancel}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={!isEditMode && (isLoadingNumber || isFormDisabled)}>
-                {isEditMode ? 'Save Changes' : 'Next Step'}
+              <Button type="submit" variant="ghost" disabled={!isEditMode && (isLoadingNumber || isFormDisabled)}>
+                {isEditMode ? 'Save Changes' : 'Next'}
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         )}
 
@@ -339,17 +340,21 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
           <Form {...clientForm}>
             <form onSubmit={handleFinalSubmit} className="space-y-4">
               <InvoiceClientStep form={clientForm} onValidationChange={setIsClientStepValid} clearForms={clearClientForms} />
-              <DialogFooter className="flex justify-between">
-                <Button type="button" variant="outline" onClick={handleBack}>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
+              <div className="flex justify-between mt-6">
+                <Button type="button" variant="ghost" onClick={handleBack}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
                   Back
                 </Button>
-                <div className="space-x-2">
-                  <Button type="submit" disabled={!isClientStepValid}>
-                    Create Invoice
-                  </Button>
-                </div>
-              </DialogFooter>
+                <Button
+                  type="submit"
+                  variant={isClientStepValid ? 'default' : 'ghost'}
+                  className={isClientStepValid ? 'bg-teal-500 hover:bg-teal-600 text-white transition-colors' : ''}
+                  disabled={!isClientStepValid}
+                >
+                  Create Invoice
+                  {!isLoading && <ArrowRight className="w-4 h-4 ml-2" />}
+                </Button>
+              </div>
             </form>
           </Form>
         )}

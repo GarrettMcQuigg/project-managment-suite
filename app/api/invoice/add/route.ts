@@ -136,7 +136,6 @@ export async function POST(request: Request) {
               notes: invoice.notes || undefined
             });
 
-            // Update the invoice to mark that notification was sent
             await db.invoice.update({
               where: { id: invoice.id },
               data: {

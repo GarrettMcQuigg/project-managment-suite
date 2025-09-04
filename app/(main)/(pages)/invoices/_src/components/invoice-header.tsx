@@ -3,16 +3,27 @@
 import { Button } from '@/packages/lib/components/button';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { InvoiceWithMetadata } from '@/packages/lib/prisma/types';
 import { InvoiceForm } from './invoice-form';
 import { toast } from 'react-toastify';
-import { API_INVOICE_ADD_ROUTE } from '@/packages/lib/routes';
+import { API_INVOICE_ADD_ROUTE, API_INVOICE_LIST_ROUTE } from '@/packages/lib/routes';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
+import { ClientFormValues } from '../../../clients/[id]/_src/types';
+import { mutate } from 'swr';
 
 export function InvoiceHeader() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  const handleCreateInvoice = async (formData: Partial<InvoiceWithMetadata>) => {
+  const handleCreateInvoice = async (formData: {
+    invoiceNumber?: string;
+    type?: string;
+    status?: string;
+    dueDate?: Date;
+    notes?: string | null;
+    amount?: string;
+    notifyClient?: boolean;
+    projectId?: string;
+    client: ClientFormValues;
+  }) => {
     try {
       const response = await fetcher({
         url: API_INVOICE_ADD_ROUTE,
@@ -22,13 +33,14 @@ export function InvoiceHeader() {
       });
 
       if (response.err) {
-        toast.error('Failed to update invoice');
+        toast.error('Failed to create invoice');
         return;
       }
 
       setIsCreateDialogOpen(false);
-      // mutate(endpoint);
-      toast.success('Invoice updated successfully');
+      mutate(API_INVOICE_LIST_ROUTE);
+      toast.success('Invoice created successfully');
+      window.location.reload(); // Refresh to show new invoice
     } catch (error) {
       console.error(error);
       toast.error('An error occurred');

@@ -25,14 +25,7 @@ class EmailService {
 
   async send(from: string, to: string, subject: string, text: string, html: string): Promise<Error | null> {
     try {
-      console.log('Mailgun config:', {
-        baseUrl: this.baseUrl,
-        domain: this.domain,
-        hasApiKey: !!this.apiKey
-      });
-
       const url = `${this.baseUrl}/v3/${this.domain}/messages`;
-      console.log('Sending to URL:', url);
 
       const formData = new FormData();
       formData.append('from', from);
@@ -44,7 +37,7 @@ class EmailService {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Authorization': `Basic ${Buffer.from(`api:${this.apiKey}`).toString('base64')}`
+          Authorization: `Basic ${Buffer.from(`api:${this.apiKey}`).toString('base64')}`
         },
         body: formData
       });
@@ -66,17 +59,11 @@ class EmailService {
     }
   }
 
-  // TODO : Test this once Mailgun is set up
   async sendInvoicePaymentEmail(params: SendInvoicePaymentEmailParams): Promise<Error | null> {
     try {
       const { subject, text, html } = getInvoicePaymentEmail(params);
 
-      // Use a no-reply email from your Mailgun domain
       const from = `"${params.companyName}" <noreply@${this.domain}>`;
-
-      console.log(`Sending invoice payment email to: ${params.to}`);
-      console.log(`Invoice #: ${params.invoiceNumber}`);
-      console.log(`Payment Link: ${params.paymentLink}`);
 
       return await this.send(from, params.to, subject, text, html);
     } catch (err: any) {

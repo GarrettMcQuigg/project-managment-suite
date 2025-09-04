@@ -9,35 +9,26 @@ interface InvoiceEmailTemplateProps {
   notes?: string;
 }
 
-export const getInvoicePaymentEmail = ({
-  invoiceNumber,
-  projectName,
-  amount,
-  dueDate,
-  paymentLink,
-  companyName,
-  clientName,
-  notes
-}: InvoiceEmailTemplateProps) => {
+export const getInvoicePaymentEmail = ({ invoiceNumber, projectName, amount, dueDate, paymentLink, companyName, clientName, notes }: InvoiceEmailTemplateProps) => {
   const subject = `Invoice #${invoiceNumber} - Payment Request`;
-  
+
   const text = `
-Hi ${clientName},
+    Hi ${clientName},
 
-${projectName ? `Regarding your project "${projectName}", ` : ''}we've issued invoice #${invoiceNumber} in the amount of ${amount}.
+    ${projectName ? `Regarding your project "${projectName}", ` : ''}we've issued invoice #${invoiceNumber} in the amount of ${amount}.
 
-Invoice Details:
-- Invoice #: ${invoiceNumber}
-${projectName ? `- Project: ${projectName}\n` : ''}- Amount Due: ${amount}
-- Due Date: ${dueDate}
-${notes ? `\nNotes: ${notes}\n` : ''}
-You can view and pay your invoice by clicking the link below:
-${paymentLink}
+    Invoice Details:
+    - Invoice #: ${invoiceNumber}
+    ${projectName ? `- Project: ${projectName}\n` : ''}- Amount Due: ${amount}
+    - Due Date: ${dueDate}
+    ${notes ? `\nNotes: ${notes}\n` : ''}
+    You can view and pay your invoice by clicking the link below:
+    ${paymentLink}
 
-Thank you for your business!
+    Thank you for your business!
 
-Best regards,
-${companyName}
+    Best regards,
+    ${companyName}
   `;
 
   const html = `
@@ -57,12 +48,16 @@ ${companyName}
             <td style="padding: 8px 0; border-bottom: 1px solid #eee; width: 140px;">Invoice #:</td>
             <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${invoiceNumber}</td>
           </tr>
-          ${projectName ? `
+          ${
+            projectName
+              ? `
           <tr>
             <td style="padding: 8px 0; border-bottom: 1px solid #eee;">Project:</td>
             <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${projectName}</td>
           </tr>
-          ` : ''}
+          `
+              : ''
+          }
           <tr>
             <td style="padding: 8px 0; border-bottom: 1px solid #eee;">Amount Due:</td>
             <td style="padding: 8px 0; border-bottom: 1px solid #eee; font-weight: bold;">${amount}</td>
@@ -73,11 +68,15 @@ ${companyName}
           </tr>
         </table>
         
-        ${notes ? `
+        ${
+          notes
+            ? `
         <div style="margin-top: 15px; padding: 10px; background: #fff; border-radius: 4px;">
           <p style="margin: 0; font-style: italic;">${notes}</p>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
       
       <div style="text-align: center; margin: 30px 0;">

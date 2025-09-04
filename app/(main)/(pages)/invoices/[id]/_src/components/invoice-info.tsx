@@ -14,6 +14,7 @@ import { Skeleton } from '@/packages/lib/components/skeleton';
 import { Pencil, DollarSign, Calendar, User, Building2, FileText } from 'lucide-react';
 import { DeleteInvoiceButton } from './delete-invoice';
 import { format } from 'date-fns';
+import { ClientFormValues } from '../../../clients/[id]/_src/types';
 
 export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
   const router = useRouter();
@@ -33,7 +34,17 @@ export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
     }
   }, [data, error, router]);
 
-  const handleInvoiceUpdate = async (formData: Partial<InvoiceWithMetadata>) => {
+  const handleInvoiceUpdate = async (formData: {
+    invoiceNumber?: string;
+    type?: string;
+    status?: string;
+    dueDate?: Date;
+    notes?: string | null;
+    amount?: string;
+    notifyClient?: boolean;
+    projectId?: string;
+    client: ClientFormValues;
+  }) => {
     try {
       const response = await fetcher({
         url: API_INVOICE_UPDATE_ROUTE,
@@ -44,8 +55,8 @@ export function InvoiceInfo({ invoiceId }: { invoiceId: string }) {
           status: formData.status,
           dueDate: formData.dueDate,
           notes: formData.notes,
-          paymentMethod: formData.paymentMethod,
-          amount: formData.amount
+          amount: formData.amount,
+          client: formData.client
         },
         method: HttpMethods.PUT
       });

@@ -1,39 +1,26 @@
 'use client';
 
-import { Button } from '@/packages/lib/components/button';
-import { ProjectStatus } from '@prisma/client';
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { MoonIcon, SunIcon } from 'lucide-react';
+import { Crown, ArrowLeft, Eye, MoonIcon, SunIcon } from 'lucide-react';
 import { PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import router from 'next/router';
+import { Button } from '@/packages/lib/components/button';
+import { statusColors } from '@/app/(main)/(pages)/dashboard/_src/utils/status-colors';
+import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 
 interface PortalHeaderProps {
-  projectStatus: ProjectStatus;
+  projectStatus: string;
   isOwner: boolean;
   visitorName: string;
-  projectId: string;
+  project: ProjectWithMetadata;
   portalSlug: string;
 }
 
-const statusColors: Record<ProjectStatus, string> = {
-  DRAFT: 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-  PREPARATION: 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800/40 dark:text-yellow-300',
-  ACTIVE: 'bg-blue-200 text-blue-800 dark:bg-blue-800/40 dark:text-blue-300',
-  PAUSED: 'bg-orange-200 text-orange-800 dark:bg-orange-800/40 dark:text-orange-300',
-  COMPLETED: 'bg-green-200 text-green-800 dark:bg-green-800/40 dark:text-green-300',
-  ARCHIVED: 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-  DELETED: 'bg-red-200 text-red-800 dark:bg-red-800/40 dark:text-red-300'
-};
-
-export default function PortalHeader({ projectStatus, isOwner, visitorName, projectId, portalSlug }: PortalHeaderProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const isPreview = searchParams.get('preview') === 'true';
-  const [previewMode, setPreviewMode] = useState<boolean>(isPreview);
+export default function PortalHeader({ projectStatus, isOwner, visitorName, project, portalSlug }: PortalHeaderProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
+  const [previewMode, setPreviewMode] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -45,7 +32,7 @@ export default function PortalHeader({ projectStatus, isOwner, visitorName, proj
 
       const url =
         routeWithParam(PROJECT_PORTAL_ROUTE, {
-          id: projectId,
+          id: project.id,
           portalSlug: portalSlug
         }) + (newPreviewMode ? '?preview=true' : '');
 
@@ -56,51 +43,57 @@ export default function PortalHeader({ projectStatus, isOwner, visitorName, proj
   const viewText = isOwner ? (previewMode ? 'Client View Preview' : 'Owner View') : 'Client Portal';
 
   return (
-    <div className="container mx-auto px-4 py-6 lg:w-3/4">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold">Solira Portal</h1>
-          <div className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[projectStatus]}`}>{projectStatus.replace('_', ' ')}</div>
-        </div>
+    <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <button className="hidden xs:block p-2 rounded-lg hover:bg-muted transition-colors">
+              <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+            </button>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <Crown className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <h1 className="font-semibold text-foreground">Solira Portal</h1>
+                {/* <p className="text-sm text-muted-foreground">Welcome back, {isOwner ? project.user.name : visitorName}</p> */}
+              </div>
+            </div>
+          </div>
 
-        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
-          <div className="flex items-center gap-2">
-            {isOwner ? (
-              <Button variant="outline" onClick={handleToggleView}>
-                <div className={`h-2 w-2 rounded-full ${!previewMode ? 'bg-emerald-500 dark:bg-[#00b894]' : 'bg-red-500/80 dark:bg-red-400'}`} />
-                <span className="text-sm text-gray-500 dark:text-gray-400">{viewText}</span>
-              </Button>
-            ) : (
-              <>
-                <div className="h-2 w-2 rounded-full bg-gray-400 dark:bg-gray-500" />
-                <span className="text-sm text-gray-500 dark:text-gray-400">{viewText}</span>
-              </>
+          <div className="flex items-center space-x-4">
+            <div
+              className={`hidden xs:block px-3 py-1.5 rounded-full text-xs font-medium border ${
+                projectStatus === 'ACTIVE' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-border'
+              }`}
+            >
+              {projectStatus}
+            </div>
+
+            {isOwner && (
+              <div className="hidden xs:flex items-center space-x-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-xs font-medium border border-primary/20">
+                <Eye className="h-3 w-3" />
+                <span>Owner View</span>
+              </div>
+            )}
+
+            {mounted && (
+              <button
+                type="button"
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {theme === 'dark' ? (
+                  <MoonIcon className="h-5 w-5 text-foreground hover:text-muted-foreground transition-colors" />
+                ) : (
+                  <SunIcon className="h-5 w-5 text-foreground hover:text-muted-foreground transition-colors" />
+                )}
+              </button>
             )}
           </div>
-
-          <div className="text-sm">
-            <span className="text-gray-500 dark:text-gray-400 mr-2">Viewing as:</span>
-            <span className="font-medium">{visitorName}</span>
-          </div>
-
-          {mounted && (
-            <button
-              type="button"
-              className="bg-transparent cursor-pointer"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              <div className="transition-all duration-200 hover:scale-110">
-                {theme === 'dark' ? (
-                  <MoonIcon className="h-5 w-5 text-white hover:text-gray-200 transition-colors duration-200" aria-hidden="true" />
-                ) : (
-                  <SunIcon className="h-5 w-5 text-black hover:text-gray-800 transition-colors duration-200" aria-hidden="true" />
-                )}
-              </div>
-            </button>
-          )}
         </div>
       </div>
-    </div>
+    </header>
   );
 }

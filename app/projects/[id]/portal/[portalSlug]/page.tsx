@@ -1,12 +1,14 @@
 import PortalHeader from './_src/portal-header';
 import ProjectTimeline from './_src/project-timeline';
-import ProjectMessaging from './_src/project-messaging';
-import ProjectDetails from './_src/project-details';
+import ProjectMessaging, { PortalContext } from './_src/project-messaging';
 import { db } from '@/packages/lib/prisma/client';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
-import { PROJECT_DETAILS_ROUTE, API_AUTH_PORTAL_ROUTE, routeWithParam, PROJECT_PORTAL_ROUTE, AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
+import { API_AUTH_PORTAL_ROUTE, routeWithParam, PROJECT_PORTAL_ROUTE, AUTH_SIGNIN_ROUTE, PROJECT_DETAILS_ROUTE } from '@/packages/lib/routes';
+import ProjectOverview from './_src/project-overview';
+import PortalClientInfo from './_src/portal-client-info';
+import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 
 export default async function ProjectPortalPage({ params, searchParams }: { params: Promise<{ id: string; portalSlug: string }>; searchParams: Promise<{ preview?: string }> }) {
   const resolvedParams = await params;
@@ -19,16 +21,23 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
 
   const isPreviewMode = resolvedSearchParams.preview === 'true';
 
-  const project = await db.project.findUnique({
+  const project = (await db.project.findUnique({
     where: {
       id: resolvedParams.id,
       portalSlug: resolvedParams.portalSlug,
       portalEnabled: true
     },
     include: {
-      client: true
+      client: true,
+      checkpoints: true,
+      invoices: true,
+      user: true,
+      attachments: true,
+      messages: true,
+      portalViews: true,
+      calendarEvent: true
     }
-  });
+  })) as ProjectWithMetadata;
 
   if (!project) {
     redirect(AUTH_SIGNIN_ROUTE);
@@ -74,48 +83,71 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
   }
 
   const isOwner = context.type === 'user' && context.user.id === project.userId;
-
   const effectiveIsOwner = isOwner && !isPreviewMode;
 
   return (
-    <div className="min-h-screen text-gray-900 dark:text-white pb-8">
-      <PortalHeader projectStatus={project.status} isOwner={isOwner} visitorName={visitorName} projectId={resolvedParams.id} portalSlug={resolvedParams.portalSlug} />
+    <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
+        <PortalHeader projectStatus={project.status} isOwner={isOwner} visitorName={visitorName} project={project} portalSlug={resolvedParams.portalSlug} />
 
-      <main className={`${effectiveIsOwner ? 'mb-4' : ''} md:container md:mx-auto sm:px-4 px-2 lg:w-3/4 py-8`}>
-        <div className="grid grid-cols-1 gap-16">
-          {context.type !== 'none' && (
-            <>
-              <ProjectDetails projectId={resolvedParams.id} />
-              <ProjectTimeline projectId={resolvedParams.id} isOwner={effectiveIsOwner} />
-              <ProjectMessaging projectId={resolvedParams.id} isOwner={effectiveIsOwner} context={context} />
-            </>
-          )}
-        </div>
-      </main>
+        <main className="container mx-auto px-4 py-6 max-w-7xl">
+          <div className="bg-card border border-border rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-border p-6">
+              <ProjectOverview project={project} />
+            </div>
 
-      {/* Owner badge - only visible in owner mode, not in preview mode */}
-      {effectiveIsOwner && (
-        <div className="fixed bottom-0 left-0 w-full bg-primary/50 p-3 border-t shadow-md z-50">
-          <div className="container mx-auto flex items-center justify-between">
-            <span className="text-sm text-black dark:text-white">Viewing as project owner</span>
-            <a href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: resolvedParams.id })} className="text-sm text-text-gray-800 dark:text-gray-200 underline">
-              Back to Project Details
-            </a>
+            <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[800px]">
+              <div className="lg:col-span-8 border-r border-border">
+                <div className="p-6 h-full">
+                  <ProjectTimeline projectId={resolvedParams.id} isOwner={isOwner} />
+                </div>
+              </div>
+
+              <div className="lg:col-span-4 flex flex-col">
+                {isOwner && !isPreviewMode && (
+                  <div className="border-b border-border flex-shrink-0">
+                    <PortalClientInfo client={project.client} />
+                  </div>
+                )}
+
+                <div className="flex-1 min-h-0">
+                  <ProjectMessaging project={project} isOwner={isOwner} context={context as PortalContext} />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
-
-      {/* Preview mode indicator - only visible when in preview mode */}
-      {isOwner && isPreviewMode && (
-        <div className="fixed bottom-0 left-0 w-full bg-red-500/50 p-3 border-t shadow-md z-50">
-          <div className="container mx-auto flex items-center justify-between">
-            <span className="text-sm">Client view preview mode</span>
-            <a href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: resolvedParams.id })} className="text-sm text-text-gray-800 dark:text-gray-200 underline">
-              Back to Project Details
-            </a>
+        </main>
+        {/* Owner badge - only visible in owner mode, not in preview mode */}
+        {effectiveIsOwner && (
+          <div className="fixed bottom-0 left-0 w-full bg-primary/50 p-3 border-t shadow-md z-50">
+            <div className="container mx-auto flex items-center justify-between">
+              <span className="text-sm text-black dark:text-white">Viewing as project owner</span>
+              <div className="block xs:hidden">
+                <a href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: resolvedParams.id })} className="text-sm text-text-gray-800 dark:text-gray-200 underline">
+                  Back to Project Details
+                </a>
+              </div>
+              <div className="hidden xs:block">
+                <a href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: resolvedParams.id })} className="text-sm text-text-gray-800 dark:text-gray-200 underline">
+                  Back
+                </a>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Preview mode indicator - only visible when in preview mode */}
+        {isOwner && isPreviewMode && (
+          <div className="fixed bottom-0 left-0 w-full bg-red-500/50 p-3 border-t shadow-md z-50">
+            <div className="container mx-auto flex items-center justify-between">
+              <span className="text-sm">Client view preview mode</span>
+              <a href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: resolvedParams.id })} className="text-sm text-text-gray-800 dark:text-gray-200 underline">
+                Back to Project Details
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

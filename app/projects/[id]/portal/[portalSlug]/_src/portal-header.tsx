@@ -5,19 +5,16 @@ import { useTheme } from 'next-themes';
 import { Crown, ArrowLeft, Eye, MoonIcon, SunIcon } from 'lucide-react';
 import { PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
 import router from 'next/router';
-import { Button } from '@/packages/lib/components/button';
-import { statusColors } from '@/app/(main)/(pages)/dashboard/_src/utils/status-colors';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 
 interface PortalHeaderProps {
   projectStatus: string;
   isOwner: boolean;
-  visitorName: string;
   project: ProjectWithMetadata;
   portalSlug: string;
 }
 
-export default function PortalHeader({ projectStatus, isOwner, visitorName, project, portalSlug }: PortalHeaderProps) {
+export default function PortalHeader({ projectStatus, isOwner, project, portalSlug }: PortalHeaderProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);

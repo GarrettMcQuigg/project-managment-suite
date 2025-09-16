@@ -88,7 +88,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
   return (
     <div className="min-h-screen bg-background">
       <div className="min-h-screen">
-        <PortalHeader projectStatus={project.status} isOwner={isOwner} visitorName={visitorName} project={project} portalSlug={resolvedParams.portalSlug} />
+        <PortalHeader projectStatus={project.status} isOwner={isOwner} project={project} portalSlug={resolvedParams.portalSlug} />
 
         <main className="container mx-auto px-4 py-6 max-w-7xl mb-16">
           <div className="bg-card border border-border rounded-2xl shadow-lg overflow-hidden">

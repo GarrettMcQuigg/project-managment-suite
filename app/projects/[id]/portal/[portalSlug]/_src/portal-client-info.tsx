@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Client } from '@prisma/client';
-import { Mail, Phone, Calendar, User, X } from 'lucide-react';
+import { Mail, Phone, Calendar, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
 

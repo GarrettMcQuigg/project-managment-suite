@@ -5,7 +5,6 @@ import { Client } from '@prisma/client';
 import { Mail, Phone, Calendar, User, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
-import { Button } from '@/packages/lib/components/button';
 
 export default function PortalClientInfo({ client }: { client: Client }) {
   const [isOpen, setIsOpen] = useState(false);

@@ -173,10 +173,10 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
   const getAvatarGradient = (name: string) => {
     // Current user gets grey background
     if (isCurrentUserMessage(name)) {
-      return 'from-slate-100 to-slate-300';
+      return 'from-slate-100 to-slate-300 text-gray-600';
     }
     // All other users get indigo gradient
-    return 'from-indigo-500 to-indigo-600';
+    return 'from-indigo-500 to-indigo-600 text-white';
   };
 
   const formatTime = (timestamp: string) => {
@@ -248,20 +248,28 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
           </div>
         ) : (
           <>
-            {messages.map((msg) => {
+            {messages.map((msg, index) => {
               const isOwn = isCurrentUserMessage(msg.sender);
+              const showAvatar = shouldShowAvatar(index);
+              const showSender = shouldShowSender(index);
 
               return (
                 <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`flex max-w-[85%] ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end xs:space-x-2`}>
+                  <div className={`flex max-w-[85%] ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
                     {/* Avatar */}
-                    <div className={`flex xs:hidden flex-shrink-0 ${isOwn ? 'ml-2' : 'mr-2'}`}>
-                      <div className={`w-8 h-8 rounded-full flex bg-gradient-to-br items-center justify-center text-gray-500 text-xs font-bold`}>{getInitials(msg.sender)}</div>
+                    <div className={`flex-shrink-0 ${isOwn ? 'ml-2' : 'mr-2'}`}>
+                      {showAvatar ? (
+                        <div className={`w-8 h-8 rounded-full flex bg-gradient-to-br ${getAvatarGradient(msg.sender)} items-center justify-center text-xs font-bold`}>
+                          {getInitials(msg.sender)}
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8"></div>
+                      )}
                     </div>
 
                     {/* Message bubble */}
                     <div className="space-y-1">
-                      {!isOwn && <p className="text-xs font-medium text-muted-foreground px-3">{msg.sender}</p>}
+                      {!isOwn && showSender && <p className="text-xs font-medium text-muted-foreground px-3">{msg.sender}</p>}
 
                       <div className={`px-3 py-2 rounded-xl shadow-sm ${isOwn ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}>
                         <p className="text-sm leading-relaxed break-words">{msg.text}</p>

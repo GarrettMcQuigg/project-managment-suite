@@ -90,13 +90,13 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
       <div className="min-h-screen">
         <PortalHeader projectStatus={project.status} isOwner={isOwner} visitorName={visitorName} project={project} portalSlug={resolvedParams.portalSlug} />
 
-        <main className="container mx-auto px-4 py-6 max-w-7xl">
+        <main className="container mx-auto px-4 py-6 max-w-7xl mb-16">
           <div className="bg-card border border-border rounded-2xl shadow-lg overflow-hidden">
             <div className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-border p-6">
               <ProjectOverview project={project} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[800px]">
+            <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[800px] max-h-[1050px]">
               <div className="lg:col-span-8 border-r border-border">
                 <div className="p-6 h-full">
                   <ProjectTimeline projectId={resolvedParams.id} isOwner={isOwner} />

@@ -44,7 +44,7 @@ export default function PortalHeader({ projectStatus, isOwner, visitorName, proj
 
   return (
     <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+      <div className="container mx-auto p-4 max-w-7xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button className="hidden xs:block p-2 rounded-lg hover:bg-muted transition-colors">

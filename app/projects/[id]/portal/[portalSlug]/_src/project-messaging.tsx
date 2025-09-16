@@ -179,15 +179,6 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
     return 'from-indigo-500 to-indigo-600';
   };
 
-  const getAvatarColor = (name: string) => {
-    // Current user gets blue text to match message bubble
-    if (isCurrentUserMessage(name)) {
-      return 'text-blue-600';
-    }
-    // All other users get white text
-    return 'text-white';
-  };
-
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -212,7 +203,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
   const uniqueSenders = [...new Set(messages.map((m) => m.sender))];
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col max-h-[972px]">
       {/* Header */}
       <div className="border-b border-border px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -242,7 +233,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
       </div>
 
       {/* Messages */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0 max-h-[calc(100vh-24rem)]">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-center">
             <div className="space-y-6">
@@ -265,9 +256,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
                   <div className={`flex max-w-[85%] ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end xs:space-x-2`}>
                     {/* Avatar */}
                     <div className={`flex xs:hidden flex-shrink-0 ${isOwn ? 'ml-2' : 'mr-2'}`}>
-                      <div className={`w-8 h-8 rounded-full flex bg-gradient-to-br ${getAvatarColor(msg.sender)} items-center justify-center text-white text-xs font-bold`}>
-                        {getInitials(msg.sender)}
-                      </div>
+                      <div className={`w-8 h-8 rounded-full flex bg-gradient-to-br items-center justify-center text-gray-500 text-xs font-bold`}>{getInitials(msg.sender)}</div>
                     </div>
 
                     {/* Message bubble */}

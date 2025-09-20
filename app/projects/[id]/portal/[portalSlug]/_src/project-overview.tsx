@@ -18,7 +18,7 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
         <div className="flex items-center gap-4 mb-3">
           <h1 className="text-lg sm:text-3xl font-bold text-card-foreground leading-tight">{project.name}</h1>
         </div>
-        <p className="text-muted-foreground text-xs sm:text-md leading-relaxed mb-6">{project.description}</p>
+        <div className="text-muted-foreground text-xs sm:text-sm leading-relaxed mb-6">{project.description}</div>
 
         {/* Quick Stats */}
         <div className="flex flex-wrap items-center gap-6 text-sm">

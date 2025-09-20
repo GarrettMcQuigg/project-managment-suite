@@ -98,7 +98,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
 
             <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[800px] max-h-[1050px]">
               <div className="lg:col-span-8 border-r border-border">
-                <div className="p-6 h-full">
+                <div className="h-full">
                   <ProjectTimeline projectId={resolvedParams.id} isOwner={isOwner} />
                 </div>
               </div>

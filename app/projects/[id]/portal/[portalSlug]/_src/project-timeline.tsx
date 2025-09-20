@@ -167,8 +167,8 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
 
   const getNodeColor = (status: string, isCurrentTask: boolean) => {
     if (status === 'COMPLETED') return 'bg-primary/60';
-    if (isCurrentTask) return 'bg-gradient-to-br from-primary via-indigo-500 to-indigo-600 shadow-lg shadow-primary/25';
-    return 'bg-muted';
+    if (isCurrentTask) return 'bg-gradient-to-br from-primary via-primary/50 to-indigo-500 shadow-lg shadow-primary/25';
+    return 'dark:bg-violet-500/80 bg-violet-400/80';
   };
 
   return (
@@ -265,13 +265,13 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
                   {/* Checkpoint Card */}
                   <div
                     className={`
-                      relative border rounded-xl
+                      relative border rounded-lg
                       ${
                         isCurrentTask
-                          ? 'border-primary/30 bg-gradient-to-br from-card via-primary/5 to-indigo-500/5 shadow-lg shadow-primary/10 ring-1 ring-primary/20'
+                          ? 'border-primary/30 bg-gradient-to-br from-card via-primary/10 to-indigo-500/5 shadow-lg shadow-primary/10 ring-1 ring-primary/20'
                           : isCompleted
                             ? 'border-border/50 bg-card/60 opacity-70'
-                            : 'border-indigo-500/30 bg-gradient-to-r from-indigo-50 via-white to-indigo-50 hover:border-indigo-500/40 hover:from-indigo-50/50 hover:via-blue-50 hover:to-indigo-50/50'
+                            : 'border-indigo-500/30 bg-gradient-to-r from-indigo-50 via-white to-indigo-50 dark:bg-gradient-to-r dark:from-card dark:via-violet-500/10 dark:to-indigo-500/5 hover:border-indigo-500/40 hover:from-indigo-50/50 hover:via-blue-50 hover:to-indigo-50/50'
                       }
                     `}
                   >

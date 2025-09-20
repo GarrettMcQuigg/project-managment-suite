@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, ImageIcon, File, MessageSquare, Users, Clock, Clapperboard, Play, FileText, Table, X, Download } from 'lucide-react';
+import { Send, Paperclip, ImageIcon, File, MessageSquare, MessageCircleCode, Users, Clapperboard, Play, FileText, Table, X, Download } from 'lucide-react';
 import { fetcher, swrFetcher } from '@/packages/lib/helpers/fetcher';
 import useSWR, { mutate } from 'swr';
 import { toast } from 'react-toastify';
@@ -192,7 +192,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
   };
 
   return (
-    <div className="h-full flex flex-col max-h-[972px]">
+    <div className="flex flex-col max-h-[500px] sm:max-h-[700px] lg:max-h-[972px]">
       {/* Header */}
       <div className="border-b border-border px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -211,18 +211,18 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
                   <span>{uniqueSenders.length} participants</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Clock className="h-4 w-4 text-primary" />
+                  <MessageCircleCode className="h-4 w-4 text-primary" />
                   <span>{messages.length} messages</span>
                 </div>
               </div>
             </div>
           </div>
-          {isOwner && <div className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">Owner</div>}
+          {isOwner && <div className="hidden sm:block px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">Owner</div>}
         </div>
       </div>
 
       {/* Messages */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-3 min-h-0 pb-4">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-center">
             <div className="space-y-6">
@@ -244,9 +244,9 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
 
               return (
                 <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`flex max-w-[85%] ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
+                  <div className={`flex max-w-[85%] ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end sm:space-x-2`}>
                     {/* Avatar */}
-                    <div className={`flex-shrink-0 ${isOwn ? 'ml-2' : 'mr-2'}`}>
+                    <div className={`hidden sm:flex flex-shrink-0 ${isOwn ? 'ml-2' : 'mr-2'}`}>
                       {showAvatar ? (
                         <div className={`w-8 h-8 rounded-full flex bg-gradient-to-br ${getAvatarGradient(msg.sender)} items-center justify-center text-xs font-bold`}>
                           {getInitials(msg.sender)}
@@ -282,7 +282,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
                                     width={288}
                                     height={192}
                                     loader={ImageLoader}
-                                    className="rounded-xl max-w-72 max-h-48 object-cover transition-transform hover:scale-[1.02] shadow-lg"
+                                    className="rounded-xl sm:max-w-72 sm:max-h-48 object-cover transition-transform hover:scale-[1.02] shadow-lg"
                                   />
                                   <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 rounded-xl transition-colors"></div>
                                 </div>

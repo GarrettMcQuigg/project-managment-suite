@@ -96,7 +96,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
               <ProjectOverview project={project} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[800px] max-h-[1050px]">
+            <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[800px] max-h-[1200px]">
               <div className="lg:col-span-8 border-r border-border">
                 <div className="h-full">
                   <ProjectTimeline projectId={resolvedParams.id} isOwner={isOwner} />
@@ -110,7 +110,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
                   </div>
                 )}
 
-                <div className="flex-1 min-h-0">
+                <div className="">
                   <ProjectMessaging project={project} isOwner={isOwner} context={context as PortalContext} />
                 </div>
               </div>

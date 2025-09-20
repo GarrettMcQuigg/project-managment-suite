@@ -181,38 +181,47 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
               <Target className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-card-foreground">Project Timeline</h2>
-              <p className="text-sm text-muted-foreground">Track your project milestones</p>
+              <h2 className="text-2xl md:text-2xl sm:text-xl font-bold text-card-foreground">
+                <span className="hidden sm:inline">Project</span> Timeline
+              </h2>
+              <p className="text-sm text-muted-foreground hidden sm:block">Track your project milestones</p>
             </div>
           </div>
 
           <button onClick={toggleGlobalCollapse} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card hover:bg-accent transition-colors border">
             {isGloballyCollapsed ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
-            <span className="text-sm font-medium">{isGloballyCollapsed ? 'Show All' : 'Focus Mode'}</span>
+            <span className="text-sm font-medium hidden sm:inline">{isGloballyCollapsed ? 'Show All' : 'Focus Mode'}</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 px-2">
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-card border">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            <div>
-              <div className="text-sm text-muted-foreground">Progress</div>
-              <div className="font-semibold">
-                {completedCheckpoints} of {totalCheckpoints} done
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center justify-center gap-3 p-3 rounded-lg bg-card border">
+            <div className="flex flex-col justify-center">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <TrendingUp className="sm:h-5 sm:w-5 h-4 w-4 text-primary" /> Progress
+              </div>
+              <div className="font-semibold text-center">
+                <span>
+                  {completedCheckpoints} of {totalCheckpoints}
+                </span>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-card border">
-            <Calendar className="h-5 w-5 text-indigo-500" />
+          <div className="flex items-center justify-center gap-3 rounded-lg bg-card border">
             <div>
-              <div className="text-sm text-muted-foreground">Checkpoints</div>
-              <div className="font-semibold">{totalCheckpoints} total</div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Calendar className="sm:h-5 sm:w-5 h-4 w-4 text-indigo-500" /> Checkpoints
+              </div>
+              <div className="font-semibold text-center">
+                {totalCheckpoints}
+                <span className="hidden sm:inline"> total</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Enhanced Progress Bar */}
-        <div className="space-y-3 px-2">
+        <div className="px-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Overall Progress</span>
             <span className="text-lg font-bold bg-gradient-to-r from-primary to-indigo-500/80 bg-clip-text text-transparent">{progressPercentage}%</span>
@@ -226,8 +235,8 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
       </div>
 
       {/* Timeline */}
-      <div className="flex-1 px-1 max-h-[850px] overflow-y-auto">
-        <div className="space-y-4 mt-4">
+      <div className="flex-1 px-1 max-h-[800px] overflow-y-auto overscroll-contain">
+        <div className="space-y-4 mt-4 pb-4">
           {project.checkpoints
             .sort((a, b) => a.order - b.order)
             .filter((checkpoint) => !isGloballyCollapsed || checkpoint.id === currentTaskId)
@@ -295,7 +304,7 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
                             }}
                             disabled={isUpdating}
                             className={`
-                              relative px-4 p-2 rounded-md font-semibold text-sm
+                              relative py-2 px-2 sm:px-4 rounded-md font-semibold text-sm
                               transform transition-all duration-300
                               disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
                               shadow-sm hover:shadow-md
@@ -327,17 +336,17 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
                             {isUpdating ? (
                               <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                                <span>Updating...</span>
+                                <span className="hidden sm:inline">Updating...</span>
                               </div>
                             ) : isCompleted ? (
                               <div className="flex items-center gap-2">
                                 <CheckCircle className="h-4 w-4" />
-                                <span>Completed</span>
+                                <span className="hidden sm:inline">Completed</span>
                               </div>
                             ) : (
                               <div className="flex items-center gap-2">
                                 <Circle className="h-4 w-4" />
-                                <span>Mark Complete</span>
+                                <span className="hidden sm:inline">Mark Complete</span>
                               </div>
                             )}
                           </button>
@@ -345,7 +354,7 @@ export default function ProjectTimeline({ projectId, isOwner }: { projectId: str
                       </div>
 
                       {/* Expand/Collapse Indicator */}
-                      <div className="ml-2">
+                      <div className="hidden sm:inline ml-2">
                         <div
                           className={`
                           p-1 rounded-full transition-all duration-300

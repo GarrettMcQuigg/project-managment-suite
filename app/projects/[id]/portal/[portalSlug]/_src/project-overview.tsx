@@ -16,9 +16,9 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
       {/* Project Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-4 mb-3">
-          <h1 className="text-3xl font-bold text-card-foreground leading-tight">{project.name}</h1>
+          <h1 className="text-lg sm:text-3xl font-bold text-card-foreground leading-tight">{project.name}</h1>
         </div>
-        <p className="text-muted-foreground text-lg leading-relaxed mb-6">{project.description}</p>
+        <p className="text-muted-foreground text-xs sm:text-md leading-relaxed mb-6">{project.description}</p>
 
         {/* Quick Stats */}
         <div className="flex flex-wrap items-center gap-6 text-sm">
@@ -49,8 +49,8 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
             <path
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
               fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
+              stroke="rgba(128, 128, 128, 0.3)"
+              strokeWidth="3"
               strokeDasharray="100, 100"
               className="text-muted"
             />

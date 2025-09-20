@@ -274,7 +274,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
                                 <div
                                   key={attachment.id}
                                   className="relative group/image cursor-pointer"
-                                  onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as any)}
+                                  onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
                                 >
                                   <Image
                                     src={attachment.blobUrl || '/placeholder.svg'}
@@ -289,7 +289,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
                               ) : (
                                 <div
                                   key={attachment.id}
-                                  onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as any)}
+                                  onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
                                   className={`inline-flex items-center space-x-3 px-4 py-3 rounded-xl text-sm transition-all hover:scale-[1.02] shadow-sm hover:shadow-md cursor-pointer ${
                                     isOwn
                                       ? 'bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground'
@@ -483,12 +483,12 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    const url = (previewFile as any).blobUrl || URL.createObjectURL(previewFile);
+                    const url = (previewFile as File & { blobUrl: string }).blobUrl || URL.createObjectURL(previewFile);
                     const a = document.createElement('a');
                     a.href = url;
                     a.download = previewFile.name;
                     a.click();
-                    if (!(previewFile as any).blobUrl) {
+                    if (!(previewFile as File & { blobUrl: string }).blobUrl) {
                       URL.revokeObjectURL(url);
                     }
                   }}
@@ -507,30 +507,38 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
               {previewFile.type.startsWith('image/') ? (
                 <div className="flex items-center justify-center">
                   <Image
-                    src={(previewFile as any).blobUrl || URL.createObjectURL(previewFile)}
+                    src={(previewFile as File & { blobUrl: string }).blobUrl || URL.createObjectURL(previewFile)}
                     alt={previewFile.name}
                     className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
                     width={800}
                     height={600}
-                    loader={(previewFile as any).blobUrl ? ImageLoader : undefined}
+                    loader={(previewFile as File & { blobUrl: string }).blobUrl ? ImageLoader : undefined}
                   />
                 </div>
               ) : previewFile.type.startsWith('video/') ? (
                 <div className="flex items-center justify-center">
-                  <video src={(previewFile as any).blobUrl || URL.createObjectURL(previewFile)} controls className="max-w-full max-h-[70vh] rounded-lg shadow-lg">
+                  <video
+                    src={(previewFile as File & { blobUrl: string }).blobUrl || URL.createObjectURL(previewFile)}
+                    controls
+                    className="max-w-full max-h-[70vh] rounded-lg shadow-lg"
+                  >
                     Your browser does not support the video tag.
                   </video>
                 </div>
               ) : previewFile.type === 'application/pdf' ? (
                 <div className="w-full h-[70vh] rounded-lg overflow-hidden shadow-lg">
-                  <iframe src={(previewFile as any).blobUrl || URL.createObjectURL(previewFile)} className="w-full h-full border-0" title={`PDF Preview: ${previewFile.name}`}>
+                  <iframe
+                    src={(previewFile as File & { blobUrl: string }).blobUrl || URL.createObjectURL(previewFile)}
+                    className="w-full h-full border-0"
+                    title={`PDF Preview: ${previewFile.name}`}
+                  >
                     <div className="text-center py-12">
                       <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-semibold text-foreground mb-2">PDF Preview Unavailable</h3>
                       <p className="text-muted-foreground mb-4">Your browser doesn't support PDF preview. Download to view the content.</p>
                       <button
                         onClick={() => {
-                          const url = (previewFile as any).blobUrl || URL.createObjectURL(previewFile);
+                          const url = (previewFile as File & { blobUrl: string }).blobUrl || URL.createObjectURL(previewFile);
                           window.open(url, '_blank');
                         }}
                         className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
@@ -547,12 +555,12 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
                   <p className="text-muted-foreground mb-4">CSV files cannot be previewed directly. Download to view the data.</p>
                   <button
                     onClick={() => {
-                      const url = (previewFile as any).blobUrl || URL.createObjectURL(previewFile);
+                      const url = (previewFile as File & { blobUrl: string }).blobUrl || URL.createObjectURL(previewFile);
                       const a = document.createElement('a');
                       a.href = url;
                       a.download = previewFile.name;
                       a.click();
-                      if (!(previewFile as any).blobUrl) {
+                      if (!(previewFile as File & { blobUrl: string }).blobUrl) {
                         URL.revokeObjectURL(url);
                       }
                     }}
@@ -568,12 +576,12 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
                   <p className="text-muted-foreground mb-4">This file type cannot be previewed directly. Download to view the content.</p>
                   <button
                     onClick={() => {
-                      const url = (previewFile as any).blobUrl || URL.createObjectURL(previewFile);
+                      const url = (previewFile as File & { blobUrl: string }).blobUrl || URL.createObjectURL(previewFile);
                       const a = document.createElement('a');
                       a.href = url;
                       a.download = previewFile.name;
                       a.click();
-                      if (!(previewFile as any).blobUrl) {
+                      if (!(previewFile as File & { blobUrl: string }).blobUrl) {
                         URL.revokeObjectURL(url);
                       }
                     }}

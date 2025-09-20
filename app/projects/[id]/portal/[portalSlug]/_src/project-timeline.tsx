@@ -7,7 +7,7 @@ import type { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_AUTH_PORTAL_GET_BY_ID_ROUTE, PROJECTS_ROUTE, API_PROJECT_UPDATE_CHECKPOINT_STATUS_ROUTE, API_PROJECT_GET_BY_ID_ROUTE } from '@/packages/lib/routes';
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
-import { CheckCircle, Clock, Circle, Calendar, Target, Zap, TrendingUp, ChevronDown, ChevronRight, Minimize2, Maximize2 } from 'lucide-react';
+import { CheckCircle, Clock, Circle, Calendar, Target, Zap, TrendingUp, ChevronDown, Minimize2, Maximize2 } from 'lucide-react';
 import { Checkpoint, CheckpointStatus } from '@prisma/client';
 import { toast } from 'react-toastify';
 

@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { Crown, ArrowLeft, Eye, MoonIcon, SunIcon } from 'lucide-react';
-import { PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
-import router from 'next/router';
+// import { PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
+// import router from 'next/router';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 
 interface PortalHeaderProps {
@@ -15,29 +15,31 @@ interface PortalHeaderProps {
 }
 
 export default function PortalHeader({ projectStatus, isOwner, project, portalSlug }: PortalHeaderProps) {
+  // TODO : Implement preview mode
+  console.log(project, portalSlug);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [previewMode, setPreviewMode] = useState(false);
+  // const [previewMode, setPreviewMode] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleToggleView = () => {
-    if (isOwner) {
-      const newPreviewMode = !previewMode;
-      setPreviewMode(newPreviewMode);
+  // const handleToggleView = () => {
+  //   if (isOwner) {
+  //     const newPreviewMode = !previewMode;
+  //     setPreviewMode(newPreviewMode);
 
-      const url =
-        routeWithParam(PROJECT_PORTAL_ROUTE, {
-          id: project.id,
-          portalSlug: portalSlug
-        }) + (newPreviewMode ? '?preview=true' : '');
+  //     const url =
+  //       routeWithParam(PROJECT_PORTAL_ROUTE, {
+  //         id: project.id,
+  //         portalSlug: portalSlug
+  //       }) + (newPreviewMode ? '?preview=true' : '');
 
-      router.push(url);
-    }
-  };
+  //     router.push(url);
+  //   }
+  // };
 
-  const viewText = isOwner ? (previewMode ? 'Client View Preview' : 'Owner View') : 'Client Portal';
+  // const viewText = isOwner ? (previewMode ? 'Client View Preview' : 'Owner View') : 'Client Portal';
 
   return (
     <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">

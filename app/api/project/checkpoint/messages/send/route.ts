@@ -2,7 +2,7 @@ import { handleBadRequest, handleError, handleNotFound, handleSuccess, handleUna
 import { PortalVisitor } from '@/packages/lib/helpers/get-portal-user';
 import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
-import { User } from '@prisma/client';
+import { ProjectMessageAttachment, User } from '@prisma/client';
 import { put } from '@vercel/blob';
 import { UpdateMessageMetrics } from '@/packages/lib/helpers/analytics/messages/message-metrics';
 import { TrackMessageSent, TrackMessageReceived } from '@/packages/lib/helpers/analytics/communication';
@@ -142,7 +142,7 @@ export async function POST(request: Request) {
       return handleBadRequest({ message: 'Failed to create checkpoint message' });
     }
 
-    let attachments: any[] = [];
+    let attachments: { id: string; fileName: string; fileUrl: string; fileType: string }[] = [];
 
     if (attachmentFiles.length > 0) {
       const attachmentPromises = attachmentFiles.map(async (file) => {

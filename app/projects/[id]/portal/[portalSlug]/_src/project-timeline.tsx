@@ -34,11 +34,12 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import ImageLoader from './image-loader';
-import { Checkpoint, CheckpointStatus, ProjectMessage } from '@prisma/client';
+import { Checkpoint, CheckpointStatus } from '@prisma/client';
 import { toast } from 'react-toastify';
 
 interface CheckpointMessage {
   id: string;
+  checkpointId?: string;
   text: string;
   sender?: string;
   createdAt: string;
@@ -119,10 +120,11 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
     }
   }, [data, error]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const loadCheckpointMessages = (project: any) => {
     const messagesByCheckpoint: { [key: string]: CheckpointMessage[] } = {};
 
-    project.checkpointMessages?.forEach((message: any) => {
+    project.checkpointMessages?.forEach((message: CheckpointMessage) => {
       if (message.checkpointId) {
         if (!messagesByCheckpoint[message.checkpointId]) {
           messagesByCheckpoint[message.checkpointId] = [];
@@ -300,13 +302,6 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
       }
       return !prev;
     });
-  };
-
-  const getFileIcon = (fileType: string) => {
-    if (fileType.startsWith('image/')) {
-      return <ImageIcon className="h-4 w-4" />;
-    }
-    return <File className="h-4 w-4" />;
   };
 
   // Helper to create a File-like object from message attachment for preview

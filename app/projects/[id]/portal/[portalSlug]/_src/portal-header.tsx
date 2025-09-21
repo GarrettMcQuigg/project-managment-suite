@@ -3,22 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { Crown, ArrowLeft, Eye, MoonIcon, SunIcon } from 'lucide-react';
-// import { PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
-// import router from 'next/router';
-import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { useRouter } from 'next/navigation';
 
 interface PortalHeaderProps {
   projectStatus: string;
   isOwner: boolean;
-  project: ProjectWithMetadata;
-  portalSlug: string;
 }
 
-export default function PortalHeader({ projectStatus, isOwner, project, portalSlug }: PortalHeaderProps) {
+export default function PortalHeader({ projectStatus, isOwner }: PortalHeaderProps) {
   const router = useRouter();
   // TODO : Implement preview mode
-  console.log(project, portalSlug);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   // const [previewMode, setPreviewMode] = useState(false);
@@ -45,7 +39,7 @@ export default function PortalHeader({ projectStatus, isOwner, project, portalSl
 
   return (
     <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
-      <div className="container mx-auto p-4 max-w-7xl">
+      <div className="container mx-auto py-4 px-12">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button onClick={() => router.back()} className="block xs:hidden p-2 rounded-lg hover:bg-muted transition-colors">

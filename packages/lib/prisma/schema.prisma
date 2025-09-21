@@ -163,6 +163,7 @@ model Checkpoint {
   endDate     DateTime
   status      CheckpointStatus @default(PENDING)
   invoice     Invoice[]
+  messages    ProjectMessage[]
 
   // Calendar fields
   calendarEvent CalendarEvent[]
@@ -199,14 +200,16 @@ enum ProjectStatus {
 }
 
 model ProjectMessage {
-  id          String                     @id @default(uuid())
-  project     Project                    @relation(fields: [projectId], references: [id])
-  projectId   String
-  sender      String?
-  text        String
-  attachments ProjectMessageAttachment[]
-  createdAt   DateTime                   @default(now())
-  messageRead MessageRead[] // TODO : implement later
+  id            String                     @id @default(uuid())
+  project       Project                    @relation(fields: [projectId], references: [id])
+  projectId     String
+  checkpoint    Checkpoint?                @relation(fields: [checkpointId], references: [id])
+  checkpointId  String?
+  sender        String?
+  text          String
+  attachments   ProjectMessageAttachment[]
+  createdAt     DateTime                   @default(now())
+  messageRead   MessageRead[] // TODO : implement later
 
   // Response tracking fields
   responseToMessage   ProjectMessage?  @relation("MessageResponses", fields: [responseToMessageId], references: [id], onDelete: SetNull)

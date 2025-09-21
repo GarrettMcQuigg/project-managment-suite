@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, ImageIcon, File, MessageSquare, MessageCircleCode, Users, Clapperboard, Play, FileText, Table, X, Download } from 'lucide-react';
+import { Send, Paperclip, ImageIcon, File, MessageSquare, MessageCircleCode, Users, Clapperboard, Play, FileText, Table, X, Download, ChevronRight, Target } from 'lucide-react';
 import { fetcher, swrFetcher } from '@/packages/lib/helpers/fetcher';
 import useSWR, { mutate } from 'swr';
 import { toast } from 'react-toastify';
@@ -15,6 +15,7 @@ import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 interface ProjectMessage {
   id: string;
   projectId: string;
+  checkpointId?: string;
   sender: string;
   text: string;
   attachments: Array<{
@@ -36,9 +37,10 @@ interface ProjectMessagingProps {
   project: ProjectWithMetadata;
   isOwner?: boolean;
   context: PortalContext;
+  onScrollToCheckpoint?: (checkpointId: string) => void;
 }
 
-export default function ProjectMessaging({ project, isOwner = false, context }: ProjectMessagingProps) {
+export default function ProjectMessaging({ project, isOwner = false, context, onScrollToCheckpoint }: ProjectMessagingProps) {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -191,8 +193,13 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
     };
   };
 
+  const getCheckpointName = (checkpointId: string) => {
+    const checkpoint = project.checkpoints?.find((c) => c.id === checkpointId);
+    return checkpoint?.name || 'Checkpoint';
+  };
+
   return (
-    <div className="flex flex-col max-h-[500px] sm:max-h-[700px] lg:max-h-[972px]">
+    <div className="flex flex-col max-h-[500px] sm:max-h-[700px] lg:max-h-[1054px]">
       {/* Header */}
       <div className="border-b border-border px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -261,10 +268,26 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
                       {!isOwn && showSender && <p className="text-xs font-medium text-muted-foreground px-3">{msg.sender}</p>}
 
                       <div className={`px-3 py-2 rounded-xl shadow-sm ${isOwn ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}>
-                        {msg.text && <p className="text-sm leading-relaxed break-words">{msg.text}</p>}
+                        {msg.checkpointId ? (
+                          // Checkpoint message indicator
+                          <div
+                            className={`flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity ${isOwn ? 'text-white' : 'text-foreground'}`}
+                            onClick={() => onScrollToCheckpoint?.(msg.checkpointId!)}
+                          >
+                            <Target className="h-4 w-4 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{getCheckpointName(msg.checkpointId)}</p>
+                              <p className={`text-xs truncate ${isOwn ? 'text-white/70' : 'text-muted-foreground'}`}>Checkpoint message</p>
+                            </div>
+                            <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                          </div>
+                        ) : (
+                          // Regular message
+                          msg.text && <p className="text-sm leading-relaxed break-words">{msg.text}</p>
+                        )}
 
-                        {/* Attachments */}
-                        {msg.attachments && msg.attachments.length > 0 && (
+                        {/* Attachments - only show for regular messages, not checkpoint messages */}
+                        {!msg.checkpointId && msg.attachments && msg.attachments.length > 0 && (
                           <div className={`space-y-3 ${msg.text ? 'mt-3' : ''}`}>
                             {msg.attachments.map((attachment) => {
                               const isImage = attachment.contentType.startsWith('image/');
@@ -450,7 +473,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
           <button
             type="submit"
             disabled={isSubmitting || (!message.trim() && files.length === 0)}
-            className="flex-shrink-0 p-2 bg-primary hover:bg-primary/90 disabled:bg-muted text-white disabled:text-muted-foreground rounded-lg transition-colors"
+            className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Send className="h-5 w-5" />
           </button>

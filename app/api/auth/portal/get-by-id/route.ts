@@ -19,7 +19,12 @@ export async function GET(request: NextRequest) {
       include: {
         client: true,
         checkpoints: true,
-        invoices: true
+        invoices: true,
+        messages: {
+          include: {
+            attachments: true
+          }
+        }
       }
     });
 
@@ -45,7 +50,8 @@ export async function GET(request: NextRequest) {
       checkpoints: project.checkpoints,
       client: project.client,
       invoices: project.invoices,
-      portalPassEncryption: project.portalPassEncryption
+      portalPassEncryption: project.portalPassEncryption,
+      checkpointMessages: project.messages.filter((message) => message.checkpointId !== null)
     };
 
     return handleSuccess({ content: portalProjectData });

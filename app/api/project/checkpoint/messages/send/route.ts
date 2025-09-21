@@ -2,10 +2,10 @@ import { handleBadRequest, handleError, handleNotFound, handleSuccess, handleUna
 import { PortalVisitor } from '@/packages/lib/helpers/get-portal-user';
 import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
-import { ProjectMessageAttachment, User } from '@prisma/client';
 import { put } from '@vercel/blob';
 import { UpdateMessageMetrics } from '@/packages/lib/helpers/analytics/messages/message-metrics';
 import { TrackMessageSent, TrackMessageReceived } from '@/packages/lib/helpers/analytics/communication';
+import { User } from '@prisma/client';
 
 export async function POST(request: Request) {
   try {

@@ -685,7 +685,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                                       </button>
                                       {isImage ? (
                                         <div className="relative">
-                                          <img src={URL.createObjectURL(file)} alt={file.name} className="w-16 h-16 object-cover rounded-t-lg" />
+                                          <Image src={URL.createObjectURL(file)} alt={file.name} className="w-16 h-16 object-cover rounded-t-lg" width={64} height={64} />
                                           <div className="px-2 py-1 bg-card/90">
                                             <span className="text-xs font-medium text-card-foreground truncate block max-w-12">{file.name}</span>
                                           </div>

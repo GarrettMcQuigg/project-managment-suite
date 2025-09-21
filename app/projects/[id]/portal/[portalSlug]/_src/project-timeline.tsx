@@ -508,9 +508,9 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                                     shadow-primary/25 hover:shadow-primary/40
                                   `
                                   : `
-                                    bg-gradient-to-r from-slate-50 via-white to-slate-50
+                                    bg-indigo-500/10
                                     hover:from-indigo-50 hover:via-blue-50 hover:to-indigo-50
-                                    text-slate-700 hover:text-indigo-700 border border-slate-200
+                                    text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900
                                     hover:border-indigo-300/60 hover:shadow-indigo-200/40
                                     before:bg-gradient-to-r before:from-indigo-400/0 before:via-indigo-400/10 before:to-indigo-400/0
                                     hover:before:from-indigo-400/5 hover:before:via-indigo-400/15 hover:before:to-indigo-400/5

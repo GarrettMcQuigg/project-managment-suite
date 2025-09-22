@@ -15,10 +15,10 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
       {/* Project Info */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-4 mb-3">
-          <h1 className="text-lg sm:text-3xl font-bold text-card-foreground leading-tight">{project.name}</h1>
+        <div className="flex items-center gap-4 mb-2">
+          <h1 className="text-lg sm:text-2xl font-bold text-card-foreground leading-tight">{project.name}</h1>
         </div>
-        <div className="text-muted-foreground text-xs sm:text-sm leading-relaxed mb-6">{project.description}</div>
+        <div className="text-muted-foreground text-xs sm:text-sm leading-relaxed mb-4">{project.description}</div>
 
         {/* Quick Stats */}
         <div className="flex flex-wrap items-center gap-6 text-sm">
@@ -43,7 +43,7 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
 
       {/* Progress Circle */}
       <div className="flex-shrink-0 flex items-center justify-center">
-        <div className="relative w-32 h-32">
+        <div className="relative w-24 h-24">
           {/* Background circle */}
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
             <path
@@ -67,8 +67,8 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
           </svg>
           {/* Center content */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="text-2xl font-bold text-card-foreground">{Math.abs(daysRemaining)}</div>
-            <div className={`text-sm font-medium ${isPastDue ? 'text-destructive' : 'text-muted-foreground'}`}>{isPastDue ? 'days overdue' : 'days left'}</div>
+            <div className="text-lg font-bold text-card-foreground">{Math.abs(daysRemaining)}</div>
+            <div className={`text-xs font-medium ${isPastDue ? 'text-destructive' : 'text-muted-foreground'}`}>{isPastDue ? 'days overdue' : 'days left'}</div>
           </div>
         </div>
       </div>

@@ -90,8 +90,8 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
       <div className="min-h-screen">
         <PortalHeader projectStatus={project.status} isOwner={isOwner} />
 
-        <main className="container mx-auto px-4 py-6 px-12 mb-16">
-          <div className="bg-card border border-border rounded-2xl shadow-lg overflow-hidden">
+        <main className="container mx-auto py-6 px-12 mb-16">
+          <div className="bg-card border border-border rounded-md shadow-lg overflow-hidden">
             <div className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-border p-6">
               <ProjectOverview project={project} />
             </div>

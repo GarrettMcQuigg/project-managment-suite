@@ -22,6 +22,7 @@ import {
   Zap,
   TrendingUp,
   ChevronDown,
+  ChevronUp,
   Minimize2,
   Maximize2,
   MessageCircle,
@@ -66,6 +67,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
   const [isGloballyCollapsed, setIsGloballyCollapsed] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
+  const [collapsedDiscussions, setCollapsedDiscussions] = useState<Set<string>>(new Set());
 
   const [checkpointMessages, setCheckpointMessages] = useState<{ [key: string]: CheckpointMessage[] }>({});
   const [newMessages, setNewMessages] = useState<{ [key: string]: string }>({});
@@ -156,6 +158,18 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
 
   const toggleCardExpansion = (checkpointId: string) => {
     setExpandedCards((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(checkpointId)) {
+        newSet.delete(checkpointId);
+      } else {
+        newSet.add(checkpointId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleDiscussionCollapse = (checkpointId: string) => {
+    setCollapsedDiscussions((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(checkpointId)) {
         newSet.delete(checkpointId);
@@ -588,165 +602,178 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                         </div>
 
                         {/* Checkpoint Messages Section */}
-                        <div className="border-t border-border/30 pt-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <MessageCircle className="h-4 w-4 text-primary" />
-                            <span className="font-medium text-sm">Checkpoint Discussion</span>
-                            {messages.length > 0 && (
-                              <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                                {messages.length} message{messages.length !== 1 ? 's' : ''}
-                              </span>
-                            )}
+                        <div className="border border-border p-3 rounded-lg">
+                          <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleDiscussionCollapse(checkpoint.id)}>
+                            <div className="flex items-center gap-2">
+                              <MessageCircle className="h-4 w-4 text-primary" />
+                              <span className="font-medium text-sm">Checkpoint Discussion</span>
+                              {messages.length > 0 && (
+                                <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                                  {messages.length} message{messages.length !== 1 ? 's' : ''}
+                                </span>
+                              )}
+                            </div>
+                            <button type="button" className="p-1 rounded-md hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground">
+                              {collapsedDiscussions.has(checkpoint.id) ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                            </button>
                           </div>
 
-                          {/* Messages Display */}
-                          {messages.length > 0 && (
-                            <div className="space-y-3 mb-4 max-h-[400px] overflow-y-auto">
-                              {messages.map((message) => (
-                                <div
-                                  key={message.id}
-                                  className={`
-                                    flex items-start gap-3 p-3 rounded-lg text-sm
-                                    ${message.sender === 'Owner' ? 'bg-primary/5 border border-primary/10 ml-4' : 'bg-muted/50 border border-border/30 mr-4'}
-                                  `}
-                                >
-                                  <div className="flex-1">
-                                    <div className="flex items-center justify-between mb-1">
-                                      <span className="font-medium text-xs text-muted-foreground">{message.sender || 'Anonymous'}</span>
-                                      <span className="text-xs text-muted-foreground">{format(new Date(message.createdAt), 'MMM d, h:mm a')}</span>
-                                    </div>
-                                    {message.text && message.text.trim() && <p className="text-foreground">{message.text ? message.text : ''}</p>}
+                          {!collapsedDiscussions.has(checkpoint.id) && (
+                            <>
+                              {/* Messages Display */}
+                              {messages.length > 0 && (
+                                <div className="space-y-3 my-4 max-h-[400px] overflow-y-auto">
+                                  {messages.map((message) => {
+                                    const isOwn = message.sender === 'Owner';
 
-                                    {/* Message Attachments */}
-                                    {message.attachments && message.attachments.length > 0 && (
-                                      <div className="mt-3 space-y-3">
-                                        {message.attachments.map((attachment) => {
-                                          const isImage = attachment.contentType.startsWith('image/');
-                                          const fileName = attachment.pathname.split('/').pop() || 'Attachment';
+                                    return (
+                                      <div key={message.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`max-w-[85%]`}>
+                                          {!isOwn && <p className="text-xs font-medium text-muted-foreground px-3 mb-1">{message.sender || 'Anonymous'}</p>}
 
-                                          return isImage ? (
-                                            <div
-                                              key={attachment.id}
-                                              className="relative group/image cursor-pointer"
-                                              onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
-                                            >
-                                              <Image
-                                                src={attachment.blobUrl || '/placeholder.svg'}
-                                                alt={fileName}
-                                                width={200}
-                                                height={150}
-                                                loader={ImageLoader}
-                                                className="rounded-lg max-w-48 max-h-36 object-cover transition-transform hover:scale-[1.02] shadow-sm"
-                                              />
-                                              <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 rounded-lg transition-colors"></div>
-                                            </div>
-                                          ) : (
-                                            <div
-                                              key={attachment.id}
-                                              onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
-                                              className="inline-flex items-center space-x-2 px-3 py-2 rounded-lg text-xs transition-all hover:scale-[1.02] shadow-sm hover:shadow-md cursor-pointer bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border"
-                                            >
-                                              <File className="h-4 w-4" />
-                                              <span className="truncate max-w-32 font-medium">{fileName}</span>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                                          <div className={`px-3 py-2 rounded-xl shadow-sm ${isOwn ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}>
+                                            {message.text && message.text.trim() && <p className="text-sm leading-relaxed break-words">{message.text}</p>}
 
-                          {/* File preview for checkpoint */}
-                          {(checkpointFiles[checkpoint.id] || []).length > 0 && (
-                            <div className="space-y-3">
-                              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                                <ImageIcon className="h-4 w-4 text-primary" />
-                                <span className="font-medium">
-                                  {(checkpointFiles[checkpoint.id] || []).length} file{(checkpointFiles[checkpoint.id] || []).length > 1 ? 's' : ''} ready to send
-                                </span>
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {(checkpointFiles[checkpoint.id] || []).map((file, index) => {
-                                  const isImage = file.type.startsWith('image/');
-                                  return (
-                                    <div
-                                      key={index}
-                                      className="relative bg-card/80 backdrop-blur-sm rounded-lg border border-border/30 shadow-sm hover:shadow-md transition-shadow overflow-hidden group"
-                                    >
-                                      <button
-                                        type="button"
-                                        onClick={() => removeFileFromCheckpoint(checkpoint.id, index)}
-                                        className="absolute top-1 right-1 z-20 w-5 h-5 rounded-full bg-destructive/80 hover:bg-destructive text-destructive-foreground flex items-center justify-center text-xs transition-all hover:scale-110 opacity-0 group-hover:opacity-100"
-                                      >
-                                        ×
-                                      </button>
-                                      {isImage ? (
-                                        <div className="relative">
-                                          <Image src={URL.createObjectURL(file)} alt={file.name} className="w-16 h-16 object-cover rounded-t-lg" width={64} height={64} />
-                                          <div className="px-2 py-1 bg-card/90">
-                                            <span className="text-xs font-medium text-card-foreground truncate block max-w-12">{file.name}</span>
+                                            {/* Attachments */}
+                                            {message.attachments && message.attachments.length > 0 && (
+                                              <div className={`space-y-3 ${message.text ? 'mt-3' : ''}`}>
+                                                {message.attachments.map((attachment) => {
+                                                  const isImage = attachment.contentType.startsWith('image/');
+                                                  const fileName = attachment.pathname.split('/').pop() || 'Attachment';
+
+                                                  return isImage ? (
+                                                    <div
+                                                      key={attachment.id}
+                                                      className="relative group/image cursor-pointer"
+                                                      onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
+                                                    >
+                                                      <Image
+                                                        src={attachment.blobUrl || '/placeholder.svg'}
+                                                        alt={fileName}
+                                                        width={288}
+                                                        height={192}
+                                                        loader={ImageLoader}
+                                                        className="rounded-xl sm:max-w-72 sm:max-h-48 object-cover transition-transform hover:scale-[1.02] shadow-lg"
+                                                      />
+                                                      <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 rounded-xl transition-colors"></div>
+                                                    </div>
+                                                  ) : (
+                                                    <div
+                                                      key={attachment.id}
+                                                      onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
+                                                      className={`inline-flex items-center space-x-3 px-4 py-3 rounded-xl text-sm transition-all hover:scale-[1.02] shadow-sm hover:shadow-md cursor-pointer ${
+                                                        isOwn
+                                                          ? 'bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground'
+                                                          : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border'
+                                                      }`}
+                                                    >
+                                                      <File className="h-5 w-5" />
+                                                      <span className="truncate max-w-40 font-medium">{fileName}</span>
+                                                    </div>
+                                                  );
+                                                })}
+                                              </div>
+                                            )}
+
+                                            <p className={`text-xs mt-1 ${isOwn ? 'text-white/70' : 'text-muted-foreground'}`}>{format(new Date(message.createdAt), 'MMM d, h:mm a')}</p>
                                           </div>
                                         </div>
-                                      ) : (
-                                        <div className="flex flex-col items-center p-2 w-16">
-                                          <File className="h-6 w-6 text-muted-foreground mb-1" />
-                                          <span className="text-xs font-medium text-card-foreground truncate block max-w-12 text-center">{file.name}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+
+                              {/* File preview for checkpoint */}
+                              {(checkpointFiles[checkpoint.id] || []).length > 0 && (
+                                <div className="space-y-3">
+                                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                                    <ImageIcon className="h-4 w-4 text-primary" />
+                                    <span className="font-medium">
+                                      {(checkpointFiles[checkpoint.id] || []).length} file{(checkpointFiles[checkpoint.id] || []).length > 1 ? 's' : ''} ready to send
+                                    </span>
+                                  </div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {(checkpointFiles[checkpoint.id] || []).map((file, index) => {
+                                      const isImage = file.type.startsWith('image/');
+                                      return (
+                                        <div
+                                          key={index}
+                                          className="relative bg-card/80 backdrop-blur-sm rounded-lg border border-border/30 shadow-sm hover:shadow-md transition-shadow overflow-hidden group"
+                                        >
+                                          <button
+                                            type="button"
+                                            onClick={() => removeFileFromCheckpoint(checkpoint.id, index)}
+                                            className="absolute top-1 right-1 z-20 w-5 h-5 rounded-full bg-destructive/80 hover:bg-destructive text-destructive-foreground flex items-center justify-center text-xs transition-all hover:scale-110 opacity-0 group-hover:opacity-100"
+                                          >
+                                            ×
+                                          </button>
+                                          {isImage ? (
+                                            <div className="relative">
+                                              <Image src={URL.createObjectURL(file)} alt={file.name} className="w-16 h-16 object-cover rounded-t-lg" width={64} height={64} />
+                                              <div className="px-2 py-1 bg-card/90">
+                                                <span className="text-xs font-medium text-card-foreground truncate block max-w-12">{file.name}</span>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <div className="flex flex-col items-center p-2 w-16">
+                                              <File className="h-6 w-6 text-muted-foreground mb-1" />
+                                              <span className="text-xs font-medium text-card-foreground truncate block max-w-12 text-center">{file.name}</span>
+                                            </div>
+                                          )}
                                         </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Message Input */}
+                              <div className="space-y-3">
+                                <form onSubmit={(e) => handleSubmitCheckpointMessage(checkpoint.id, e)} className="flex items-center space-x-2">
+                                  <input
+                                    type="file"
+                                    ref={(el) => {
+                                      fileInputRefs.current[checkpoint.id] = el;
+                                    }}
+                                    onChange={(e) => handleFileChange(checkpoint.id, e)}
+                                    className="hidden"
+                                    multiple
+                                    accept="image/*,.pdf,.doc,.docx,.txt"
+                                  />
+
+                                  <button
+                                    type="button"
+                                    onClick={() => fileInputRefs.current[checkpoint.id]?.click()}
+                                    className="flex-shrink-0 p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
+                                  >
+                                    <Paperclip className="h-5 w-5" />
+                                  </button>
+
+                                  <input
+                                    type="text"
+                                    value={newMessages[checkpoint.id] || ''}
+                                    onChange={(e) => setNewMessages((prev) => ({ ...prev, [checkpoint.id]: e.target.value }))}
+                                    placeholder="Add a message about this checkpoint..."
+                                    className="flex-1 px-3 py-2 rounded-lg border border-input focus:border-ring focus:outline-none bg-background text-foreground placeholder-muted-foreground text-sm"
+                                    disabled={sendingMessages[checkpoint.id]}
+                                  />
+
+                                  <button
+                                    type="submit"
+                                    disabled={sendingMessages[checkpoint.id] || (!newMessages[checkpoint.id]?.trim() && (checkpointFiles[checkpoint.id] || []).length === 0)}
+                                    className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                  >
+                                    {sendingMessages[checkpoint.id] ? (
+                                      <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                      <Send className="h-5 w-5" />
+                                    )}
+                                  </button>
+                                </form>
                               </div>
-                            </div>
+                            </>
                           )}
-
-                          {/* Message Input */}
-                          <div className="space-y-3">
-                            <form onSubmit={(e) => handleSubmitCheckpointMessage(checkpoint.id, e)} className="flex items-center space-x-2">
-                              <input
-                                type="file"
-                                ref={(el) => {
-                                  fileInputRefs.current[checkpoint.id] = el;
-                                }}
-                                onChange={(e) => handleFileChange(checkpoint.id, e)}
-                                className="hidden"
-                                multiple
-                                accept="image/*,.pdf,.doc,.docx,.txt"
-                              />
-
-                              <button
-                                type="button"
-                                onClick={() => fileInputRefs.current[checkpoint.id]?.click()}
-                                className="flex-shrink-0 p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
-                              >
-                                <Paperclip className="h-5 w-5" />
-                              </button>
-
-                              <input
-                                type="text"
-                                value={newMessages[checkpoint.id] || ''}
-                                onChange={(e) => setNewMessages((prev) => ({ ...prev, [checkpoint.id]: e.target.value }))}
-                                placeholder="Add a message about this checkpoint..."
-                                className="flex-1 px-3 py-2 rounded-lg border border-input focus:border-ring focus:outline-none bg-background text-foreground placeholder-muted-foreground text-sm"
-                                disabled={sendingMessages[checkpoint.id]}
-                              />
-
-                              <button
-                                type="submit"
-                                disabled={sendingMessages[checkpoint.id] || (!newMessages[checkpoint.id]?.trim() && (checkpointFiles[checkpoint.id] || []).length === 0)}
-                                className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                              >
-                                {sendingMessages[checkpoint.id] ? (
-                                  <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  <Send className="h-5 w-5" />
-                                )}
-                              </button>
-                            </form>
-                          </div>
                         </div>
                       </div>
                     </div>

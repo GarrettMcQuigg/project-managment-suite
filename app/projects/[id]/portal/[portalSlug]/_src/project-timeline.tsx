@@ -358,7 +358,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
   };
 
   return (
-    <div className="h-full flex flex-col space-y-6 p-4">
+    <div className="h-full flex flex-col space-y-4 p-4">
       {/* Header */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -380,7 +380,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        {/* <div className="grid grid-cols-2 gap-4">
           <div className="flex items-center justify-center gap-3 p-3 rounded-lg bg-card border">
             <div className="flex flex-col justify-center">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -404,7 +404,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Progress Bar */}
         <div className="px-2">
@@ -469,7 +469,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                     `}
                   >
                     {/* Card Header - Always Visible */}
-                    <div className="flex items-center justify-between p-4 cursor-pointer" onClick={() => toggleCardExpansion(checkpoint.id)}>
+                    <div className="flex items-center justify-between px-4 py-3 cursor-pointer" onClick={() => toggleCardExpansion(checkpoint.id)}>
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className="flex-1 min-w-0">
                           <h3

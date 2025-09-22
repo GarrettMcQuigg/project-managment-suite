@@ -42,9 +42,8 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
       </div>
 
       {/* Progress Circle */}
-      <div className="flex-shrink-0 flex items-center justify-center">
+      {/* <div className="flex-shrink-0 flex items-center justify-center">
         <div className="relative w-24 h-24">
-          {/* Background circle */}
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
             <path
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -54,7 +53,6 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
               strokeDasharray="100, 100"
               className="text-muted"
             />
-            {/* Progress circle */}
             <path
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
               fill="none"
@@ -65,13 +63,12 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
               className="text-primary transition-all duration-1000 ease-out"
             />
           </svg>
-          {/* Center content */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className="text-lg font-bold text-card-foreground">{Math.abs(daysRemaining)}</div>
             <div className={`text-xs font-medium ${isPastDue ? 'text-destructive' : 'text-muted-foreground'}`}>{isPastDue ? 'days overdue' : 'days left'}</div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

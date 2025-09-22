@@ -92,13 +92,13 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
 
         <main className="container mx-auto py-6 px-12 mb-16">
           <div className="bg-card border border-border rounded-md shadow-lg overflow-hidden">
-            <div className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-border p-6">
-              <ProjectOverview project={project} />
-            </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[400px] max-h-[1600px]">
-              <div className="lg:col-span-8 border-r border-border">
-                <div className="h-full">
+              <div className="lg:col-span-8 border-r border-border flex flex-col">
+                <div className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-border p-6 flex-shrink-0">
+                  <ProjectOverview project={project} />
+                </div>
+
+                <div className="flex-1">
                   <ProjectTimeline projectId={resolvedParams.id} isOwner={isOwner} />
                 </div>
               </div>

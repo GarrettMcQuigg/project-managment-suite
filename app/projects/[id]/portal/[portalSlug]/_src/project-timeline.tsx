@@ -602,7 +602,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                         </div>
 
                         {/* Checkpoint Messages Section */}
-                        <div className="border border-border p-3 rounded-lg">
+                        <div className="border border-border bg-card p-3 rounded-lg">
                           <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleDiscussionCollapse(checkpoint.id)}>
                             <div className="flex items-center gap-2">
                               <MessageCircle className="h-4 w-4 text-primary" />
@@ -613,28 +613,37 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                                 </span>
                               )}
                             </div>
-                            <button type="button" className="p-1 rounded-md hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground">
-                              {collapsedDiscussions.has(checkpoint.id) ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-                            </button>
+                            <div
+                              className={`
+                                p-1 rounded-full transition-all duration-300
+                                ${!collapsedDiscussions.has(checkpoint.id) ? 'rotate-180 bg-primary/10 text-primary' : 'bg-muted/50 text-muted-foreground hover:bg-muted'}
+                              `}
+                            >
+                              <ChevronDown className="h-4 w-4" />
+                            </div>
                           </div>
 
-                          {!collapsedDiscussions.has(checkpoint.id) && (
-                            <>
-                              {/* Messages Display */}
-                              {messages.length > 0 && (
-                                <div className="space-y-3 my-4 max-h-[400px] overflow-y-auto">
+                          <div
+                            className={`
+                              transition-all duration-300 overflow-hidden
+                              ${!collapsedDiscussions.has(checkpoint.id) ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}
+                            `}
+                          >
+                            {messages.length > 0 && (
+                              <div className="space-y-3 my-4 max-h-[400px] overflow-y-auto">
                                   {messages.map((message) => {
-                                    const isOwn = message.sender === 'Owner';
+                                    const isOwn = isOwner && (message.sender === 'Owner' || message.sender?.includes('McQuigg'));
 
                                     return (
                                       <div key={message.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
                                         <div className={`max-w-[85%]`}>
                                           {!isOwn && <p className="text-xs font-medium text-muted-foreground px-3 mb-1">{message.sender || 'Anonymous'}</p>}
 
-                                          <div className={`px-3 py-2 rounded-xl shadow-sm ${isOwn ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}>
+                                          <div
+                                            className={`px-3 py-2 rounded-xl shadow-sm ${isOwn ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}
+                                          >
                                             {message.text && message.text.trim() && <p className="text-sm leading-relaxed break-words">{message.text}</p>}
 
-                                            {/* Attachments */}
                                             {message.attachments && message.attachments.length > 0 && (
                                               <div className={`space-y-3 ${message.text ? 'mt-3' : ''}`}>
                                                 {message.attachments.map((attachment) => {
@@ -675,7 +684,9 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                                               </div>
                                             )}
 
-                                            <p className={`text-xs mt-1 ${isOwn ? 'text-white/70' : 'text-muted-foreground'}`}>{format(new Date(message.createdAt), 'MMM d, h:mm a')}</p>
+                                            <p className={`text-xs mt-1 ${isOwn ? 'text-white/70' : 'text-muted-foreground'}`}>
+                                              {format(new Date(message.createdAt), 'MMM d, h:mm a')}
+                                            </p>
                                           </div>
                                         </div>
                                       </div>
@@ -772,8 +783,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                                   </button>
                                 </form>
                               </div>
-                            </>
-                          )}
+                          </div>
                         </div>
                       </div>
                     </div>

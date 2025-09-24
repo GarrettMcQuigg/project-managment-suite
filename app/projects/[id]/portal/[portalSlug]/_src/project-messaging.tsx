@@ -199,7 +199,7 @@ export default function ProjectMessaging({ project, isOwner = false, context, on
   };
 
   return (
-    <div className="flex flex-col max-h-[400px] sm:max-h-[500px] lg:max-h-[756px]">
+    <div className="flex flex-col h-full max-h-[400px] sm:max-h-[500px] lg:max-h-[720px]">
       {/* Header */}
       <div className="border-b border-border px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -229,7 +229,7 @@ export default function ProjectMessaging({ project, isOwner = false, context, on
       </div>
 
       {/* Messages */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-3 min-h-0 pb-4">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-3 min-h-0">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-center">
             <div className="space-y-6">
@@ -339,145 +339,148 @@ export default function ProjectMessaging({ project, isOwner = false, context, on
         )}
       </div>
 
-      {/* File preview */}
-      {files.length > 0 && (
-        <div className="border-t border-border px-4 py-3">
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
-            <ImageIcon className="h-4 w-4 text-primary" />
-            <span className="font-medium">
-              {files.length} file{files.length > 1 ? 's' : ''} ready to send
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {files.map((file, index) => {
-              const isImage = file.type.startsWith('image/');
-              const isVideo = file.type.startsWith('video/');
-              const isPDF = file.type === 'application/pdf';
-              const isCSV = file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv');
-              const isExcel =
-                file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-                file.type === 'application/vnd.ms-excel' ||
-                file.name.toLowerCase().endsWith('.xlsx') ||
-                file.name.toLowerCase().endsWith('.xls');
-              const previewUrl = isImage || isVideo ? URL.createObjectURL(file) : null;
+      {/* Bottom section - File preview and Input */}
+      <div className="flex-shrink-0">
+        {/* File preview */}
+        {files.length > 0 && (
+          <div className="border-t border-border px-4 py-3">
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
+              <ImageIcon className="h-4 w-4 text-primary" />
+              <span className="font-medium">
+                {files.length} file{files.length > 1 ? 's' : ''} ready to send
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {files.map((file, index) => {
+                const isImage = file.type.startsWith('image/');
+                const isVideo = file.type.startsWith('video/');
+                const isPDF = file.type === 'application/pdf';
+                const isCSV = file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv');
+                const isExcel =
+                  file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                  file.type === 'application/vnd.ms-excel' ||
+                  file.name.toLowerCase().endsWith('.xlsx') ||
+                  file.name.toLowerCase().endsWith('.xls');
+                const previewUrl = isImage || isVideo ? URL.createObjectURL(file) : null;
 
-              const getDocumentThumbnail = () => {
-                if (isPDF) {
-                  return (
-                    <div className="relative w-20 h-20 bg-gradient-to-br from-slate-500 to-slate-600 rounded-t-xl flex flex-col items-center justify-center group/doc">
-                      <FileText className="h-6 w-6 text-white mb-1" />
-                      <span className="text-xs font-bold text-white">PDF</span>
-                      <div className="absolute inset-0 bg-black/30 rounded-t-xl opacity-0 group-hover/doc:opacity-100 transition-opacity duration-200"></div>
-                    </div>
-                  );
-                } else if (isCSV) {
-                  return (
-                    <div className="relative w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-t-xl flex flex-col items-center justify-center group/doc">
-                      <Table className="h-6 w-6 text-white mb-1" />
-                      <span className="text-xs font-bold text-white">CSV</span>
-                      <div className="absolute inset-0 bg-black/30 rounded-t-xl opacity-0 group-hover/doc:opacity-100 transition-opacity duration-200"></div>
-                    </div>
-                  );
-                } else if (isExcel) {
-                  return (
-                    <div className="relative w-20 h-20 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-t-xl flex flex-col items-center justify-center overflow-hidden group/doc">
-                      <div className="relative z-10 flex flex-col items-center">
-                        <Table className="h-4 w-4 text-white mb-1" />
-                        <span className="text-xs font-bold text-white">XLS</span>
+                const getDocumentThumbnail = () => {
+                  if (isPDF) {
+                    return (
+                      <div className="relative w-20 h-20 bg-gradient-to-br from-slate-500 to-slate-600 rounded-t-xl flex flex-col items-center justify-center group/doc">
+                        <FileText className="h-6 w-6 text-white mb-1" />
+                        <span className="text-xs font-bold text-white">PDF</span>
+                        <div className="absolute inset-0 bg-black/30 rounded-t-xl opacity-0 group-hover/doc:opacity-100 transition-opacity duration-200"></div>
                       </div>
-                      <div className="absolute inset-0 bg-black/30 rounded-t-xl opacity-0 group-hover/doc:opacity-100 transition-opacity duration-200"></div>
-                    </div>
-                  );
-                }
-                return null;
-              };
+                    );
+                  } else if (isCSV) {
+                    return (
+                      <div className="relative w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-t-xl flex flex-col items-center justify-center group/doc">
+                        <Table className="h-6 w-6 text-white mb-1" />
+                        <span className="text-xs font-bold text-white">CSV</span>
+                        <div className="absolute inset-0 bg-black/30 rounded-t-xl opacity-0 group-hover/doc:opacity-100 transition-opacity duration-200"></div>
+                      </div>
+                    );
+                  } else if (isExcel) {
+                    return (
+                      <div className="relative w-20 h-20 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-t-xl flex flex-col items-center justify-center overflow-hidden group/doc">
+                        <div className="relative z-10 flex flex-col items-center">
+                          <Table className="h-4 w-4 text-white mb-1" />
+                          <span className="text-xs font-bold text-white">XLS</span>
+                        </div>
+                        <div className="absolute inset-0 bg-black/30 rounded-t-xl opacity-0 group-hover/doc:opacity-100 transition-opacity duration-200"></div>
+                      </div>
+                    );
+                  }
+                  return null;
+                };
 
-              return (
-                <div
-                  key={index}
-                  className="relative bg-card/80 backdrop-blur-sm rounded-xl border border-border/30 shadow-sm hover:shadow-md transition-shadow overflow-hidden group cursor-pointer"
-                >
-                  {/* Remove button */}
-                  <button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full bg-destructive/80 hover:bg-destructive text-destructive-foreground flex items-center justify-center text-sm transition-all hover:scale-110 opacity-0 group-hover:opacity-100"
+                return (
+                  <div
+                    key={index}
+                    className="relative bg-card/80 backdrop-blur-sm rounded-xl border border-border/30 shadow-sm hover:shadow-md transition-shadow overflow-hidden group cursor-pointer"
                   >
-                    ×
-                  </button>
+                    {/* Remove button */}
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full bg-destructive/80 hover:bg-destructive text-destructive-foreground flex items-center justify-center text-sm transition-all hover:scale-110 opacity-0 group-hover:opacity-100"
+                    >
+                      ×
+                    </button>
 
-                  {isImage && previewUrl ? (
-                    <div className="relative" onClick={() => setPreviewFile(file)}>
-                      <div className="relative group/img">
-                        <Image src={previewUrl} alt={file.name} className="w-20 h-20 object-cover rounded-t-xl" width={80} height={80} />
-                        <div className="absolute inset-0 bg-black/30 rounded-t-xl opacity-0 group-hover/img:opacity-100 transition-opacity duration-200"></div>
-                      </div>
-                      <div className="px-2 py-1 bg-card/90">
-                        <span className="text-xs font-medium text-card-foreground truncate block max-w-16">{file.name}</span>
-                      </div>
-                    </div>
-                  ) : isVideo ? (
-                    <div className="relative w-20" onClick={() => setPreviewFile(file)}>
-                      <div className="relative w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-t-xl flex items-center justify-center group/video">
-                        <Clapperboard className="h-8 w-8 text-slate-600 dark:text-slate-300" />
-                        <div className="absolute inset-0 bg-black/50 rounded-t-xl opacity-0 group-hover/video:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                          <Play className="h-6 w-6 text-white fill-current" />
+                    {isImage && previewUrl ? (
+                      <div className="relative" onClick={() => setPreviewFile(file)}>
+                        <div className="relative group/img">
+                          <Image src={previewUrl} alt={file.name} className="w-20 h-20 object-cover rounded-t-xl" width={80} height={80} />
+                          <div className="absolute inset-0 bg-black/30 rounded-t-xl opacity-0 group-hover/img:opacity-100 transition-opacity duration-200"></div>
+                        </div>
+                        <div className="px-2 py-1 bg-card/90">
+                          <span className="text-xs font-medium text-card-foreground truncate block max-w-16">{file.name}</span>
                         </div>
                       </div>
-                      <div className="px-2 py-1 bg-card/90">
-                        <span className="text-xs font-medium text-card-foreground truncate block max-w-16">{file.name}</span>
+                    ) : isVideo ? (
+                      <div className="relative w-20" onClick={() => setPreviewFile(file)}>
+                        <div className="relative w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-t-xl flex items-center justify-center group/video">
+                          <Clapperboard className="h-8 w-8 text-slate-600 dark:text-slate-300" />
+                          <div className="absolute inset-0 bg-black/50 rounded-t-xl opacity-0 group-hover/video:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                            <Play className="h-6 w-6 text-white fill-current" />
+                          </div>
+                        </div>
+                        <div className="px-2 py-1 bg-card/90">
+                          <span className="text-xs font-medium text-card-foreground truncate block max-w-16">{file.name}</span>
+                        </div>
                       </div>
-                    </div>
-                  ) : isPDF || isCSV || isExcel ? (
-                    <div className="relative w-20" onClick={() => setPreviewFile(file)}>
-                      {getDocumentThumbnail()}
-                      <div className="px-2 py-1 bg-card/90">
-                        <span className="text-xs font-medium text-card-foreground truncate block max-w-16">{file.name}</span>
+                    ) : isPDF || isCSV || isExcel ? (
+                      <div className="relative w-20" onClick={() => setPreviewFile(file)}>
+                        {getDocumentThumbnail()}
+                        <div className="px-2 py-1 bg-card/90">
+                          <span className="text-xs font-medium text-card-foreground truncate block max-w-16">{file.name}</span>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center p-3 w-20">
-                      <File className="h-8 w-8 text-muted-foreground mb-1" />
-                      <span className="text-xs font-medium text-card-foreground truncate block max-w-16 text-center">{file.name}</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                    ) : (
+                      <div className="flex flex-col items-center p-3 w-20">
+                        <File className="h-8 w-8 text-muted-foreground mb-1" />
+                        <span className="text-xs font-medium text-card-foreground truncate block max-w-16 text-center">{file.name}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
+        )}
+
+        {/* Input */}
+        <div className="border-t border-border lg:px-4 px-2 py-3 flex-shrink-0">
+          <form onSubmit={handleSubmit} className="flex items-center gap-x-2">
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-shrink-0 p-2 text-muted-foreground hover:text-primary hover:bg-muted border border-border rounded-lg transition-colors"
+            >
+              <Paperclip className="h-5 w-5" />
+            </button>
+
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-1 px-3 py-2 w-1/2 lg:w-full rounded-lg border border-input focus:border-ring focus:outline-none bg-background text-foreground placeholder-muted-foreground text-sm"
+              disabled={isSubmitting}
+            />
+
+            <button
+              type="submit"
+              disabled={isSubmitting || (!message.trim() && files.length === 0)}
+              className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <Send className="h-5 w-5" />
+            </button>
+          </form>
         </div>
-      )}
-
-      {/* Input */}
-      <div className="border-t border-border px-4 py-3 flex-shrink-0">
-        <form onSubmit={handleSubmit} className="flex items-center space-x-2">
-          <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
-
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex-shrink-0 p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
-          >
-            <Paperclip className="h-5 w-5" />
-          </button>
-
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 px-3 py-2 rounded-lg border border-input focus:border-ring focus:outline-none bg-background text-foreground placeholder-muted-foreground text-sm"
-            disabled={isSubmitting}
-          />
-
-          <button
-            type="submit"
-            disabled={isSubmitting || (!message.trim() && files.length === 0)}
-            className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <Send className="h-5 w-5" />
-          </button>
-        </form>
       </div>
 
       {/* File Preview Dialog */}

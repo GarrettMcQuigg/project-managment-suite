@@ -8,8 +8,8 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
   const totalCheckpoints = project.checkpoints.length;
   const progressPercentage = Math.round((completedCheckpoints / totalCheckpoints) * 100);
 
-  const daysRemaining = Math.ceil((new Date(project.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-  const isPastDue = daysRemaining < 0;
+  // const daysRemaining = Math.ceil((new Date(project.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+  // const isPastDue = daysRemaining < 0;
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -18,7 +18,7 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
         <div className="flex items-center gap-4 mb-2">
           <h1 className="text-lg sm:text-2xl font-bold text-card-foreground leading-tight">{project.name}</h1>
         </div>
-        <div className="text-muted-foreground text-xs sm:text-sm leading-relaxed mb-4">{project.description}</div>
+        <div className="text-muted-foreground text-xs sm:text-sm leading-relaxed mb-3">{project.description}</div>
 
         {/* Quick Stats */}
         <div className="flex flex-wrap items-center gap-6 text-sm">

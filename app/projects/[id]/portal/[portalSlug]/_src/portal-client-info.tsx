@@ -14,11 +14,11 @@ export default function PortalClientInfo({ client }: { client: Client }) {
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-muted/50 transition-colors group bg-card/80 backdrop-blur-md border border-border border-primary/20"
+        className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors group bg-card/80 backdrop-blur-md border border-border border-primary/20"
       >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-            <User className="h-5 w-5 text-primary" />
+        <div className="flex items-center gap-4">
+          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+            <User className="h-4 w-4 text-primary" />
           </div>
           <div className="text-left">
             <h3 className="font-semibold text-foreground">{client.name}</h3>

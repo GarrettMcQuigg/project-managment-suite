@@ -20,9 +20,7 @@ import {
   Calendar,
   Target,
   Zap,
-  TrendingUp,
   ChevronDown,
-  ChevronUp,
   Minimize2,
   Maximize2,
   MessageCircle,
@@ -76,6 +74,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
   const [previewFile, setPreviewFile] = useState<File | null>(null);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const checkpointRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const messageContainerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const scrollToCheckpoint = (checkpointId: string) => {
     const checkpointRef = checkpointRefs.current[checkpointId];
@@ -86,6 +85,18 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
         checkpointRef.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
+        });
+      }, 100);
+    }
+  };
+
+  const scrollMessagesToBottom = (checkpointId: string) => {
+    const messageContainer = messageContainerRefs.current[checkpointId];
+    if (messageContainer) {
+      setTimeout(() => {
+        messageContainer.scrollTo({
+          top: messageContainer.scrollHeight,
+          behavior: 'smooth'
         });
       }, 100);
     }
@@ -235,6 +246,11 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
 
       mutate(endpoint);
 
+      // Scroll to bottom after sending message with delay to ensure message is loaded
+      setTimeout(() => {
+        scrollMessagesToBottom(checkpointId);
+      }, 1000);
+
       toast.success('Message sent successfully');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -337,8 +353,8 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
     );
   }
 
-  const completedCheckpoints = project.checkpoints.filter((c) => c.status === CheckpointStatus.COMPLETED).length;
-  const totalCheckpoints = project.checkpoints.length;
+  // const completedCheckpoints = project.checkpoints.filter((c) => c.status === CheckpointStatus.COMPLETED).length;
+  // const totalCheckpoints = project.checkpoints.length;
 
   const getCheckpointIcon = (status: string) => {
     switch (status) {
@@ -360,14 +376,14 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
   return (
     <div className="h-full flex flex-col space-y-4 p-4">
       {/* Header */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-indigo-500/80 rounded-xl flex items-center justify-center shadow-lg">
               <Target className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl md:text-2xl sm:text-xl font-bold text-card-foreground">
+              <h2 className="text-md sm:text-lg font-bold text-card-foreground">
                 <span className="hidden sm:inline">Project</span> Timeline
               </h2>
               <p className="text-sm text-muted-foreground hidden sm:block">Track your project milestones</p>
@@ -410,9 +426,9 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
         <div className="px-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Overall Progress</span>
-            <span className="text-lg font-bold bg-gradient-to-r from-primary to-indigo-500/80 bg-clip-text text-transparent">{progressPercentage}%</span>
+            <span className="text-md font-bold bg-gradient-to-r from-primary to-indigo-500/80 bg-clip-text text-transparent">{progressPercentage}%</span>
           </div>
-          <div className="relative w-full bg-muted rounded-full h-4 overflow-hidden shadow-inner">
+          <div className="relative w-full bg-muted rounded-full h-2 overflow-hidden shadow-inner">
             <div className="h-full bg-primary rounded-full transition-all duration-1000 ease-out shadow-sm" style={{ width: `${progressPercentage}%` }}>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
             </div>
@@ -630,7 +646,12 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                             `}
                           >
                             {messages.length > 0 && (
-                              <div className="space-y-3 my-4 max-h-[400px] overflow-y-auto">
+                              <div
+                                ref={(el) => {
+                                  messageContainerRefs.current[checkpoint.id] = el;
+                                }}
+                                className="space-y-3 my-4 max-h-[400px] overflow-y-auto"
+                              >
                                 {messages.map((message) => {
                                   const isOwn = isOwner && (message.sender === 'Owner' || message.sender?.includes('McQuigg'));
 
@@ -740,7 +761,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                             )}
 
                             {/* Message Input */}
-                            <div className="space-y-3">
+                            <div className="space-y-3 mt-2">
                               <form onSubmit={(e) => handleSubmitCheckpointMessage(checkpoint.id, e)} className="flex items-center space-x-2">
                                 <input
                                   type="file"

@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, ImageIcon, File, MessageSquare, MessageCircleCode, Users, Clapperboard, Play, FileText, Table, X, Download, ChevronRight, Target } from 'lucide-react';
+import { Send, Paperclip, ImageIcon, File, MessageSquare, MessageCircleCode, Users, Clapperboard, Play, FileText, Table, X, Download } from 'lucide-react';
 import { fetcher, swrFetcher } from '@/packages/lib/helpers/fetcher';
 import useSWR, { mutate } from 'swr';
 import { toast } from 'react-toastify';
@@ -37,10 +37,10 @@ interface ProjectMessagingProps {
   project: ProjectWithMetadata;
   isOwner?: boolean;
   context: PortalContext;
-  onScrollToCheckpoint?: (checkpointId: string) => void;
+  // onScrollToCheckpoint?: (checkpointId: string) => void;
 }
 
-export default function ProjectMessaging({ project, isOwner = false, context, onScrollToCheckpoint }: ProjectMessagingProps) {
+export default function ProjectMessaging({ project, isOwner = false, context }: ProjectMessagingProps) {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -193,10 +193,10 @@ export default function ProjectMessaging({ project, isOwner = false, context, on
     };
   };
 
-  const getCheckpointName = (checkpointId: string) => {
-    const checkpoint = project.checkpoints?.find((c) => c.id === checkpointId);
-    return checkpoint?.name || 'Checkpoint';
-  };
+  // const getCheckpointName = (checkpointId: string) => {
+  //   const checkpoint = project.checkpoints?.find((c) => c.id === checkpointId);
+  //   return checkpoint?.name || 'Checkpoint';
+  // };
 
   return (
     <div className="flex flex-col h-full max-h-[400px] sm:max-h-[500px] lg:max-h-[720px]">
@@ -244,31 +244,33 @@ export default function ProjectMessaging({ project, isOwner = false, context, on
           </div>
         ) : (
           <>
-            {messages.map((msg, index) => {
-              const isOwn = isCurrentUserMessage(msg.sender);
-              const showAvatar = shouldShowAvatar(index);
-              const showSender = shouldShowSender(index);
+            {messages
+              .filter((msg) => !msg.checkpointId)
+              .map((msg, index) => {
+                const isOwn = isCurrentUserMessage(msg.sender);
+                const showAvatar = shouldShowAvatar(index);
+                const showSender = shouldShowSender(index);
 
-              return (
-                <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`flex max-w-[85%] ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end sm:space-x-2`}>
-                    {/* Avatar */}
-                    <div className={`hidden sm:flex flex-shrink-0 ${isOwn ? 'ml-2' : 'mr-2'}`}>
-                      {showAvatar ? (
-                        <div className={`w-8 h-8 rounded-full flex bg-gradient-to-br ${getAvatarGradient(msg.sender)} items-center justify-center text-xs font-bold`}>
-                          {getInitials(msg.sender)}
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8"></div>
-                      )}
-                    </div>
+                return (
+                  <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`flex max-w-[85%] ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end sm:space-x-2`}>
+                      {/* Avatar */}
+                      <div className={`hidden sm:flex flex-shrink-0 ${isOwn ? 'ml-2' : 'mr-2'}`}>
+                        {showAvatar ? (
+                          <div className={`w-8 h-8 rounded-full flex bg-gradient-to-br ${getAvatarGradient(msg.sender)} items-center justify-center text-xs font-bold`}>
+                            {getInitials(msg.sender)}
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8"></div>
+                        )}
+                      </div>
 
-                    {/* Message bubble */}
-                    <div className="space-y-1">
-                      {!isOwn && showSender && <p className="text-xs font-medium text-muted-foreground px-3">{msg.sender}</p>}
+                      {/* Message bubble */}
+                      <div className="space-y-1">
+                        {!isOwn && showSender && <p className="text-xs font-medium text-muted-foreground px-3">{msg.sender}</p>}
 
-                      <div className={`px-3 py-2 rounded-xl shadow-sm ${isOwn ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}>
-                        {msg.checkpointId ? (
+                        <div className={`px-3 py-2 rounded-xl shadow-sm ${isOwn ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}>
+                          {/* {msg.checkpointId ? (
                           // Checkpoint message indicator
                           <div
                             className={`flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity ${isOwn ? 'text-white' : 'text-foreground'}`}
@@ -284,56 +286,59 @@ export default function ProjectMessaging({ project, isOwner = false, context, on
                         ) : (
                           // Regular message
                           msg.text && <p className="text-sm leading-relaxed break-words">{msg.text}</p>
-                        )}
+                        )} */}
 
-                        {/* Attachments - only show for regular messages, not checkpoint messages */}
-                        {!msg.checkpointId && msg.attachments && msg.attachments.length > 0 && (
-                          <div className={`space-y-3 ${msg.text ? 'mt-3' : ''}`}>
-                            {msg.attachments.map((attachment) => {
-                              const isImage = attachment.contentType.startsWith('image/');
-                              const fileName = attachment.pathname.split('/').pop() || 'Attachment';
+                          {/* Regular message */}
+                          {msg.text && <p className="text-sm leading-relaxed break-words">{msg.text}</p>}
 
-                              return isImage ? (
-                                <div
-                                  key={attachment.id}
-                                  className="relative group/image cursor-pointer"
-                                  onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
-                                >
-                                  <Image
-                                    src={attachment.blobUrl || '/placeholder.svg'}
-                                    alt={fileName}
-                                    width={288}
-                                    height={192}
-                                    loader={ImageLoader}
-                                    className="rounded-xl sm:max-w-72 sm:max-h-48 object-cover transition-transform hover:scale-[1.02] shadow-lg"
-                                  />
-                                  <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 rounded-xl transition-colors"></div>
-                                </div>
-                              ) : (
-                                <div
-                                  key={attachment.id}
-                                  onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
-                                  className={`inline-flex items-center space-x-3 px-4 py-3 rounded-xl text-sm transition-all hover:scale-[1.02] shadow-sm hover:shadow-md cursor-pointer ${
-                                    isOwn
-                                      ? 'bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground'
-                                      : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border'
-                                  }`}
-                                >
-                                  <File className="h-5 w-5" />
-                                  <span className="truncate max-w-40 font-medium">{fileName}</span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+                          {/* Attachments - only show for regular messages, not checkpoint messages */}
+                          {!msg.checkpointId && msg.attachments && msg.attachments.length > 0 && (
+                            <div className={`space-y-3 ${msg.text ? 'mt-3' : ''}`}>
+                              {msg.attachments.map((attachment) => {
+                                const isImage = attachment.contentType.startsWith('image/');
+                                const fileName = attachment.pathname.split('/').pop() || 'Attachment';
 
-                        <p className={`text-xs mt-1 ${isOwn ? 'text-white/70' : 'text-muted-foreground'}`}>{formatTime(msg.createdAt)}</p>
+                                return isImage ? (
+                                  <div
+                                    key={attachment.id}
+                                    className="relative group/image cursor-pointer"
+                                    onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
+                                  >
+                                    <Image
+                                      src={attachment.blobUrl || '/placeholder.svg'}
+                                      alt={fileName}
+                                      width={288}
+                                      height={192}
+                                      loader={ImageLoader}
+                                      className="rounded-xl sm:max-w-72 sm:max-h-48 object-cover transition-transform hover:scale-[1.02] shadow-lg"
+                                    />
+                                    <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 rounded-xl transition-colors"></div>
+                                  </div>
+                                ) : (
+                                  <div
+                                    key={attachment.id}
+                                    onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
+                                    className={`inline-flex items-center space-x-3 px-4 py-3 rounded-xl text-sm transition-all hover:scale-[1.02] shadow-sm hover:shadow-md cursor-pointer ${
+                                      isOwn
+                                        ? 'bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground'
+                                        : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border'
+                                    }`}
+                                  >
+                                    <File className="h-5 w-5" />
+                                    <span className="truncate max-w-40 font-medium">{fileName}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          <p className={`text-xs mt-1 ${isOwn ? 'text-white/70' : 'text-muted-foreground'}`}>{formatTime(msg.createdAt)}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
             <div ref={messagesEndRef} />
           </>
         )}

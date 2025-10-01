@@ -1,7 +1,6 @@
 import { db } from '@/packages/lib/prisma/client';
 import { SignupRequestBody, SignupRequestBodySchema } from './types';
 import * as bcrypt from 'bcrypt';
-// import { codeHasExpired } from '@packages/lib/services/email-service/templates/verify-email';
 import { User } from '@prisma/client';
 import { handleBadRequest, handleConflict, handleError, handleSuccess } from '@packages/lib/helpers/api-response-handlers';
 import { setAuthCookies } from '@/packages/lib/helpers/cookies';
@@ -19,27 +18,7 @@ export async function POST(request: Request) {
     return handleBadRequest({ message: error.message, err: error });
   }
 
-  // if (requestBody.phone !== '+19132231730') {
-  // return handleError({ message: 'Registration is currently invite-only.' });
-  // }
-
   try {
-    // let err = await verifyEmailCode(requestBody.email, requestBody.emailMFACode);
-    // if (err) {
-    //   throw err;
-    // }
-
-    // err = await verifyPhoneCode(requestBody.phone, requestBody.smsMFACode);
-    // if (err) {
-    //   throw err;
-    // }
-
-    // await db.emailMFASession.delete({
-    //   where: {
-    //     email: requestBody.email
-    //   }
-    // });
-
     const emailIsAvailable = await CheckEmailAvailability(requestBody.email);
     if (!emailIsAvailable) {
       return handleConflict({
@@ -71,48 +50,6 @@ export async function POST(request: Request) {
     return handleError({ message: errorMessage, err });
   }
 }
-
-// async function verifyEmailCode(email: string, code: string): Promise<Error | null> {
-//   try {
-//     const session = await db.emailMFASession.findUnique({
-//       where: {
-//         email
-//       }
-//     });
-
-//     if (!session) {
-//       return new Error('No MFA session found for the email.');
-//     }
-
-//     if (session.code !== code.toUpperCase()) {
-//       return new Error('Invalid MFA code.');
-//     }
-
-//     if (codeHasExpired(session.createdAt)) {
-//       await db.emailMFASession.delete({
-//         where: {
-//           email
-//         }
-//       });
-
-//       return new Error('MFA code has expired.');
-//     }
-
-//     return null;
-//   } catch (err: any) {
-//     console.error('Error: ', err);
-//     return new Error('An error occurred while verifying the email code.');
-//   }
-// }
-
-// async function verifyPhoneCode(phone: string, code: string): Promise<Error | null> {
-//   const err = await twilioService.checkVerificationCode(phone, code);
-//   if (err) {
-//     return new Error(err.message);
-//   }
-
-//   return null;
-// }
 
 async function createNewUser(requestBody: SignupRequestBody): Promise<{ user: User | null; error: Error | null }> {
   try {

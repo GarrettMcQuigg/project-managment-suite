@@ -20,7 +20,7 @@ export type ClientWithMetadata = Prisma.ClientGetPayload<{
 }>;
 
 export type ProjectWithMetadata = Prisma.ProjectGetPayload<{
-  include: { client: true; invoices: true; checkpoints: true; portalViews: true; attachments: true; messages: true };
+  include: { client: true; invoices: true; checkpoints: true; portalViews: true; attachments: true; messages: { include: { attachments: true } } };
 }>;
 
 export type CalendarEventWithMetadata = Prisma.CalendarEventGetPayload<{

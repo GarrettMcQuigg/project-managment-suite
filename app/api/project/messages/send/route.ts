@@ -1,11 +1,11 @@
 import { handleBadRequest, handleError, handleNotFound, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
+import { createAdminClient } from '@/packages/lib/utils/supabase/client';
 import { PortalVisitor } from '@/packages/lib/helpers/get-portal-user';
 import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
 import { User } from '@prisma/client';
-import { put } from '@vercel/blob';
 import { UpdateMessageMetrics } from '@/packages/lib/helpers/analytics/messages/message-metrics';
-import { TrackMessageSent, TrackMessageReceived } from '@/packages/lib/helpers/analytics/communication';
+import { TrackMessageReceived, TrackMessageSent } from '@/packages/lib/helpers/analytics/communication';
 
 export async function POST(request: Request) {
   try {
@@ -89,28 +89,22 @@ export async function POST(request: Request) {
       await Promise.all([
         // Response rate calculation
         UpdateMessageMetrics(currentUser.id),
-        
+
         // Communication analytics tracking
-        TrackMessageSent(
-          currentUser.id, 
-          projectWithClient.client.id,
-          text || ''
-        )
+        TrackMessageSent(currentUser.id, projectWithClient.client.id, text || '')
       ]);
-      
-      console.log(`Message sent by user ${currentUser.id} to client ${projectWithClient.client.id}`);
     } else if (context.type === 'portal') {
       const portalVisitor = currentUser as PortalVisitor;
-      
+
       // Get the project owner and client info
       const projectWithDetails = await db.project.findUnique({
         where: { id: projectId },
-        include: { 
+        include: {
           client: true,
           user: true
         }
       });
-      
+
       if (!projectWithDetails?.user || !projectWithDetails?.client) {
         return handleNotFound({ message: 'Project details not found' });
       }
@@ -127,17 +121,15 @@ export async function POST(request: Request) {
       await Promise.all([
         // Response rate calculation
         UpdateMessageMetrics(projectWithDetails.userId),
-        
+
         // Communication analytics tracking - client sending message to user
         TrackMessageReceived(
-          projectWithDetails.userId, 
+          projectWithDetails.userId,
           projectWithDetails.client.id,
           text || '',
           undefined // responseToMessageId is not tracked in this UI
         )
       ]);
-      
-      console.log(`Message received by user ${projectWithDetails.userId} from client ${projectWithDetails.client.id}`);
     }
 
     if (!newMessage) {
@@ -145,16 +137,34 @@ export async function POST(request: Request) {
     }
 
     if (attachmentFiles.length > 0) {
+      const supabase = await createAdminClient();
+
       const attachmentPromises = attachmentFiles.map(async (file) => {
         try {
-          const blobPath = `project-messages/${projectId}/message-${newMessage.id}-${file.name}`;
-          const blob = await put(blobPath, file, { access: 'public' });
+          const filePath = `project-messages/${projectId}/message-${newMessage.id}-${file.name}`;
+          const fileBuffer = await file.arrayBuffer();
+
+          const { data, error: storageError } = await supabase.storage.from('blob-storage').upload(filePath, fileBuffer, {
+            contentType: file.type,
+            upsert: false
+          });
+
+          if (storageError) {
+            throw storageError;
+          }
+
+          // Generate a signed URL valid for 90 days
+          const { data: signedUrlData, error: signedUrlError } = await supabase.storage.from('blob-storage').createSignedUrl(filePath, 7776000); // 90 days in seconds
+
+          if (signedUrlError) {
+            throw signedUrlError;
+          }
 
           return db.projectMessageAttachment.create({
             data: {
               messageId: newMessage.id,
-              blobUrl: blob.url,
-              pathname: blob.pathname,
+              blobUrl: signedUrlData.signedUrl,
+              pathname: filePath,
               contentType: file.type
             }
           });

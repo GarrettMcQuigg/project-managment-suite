@@ -1,54 +1,512 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-// User Models ==============================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-model User {
-  id           String    @id @default(uuid())
-  firstname    String
-  lastname     String
-  phone        String
-  email        String    @unique
-  profileImg   String?
-  profileImgId String?
-  coverImg     String?
-  coverImgId   String?
-  location     String?
-  bio          String?
-  dateOfBirth  DateTime?
-  password     String
-  role         UserRole  @default(USER)
-  projects     Project[]
-  clients      Client[]
-  invoices     Invoice[]
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-  // Stripe Connect fields
+model User {
+  id                  String              @id @default(uuid())
+  firstname           String
+  lastname            String
+  phone               String
+  email               String              @unique
+  profileImg          String?
+  profileImgId        String?
+  coverImg            String?
+  coverImgId          String?
+  location            String?
+  bio                 String?
+  dateOfBirth         DateTime?
+  password            String
+  role                UserRole            @default(USER)
   stripeAccountId     String?             @map("stripe_account_id")
   stripeAccountStatus StripeAccountStatus @default(NOT_CONNECTED) @map("stripe_account_status")
-
-  // Subscription fields
-  subscription Subscription?
-
-  // Calendar fields
-  calendarEvent CalendarEvent[]
-
-  // Analytics
-  analytics    Analytics?
-  userActivity UserActivity[]
-  pageView     PageView[]
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
-  deletedAt DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @default(now())
+  deletedAt           DateTime?
+  analytics           Analytics?
+  calendarEvent       CalendarEvent[]
+  clients             Client[]
+  invoices            Invoice[]
+  pageView            PageView[]
+  projects            Project[]
+  subscription        Subscription?
+  userActivity        UserActivity[]
 
   @@map("users")
+}
+
+model Project {
+  id                   String               @id @default(uuid())
+  userId               String
+  clientId             String
+  type                 ProjectType?
+  name                 String
+  description          String
+  status               ProjectStatus        @default(PREPARATION)
+  portalSlug           String               @unique @default(cuid())
+  portalPass           String
+  portalPassEncryption String
+  portalEnabled        Boolean              @default(true)
+  startDate            DateTime
+  endDate              DateTime
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  deletedAt            DateTime?
+  calendarEvent        CalendarEvent[]
+  checkpoints          Checkpoint[]
+  invoices             Invoice[]
+  portalViews          PortalView[]
+  client               Client               @relation(fields: [clientId], references: [id])
+  user                 User                 @relation(fields: [userId], references: [id])
+  projectAllocation    ProjectAllocation[]
+  attachments          ProjectAttachment[]
+  messages             ProjectMessage[]
+  participants         ProjectParticipant[]
+  projectPerformance   ProjectPerformance[]
+  timeTracking         TimeTracking[]
+}
+
+model PortalView {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  viewedAt  DateTime @default(now())
+  ipAddress String?
+  project   Project  @relation(fields: [projectId], references: [id])
+}
+
+model Checkpoint {
+  id            String           @id @default(uuid())
+  projectId     String
+  order         Int              @default(autoincrement())
+  type          CheckpointType
+  name          String
+  description   String?
+  startDate     DateTime
+  endDate       DateTime
+  status        CheckpointStatus @default(PENDING)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  calendarEvent CalendarEvent[]
+  project       Project          @relation(fields: [projectId], references: [id])
+  invoice       Invoice?
+  messages      ProjectMessage[]
+}
+
+model ProjectMessage {
+  id                  String                     @id @default(uuid())
+  projectId           String
+  checkpointId        String?
+  sender              String?
+  text                String
+  createdAt           DateTime                   @default(now())
+  responseToMessageId String?
+  messageRead         MessageRead[]
+  checkpoint          Checkpoint?                @relation(fields: [checkpointId], references: [id])
+  project             Project                    @relation(fields: [projectId], references: [id])
+  responseToMessage   ProjectMessage?            @relation("MessageResponses", fields: [responseToMessageId], references: [id])
+  responses           ProjectMessage[]           @relation("MessageResponses")
+  attachments         ProjectMessageAttachment[]
+}
+
+model ProjectParticipant {
+  id           String          @id @default(uuid())
+  projectId    String
+  role         ParticipantRole @default(VIEWER)
+  isActive     Boolean         @default(true)
+  email        String
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  messageReads MessageRead[]
+  project      Project         @relation(fields: [projectId], references: [id])
+
+  @@unique([projectId, email])
+}
+
+model MessageRead {
+  id        String             @id @default(uuid())
+  messageId String
+  readById  String
+  readAt    DateTime           @default(now())
+  message   ProjectMessage     @relation(fields: [messageId], references: [id])
+  readBy    ProjectParticipant @relation(fields: [readById], references: [id])
+
+  @@unique([messageId, readById])
+}
+
+model ProjectAttachment {
+  id          String   @id @default(uuid())
+  projectId   String
+  blobUrl     String
+  pathname    String
+  contentType String
+  createdAt   DateTime @default(now())
+  project     Project  @relation(fields: [projectId], references: [id])
+}
+
+model ProjectMessageAttachment {
+  id          String         @id @default(uuid())
+  messageId   String
+  blobUrl     String
+  pathname    String
+  contentType String
+  createdAt   DateTime       @default(now())
+  message     ProjectMessage @relation(fields: [messageId], references: [id])
+}
+
+model Client {
+  id                 String              @id @default(uuid())
+  userId             String
+  name               String
+  email              String
+  phone              String
+  isArchived         Boolean             @default(false)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  deletedAt          DateTime?
+  calendarEvent      CalendarEvent[]
+  user               User                @relation(fields: [userId], references: [id])
+  clientEngagement   ClientEngagement[]
+  clientInteractions ClientInteraction[]
+  invoices           Invoice[]
+  projects           Project[]
+
+  @@unique([userId, email])
+}
+
+model Invoice {
+  id                 String          @id @default(uuid())
+  userId             String
+  projectId          String?
+  clientId           String?
+  checkpointId       String?         @unique
+  invoiceNumber      String
+  type               InvoiceType     @default(STANDARD)
+  amount             String?
+  status             InvoiceStatus   @default(SENT)
+  dueDate            DateTime
+  notifyClient       Boolean?        @default(false)
+  paymentMethod      PaymentMethod?
+  notes              String?
+  stripeCheckoutId   String?         @default("")
+  stripeCheckoutUrl  String?         @default("")
+  stripePaid         Boolean         @default(false)
+  stripePaidAt       DateTime?
+  notificationSent   Boolean         @default(false)
+  notificationSentAt DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  calendarEvent      CalendarEvent[]
+  checkpoint         Checkpoint?     @relation(fields: [checkpointId], references: [id])
+  client             Client?         @relation(fields: [clientId], references: [id])
+  project            Project?        @relation(fields: [projectId], references: [id])
+  user               User            @relation(fields: [userId], references: [id])
+  payments           Payment[]
+
+  @@unique([projectId, invoiceNumber])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  invoiceId     String
+  amount        Decimal       @db.Decimal(10, 2)
+  paymentMethod PaymentMethod
+  status        PaymentStatus @default(PENDING)
+  paidAt        DateTime?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  invoice       Invoice       @relation(fields: [invoiceId], references: [id])
+}
+
+model CalendarEvent {
+  id           String              @id @default(uuid())
+  title        String
+  description  String?
+  startDate    DateTime
+  endDate      DateTime?
+  isAllDay     Boolean?            @default(false)
+  type         CalendarEventType
+  status       CalendarEventStatus @default(SCHEDULED)
+  color        String?
+  projectId    String?
+  checkpointId String?
+  invoiceId    String?
+  userId       String
+  clientId     String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  deletedAt    DateTime?
+  checkpoint   Checkpoint?         @relation(fields: [checkpointId], references: [id])
+  client       Client?             @relation(fields: [clientId], references: [id])
+  invoice      Invoice?            @relation(fields: [invoiceId], references: [id])
+  project      Project?            @relation(fields: [projectId], references: [id])
+  user         User                @relation(fields: [userId], references: [id])
+  reminders    EventReminder[]
+
+  @@index([startDate])
+  @@index([userId])
+}
+
+model EventReminder {
+  id                  String        @id @default(uuid())
+  calendarEventId     String
+  reminderTime        DateTime
+  emailEnabled        Boolean       @default(false)
+  phoneEnabled        Boolean       @default(false)
+  notificationEnabled Boolean       @default(false)
+  sent                Boolean       @default(false)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  calendarEvent       CalendarEvent @relation(fields: [calendarEventId], references: [id])
+}
+
+model Subscription {
+  id                  String                @id @default(uuid())
+  userId              String                @unique
+  status              SubscriptionStatus    @default(ACTIVE)
+  tierId              String
+  currentPeriodStart  DateTime
+  currentPeriodEnd    DateTime
+  cancelAtPeriodEnd   Boolean               @default(false)
+  billingCycle        BillingCycle          @default(MONTHLY)
+  nextBillingDate     DateTime
+  lastPaymentAttempt  DateTime?
+  failedPaymentCount  Int                   @default(0)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  tier                SubscriptionPlan      @relation(fields: [tierId], references: [id])
+  user                User                  @relation(fields: [userId], references: [id])
+  subscriptionHistory SubscriptionHistory[]
+}
+
+model SubscriptionPlan {
+  id                  String                @id @default(uuid())
+  name                SubscriptionTierName  @unique
+  displayName         String
+  monthlyPrice        Decimal?              @db.Decimal(10, 2)
+  annualPrice         Decimal?              @db.Decimal(10, 2)
+  currency            String                @default("USD")
+  projectLimit        Int?
+  storageLimit        Int?
+  clientLimit         Int?
+  teamMemberLimit     Int?
+  isActive            Boolean               @default(true)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  features            PlanFeature[]
+  subscriptions       Subscription[]
+  subscriptionHistory SubscriptionHistory[]
+}
+
+model PlanFeature {
+  id                 String           @id @default(uuid())
+  name               String
+  description        String?
+  subscriptionPlanId String
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  subscriptionPlan   SubscriptionPlan @relation(fields: [subscriptionPlanId], references: [id])
+
+  @@unique([subscriptionPlanId, name])
+}
+
+model SubscriptionHistory {
+  id             String             @id @default(uuid())
+  subscriptionId String
+  planId         String
+  status         SubscriptionStatus
+  startDate      DateTime
+  endDate        DateTime?
+  createdAt      DateTime           @default(now())
+  plan           SubscriptionPlan   @relation(fields: [planId], references: [id])
+  subscription   Subscription       @relation(fields: [subscriptionId], references: [id])
+}
+
+model Analytics {
+  id                     String                  @id @default(uuid())
+  userId                 String                  @unique
+  loginCount             Int                     @default(0)
+  lastLogin              DateTime?
+  projectsCreated        Int                     @default(0)
+  projectsCompleted      Int                     @default(0)
+  totalRevenue           Decimal                 @default(0) @db.Decimal(10, 2)
+  activeClients          Int                     @default(0)
+  responseRate           Decimal?                @db.Decimal(5, 2)
+  avgResponseTime        Int?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  user                   User                    @relation(fields: [userId], references: [id])
+  clientEngagement       ClientEngagement[]
+  communicationAnalytics CommunicationAnalytics?
+  monthlyRevenue         MonthlyRevenue[]
+  performanceMetrics     PerformanceMetrics?
+  timeTracking           TimeTracking[]
+  workloadDistribution   WorkloadDistribution[]
+}
+
+model MonthlyRevenue {
+  id          String    @id @default(uuid())
+  analyticsId String
+  month       DateTime
+  amount      Decimal   @db.Decimal(10, 2)
+  growth      Decimal?  @db.Decimal(5, 2)
+  createdAt   DateTime  @default(now())
+  analytics   Analytics @relation(fields: [analyticsId], references: [id])
+
+  @@unique([analyticsId, month])
+}
+
+model ClientEngagement {
+  id            String    @id @default(uuid())
+  analyticsId   String
+  clientId      String
+  lastContact   DateTime
+  messageCount  Int       @default(0)
+  clientRevenue Decimal   @default(0) @db.Decimal(10, 2)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  analytics     Analytics @relation(fields: [analyticsId], references: [id])
+  client        Client    @relation(fields: [clientId], references: [id])
+
+  @@unique([analyticsId, clientId])
+}
+
+model UserActivity {
+  id        String     @id @default(uuid())
+  userId    String
+  action    ActionType
+  resource  String?
+  timestamp DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id])
+
+  @@index([userId, timestamp])
+}
+
+model TimeTracking {
+  id          String    @id @default(uuid())
+  analyticsId String
+  projectId   String
+  startTime   DateTime
+  endTime     DateTime?
+  duration    Int?
+  description String?
+  billable    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  analytics   Analytics @relation(fields: [analyticsId], references: [id])
+  project     Project   @relation(fields: [projectId], references: [id])
+
+  @@index([analyticsId, projectId])
+  @@index([startTime, endTime])
+}
+
+model CommunicationAnalytics {
+  id                       String              @id @default(uuid())
+  analyticsId              String              @unique
+  avgResponseTime          Int?
+  previousAvgResponseTime  Int?
+  messagesSent             Int                 @default(0)
+  messagesReceived         Int                 @default(0)
+  totalResponseTimeMinutes Int                 @default(0)
+  responseCount            Int                 @default(0)
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+  clientInteractions       ClientInteraction[]
+  analytics                Analytics           @relation(fields: [analyticsId], references: [id])
+}
+
+model ClientInteraction {
+  id                       String                 @id @default(uuid())
+  communicationAnalyticsId String
+  clientId                 String
+  lastInteraction          DateTime
+  sentimentScore           Decimal?               @db.Decimal(3, 2)
+  interactionCount         Int                    @default(0)
+  averageResponseTime      Int?
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+  client                   Client                 @relation(fields: [clientId], references: [id])
+  communicationAnalytics   CommunicationAnalytics @relation(fields: [communicationAnalyticsId], references: [id])
+
+  @@unique([communicationAnalyticsId, clientId])
+}
+
+model PerformanceMetrics {
+  id                    String               @id @default(uuid())
+  analyticsId           String               @unique
+  projectProfitability  Decimal              @default(0) @db.Decimal(10, 2)
+  clientAcquisitionCost Decimal              @default(0) @db.Decimal(10, 2)
+  clientLifetimeValue   Decimal              @default(0) @db.Decimal(10, 2)
+  projectCompletionRate Decimal              @default(0) @db.Decimal(5, 2)
+  onTimeDeliveryRate    Decimal              @default(0) @db.Decimal(5, 2)
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  analytics             Analytics            @relation(fields: [analyticsId], references: [id])
+  projectDetails        ProjectPerformance[]
+}
+
+model ProjectPerformance {
+  id                   String             @id @default(uuid())
+  performanceMetricsId String
+  projectId            String
+  estimatedHours       Int
+  actualHours          Int
+  estimatedCost        Decimal            @db.Decimal(10, 2)
+  actualCost           Decimal            @db.Decimal(10, 2)
+  revenue              Decimal            @db.Decimal(10, 2)
+  profitMargin         Decimal            @db.Decimal(5, 2)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  performanceMetrics   PerformanceMetrics @relation(fields: [performanceMetricsId], references: [id])
+  project              Project            @relation(fields: [projectId], references: [id])
+
+  @@unique([performanceMetricsId, projectId])
+}
+
+model WorkloadDistribution {
+  id                String              @id @default(uuid())
+  analyticsId       String
+  date              DateTime
+  totalHours        Decimal             @default(0) @db.Decimal(5, 2)
+  billableHours     Decimal             @default(0) @db.Decimal(5, 2)
+  nonBillableHours  Decimal             @default(0) @db.Decimal(5, 2)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  projectAllocation ProjectAllocation[]
+  analytics         Analytics           @relation(fields: [analyticsId], references: [id])
+
+  @@unique([analyticsId, date])
+}
+
+model ProjectAllocation {
+  id                     String               @id @default(uuid())
+  workloadDistributionId String
+  projectId              String
+  hoursAllocated         Decimal              @default(0) @db.Decimal(5, 2)
+  percentageOfTotal      Decimal              @default(0) @db.Decimal(5, 2)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  project                Project              @relation(fields: [projectId], references: [id])
+  workloadDistribution   WorkloadDistribution @relation(fields: [workloadDistributionId], references: [id])
+
+  @@unique([workloadDistributionId, projectId])
+}
+
+model PageView {
+  id         String   @id @default(uuid())
+  userId     String
+  page       Pages
+  resourceId String?
+  duration   Int?
+  timestamp  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, timestamp])
 }
 
 enum UserRole {
@@ -65,73 +523,18 @@ enum StripeAccountStatus {
   RESTRICTED
 }
 
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-
-// Project Models ===========================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-model Project {
-  id           String               @id @default(uuid())
-  user         User                 @relation(fields: [userId], references: [id])
-  userId       String
-  client       Client               @relation(fields: [clientId], references: [id])
-  clientId     String
-  type         ProjectType?
-  name         String
-  // TODO : Add a projectSlug
-  description  String
-  status       ProjectStatus        @default(PREPARATION)
-  invoices     Invoice[] // Tracks actual invoices for the project
-  checkpoints  Checkpoint[]
-  attachments  ProjectAttachment[]
-  messages     ProjectMessage[]
-  participants ProjectParticipant[]
-
-  // Portal fields
-  portalSlug           String       @unique @default(cuid())
-  portalPass           String
-  portalPassEncryption String
-  portalEnabled        Boolean      @default(true)
-  portalViews          PortalView[]
-
-  // Calendar fields
-  calendarEvent CalendarEvent[]
-
-  // Analytics fields
-  timeTracking       TimeTracking[]
-  projectPerformance ProjectPerformance[]
-  projectAllocation  ProjectAllocation[]
-
-  startDate DateTime
-  endDate   DateTime
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-}
-
-model PortalView {
-  id        String   @id @default(cuid())
-  project   Project  @relation(fields: [projectId], references: [id])
-  projectId String
-  name      String
-  viewedAt  DateTime @default(now())
-  ipAddress String?
-}
-
 enum ProjectType {
-  BRANDING // Logo design, brand identity, style guides
-  PHOTOGRAPHY // Photo shoots, image editing, photo collections
-  ILLUSTRATION // Custom illustrations, art commissions
-  WEB_DESIGN // Websites, landing pages, digital experiences
-  VIDEO // Video production, editing, animation
-  SOCIAL_MEDIA // Content creation, campaign management
-  PRINT // Physical materials, packaging, editorial
-  EXHIBITION // Art shows, installations, gallery work
-  CAMPAIGN // Multi-channel creative campaigns
-  COLLABORATION // Joint creative projects
-  OTHER // Other project types
+  BRANDING
+  PHOTOGRAPHY
+  ILLUSTRATION
+  WEB_DESIGN
+  VIDEO
+  SOCIAL_MEDIA
+  PRINT
+  EXHIBITION
+  CAMPAIGN
+  COLLABORATION
+  OTHER
 }
 
 enum PaymentSchedule {
@@ -151,27 +554,6 @@ enum PaymentMethod {
   OTHER
 }
 
-model Checkpoint {
-  id          String           @id @default(uuid())
-  project     Project          @relation(fields: [projectId], references: [id])
-  projectId   String
-  order       Int              @default(autoincrement())
-  type        CheckpointType
-  name        String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  status      CheckpointStatus @default(PENDING)
-  invoice     Invoice[]
-  messages    ProjectMessage[]
-
-  // Calendar fields
-  calendarEvent CalendarEvent[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 enum CheckpointType {
   PREPARATION
   DESIGN
@@ -185,7 +567,7 @@ enum CheckpointStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
-  BLOCKED // TODO : Is this needed?
+  BLOCKED
   PAUSED
 }
 
@@ -199,157 +581,11 @@ enum ProjectStatus {
   DELETED
 }
 
-model ProjectMessage {
-  id            String                     @id @default(uuid())
-  project       Project                    @relation(fields: [projectId], references: [id])
-  projectId     String
-  checkpoint    Checkpoint?                @relation(fields: [checkpointId], references: [id])
-  checkpointId  String?
-  sender        String?
-  text          String
-  attachments   ProjectMessageAttachment[]
-  createdAt     DateTime                   @default(now())
-  messageRead   MessageRead[] // TODO : implement later
-
-  // Response tracking fields
-  responseToMessage   ProjectMessage?  @relation("MessageResponses", fields: [responseToMessageId], references: [id], onDelete: SetNull)
-  responseToMessageId String?
-  responses           ProjectMessage[] @relation("MessageResponses")
-}
-
-model ProjectParticipant {
-  id           String          @id @default(uuid())
-  project      Project         @relation(fields: [projectId], references: [id])
-  projectId    String
-  role         ParticipantRole @default(VIEWER)
-  isActive     Boolean         @default(true)
-  email        String
-  messageReads MessageRead[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([projectId, email])
-}
-
 enum ParticipantRole {
   OWNER
   ADMIN
   EDITOR
   VIEWER
-}
-
-model MessageRead {
-  id        String             @id @default(uuid())
-  message   ProjectMessage     @relation(fields: [messageId], references: [id])
-  messageId String
-  readBy    ProjectParticipant @relation(fields: [readById], references: [id])
-  readById  String
-  readAt    DateTime           @default(now())
-
-  @@unique([messageId, readById])
-}
-
-model ProjectAttachment {
-  id          String   @id @default(uuid())
-  project     Project  @relation(fields: [projectId], references: [id])
-  projectId   String
-  blobUrl     String
-  pathname    String
-  contentType String
-  createdAt   DateTime @default(now())
-}
-
-model ProjectMessageAttachment {
-  id          String         @id @default(uuid())
-  message     ProjectMessage @relation(fields: [messageId], references: [id])
-  messageId   String
-  blobUrl     String
-  pathname    String
-  contentType String
-  createdAt   DateTime       @default(now())
-}
-
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-
-// Client Models ============================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-
-model Client {
-  id         String    @id @default(uuid())
-  user       User      @relation(fields: [userId], references: [id])
-  userId     String
-  name       String
-  email      String
-  phone      String
-  projects   Project[]
-  invoices   Invoice[]
-  isArchived Boolean   @default(false)
-  // paymentMethods PaymentMethod[]
-  // preferredPaymentMethod PaymentMethod?
-
-  // Calendar fields
-  calendarEvent CalendarEvent[]
-
-  // Analytics
-  clientEngagement   ClientEngagement[]
-  clientInteractions ClientInteraction[]
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  @@unique([userId, email])
-}
-
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-
-// Invoice  Models ==========================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-
-model Invoice {
-  id            String         @id @default(uuid())
-  user          User           @relation(fields: [userId], references: [id])
-  userId        String
-  project       Project?       @relation(fields: [projectId], references: [id])
-  projectId     String?
-  client        Client?        @relation(fields: [clientId], references: [id])
-  clientId      String?
-  checkpoint    Checkpoint?    @relation(fields: [checkpointId], references: [id])
-  checkpointId  String?        @unique // Only used for milestone payments
-  invoiceNumber String
-  type          InvoiceType    @default(STANDARD)
-  amount        String?
-  status        InvoiceStatus  @default(SENT)
-  dueDate       DateTime
-  notifyClient  Boolean?       @default(false)
-  payments      Payment[] // Track all payments made against this invoice
-  paymentMethod PaymentMethod? // Do we even need?
-  notes         String?
-
-  // Stripe
-  stripeCheckoutId  String?   @default("")
-  stripeCheckoutUrl String?   @default("")
-  stripePaid        Boolean   @default(false)
-  stripePaidAt      DateTime?
-
-  // Notification fields
-  notificationSent   Boolean   @default(false)
-  notificationSentAt DateTime?
-
-  // Calendar fields
-  calendarEvent CalendarEvent[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([projectId, invoiceNumber])
 }
 
 enum InvoiceType {
@@ -369,26 +605,12 @@ enum InvoiceStatus {
 }
 
 enum PaymentType {
-  DEPOSIT // Initial payment to start project
-  INSTALLMENT // Regular partial payments
-  MILESTONE // Payments tied to project checkpoints... maybe
-  ADDITIONAL // Extra work/changes/bonuses
-  FINAL // Final payment to complete project
+  DEPOSIT
+  INSTALLMENT
+  MILESTONE
+  ADDITIONAL
+  FINAL
   OTHER
-}
-
-model Payment {
-  id            String        @id @default(uuid())
-  invoice       Invoice       @relation(fields: [invoiceId], references: [id])
-  invoiceId     String
-  amount        Decimal       @db.Decimal(10, 2)
-  paymentMethod PaymentMethod
-  status        PaymentStatus @default(PENDING)
-  paidAt        DateTime?
-  notes         String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 enum PaymentStatus {
@@ -399,67 +621,13 @@ enum PaymentStatus {
   REFUNDED
 }
 
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-
-// Calendar Models ==========================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-
-model CalendarEvent {
-  id          String              @id @default(uuid())
-  title       String
-  description String?
-  startDate   DateTime
-  endDate     DateTime?
-  isAllDay    Boolean?            @default(false)
-  type        CalendarEventType
-  status      CalendarEventStatus @default(SCHEDULED)
-  color       String? // For custom event coloring
-
-  project      Project?    @relation(fields: [projectId], references: [id])
-  projectId    String?
-  checkpoint   Checkpoint? @relation(fields: [checkpointId], references: [id])
-  checkpointId String?
-  invoice      Invoice?    @relation(fields: [invoiceId], references: [id])
-  invoiceId    String?
-  user         User        @relation(fields: [userId], references: [id])
-  userId       String
-  client       Client?     @relation(fields: [clientId], references: [id])
-  clientId     String?
-
-  // Reminder settings
-  reminders EventReminder[]
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  @@index([startDate])
-  @@index([userId])
-}
-
-model EventReminder {
-  id                  String        @id @default(uuid())
-  calendarEvent       CalendarEvent @relation(fields: [calendarEventId], references: [id])
-  calendarEventId     String
-  reminderTime        DateTime
-  emailEnabled        Boolean       @default(false)
-  phoneEnabled        Boolean       @default(false)
-  notificationEnabled Boolean       @default(false)
-  sent                Boolean       @default(false)
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-}
-
 enum CalendarEventType {
-  PROJECT_TIMELINE // Overall project duration
-  CHECKPOINT_DEADLINE // Individual checkpoint deadlines
-  INVOICE_DUE // Invoice due dates
-  CLIENT_ANNIVERSARY // Client relationship anniversaries
-  PLATFORM_MILESTONE // Platform usage milestones
-  CUSTOM // For user-created custom events
+  PROJECT_TIMELINE
+  CHECKPOINT_DEADLINE
+  INVOICE_DUE
+  CLIENT_ANNIVERSARY
+  PLATFORM_MILESTONE
+  CUSTOM
 }
 
 enum CalendarEventStatus {
@@ -467,92 +635,6 @@ enum CalendarEventStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
-}
-
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-
-// Subscription Models ======================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-
-model Subscription {
-  id     String             @id @default(uuid())
-  user   User               @relation(fields: [userId], references: [id])
-  userId String             @unique
-  status SubscriptionStatus @default(ACTIVE)
-
-  // Reference to the tier
-  tier   SubscriptionPlan @relation(fields: [tierId], references: [id])
-  tierId String
-
-  currentPeriodStart DateTime
-  currentPeriodEnd   DateTime
-  cancelAtPeriodEnd  Boolean      @default(false)
-  billingCycle       BillingCycle @default(MONTHLY)
-  nextBillingDate    DateTime
-
-  // Payment details
-  // TODO : Make more robust. Need to track payment history, payment method, card/bank details, etc.
-  // paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
-  // paymentMethodId String?
-
-  // For handling failed payments
-  lastPaymentAttempt DateTime?
-  failedPaymentCount Int       @default(0)
-
-  // History
-  subscriptionHistory SubscriptionHistory[]
-
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model SubscriptionPlan {
-  id          String               @id @default(uuid())
-  // TODO : Why 2 names?
-  name        SubscriptionTierName @unique
-  displayName String
-
-  // Pricing
-  monthlyPrice Decimal? @db.Decimal(10, 2)
-  annualPrice  Decimal? @db.Decimal(10, 2)
-  currency     String   @default("USD")
-
-  // Feature limits
-  projectLimit    Int?
-  storageLimit    Int? // in MB
-  clientLimit     Int?
-  teamMemberLimit Int? // Studio feature
-
-  // Additional features
-  features PlanFeature[]
-
-  // Subscriptions using this plan
-  subscriptions Subscription[]
-
-  // For tracking historical subscriptions
-  // TODO : This doesn't make sense to me to have this here and in Subscription model. However I do want a reference to the plan in the history model.
-  subscriptionHistory SubscriptionHistory[] // Why would I have this here if it's already in the Subscription model?
-
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model PlanFeature {
-  id                 String           @id @default(uuid())
-  name               String
-  description        String?
-  subscriptionPlan   SubscriptionPlan @relation(fields: [subscriptionPlanId], references: [id])
-  subscriptionPlanId String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([subscriptionPlanId, name])
 }
 
 enum SubscriptionStatus {
@@ -574,226 +656,6 @@ enum SubscriptionTierName {
 enum BillingCycle {
   MONTHLY
   ANNUALLY
-}
-
-model SubscriptionHistory {
-  id             String       @id @default(uuid())
-  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
-  subscriptionId String
-
-  // Reference to the plan at that time
-  plan   SubscriptionPlan @relation(fields: [planId], references: [id])
-  planId String
-
-  status    SubscriptionStatus
-  startDate DateTime
-  endDate   DateTime?
-  createdAt DateTime           @default(now())
-}
-
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-
-// Analytics Models =========================================================================================================================================================
-// ==========================================================================================================================================================================
-// ==========================================================================================================================================================================
-model Analytics {
-  id     String @id @default(uuid())
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
-
-  // User activity metrics
-  loginCount Int       @default(0)
-  lastLogin  DateTime?
-
-  // Project metrics
-  projectsCreated   Int @default(0)
-  projectsCompleted Int @default(0) // TODO : Do I want this?
-
-  // Revenue metrics
-  totalRevenue   Decimal          @default(0) @db.Decimal(10, 2)
-  monthlyRevenue MonthlyRevenue[]
-
-  // Client metrics
-  activeClients    Int                @default(0)
-  clientEngagement ClientEngagement[]
-
-  // Message metrics
-  responseRate    Decimal? @db.Decimal(5, 2) // percentage
-  avgResponseTime Int? // in minutes
-
-  // Time tracking metrics
-  timeTracking TimeTracking[]
-
-  // Communication analytics
-  communicationAnalytics CommunicationAnalytics?
-
-  // Performance metrics
-  performanceMetrics PerformanceMetrics?
-
-  // Workload distribution
-  workloadDistribution WorkloadDistribution[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model MonthlyRevenue {
-  id          String    @id @default(uuid())
-  analytics   Analytics @relation(fields: [analyticsId], references: [id])
-  analyticsId String
-  month       DateTime // Store the first day of each month
-  amount      Decimal   @db.Decimal(10, 2)
-  growth      Decimal?  @db.Decimal(5, 2) // percentage growth from previous month
-
-  createdAt DateTime @default(now())
-
-  @@unique([analyticsId, month])
-}
-
-model ClientEngagement {
-  id            String    @id @default(uuid())
-  analytics     Analytics @relation(fields: [analyticsId], references: [id])
-  analyticsId   String
-  client        Client    @relation(fields: [clientId], references: [id])
-  clientId      String
-  lastContact   DateTime
-  messageCount  Int       @default(0)
-  clientRevenue Decimal   @default(0) @db.Decimal(10, 2)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([analyticsId, clientId])
-}
-
-model UserActivity {
-  id        String     @id @default(uuid())
-  user      User       @relation(fields: [userId], references: [id])
-  userId    String
-  action    ActionType
-  resource  String? // ID of related resource (project, client, invoice)
-  timestamp DateTime   @default(now())
-
-  @@index([userId, timestamp])
-}
-
-model TimeTracking {
-  id          String    @id @default(uuid())
-  analytics   Analytics @relation(fields: [analyticsId], references: [id])
-  analyticsId String
-  project     Project   @relation(fields: [projectId], references: [id])
-  projectId   String
-  startTime   DateTime
-  endTime     DateTime?
-  duration    Int? // Duration in minutes
-  description String?
-  billable    Boolean   @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([analyticsId, projectId])
-  @@index([startTime, endTime])
-}
-
-model CommunicationAnalytics {
-  id                       String              @id @default(uuid())
-  analytics                Analytics           @relation(fields: [analyticsId], references: [id])
-  analyticsId              String              @unique
-  avgResponseTime          Int? // Average response time in minutes
-  previousAvgResponseTime  Int? // Previous average response time for tracking changes
-  messagesSent             Int                 @default(0)
-  messagesReceived         Int                 @default(0)
-  totalResponseTimeMinutes Int                 @default(0) // Total minutes for calculating average
-  responseCount            Int                 @default(0) // Number of responses for calculating average
-  clientInteractions       ClientInteraction[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model ClientInteraction {
-  id                       String                 @id @default(uuid())
-  communicationAnalytics   CommunicationAnalytics @relation(fields: [communicationAnalyticsId], references: [id])
-  communicationAnalyticsId String
-  client                   Client                 @relation(fields: [clientId], references: [id])
-  clientId                 String
-  lastInteraction          DateTime
-  sentimentScore           Decimal?               @db.Decimal(3, 2) // -1.0 to 1.0 scale
-  interactionCount         Int                    @default(0)
-  averageResponseTime      Int? // In minutes
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([communicationAnalyticsId, clientId])
-}
-
-model PerformanceMetrics {
-  id                    String               @id @default(uuid())
-  analytics             Analytics            @relation(fields: [analyticsId], references: [id])
-  analyticsId           String               @unique
-  projectProfitability  Decimal              @default(0) @db.Decimal(10, 2) // Average profit margin
-  clientAcquisitionCost Decimal              @default(0) @db.Decimal(10, 2)
-  clientLifetimeValue   Decimal              @default(0) @db.Decimal(10, 2)
-  projectCompletionRate Decimal              @default(0) @db.Decimal(5, 2) // Percentage
-  onTimeDeliveryRate    Decimal              @default(0) @db.Decimal(5, 2) // Percentage
-  projectDetails        ProjectPerformance[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model ProjectPerformance {
-  id                   String             @id @default(uuid())
-  performanceMetrics   PerformanceMetrics @relation(fields: [performanceMetricsId], references: [id])
-  performanceMetricsId String
-  project              Project            @relation(fields: [projectId], references: [id])
-  projectId            String
-  estimatedHours       Int
-  actualHours          Int
-  estimatedCost        Decimal            @db.Decimal(10, 2)
-  actualCost           Decimal            @db.Decimal(10, 2)
-  revenue              Decimal            @db.Decimal(10, 2)
-  profitMargin         Decimal            @db.Decimal(5, 2) // Percentage
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([performanceMetricsId, projectId])
-}
-
-model WorkloadDistribution {
-  id                String              @id @default(uuid())
-  analytics         Analytics           @relation(fields: [analyticsId], references: [id])
-  analyticsId       String
-  date              DateTime // Date for this workload snapshot
-  totalHours        Decimal             @default(0) @db.Decimal(5, 2)
-  billableHours     Decimal             @default(0) @db.Decimal(5, 2)
-  nonBillableHours  Decimal             @default(0) @db.Decimal(5, 2)
-  projectAllocation ProjectAllocation[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([analyticsId, date])
-}
-
-model ProjectAllocation {
-  id                     String               @id @default(uuid())
-  workloadDistribution   WorkloadDistribution @relation(fields: [workloadDistributionId], references: [id])
-  workloadDistributionId String
-  project                Project              @relation(fields: [projectId], references: [id])
-  projectId              String
-  hoursAllocated         Decimal              @default(0) @db.Decimal(5, 2)
-  percentageOfTotal      Decimal              @default(0) @db.Decimal(5, 2) // Percentage of total workload
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([workloadDistributionId, projectId])
 }
 
 enum ActionType {
@@ -818,18 +680,6 @@ enum ActionType {
   CREATE_EVENT
   UPDATE_EVENT
   DELETE_EVENT
-}
-
-model PageView {
-  id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String
-  page       Pages
-  resourceId String? // ID of viewed resource
-  duration   Int? // Time spent on page in seconds
-  timestamp  DateTime @default(now())
-
-  @@index([userId, timestamp])
 }
 
 enum Pages {

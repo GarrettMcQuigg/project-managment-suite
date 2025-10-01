@@ -17,7 +17,11 @@ export async function getProjectList(): Promise<ProjectWithMetadata[] | null> {
         invoices: true,
         user: true,
         attachments: true,
-        messages: true,
+        messages: {
+          include: {
+            attachments: true
+          }
+        },
         portalViews: true,
         calendarEvent: true
       },

@@ -9,6 +9,7 @@ import { API_AUTH_PORTAL_ROUTE, routeWithParam, PROJECT_PORTAL_ROUTE, AUTH_SIGNI
 import ProjectOverview from './_src/project-overview';
 import PortalClientInfo from './_src/portal-client-info';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
+import { getProjectWithMetadataById } from '@/packages/lib/helpers/get-project-by-id';
 
 export default async function ProjectPortalPage({ params, searchParams }: { params: Promise<{ id: string; portalSlug: string }>; searchParams: Promise<{ preview?: string }> }) {
   const resolvedParams = await params;
@@ -21,23 +22,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
 
   const isPreviewMode = resolvedSearchParams.preview === 'true';
 
-  const project = (await db.project.findUnique({
-    where: {
-      id: resolvedParams.id,
-      portalSlug: resolvedParams.portalSlug,
-      portalEnabled: true
-    },
-    include: {
-      client: true,
-      checkpoints: true,
-      invoices: true,
-      user: true,
-      attachments: true,
-      messages: true,
-      portalViews: true,
-      calendarEvent: true
-    }
-  })) as ProjectWithMetadata;
+  const project: ProjectWithMetadata | null = await getProjectWithMetadataById(resolvedParams.id);
 
   if (!project) {
     redirect(AUTH_SIGNIN_ROUTE);

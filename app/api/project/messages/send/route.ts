@@ -144,7 +144,7 @@ export async function POST(request: Request) {
           const filePath = `project-messages/${projectId}/message-${newMessage.id}-${file.name}`;
           const fileBuffer = await file.arrayBuffer();
 
-          const { data, error: storageError } = await supabase.storage.from('blob-storage').upload(filePath, fileBuffer, {
+          const { error: storageError } = await supabase.storage.from('blob-storage').upload(filePath, fileBuffer, {
             contentType: file.type,
             upsert: false
           });

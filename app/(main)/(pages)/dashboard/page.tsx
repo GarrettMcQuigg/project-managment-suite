@@ -72,7 +72,7 @@ export default async function Dashboard() {
       <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
 
       {/* Stripe Connection Card - shows if not verified */}
-      <StripeConnectionCard stripeAccountStatus={currentUser.stripeAccountStatus} />
+      {/* <StripeConnectionCard stripeAccountStatus={currentUser.stripeAccountStatus} /> */}
 
       <div className="sm:flex sm:space-y-0 space-y-8 gap-8">
         <span className="md:block hidden w-full">

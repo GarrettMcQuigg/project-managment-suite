@@ -181,7 +181,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
   };
 
   const dialogTitle = getDialogTitle();
-  const isFormDisabled = stripeAccount.status !== 'VERIFIED' && !isEditMode;
+  const isFormDisabled = false; // Removed Stripe verification requirement
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
@@ -193,7 +193,9 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
           <div className="flex items-center justify-center p-8">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
-        ) : stripeAccount.status !== 'VERIFIED' ? (
+        ) : null}
+        {/* Stripe connection card - temporarily disabled */}
+        {/* {stripeAccount.status !== 'VERIFIED' ? (
           <Card className="p-4 bg-yellow-50 border-yellow-200 mb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -228,7 +230,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
               </Button>
             </div>
           </Card>
-        ) : null}
+        ) : null} */}
         {currentStep === 'invoice' && (
           <form onSubmit={handleNextStep} className="space-y-4">
             <div>
@@ -311,17 +313,16 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
             <div className="flex flex-col">
               <Label htmlFor="notifyClient">Notify Client</Label>
               <div
-                className={`flex items-center ${isFormDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                onClick={() => !isFormDisabled && setFormData((prev) => ({ ...prev, notifyClient: !prev.notifyClient }))}
+                className="flex items-center cursor-pointer"
+                onClick={() => setFormData((prev) => ({ ...prev, notifyClient: !prev.notifyClient }))}
               >
                 <input
                   id="notifyClient"
                   name="notifyClient"
                   type="checkbox"
-                  className={`${isFormDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                  className="cursor-pointer"
                   checked={formData.notifyClient || false}
                   onChange={(e) => setFormData((prev) => ({ ...prev, notifyClient: e.target.checked }))}
-                  disabled={isFormDisabled}
                 />
                 <span className="ml-2 text-sm text-muted-foreground">Send email notification when invoice is created</span>
               </div>
@@ -330,7 +331,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
               <Button type="button" variant="ghost" onClick={onCancel}>
                 Cancel
               </Button>
-              <Button type="submit" variant="ghost" disabled={!isEditMode && (isLoadingNumber || isFormDisabled)}>
+              <Button type="submit" variant="ghost" disabled={!isEditMode && isLoadingNumber}>
                 {isEditMode ? 'Save Changes' : 'Next'}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>

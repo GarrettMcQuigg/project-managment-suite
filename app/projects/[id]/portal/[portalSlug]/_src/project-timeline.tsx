@@ -374,9 +374,9 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
   };
 
   return (
-    <div className="h-full flex flex-col space-y-4 p-4">
+    <div className="h-full flex flex-col space-y-4 sm:p-4">
       {/* Header */}
-      <div className="space-y-3">
+      <div className="space-y-3 p-2 sm:px-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-indigo-500/80 rounded-xl flex items-center justify-center shadow-lg">
@@ -437,7 +437,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
       </div>
 
       {/* Timeline */}
-      <div className="flex-1 px-1 max-h-[800px] overflow-y-auto overscroll-contain">
+      <div className="flex-1 px-1 max-h-[550px] overflow-y-auto overscroll-contain">
         <div className="space-y-6 mt-4 pb-4">
           {project.checkpoints
             .sort((a, b) => a.order - b.order)
@@ -494,7 +494,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                             ${isCurrentTask ? 'text-foreground' : isCompleted ? 'text-muted-foreground' : 'text-foreground'}
                           `}
                           >
-                            {checkpoint.name}
+                            {checkpoint.name ? checkpoint.name : `Checkpoint ${index + 1}`}
                           </h3>
                           {isCurrentTask && (
                             <div className="flex items-center gap-1 text-sm text-primary font-medium mt-1">
@@ -622,9 +622,11 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                           <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleDiscussionCollapse(checkpoint.id)}>
                             <div className="flex items-center gap-2">
                               <MessageCircle className="h-4 w-4 text-primary" />
-                              <span className="font-medium text-sm">Checkpoint Discussion</span>
+                              <span className="font-medium text-sm">
+                                <span className="hidden sm:inline">Checkpoint</span> Discussion
+                              </span>
                               {messages.length > 0 && (
-                                <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                                <span className="sm:block hidden text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                                   {messages.length} message{messages.length !== 1 ? 's' : ''}
                                 </span>
                               )}
@@ -719,7 +721,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                             {/* File preview for checkpoint */}
                             {(checkpointFiles[checkpoint.id] || []).length > 0 && (
                               <div className="space-y-3">
-                                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                                <div className="flex items-center text-sm text-muted-foreground">
                                   <ImageIcon className="h-4 w-4 text-primary" />
                                   <span className="font-medium">
                                     {(checkpointFiles[checkpoint.id] || []).length} file{(checkpointFiles[checkpoint.id] || []).length > 1 ? 's' : ''} ready to send
@@ -762,7 +764,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
 
                             {/* Message Input */}
                             <div className="space-y-3 mt-2">
-                              <form onSubmit={(e) => handleSubmitCheckpointMessage(checkpoint.id, e)} className="flex items-center space-x-2">
+                              <form onSubmit={(e) => handleSubmitCheckpointMessage(checkpoint.id, e)} className="flex items-center sm:space-x-2">
                                 <input
                                   type="file"
                                   ref={(el) => {
@@ -777,9 +779,9 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                                 <button
                                   type="button"
                                   onClick={() => fileInputRefs.current[checkpoint.id]?.click()}
-                                  className="flex-shrink-0 p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
+                                  className="flex-shrink-0 sm:px-2 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
                                 >
-                                  <Paperclip className="h-5 w-5" />
+                                  <Paperclip className="sm:h-5 sm:w-5 h-4 w-4 mr-2 sm:mr-0" />
                                 </button>
 
                                 <input
@@ -787,7 +789,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                                   value={newMessages[checkpoint.id] || ''}
                                   onChange={(e) => setNewMessages((prev) => ({ ...prev, [checkpoint.id]: e.target.value }))}
                                   placeholder="Add a message about this checkpoint..."
-                                  className="flex-1 px-3 py-2 rounded-lg border border-input focus:border-ring focus:outline-none bg-background text-foreground placeholder-muted-foreground text-sm"
+                                  className="flex-1 sm:w-full w-1/2 px-3 py-2 sm:mr-0 mr-2 rounded-lg border border-input focus:border-ring focus:outline-none bg-background text-foreground placeholder-muted-foreground text-sm"
                                   disabled={sendingMessages[checkpoint.id]}
                                 />
 
@@ -797,9 +799,9 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                                   className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 >
                                   {sendingMessages[checkpoint.id] ? (
-                                    <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    <div className="sm:w-5 sm:h-5 w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                                   ) : (
-                                    <Send className="h-5 w-5" />
+                                    <Send className="sm:h-5 sm:w-5 h-4 w-4" />
                                   )}
                                 </button>
                               </form>

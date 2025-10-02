@@ -38,7 +38,7 @@ export default function PortalHeader({ projectStatus, isOwner }: PortalHeaderPro
   // const viewText = isOwner ? (previewMode ? 'Client View Preview' : 'Owner View') : 'Client Portal';
 
   return (
-    <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
+    <header className="z-50">
       <div className="container mx-auto py-4 lg:px-12 px-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">

@@ -75,26 +75,26 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
       <div className="min-h-screen">
         <PortalHeader projectStatus={project.status} isOwner={isOwner} />
 
-        <main className="container mx-auto py-6 lg:px-12 px-4 mb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[400px] max-h-[1600px]">
-            <div className="lg:col-span-8 border border-border lg:rounded-tl-md lg:rounded-bl-md shadow-md flex flex-col">
+        <main className="container mx-auto py-2 lg:px-12 px-4 mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 max-h-full">
+            <div className="lg:col-span-8 border border-border lg:rounded-tl-md lg:rounded-bl-md shadow-md flex flex-col h-full">
               <div className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-border p-4 flex-shrink-0">
                 <ProjectOverview project={project} />
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 overflow-hidden">
                 <ProjectTimeline projectId={resolvedParams.id} isOwner={isOwner} />
               </div>
             </div>
 
-            <div className="lg:col-span-4 flex flex-col">
+            <div className="lg:col-span-4 flex flex-col h-full">
               {isOwner && !isPreviewMode && (
                 <div className="border-b border-border flex-shrink-0">
                   <PortalClientInfo client={project.client} />
                 </div>
               )}
 
-              <div className="flex-1 max-h-min border border-border lg:rounded-br-md shadow-lg overflow-hidden">
+              <div className="flex-1 border border-border lg:rounded-br-md shadow-lg overflow-hidden">
                 <ProjectMessaging project={project} isOwner={isOwner} context={context as PortalContext} />
               </div>
             </div>

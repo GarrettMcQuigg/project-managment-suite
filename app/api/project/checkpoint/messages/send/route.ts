@@ -2,7 +2,7 @@ import { handleBadRequest, handleError, handleNotFound, handleSuccess, handleUna
 import { PortalVisitor } from '@/packages/lib/helpers/get-portal-user';
 import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
-import { put } from '@vercel/blob';
+import { createAdminClient } from '@/packages/lib/utils/supabase/client';
 import { UpdateMessageMetrics } from '@/packages/lib/helpers/analytics/messages/message-metrics';
 import { TrackMessageSent, TrackMessageReceived } from '@/packages/lib/helpers/analytics/communication';
 import { User } from '@prisma/client';
@@ -142,45 +142,49 @@ export async function POST(request: Request) {
       return handleBadRequest({ message: 'Failed to create checkpoint message' });
     }
 
-    let attachments: { id: string; fileName: string; fileUrl: string; fileType: string }[] = [];
-
     if (attachmentFiles.length > 0) {
+      const supabase = await createAdminClient();
+
       const attachmentPromises = attachmentFiles.map(async (file) => {
         try {
-          const blobPath = `project-checkpoint-messages/${projectId}/checkpoint-${checkpointId}/message-${newMessage.id}-${file.name}`;
-          const blob = await put(blobPath, file, { access: 'public' });
+          const filePath = `project-checkpoint-messages/${projectId}/checkpoint-${checkpointId}/message-${newMessage.id}-${file.name}`;
+          const fileBuffer = await file.arrayBuffer();
 
-          const attachment = await db.projectMessageAttachment.create({
+          const { error: storageError } = await supabase.storage.from('blob-storage').upload(filePath, fileBuffer, {
+            contentType: file.type,
+            upsert: false
+          });
+
+          if (storageError) {
+            throw storageError;
+          }
+
+          // Generate a signed URL valid for 90 days
+          const { data: signedUrlData, error: signedUrlError } = await supabase.storage.from('blob-storage').createSignedUrl(filePath, 7776000); // 90 days in seconds
+
+          if (signedUrlError) {
+            throw signedUrlError;
+          }
+
+          return db.projectMessageAttachment.create({
             data: {
               messageId: newMessage.id,
-              blobUrl: blob.url,
-              pathname: blob.pathname,
+              blobUrl: signedUrlData.signedUrl,
+              pathname: filePath,
               contentType: file.type
             }
           });
-
-          return {
-            id: attachment.id,
-            fileName: file.name,
-            fileUrl: blob.url,
-            fileType: file.type
-          };
         } catch (error) {
           console.error('Error processing attachment:', error);
           return null;
         }
       });
 
-      const attachmentResults = await Promise.all(attachmentPromises);
-      attachments = attachmentResults.filter((attachment) => attachment !== null);
+      await Promise.all(attachmentPromises);
     }
 
     return handleSuccess({
-      message: 'Checkpoint message sent successfully',
-      content: {
-        id: newMessage.id,
-        attachments: attachments
-      }
+      message: 'Checkpoint message sent successfully'
     });
   } catch (error) {
     return handleError({ message: 'Failed to send checkpoint message', err: error });

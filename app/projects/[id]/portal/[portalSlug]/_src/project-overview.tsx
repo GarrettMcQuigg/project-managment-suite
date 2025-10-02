@@ -12,16 +12,16 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
   // const isPastDue = daysRemaining < 0;
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
       {/* Project Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-4 mb-2">
-          <h1 className="text-lg sm:text-2xl font-bold text-card-foreground leading-tight">{project.name}</h1>
+      <div className="w-full flex justify-between">
+        <div className="flex flex-col">
+          <h1 className="text-lg sm:text-2xl font-bold text-card-foreground leading-tight mb-2">{project.name}</h1>
+          <div className="text-muted-foreground text-xs sm:text-sm leading-relaxed">{project.description}</div>
         </div>
-        <div className="text-muted-foreground text-xs sm:text-sm leading-relaxed mb-3">{project.description}</div>
 
         {/* Quick Stats */}
-        <div className="flex flex-wrap items-center gap-6 text-sm">
+        <div className="flex flex-col gap-6 text-sm">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-primary" />
             <span className="text-muted-foreground">
@@ -34,10 +34,10 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
               {completedCheckpoints} of {totalCheckpoints} checkpoints
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-primary" />
             <span className="text-muted-foreground">{progressPercentage}% complete</span>
-          </div>
+          </div> */}
         </div>
       </div>
 

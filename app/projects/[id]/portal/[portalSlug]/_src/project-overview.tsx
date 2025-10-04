@@ -1,12 +1,12 @@
 import React from 'react';
-import { Calendar, Target, CheckCircle } from 'lucide-react';
+import { Calendar, Target } from 'lucide-react';
 import { format } from 'date-fns';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 
 export default function ProjectOverview({ project }: { project: ProjectWithMetadata }) {
   const completedCheckpoints = project.checkpoints.filter((c) => c.status === 'COMPLETED').length;
   const totalCheckpoints = project.checkpoints.length;
-  const progressPercentage = Math.round((completedCheckpoints / totalCheckpoints) * 100);
+  // const progressPercentage = Math.round((completedCheckpoints / totalCheckpoints) * 100);
 
   // const daysRemaining = Math.ceil((new Date(project.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   // const isPastDue = daysRemaining < 0;

@@ -8,11 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/packages/lib/components/button';
 import { Textarea } from '@/packages/lib/components/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/packages/lib/components/dialog';
-import { Card } from '@/packages/lib/components/card';
 import { InvoiceStatus, InvoiceType } from '@prisma/client';
 import { fetchUniqueInvoiceNumber, generateTemporaryInvoiceNumber } from '@/packages/lib/helpers/generate-invoice-number';
 import { useStripeAccount } from '@/packages/lib/hooks/use-stripe-account';
-import { Loader2, Link2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/packages/lib/components/form';
 import { ClientFormValues } from '../../../clients/[id]/_src/types';
@@ -53,7 +52,7 @@ const defaultInvoice: FormDataWithStringAmount = {
 
 export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceFormProps) {
   const isEditMode = !!invoice;
-  const { stripeAccount, isLoading, connectStripeAccount, refetch } = useStripeAccount();
+  const { isLoading, refetch } = useStripeAccount();
   const [currentStep, setCurrentStep] = useState<'invoice' | 'client'>('invoice');
   const [formData, setFormData] = useState<FormDataWithStringAmount>({
     invoiceNumber: '',
@@ -77,7 +76,6 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
       }
     }
   });
-
 
   useEffect(() => {
     if (isOpen) {
@@ -312,10 +310,7 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
             </div>
             <div className="flex flex-col">
               <Label htmlFor="notifyClient">Notify Client</Label>
-              <div
-                className="flex items-center cursor-pointer"
-                onClick={() => setFormData((prev) => ({ ...prev, notifyClient: !prev.notifyClient }))}
-              >
+              <div className="flex items-center cursor-pointer" onClick={() => setFormData((prev) => ({ ...prev, notifyClient: !prev.notifyClient }))}>
                 <input
                   id="notifyClient"
                   name="notifyClient"

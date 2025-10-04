@@ -1,6 +1,5 @@
-// InvoiceStep.tsx
 import React, { useState, useEffect } from 'react';
-import { Trash2, Pencil, CalendarIcon, Link2 } from 'lucide-react';
+import { Trash2, Pencil, CalendarIcon } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
 import { Input } from '@/packages/lib/components/input';
 import { FormLabel } from '@/packages/lib/components/form';
@@ -12,9 +11,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/packages/lib/componen
 import { Calendar } from '@/packages/lib/components/calendar';
 import { fetchUniqueInvoiceNumber, generateTemporaryInvoiceNumber } from '@/packages/lib/helpers/generate-invoice-number';
 import { API_STRIPE_STATUS_ROUTE } from '@/packages/lib/routes';
-import { useStripeAccount } from '@/packages/lib/hooks/use-stripe-account';
-import { StripeAccountStatus } from '@prisma/client';
-import { Loader2 } from 'lucide-react';
+// import { useStripeAccount } from '@/packages/lib/hooks/use-stripe-account';
+// import { StripeAccountStatus } from '@prisma/client';
 
 type NewInvoice = {
   id: string;
@@ -85,9 +83,9 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
   const [activeInvoice, setActiveInvoice] = useState<NewInvoice>(createEmptyInvoice());
   const [isGeneratingNumber, setIsGeneratingNumber] = useState(false);
-  const [stripeStatus, setStripeStatus] = useState<StripeAccountStatus>(StripeAccountStatus.NOT_CONNECTED);
+  // const [stripeStatus, setStripeStatus] = useState<StripeAccountStatus>(StripeAccountStatus.NOT_CONNECTED);
 
-  const { connectStripeAccount, isLoading } = useStripeAccount();
+  // const { connectStripeAccount, isLoading } = useStripeAccount();
 
   function createEmptyInvoice(): NewInvoice {
     return {
@@ -135,8 +133,8 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
         });
 
         if (response.ok) {
-          const data = await response.json();
-          setStripeStatus(data.content.status);
+          // const data = await response.json();
+          // setStripeStatus(data.content.status);
         }
       } catch (error) {
         console.error('Failed to fetch Stripe status:', error);

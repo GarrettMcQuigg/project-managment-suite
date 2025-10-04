@@ -15,13 +15,13 @@ export default function ProjectOverview({ project }: { project: ProjectWithMetad
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
       {/* Project Info */}
       <div className="w-full flex justify-between">
-        <div className="flex flex-col">
-          <h1 className="text-lg sm:text-2xl font-bold text-card-foreground leading-tight mb-2">{project.name}</h1>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-lg sm:text-2xl font-bold text-card-foreground leading-tight">{project.name}</h1>
           <div className="text-muted-foreground text-xs sm:text-sm leading-relaxed">{project.description}</div>
         </div>
 
         {/* Quick Stats */}
-        <div className="flex flex-col gap-6 text-sm">
+        <div className="flex flex-col gap-4 text-sm">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-primary" />
             <span className="text-muted-foreground">

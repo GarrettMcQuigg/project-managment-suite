@@ -72,10 +72,6 @@ export async function POST(request: Request) {
       const hashedPassword = await hash(portalPassword, 10);
       const encryptedPortalPassword = await encrypt(portalPassword);
 
-      console.log('portalPassword', portalPassword);
-      console.log('hashedPassword', hashedPassword);
-      console.log('encryptedPortalPassword', encryptedPortalPassword);
-
       // 2. Create the project
       const projectRecord = await tx.project.create({
         data: {

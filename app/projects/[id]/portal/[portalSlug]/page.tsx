@@ -1,7 +1,6 @@
 import PortalHeader from './_src/portal-header';
 import ProjectTimeline from './_src/project-timeline';
 import ProjectMessaging, { PortalContext } from './_src/project-messaging';
-import { db } from '@/packages/lib/prisma/client';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
@@ -33,13 +32,13 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
   const isOwner = context.type === 'user' && context.user.id === project.userId;
 
   let portalSession = null;
-  let visitorName = 'Portal Visitor';
+  // let visitorName = 'Portal Visitor';
 
   if (sessionCookie?.value) {
     portalSession = await validatePortalSessionForProject(sessionCookie.value, resolvedParams.id);
-    if (portalSession) {
-      visitorName = portalSession.visitorName;
-    }
+    // if (portalSession) {
+    //   visitorName = portalSession.visitorName;
+    // }
   }
 
   const hasPortalAccess = !!portalSession;

@@ -36,7 +36,7 @@ export default async function middleware(request: NextRequest) {
   const portalMatch = pathname.match(/\/projects\/([^\/]+)\/portal\/([^\/]+)/);
   if (portalMatch) {
     const [, projectId, portalSlug] = portalMatch;
-    return handlePortalAccess(request, portalSlug);
+    return handlePortalAccess(request, projectId, portalSlug);
   }
 
   // Verify user is authenticated for all other protected routes

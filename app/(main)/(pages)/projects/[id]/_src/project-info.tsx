@@ -3,7 +3,6 @@
 import { swrFetcher, fetcher } from '@/packages/lib/helpers/fetcher';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_PROJECT_GET_BY_ID_ROUTE, API_PROJECT_UPDATE_ROUTE, PROJECTS_ROUTE } from '@/packages/lib/routes';
-import { Checkpoint } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
@@ -64,32 +63,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
         <ProjectDetails projectId={projectId} onEditClick={() => setIsEditDialogOpen(true)} />
         {project && <ProjectTimeline projectId={project.id} isOwner={true} />}
       </div>
-      {project && (
-        <UnifiedProjectWorkflow
-          open={isEditDialogOpen}
-          onOpenChange={setIsEditDialogOpen}
-          onComplete={handleProjectUpdate}
-          mode="edit"
-          defaultValues={{
-            project: {
-              name: project.name,
-              description: project.description,
-              type: project.type!,
-              status: project.status,
-              startDate: new Date(project.startDate),
-              endDate: new Date(project.endDate),
-              client: {
-                id: project.client?.id || '',
-                name: project.client?.name || '',
-                email: project.client?.email || '',
-                phone: project.client?.phone || ''
-              }
-            },
-            checkpoints: project.checkpoints as Checkpoint[],
-            invoices: project.invoices || []
-          }}
-        />
-      )}
+      {project && <UnifiedProjectWorkflow open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} onComplete={handleProjectUpdate} mode="edit" defaultValues={project} />}
     </>
   );
 }

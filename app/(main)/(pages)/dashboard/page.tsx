@@ -15,7 +15,7 @@ import { statusColors } from './_src/utils/status-colors';
 import { UpcomingDeadlines } from './_src/components';
 import { MissedDeadlines } from './_src/components/missed-deadlines';
 import { RecentInvoices } from './_src/components/recent-invoices';
-import StripeConnectionCard from './_src/components/stripe-connection-card';
+// import StripeConnectionCard from './_src/components/stripe-connection-card';
 import { AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
 
 function getProjectStatusData(projects: ProjectWithMetadata[]) {

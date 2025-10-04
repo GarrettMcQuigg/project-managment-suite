@@ -1,5 +1,5 @@
-import { db } from '../prisma/client';
 import { PortalSession } from '@prisma/client';
+import { db } from '../../prisma/client';
 
 export const PORTAL_SESSION_COOKIE = 'portal_session_id';
 
@@ -61,10 +61,7 @@ export async function validatePortalSession(sessionId: string): Promise<PortalSe
 /**
  * Validates a portal session and checks if it matches the given project
  */
-export async function validatePortalSessionForProject(
-  sessionId: string,
-  projectId: string
-): Promise<PortalSession | null> {
+export async function validatePortalSessionForProject(sessionId: string, projectId: string): Promise<PortalSession | null> {
   if (!sessionId || !projectId) {
     return null;
   }
@@ -128,10 +125,7 @@ export async function getActiveSessionsForProject(projectId: string): Promise<Po
 /**
  * Extends a portal session expiration time
  */
-export async function extendPortalSession(
-  sessionId: string,
-  additionalHours: number = 24
-): Promise<PortalSession | null> {
+export async function extendPortalSession(sessionId: string, additionalHours: number = 24): Promise<PortalSession | null> {
   const session = await db.portalSession.findUnique({
     where: { id: sessionId }
   });

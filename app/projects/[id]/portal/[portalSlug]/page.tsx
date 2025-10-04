@@ -9,7 +9,7 @@ import ProjectOverview from './_src/project-overview';
 import PortalClientInfo from './_src/portal-client-info';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { getProjectForPortalAccess } from '@/packages/lib/helpers/get-project-by-id';
-import { validatePortalSessionForProject, PORTAL_SESSION_COOKIE } from '@/packages/lib/helpers/portal-session';
+import { validatePortalSessionForProject, PORTAL_SESSION_COOKIE } from '@/packages/lib/helpers/portal/portal-session';
 
 export default async function ProjectPortalPage({ params, searchParams }: { params: Promise<{ id: string; portalSlug: string }>; searchParams: Promise<{ preview?: string }> }) {
   const resolvedParams = await params;

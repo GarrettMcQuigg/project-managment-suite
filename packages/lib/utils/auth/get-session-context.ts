@@ -1,6 +1,6 @@
 import { User } from '@prisma/client';
 import { getCurrentUser } from '../../helpers/get-current-user';
-import { getCurrentPortalVisitor, PortalVisitor } from '../../helpers/get-portal-user';
+import { getCurrentPortalVisitor, PortalVisitor } from '../../helpers/portal/get-portal-user';
 
 export async function getSessionContext(): Promise<{ type: 'user'; user: User } | { type: 'portal'; visitor: PortalVisitor } | { type: 'none' }> {
   const user = await getCurrentUser();

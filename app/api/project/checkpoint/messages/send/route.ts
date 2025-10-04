@@ -1,5 +1,5 @@
 import { handleBadRequest, handleError, handleNotFound, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
-import { PortalVisitor } from '@/packages/lib/helpers/get-portal-user';
+import { PortalVisitor } from '@/packages/lib/helpers/portal/get-portal-user';
 import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
 import { createAdminClient } from '@/packages/lib/utils/supabase/client';

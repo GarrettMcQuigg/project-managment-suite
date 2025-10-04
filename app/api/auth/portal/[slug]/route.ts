@@ -5,7 +5,7 @@ import { handleError } from '@/packages/lib/helpers/api-response-handlers';
 import { compare } from 'bcrypt';
 import { TOKEN_COOKIE_KEY } from '@/packages/lib/constants/cookie-keys';
 import { DASHBOARD_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
-import { createPortalSession, PORTAL_SESSION_COOKIE } from '@/packages/lib/helpers/portal-session';
+import { createPortalSession, PORTAL_SESSION_COOKIE } from '@/packages/lib/helpers/portal/portal-session';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;

@@ -3,7 +3,7 @@ import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { AddProjectRequestBody, AddProjectRequestBodySchema } from './types';
 import { hash } from 'bcrypt';
-import { generatePortalSlug, generateSecurePassword } from '@/packages/lib/helpers/project-portals';
+import { generatePortalSlug, generateSecurePassword } from '@/packages/lib/helpers/portal/project-portals';
 import { CalendarEventStatus, CalendarEventType } from '@prisma/client';
 import { encrypt } from '@/packages/lib/utils/encryption';
 import { UpdateProjectMetrics } from '@/packages/lib/helpers/analytics/project/project-metrics';

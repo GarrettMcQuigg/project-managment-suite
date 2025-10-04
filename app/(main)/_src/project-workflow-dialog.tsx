@@ -11,6 +11,7 @@ import ClientStep from './components/client-step';
 import ProjectDetailsStep, { ProjectFormData } from './components/project-step';
 import InvoiceStep from './components/invoice-step';
 import TimelineStep from './components/checkpoint-step';
+import { generateSecurePassword } from '@/packages/lib/helpers/portal/password-generator';
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -36,6 +37,7 @@ const defaultFormValues: ProjectFormData = {
   status: ProjectStatus.PREPARATION,
   startDate: new Date(),
   endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  portalPassword: generateSecurePassword(),
   client: {
     id: '',
     name: '',

@@ -32,6 +32,7 @@ export const AddProjectRequestBodySchema = Joi.object({
     .required(),
   startDate: Joi.date().required(),
   endDate: Joi.date().required(),
+  portalPassword: Joi.string().min(1).required(),
 
   client: Joi.object({
     id: Joi.string().allow('').optional(),
@@ -66,6 +67,7 @@ export type AddProjectRequestBody = {
   status: ProjectStatus;
   startDate: Date;
   endDate: Date;
+  portalPassword: string;
   client: {
     id?: string;
     name?: string;

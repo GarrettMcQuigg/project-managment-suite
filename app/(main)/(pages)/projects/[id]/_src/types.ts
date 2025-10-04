@@ -17,7 +17,14 @@ export const projectFormSchema = z
       .date({
         required_error: 'End date is required'
       })
-      .min(new Date(), 'End date must be in the future')
+      .min(new Date(), 'End date must be in the future'),
+    portalPassword: z.string().min(1, 'Portal password is required'),
+    client: z.object({
+      id: z.string().optional(),
+      name: z.string(),
+      email: z.string(),
+      phone: z.string()
+    })
   })
   .refine((data) => data.endDate > data.startDate, {
     message: 'End date must be after start date',

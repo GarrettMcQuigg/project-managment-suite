@@ -3,7 +3,7 @@ import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { AddProjectRequestBody, AddProjectRequestBodySchema } from './types';
 import { hash } from 'bcrypt';
-import { generatePortalSlug, generateSecurePassword } from '@/packages/lib/helpers/portal/project-portals';
+import { generatePortalSlug } from '@/packages/lib/helpers/portal/password-generator';
 import { CalendarEventStatus, CalendarEventType } from '@prisma/client';
 import { encrypt } from '@/packages/lib/utils/encryption';
 import { UpdateProjectMetrics } from '@/packages/lib/helpers/analytics/project/project-metrics';
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     return handleBadRequest({ message: error.message, err: error });
   }
 
-  const { client, name, description, type, status, startDate, endDate, checkpoints, invoices } = requestBody;
+  const { client, name, description, type, status, startDate, endDate, portalPassword, checkpoints, invoices } = requestBody;
 
   try {
     const result = await db.$transaction(async (tx) => {
@@ -69,9 +69,12 @@ export async function POST(request: Request) {
       }
 
       const portalSlug = generatePortalSlug();
-      const portalPassword = generateSecurePassword();
       const hashedPassword = await hash(portalPassword, 10);
       const encryptedPortalPassword = await encrypt(portalPassword);
+
+      console.log('portalPassword', portalPassword);
+      console.log('hashedPassword', hashedPassword);
+      console.log('encryptedPortalPassword', encryptedPortalPassword);
 
       // 2. Create the project
       const projectRecord = await tx.project.create({

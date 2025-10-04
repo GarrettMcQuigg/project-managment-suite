@@ -1,7 +1,5 @@
 import { cookies } from 'next/headers';
-
-export const PORTAL_SESSION_COOKIE = 'portal_session';
-export const PORTAL_VISITOR_COOKIE = 'portal_visitor';
+import { validatePortalSession, PORTAL_SESSION_COOKIE } from './portal-session';
 
 export interface PortalVisitor {
   id: string;
@@ -11,30 +9,33 @@ export interface PortalVisitor {
   createdAt: Date;
 }
 
+/**
+ * Gets the current portal visitor from the session cookie
+ * Uses the new database-backed session system
+ */
 export async function getCurrentPortalVisitor(): Promise<PortalVisitor | null> {
   try {
     const cookieStore = await cookies();
-    const portalSessionCookie = cookieStore.get(PORTAL_SESSION_COOKIE);
-    const portalVisitorCookie = cookieStore.get(PORTAL_VISITOR_COOKIE);
+    const sessionCookie = cookieStore.get(PORTAL_SESSION_COOKIE);
 
-    if (!portalSessionCookie?.value || !portalVisitorCookie?.value) {
+    if (!sessionCookie?.value) {
       return null;
     }
 
-    try {
-      const portalSession = JSON.parse(portalSessionCookie.value);
-      const portalVisitor = JSON.parse(portalVisitorCookie.value);
+    const session = await validatePortalSession(sessionCookie.value);
 
-      // Garrett TODO : Move 'portal_' to a constant and import it
-      if (!portalSession.authorized || !portalVisitor.id.startsWith('portal_')) {
-        return null;
-      }
-
-      return portalVisitor as PortalVisitor;
-    } catch (error) {
-      console.error('Error parsing portal visitor data:', error);
+    if (!session) {
       return null;
     }
+
+    // Convert session to PortalVisitor format for backwards compatibility
+    return {
+      id: session.id,
+      name: session.visitorName,
+      projectId: session.projectId,
+      portalSlug: '', // We'll need to fetch this if needed
+      createdAt: session.createdAt
+    };
   } catch (err) {
     console.error('Error in getCurrentPortalVisitor:', err);
     return null;

@@ -55,7 +55,8 @@
       "Read(/C:\\Users\\Garrett\\Development\\creatives-crm\\app\\projects\\[id]\\portal\\[portalSlug]\\_src/**)",
       "Read(/C:\\Users\\Garrett\\Development\\creatives-crm\\app\\projects\\[id]\\portal\\[portalSlug]\\_src/**)",
       "Read(//c/Users/Garrett/Development/temp-images/**)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

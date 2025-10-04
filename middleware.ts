@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { TOKEN_COOKIE_KEY, USER_COOKIE_KEY } from '@/packages/lib/constants/cookie-keys';
-import { PORTAL_VISITOR_COOKIE } from './packages/lib/helpers/get-portal-user';
+import { PORTAL_SESSION_COOKIE } from './packages/lib/helpers/portal-session';
 
 export const config = {
   matcher: [
@@ -31,33 +31,24 @@ export const config = {
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check if this is a portal route
+  // Portal route handling
   const portalMatch = pathname.match(/\/projects\/([^\/]+)\/portal\/([^\/]+)/);
-  const isPortalRoute = !!portalMatch;
-
-  // If this is a portal route, handle portal access logic
-  if (isPortalRoute) {
-    const [, projectId, portalSlug] = portalMatch!;
-    return handlePortalAccess(request, projectId, portalSlug);
+  if (portalMatch) {
+    const [, projectId, portalSlug] = portalMatch;
+    return handlePortalAccess(request, portalSlug);
   }
 
-  // For all other protected routes, verify the user is authenticated
+  // Verify user is authenticated for all other protected routes
   const isAuthenticated = isUserAuthenticated(request);
 
   if (!isAuthenticated) {
-    // Check if there's a portal visitor
-    const portalVisitorCookie = request.cookies.get(PORTAL_VISITOR_COOKIE);
-
-    if (portalVisitorCookie) {
-      try {
-        // Portal visitors can't access protected routes, redirect to portal
-        const portalVisitor = JSON.parse(portalVisitorCookie.value);
-        const portalUrl = `/projects/${portalVisitor.projectId}/portal/${portalVisitor.portalSlug}`;
-        return NextResponse.redirect(new URL(portalUrl, request.url));
-      } catch (e) {
-        // If error parsing cookie, redirect to login
-        console.error('Error parsing portal visitor cookie:', e);
-      }
+    // Block portal visitors from accessing non-portal routes
+    const portalSessionCookie = request.cookies.get(PORTAL_SESSION_COOKIE);
+    if (portalSessionCookie) {
+      const errorUrl = new URL('/auth/signin', request.url);
+      errorUrl.searchParams.set('error', 'portal_access_denied');
+      errorUrl.searchParams.set('message', 'Portal access is restricted to your project portal only');
+      return NextResponse.redirect(errorUrl);
     }
 
     // Redirect to signin
@@ -66,33 +57,20 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(signinUrl);
   }
 
-  // User is authenticated, allow access
   return NextResponse.next();
 }
 
-function handlePortalAccess(request: NextRequest, projectId: string, portalSlug: string): NextResponse {
+function handlePortalAccess(request: NextRequest, portalSlug: string): NextResponse {
   const { pathname } = request.nextUrl;
-
-  // Check if user has portal access cookie
-  const portalAccessCookie = request.cookies.get(`portal_access_${portalSlug}`);
-
-  // Check if user is already logged in
+  const portalSessionCookie = request.cookies.get(PORTAL_SESSION_COOKIE);
   const isAuthenticated = isUserAuthenticated(request);
 
-  if (portalAccessCookie) {
-    // User has portal access, let them through
+  // Allow access if portal session exists or user is authenticated
+  if (portalSessionCookie || isAuthenticated) {
     return NextResponse.next();
   }
 
-  // No valid access for portal yet
-
-  if (isAuthenticated) {
-    // User is logged in, they can view the portal if they own the project
-    // The page component will check project ownership
-    return NextResponse.next();
-  }
-
-  // No valid access - redirect to portal auth
+  // Redirect to portal auth
   const authUrl = new URL(`/api/auth/portal/${portalSlug}`, request.url);
   authUrl.searchParams.set('redirect', pathname);
   return NextResponse.redirect(authUrl);
@@ -119,12 +97,12 @@ function isUserAuthenticated(request: NextRequest): boolean {
     }
 
     const payload = JSON.parse(atob(parts[1]));
-    
+
     // Check expiration
     if (payload.exp && payload.exp < Date.now() / 1000) {
       return false;
     }
-    
+
     if (!payload.userId) {
       return false;
     }

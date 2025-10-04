@@ -199,7 +199,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
   // };
 
   return (
-    <div className="flex flex-col h-full max-h-[400px] sm:max-h-[500px] lg:max-h-[720px]">
+    <div className="flex flex-col h-full max-h-[400px] sm:max-h-[500px] lg:max-h-[770px]">
       {/* Header */}
       <div className="border-b border-border px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">

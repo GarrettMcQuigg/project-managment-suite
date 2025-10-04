@@ -5,8 +5,7 @@ import { handleError } from '@/packages/lib/helpers/api-response-handlers';
 import { compare } from 'bcrypt';
 import { TOKEN_COOKIE_KEY } from '@/packages/lib/constants/cookie-keys';
 import { DASHBOARD_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
-import { generateUniquePortalId } from '@/packages/lib/helpers/project-portals';
-import { PORTAL_SESSION_COOKIE, PORTAL_VISITOR_COOKIE } from '@/packages/lib/helpers/get-portal-user';
+import { createPortalSession, PORTAL_SESSION_COOKIE } from '@/packages/lib/helpers/portal-session';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
@@ -361,13 +360,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const slug = resolvedParams.slug;
   const { visitorName, password, redirect } = await request.json();
 
-  // Validate name length
   if (!visitorName || visitorName.length < 3) {
     return handleError({ message: 'Name must be at least 3 characters long' });
   }
 
   try {
-    // Find the project by portal slug
     const project = await db.project.findUnique({
       where: {
         portalSlug: slug,
@@ -389,8 +386,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return handleError({ message: 'Invalid password' });
     }
 
-    // Garrett TODO : This may end up duplicating a portal view record since the page.tsx also writes a record
-    // Record the portal view
     await db.portalView.create({
       data: {
         projectId: project.id,
@@ -398,82 +393,19 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       }
     });
 
-    // Generate unique ID for portal visitor
-    const uniqueId = await generateUniquePortalId();
+    const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined;
+    const userAgent = request.headers.get('user-agent') || undefined;
 
-    // Create portal visitor object
-    const portalVisitor = {
-      id: `portal_${uniqueId}`,
-      name: visitorName,
+    const session = await createPortalSession({
       projectId: project.id,
-      portalSlug: slug,
-      createdAt: new Date()
-    };
+      visitorName,
+      ipAddress,
+      userAgent,
+      expiresInHours: 24
+    });
 
-    // Set the access cookies
     const response = NextResponse.json({ success: true, redirect }, { status: 200 });
-
-    // Check if user is already logged in
-    const tokenCookie = request.cookies.get(TOKEN_COOKIE_KEY);
-    if (tokenCookie) {
-      try {
-        const tokenParts = tokenCookie.value.split('.');
-        if (tokenParts.length === 3) {
-          const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
-
-          if (payload.userId === project.userId) {
-            response.cookies.set('project_owner', 'true', {
-              httpOnly: true,
-              maxAge: 60 * 60 * 24,
-              path: '/',
-              sameSite: 'lax',
-              secure: process.env.NODE_ENV === 'production'
-            });
-          }
-        }
-      } catch (e) {
-        console.error('Error decoding token:', e);
-      }
-    }
-
-    // Set portal session cookie
-    response.cookies.set(
-      PORTAL_SESSION_COOKIE,
-      JSON.stringify({
-        projectId: project.id,
-        slug,
-        authorized: true,
-        timestamp: Date.now()
-      }),
-      {
-        httpOnly: true,
-        maxAge: 60 * 60 * 24, // 24 hours
-        path: '/',
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production'
-      }
-    );
-
-    // Set portal visitor cookie
-    response.cookies.set(PORTAL_VISITOR_COOKIE, JSON.stringify(portalVisitor), {
-      httpOnly: false,
-      maxAge: 60 * 60 * 24, // 24 hours
-      path: '/',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production'
-    });
-
-    // Store the visitor name in a cookie for backwards compatibility
-    response.cookies.set(`portal_name_${slug}`, visitorName, {
-      httpOnly: true,
-      maxAge: 60 * 60 * 24,
-      path: '/',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production'
-    });
-
-    // Set portal access cookie for backwards compatibility
-    response.cookies.set(`portal_access_${slug}`, 'true', {
+    response.cookies.set(PORTAL_SESSION_COOKIE, session.id, {
       httpOnly: true,
       maxAge: 60 * 60 * 24,
       path: '/',

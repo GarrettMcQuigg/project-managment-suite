@@ -9,28 +9,52 @@ import { API_AUTH_PORTAL_ROUTE, routeWithParam, PROJECT_PORTAL_ROUTE, AUTH_SIGNI
 import ProjectOverview from './_src/project-overview';
 import PortalClientInfo from './_src/portal-client-info';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
-import { getProjectWithMetadataById } from '@/packages/lib/helpers/get-project-by-id';
+import { getProjectForPortalAccess } from '@/packages/lib/helpers/get-project-by-id';
+import { validatePortalSessionForProject, PORTAL_SESSION_COOKIE } from '@/packages/lib/helpers/portal-session';
 
 export default async function ProjectPortalPage({ params, searchParams }: { params: Promise<{ id: string; portalSlug: string }>; searchParams: Promise<{ preview?: string }> }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
   const cookieStore = await cookies();
   const context = await getSessionContext();
-  const portalAccessCookie = cookieStore.get(`portal_access_${resolvedParams.portalSlug}`);
-  const portalNameCookie = cookieStore.get(`portal_name_${resolvedParams.portalSlug}`);
-  const visitorName = portalNameCookie?.value || 'Portal Visitor';
+  const sessionCookie = cookieStore.get(PORTAL_SESSION_COOKIE);
 
   const isPreviewMode = resolvedSearchParams.preview === 'true';
-
-  const project: ProjectWithMetadata | null = await getProjectWithMetadataById(resolvedParams.id);
+  const project: ProjectWithMetadata | null = await getProjectForPortalAccess(resolvedParams.id);
 
   if (!project) {
     redirect(AUTH_SIGNIN_ROUTE);
   }
 
-  const hasPortalAccess = !!portalAccessCookie;
+  if (project.portalSlug !== resolvedParams.portalSlug) {
+    redirect(AUTH_SIGNIN_ROUTE);
+  }
 
-  if (context.type === 'none' && !hasPortalAccess) {
+  const isOwner = context.type === 'user' && context.user.id === project.userId;
+
+  let portalSession = null;
+  let visitorName = 'Portal Visitor';
+
+  if (sessionCookie?.value) {
+    portalSession = await validatePortalSessionForProject(sessionCookie.value, resolvedParams.id);
+    if (portalSession) {
+      visitorName = portalSession.visitorName;
+    }
+  }
+
+  const hasPortalAccess = !!portalSession;
+
+  if (isOwner) {
+    // Owner has access
+  } else if (context.type === 'none' && !hasPortalAccess) {
+    const portalAuthRedirect = `${API_AUTH_PORTAL_ROUTE}/${resolvedParams.portalSlug}`;
+    const targetRoute = routeWithParam(PROJECT_PORTAL_ROUTE, {
+      id: resolvedParams.id,
+      portalSlug: resolvedParams.portalSlug
+    });
+
+    redirect(`${portalAuthRedirect}?redirect=${encodeURIComponent(targetRoute)}`);
+  } else if (context.type === 'user' && !hasPortalAccess) {
     const portalAuthRedirect = `${API_AUTH_PORTAL_ROUTE}/${resolvedParams.portalSlug}`;
     const targetRoute = routeWithParam(PROJECT_PORTAL_ROUTE, {
       id: resolvedParams.id,
@@ -40,34 +64,6 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
     redirect(`${portalAuthRedirect}?redirect=${encodeURIComponent(targetRoute)}`);
   }
 
-  if (context.type === 'user' && !hasPortalAccess) {
-    const isOwner = project.userId === context.user.id;
-
-    if (!isOwner) {
-      const portalAuthRedirect = `${API_AUTH_PORTAL_ROUTE}/${resolvedParams.portalSlug}`;
-      const targetRoute = routeWithParam(PROJECT_PORTAL_ROUTE, {
-        id: resolvedParams.id,
-        portalSlug: resolvedParams.portalSlug
-      });
-
-      redirect(`${portalAuthRedirect}?redirect=${encodeURIComponent(targetRoute)}`);
-    }
-  }
-
-  if (hasPortalAccess && (context.type !== 'user' || (context.type === 'user' && context.user.id !== project.userId))) {
-    try {
-      await db.portalView.create({
-        data: {
-          projectId: project.id,
-          name: visitorName
-        }
-      });
-    } catch (error) {
-      console.error('Failed to record portal view:', error);
-    }
-  }
-
-  const isOwner = context.type === 'user' && context.user.id === project.userId;
   const effectiveIsOwner = isOwner && !isPreviewMode;
 
   return (

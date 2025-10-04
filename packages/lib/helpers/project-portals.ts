@@ -49,6 +49,10 @@ export async function generateUniquePortalId(): Promise<string> {
   return formattedToken;
 }
 
+/**
+ * Validates if a user or portal visitor has access to a project
+ * @deprecated Use validatePortalSessionForProject from portal-session.ts instead
+ */
 export async function validateProjectAccess(
   projectId: string,
   portalSlug: string | null,
@@ -69,27 +73,16 @@ export async function validateProjectAccess(
   // Get cookie store
   const cookieJar = cookieStore || (await cookies());
 
-  // Check if the user has portal access for this project
-  const portalAccessCookie = cookieJar.get(`portal_access_${portalSlug}`);
-  const hasPortalAccess = !!portalAccessCookie;
+  // Check for portal session using new session system
+  const { validatePortalSessionForProject, PORTAL_SESSION_COOKIE } = await import('./portal-session');
+  const sessionCookie = cookieJar.get(PORTAL_SESSION_COOKIE);
 
-  if (!hasPortalAccess) {
+  if (!sessionCookie?.value) {
     return false;
   }
 
-  // Check if the portal session is for this specific project
-  const portalSessionCookie = cookieJar.get('portal_session');
-  if (!portalSessionCookie) {
-    return false;
-  }
-
-  try {
-    const portalSession = JSON.parse(portalSessionCookie.value);
-    return portalSession.projectId === projectId && portalSession.slug === portalSlug;
-  } catch (e) {
-    console.error('Error parsing portal session cookie:', e);
-    return false;
-  }
+  const session = await validatePortalSessionForProject(sessionCookie.value, projectId);
+  return !!session;
 }
 
 export async function hasPortalAccess(projectId: string, userId: string | null, portalSlug: string | null): Promise<boolean> {

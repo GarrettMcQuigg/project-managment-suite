@@ -129,7 +129,7 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange, project
         const startDate = nextDay;
         const endDate = new Date(startDate);
         endDate.setDate(endDate.getDate() + 1);
-        
+
         // Check if startDate + 1 day is within project range
         if (endDate <= projectEnd) {
           return { startDate, endDate };
@@ -205,7 +205,7 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange, project
           const startDate = nextDay;
           const endDate = new Date(startDate);
           endDate.setDate(endDate.getDate() + 1);
-          
+
           // Check if startDate + 1 day is within project range
           if (endDate <= projectEnd) {
             return { startDate, endDate };
@@ -282,9 +282,6 @@ export default function TimelineStep({ checkpoints, onCheckpointsChange, project
 
   return (
     <div>
-      <span className="flex justify-center text-xs text-muted-foreground">
-        <i>This is an optional step. You can add checkpoints later.</i>
-      </span>
       <div className="space-y-4">
         <div className="mb-6">
           <h3 className="text-lg font-medium">Project Checkpoints</h3>

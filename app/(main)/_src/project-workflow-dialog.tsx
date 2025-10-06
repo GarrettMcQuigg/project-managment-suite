@@ -191,11 +191,17 @@ export const UnifiedProjectWorkflow: React.FC<UnifiedProjectWorkflowProps> = ({ 
           <form onSubmit={form.handleSubmit(handleNext)} className="space-y-6">
             {steps[currentStep].component}
 
-            <div className="flex justify-between mt-6">
+            <div className="flex justify-between items-center mt-6">
               <Button type="button" variant="ghost" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0 || isSubmitting}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
+
+              {(currentStep === 1 || currentStep === 2) && (
+                <span className="flex justify-center text-xs text-muted-foreground">
+                  <i>This is an optional step. You can add {currentStep === 1 ? 'checkpoints' : 'invoices'} later.</i>
+                </span>
+              )}
 
               <Button
                 type="submit"

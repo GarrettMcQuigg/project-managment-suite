@@ -2,6 +2,7 @@ import { PortalSession } from '@prisma/client';
 import { db } from '../../prisma/client';
 
 export const PORTAL_SESSION_COOKIE = 'portal_session_id';
+export const PORTAL_PROJECT_COOKIE = 'portal_project_id';
 
 /**
  * Creates a new portal session for a visitor

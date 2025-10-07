@@ -15,28 +15,7 @@ import Link from 'next/link';
 
 interface ActiveProjectsWidgetProps {
   projects: ProjectWithMetadata[];
-  statusColors?: Record<ProjectStatus, string>;
 }
-
-const getProjectStatusBadgeClasses = (status: ProjectStatus) => {
-  switch (status) {
-    case ProjectStatus.COMPLETED:
-      return 'bg-green-100 text-white hover:bg-green-200';
-    case ProjectStatus.ACTIVE:
-      return 'bg-violet-100 text-white hover:bg-violet-200';
-    case ProjectStatus.PAUSED:
-      return 'bg-yellow-100 text-black hover:bg-yellow-200';
-    case ProjectStatus.DRAFT:
-      return 'bg-gray-100 text-black hover:bg-gray-200';
-    case ProjectStatus.PREPARATION:
-      return 'bg-gray-100 text-white hover:bg-gray-200';
-    case ProjectStatus.ARCHIVED:
-    case ProjectStatus.DELETED:
-      return 'bg-red-100 text-white hover:bg-red-200';
-    default:
-      return 'bg-gray-100 text-white hover:bg-gray-200';
-  }
-};
 
 const getProjectStatusIcon = (status: ProjectStatus) => {
   switch (status) {
@@ -59,7 +38,7 @@ const getProjectStatusIcon = (status: ProjectStatus) => {
   }
 };
 
-export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsWidgetProps) {
+export function ActiveProjectsWidget({ projects }: ActiveProjectsWidgetProps) {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 3;

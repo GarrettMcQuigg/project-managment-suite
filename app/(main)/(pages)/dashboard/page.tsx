@@ -76,7 +76,7 @@ export default async function Dashboard() {
 
       <div className="sm:flex sm:space-y-0 space-y-8 gap-8">
         <span className="md:block hidden w-full">
-          <ActiveProjectsWidget projects={projects || []} statusColors={statusColors} />
+          <ActiveProjectsWidget projects={projects || []} />
         </span>
         <span className="md:hidden block min-w-[45%]">
           <MobileActiveProjects projects={projects || []} statusColors={statusColors} />

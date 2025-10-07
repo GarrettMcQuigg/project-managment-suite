@@ -22,7 +22,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex items-center justify-center px-4 pt-32 md:pt-24 pb-20 overflow-hidden">
+    <section ref={sectionRef} className="relative min-h-[90vh] flex items-center justify-center px-4 pt-32 md:pt-24 pb-20 overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
         {/* Main gradient mesh */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-primary/20 via-primary/5 to-transparent blur-3xl opacity-60" />
@@ -57,7 +57,7 @@ export function HeroSection() {
         </div>
       ))}
 
-      <div className="container mx-auto max-w-7xl relative z-10 mb-16">
+      <div className="container mx-auto max-w-7xl relative z-10">
         <div className="flex flex-col items-center text-center space-y-12">
           <div className={`max-w-5xl space-y-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             {/* Badge */}

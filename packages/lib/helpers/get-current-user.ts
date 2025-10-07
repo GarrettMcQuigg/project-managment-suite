@@ -32,7 +32,7 @@ export async function getCurrentUser(): Promise<UserWithMetadata | null> {
         subscription: true,
         analytics: {
           include: {
-            communicationAnalytics: true  
+            communicationAnalytics: true
           }
         },
         calendarEvent: true,

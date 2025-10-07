@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/packages/lib/components/card';
 import { Badge } from '@/packages/lib/components/badge';
-import { Archive, CheckCircle, Clock, Paperclip, Pause, Pencil, Trash, Calendar, MessageSquare } from 'lucide-react';
+import { Archive, CheckCircle, Clock, Paperclip, Pause, Pencil, Trash, Calendar, MessageSquare, ExternalLink } from 'lucide-react';
 import { Progress } from '@/packages/lib/components/progress';
 import { Button } from '@/packages/lib/components/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -10,7 +10,8 @@ import { useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { CheckpointStatus, ProjectStatus } from '@prisma/client';
-import { PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import { PROJECT_DETAILS_ROUTE, PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import Link from 'next/link';
 
 interface ActiveProjectsWidgetProps {
   projects: ProjectWithMetadata[];
@@ -22,7 +23,7 @@ const getProjectStatusBadgeClasses = (status: ProjectStatus) => {
     case ProjectStatus.COMPLETED:
       return 'bg-green-100 text-white hover:bg-green-200';
     case ProjectStatus.ACTIVE:
-      return 'bg-blue-100 text-white hover:bg-blue-200';
+      return 'bg-violet-100 text-white hover:bg-violet-200';
     case ProjectStatus.PAUSED:
       return 'bg-yellow-100 text-black hover:bg-yellow-200';
     case ProjectStatus.DRAFT:
@@ -144,11 +145,19 @@ export function ActiveProjectsWidget({ projects, statusColors }: ActiveProjectsW
                         <CardTitle className="text-sm font-semibold p-0">{project.name}</CardTitle>
                         <p className="text-xs text-muted-foreground">{project.client.name}</p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          className={`capitalize ${getProjectStatusBadgeClasses(project.status)} transition-all duration-200`}
-                          style={statusColors ? { backgroundColor: statusColors[project.status] } : {}}
-                        >
+                      <div className="flex items-center gap-8">
+                        {project.portalEnabled && project.portalSlug && (
+                          <Link
+                            href={routeWithParam(PROJECT_PORTAL_ROUTE, { id: project.id, portalSlug: project.portalSlug })}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-block"
+                          >
+                            <Badge className="cursor-pointer flex items-center gap-1">
+                              <ExternalLink className="w-3 h-3" /> <span className="text-xs">Client Portal</span>
+                            </Badge>
+                          </Link>
+                        )}
+                        <Badge variant={project.status === ProjectStatus.ACTIVE ? 'secondary' : 'default'}>
                           {getProjectStatusIcon(project.status)}
                           {project.status.toLowerCase()}
                         </Badge>

@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/packages/lib
 import { InvoiceStatus, InvoiceType } from '@prisma/client';
 import { fetchUniqueInvoiceNumber, generateTemporaryInvoiceNumber } from '@/packages/lib/helpers/generate-invoice-number';
 import { useStripeAccount } from '@/packages/lib/hooks/use-stripe-account';
-import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Loader2, ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/packages/lib/components/form';
 import { ClientFormValues } from '../../../clients/[id]/_src/types';
@@ -77,6 +77,23 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
     }
   });
 
+  const handleGenerateInvoiceNumber = () => {
+    setIsLoadingNumber(true);
+    fetchUniqueInvoiceNumber()
+      .then((uniqueNumber: string) => {
+        setFormData((prev) => ({
+          ...prev,
+          invoiceNumber: uniqueNumber
+        }));
+      })
+      .catch((error: unknown) => {
+        console.error('Error fetching unique invoice number:', error);
+      })
+      .finally(() => {
+        setIsLoadingNumber(false);
+      });
+  };
+
   useEffect(() => {
     if (isOpen) {
       // Automatically fetch Stripe account status when dialog opens
@@ -111,20 +128,8 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
           }
         });
 
-        setIsLoadingNumber(true);
-        fetchUniqueInvoiceNumber()
-          .then((uniqueNumber: string) => {
-            setFormData((prev) => ({
-              ...prev,
-              invoiceNumber: uniqueNumber
-            }));
-          })
-          .catch((error: unknown) => {
-            console.error('Error fetching unique invoice number:', error);
-          })
-          .finally(() => {
-            setIsLoadingNumber(false);
-          });
+        // Auto-generate invoice number for new invoices
+        handleGenerateInvoiceNumber();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,6 +142,8 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
       // Remove any non-numeric characters except decimal point
       const numericValue = value.replace(/[^0-9.]/g, '');
       setFormData((prev) => ({ ...prev, [name]: numericValue }));
+    } else if (name === 'dueDate') {
+      setFormData((prev) => ({ ...prev, [name]: new Date(value) }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -233,15 +240,27 @@ export function InvoiceForm({ invoice, isOpen, onSubmit, onCancel }: InvoiceForm
           <form onSubmit={handleNextStep} className="space-y-4">
             <div>
               <Label htmlFor="invoiceNumber">Invoice Number</Label>
-              <Input
-                id="invoiceNumber"
-                name="invoiceNumber"
-                value={formData.invoiceNumber}
-                onChange={handleChange}
-                disabled={true}
-                placeholder={isLoadingNumber ? 'Generating unique invoice number...' : ''}
-                required
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="invoiceNumber"
+                  name="invoiceNumber"
+                  value={formData.invoiceNumber}
+                  onChange={handleChange}
+                  placeholder="Enter or generate invoice number"
+                  className="flex-1"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGenerateInvoiceNumber}
+                  className="shrink-0"
+                  disabled={isLoadingNumber}
+                >
+                  <RefreshCw className={isLoadingNumber ? 'animate-spin' : ''} />
+                  Generate
+                </Button>
+              </div>
             </div>
             <div className="flex gap-4">
               <div className="flex-1">

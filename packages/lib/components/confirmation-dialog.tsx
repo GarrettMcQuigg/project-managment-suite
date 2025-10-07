@@ -30,13 +30,13 @@ export default function ConfirmationDialog({ children, onConfirm, title, descrip
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end gap-4">
+          <DialogClose asChild>
+            <Button className="bg-foreground/70 hover:bg-foreground/80">Cancel</Button>
+          </DialogClose>
           <Button variant="destructive" onClick={handleConfirm}>
             Confirm
           </Button>
-          <DialogClose asChild>
-            <Button variant="secondary">Cancel</Button>
-          </DialogClose>
         </div>
       </DialogContent>
     </Dialog>

@@ -25,14 +25,14 @@ export function ActiveProjectsCard({ projects }: ActiveProjectsCardProps) {
           <div>
             <p className="text-sm font-medium text-foreground">Active Projects</p>
             <p className="text-3xl font-bold mt-1">{activeProjects.length}</p>
-            <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 mt-1">
+            <div className="flex items-center text-sm text-secondary dark:text-secondary mt-1">
               <ArrowUpRight className="h-4 w-4 mr-1" />
               <span>+{newProjects.length} new this week</span>
             </div>
           </div>
-          <div className="h-12 w-12 rounded-xl bg-blue-200 dark:bg-blue-600 flex items-center justify-center relative overflow-hidden transition-all duration-300 shadow-md scale-105">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-100/30 dark:via-blue-400/30 to-transparent animate-shimmer"></div>
-            <FolderOpen className="h-6 w-6 text-blue-600 dark:text-blue-200 relative z-10 scale-110 transition-transform duration-300" />
+          <div className="h-12 w-12 rounded-xl bg-white dark:bg-secondary/30 flex items-center justify-center relative overflow-hidden transition-all duration-300 shadow-md scale-105">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/10 dark:via-secondary/20 to-transparent animate-shimmer"></div>
+            <FolderOpen className="h-6 w-6 text-secondary dark:text-secondary relative z-10 scale-110 transition-transform duration-300" />
           </div>
         </div>
       </CardContent>

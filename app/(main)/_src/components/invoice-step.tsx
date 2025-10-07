@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Pencil, CalendarIcon } from 'lucide-react';
+import { Trash2, Pencil, CalendarIcon, RefreshCw } from 'lucide-react';
 import { Button } from '@/packages/lib/components/button';
 import { Input } from '@/packages/lib/components/input';
 import { FormLabel } from '@/packages/lib/components/form';
@@ -104,22 +104,26 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
     };
   }
 
+  const handleGenerateInvoiceNumber = () => {
+    setIsGeneratingNumber(true);
+    fetchUniqueInvoiceNumber()
+      .then((uniqueNumber) => {
+        setActiveInvoice((prev) => ({
+          ...prev,
+          invoiceNumber: uniqueNumber
+        }));
+      })
+      .catch((error) => {
+        console.error('Error fetching invoice number:', error);
+      })
+      .finally(() => {
+        setIsGeneratingNumber(false);
+      });
+  };
+
   useEffect(() => {
     if (!editingInvoiceId && !isGeneratingNumber) {
-      setIsGeneratingNumber(true);
-      fetchUniqueInvoiceNumber()
-        .then((uniqueNumber) => {
-          setActiveInvoice((prev) => ({
-            ...prev,
-            invoiceNumber: uniqueNumber
-          }));
-        })
-        .catch((error) => {
-          console.error('Error fetching invoice number:', error);
-        })
-        .finally(() => {
-          setIsGeneratingNumber(false);
-        });
+      handleGenerateInvoiceNumber();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingInvoiceId]);
@@ -161,20 +165,8 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
     const newEmptyInvoice = createEmptyInvoice();
     setActiveInvoice(newEmptyInvoice);
 
-    setIsGeneratingNumber(true);
-    fetchUniqueInvoiceNumber()
-      .then((uniqueNumber) => {
-        setActiveInvoice((prev) => ({
-          ...prev,
-          invoiceNumber: uniqueNumber
-        }));
-      })
-      .catch((error) => {
-        console.error('Error fetching invoice number:', error);
-      })
-      .finally(() => {
-        setIsGeneratingNumber(false);
-      });
+    // Auto-generate invoice number for the new empty invoice
+    handleGenerateInvoiceNumber();
   };
 
   const handleEdit = (invoice: Invoice) => {
@@ -255,6 +247,28 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
 
       <Card className="p-4">
         <div className="grid gap-4">
+          <div>
+            <FormLabel>Invoice Number</FormLabel>
+            <div className="flex gap-2">
+              <Input
+                value={activeInvoice.invoiceNumber}
+                onChange={(e) => setActiveInvoice({ ...activeInvoice, invoiceNumber: e.target.value })}
+                placeholder="Enter or generate invoice number"
+                className="border-foreground/20 flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGenerateInvoiceNumber}
+                className="shrink-0 border-foreground/20"
+                disabled={isGeneratingNumber}
+              >
+                <RefreshCw className={isGeneratingNumber ? 'animate-spin' : ''} />
+                Generate
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <FormLabel>Invoice Type</FormLabel>
@@ -332,7 +346,6 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
                 checked={activeInvoice.notifyClient}
                 onChange={(e) => setActiveInvoice({ ...activeInvoice, notifyClient: e.target.checked })}
                 className="h-4 w-4 rounded border-foreground/20 text-primary focus:ring-primary"
-                disabled={isGeneratingNumber}
               />
               <span className="ml-2 text-sm text-muted-foreground">Send email notification when invoice is created</span>
             </div>
@@ -349,9 +362,8 @@ const InvoiceStep: React.FC<InvoiceStepProps> = ({ invoices, onInvoicesChange, c
           </div>
 
           <div className="flex justify-end mt-4">
-            <Button type="button" variant="outlinePrimary" onClick={handleInvoicePublish} className="w-full sm:w-auto" disabled={isGeneratingNumber}>
+            <Button type="button" variant="outlinePrimary" onClick={handleInvoicePublish} className="w-full sm:w-auto">
               {editingInvoiceId ? 'Update' : 'Add'} Invoice
-              {isGeneratingNumber && !editingInvoiceId && ' (Generating Number...)'}
             </Button>
           </div>
         </div>

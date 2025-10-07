@@ -21,7 +21,7 @@ export function RevenueCard({ monthlyRevenue, revenueChange }: RevenueCardProps)
               <span>+{revenueChange}% from last month</span>
             </div>
           </div>
-          <div className="h-12 w-12 rounded-xl bg-green-200 dark:bg-green-600/70 flex items-center justify-center relative overflow-hidden transition-all duration-300 shadow-md scale-105">
+          <div className="h-12 w-12 rounded-xl bg-white dark:bg-green-600/70 flex items-center justify-center relative overflow-hidden transition-all duration-300 shadow-md scale-105">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-100/30 dark:via-green-400/30 to-transparent animate-shimmer"></div>
             <DollarSign className="h-6 w-6 text-green-600 dark:text-green-200 relative z-10 scale-110 transition-transform duration-300" />
           </div>

@@ -204,7 +204,7 @@ export default function ProjectMessaging({ project, isOwner = false, context, sh
   // };
 
   return (
-    <div className={`flex flex-col h-full ${showClientInfo ? 'max-h-[350px] sm:max-h-[400px] lg:max-h-[685px]' : 'max-h-[400px] sm:max-h-[500px] lg:max-h-[780px]'}`}>
+    <div className={`flex flex-col min-h-[400px] ${showClientInfo ? 'max-h-[350px] sm:max-h-[400px] lg:max-h-[727px]' : 'max-h-[400px] sm:max-h-[500px] lg:max-h-[820px]'}`}>
       {/* Header */}
       <div className="border-b border-border px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -234,9 +234,12 @@ export default function ProjectMessaging({ project, isOwner = false, context, sh
       </div>
 
       {/* Messages */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-3 min-h-0">
+      <div
+        ref={messagesContainerRef}
+        className={`h-full flex-1 overflow-y-auto overscroll-contain px-4 py-3 ${messages.length === 0 ? 'flex items-center justify-center' : 'space-y-3'}`}
+      >
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-center">
+          <div className="text-center h-full">
             <div className="space-y-6">
               <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto">
                 <MessageSquare className="h-8 w-8 text-white" />

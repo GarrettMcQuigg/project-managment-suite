@@ -376,29 +376,27 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
   };
 
   return (
-    <div className="h-full flex flex-col sm:p-4">
+    <div className="max-h-full flex flex-col p-4 overflow-y-auto overscroll-contain">
       {/* Header */}
-      <div className="space-y-3 pb-2 sm:px-0">
+      <div className="space-y-3 pb-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-indigo-500/80 rounded-xl flex items-center justify-center shadow-lg">
+          <div className="flex gap-3">
+            <div className="w-fit h-fit bg-gradient-to-br from-primary to-indigo-500/80 rounded-xl shadow-lg mt-1">
               <Target className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h2 className="text-md sm:text-lg font-bold text-card-foreground">
-                <span className="hidden sm:inline">Project</span> Timeline
-              </h2>
-              <p className="text-sm text-muted-foreground hidden sm:block">Track your project milestones</p>
+              <h2 className="text-md sm:text-lg font-bold text-card-foreground capitalize">{project.name} Timeline</h2>
+              <p className="text-sm text-muted-foreground hidden sm:block">{project.description}</p>
             </div>
           </div>
 
-          <button onClick={toggleGlobalCollapse} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card hover:bg-accent transition-colors border">
+          <button onClick={toggleGlobalCollapse} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card hover:bg-accent transition-colors border min-w-fit">
             {isGloballyCollapsed ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
             <span className="text-sm font-medium hidden sm:inline">{isGloballyCollapsed ? 'Show All' : 'Current Task'}</span>
           </button>
         </div>
 
-        <div className="sm:flex sm:justify-between sm:items-center sm:gap-3 space-y-3 sm:space-y-0 px-2">
+        <div className="sm:flex sm:justify-between sm:items-center sm:gap-3 space-y-3 sm:space-y-0">
           <div className="w-full flex flex-col items-center justify-center gap-1 p-3 rounded-lg bg-card border">
             <Calendar className="h-4 w-4 text-primary" />
             <div className="text-xs text-muted-foreground text-center">
@@ -418,7 +416,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
         </div>
 
         {/* Progress Bar */}
-        <div className="px-2">
+        <div className="">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Overall Progress</span>
             <span className="text-md font-bold bg-gradient-to-r from-primary to-indigo-500/80 bg-clip-text text-transparent">{progressPercentage}%</span>
@@ -432,7 +430,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
       </div>
 
       {/* Timeline */}
-      <div className="flex-1 px-1 max-h-[570px] overflow-y-auto overscroll-contain">
+      <div className="flex-1 max-h-[575px] overflow-y-auto overscroll-contain">
         <div className="space-y-6 mt-4 pb-4">
           {project.checkpoints
             .sort((a, b) => a.order - b.order)

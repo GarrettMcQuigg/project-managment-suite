@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
 import { API_AUTH_PORTAL_ROUTE, routeWithParam, PROJECT_PORTAL_ROUTE, AUTH_SIGNIN_ROUTE, PROJECT_DETAILS_ROUTE } from '@/packages/lib/routes';
-import ProjectOverview from './_src/project-overview';
 import PortalClientInfo from './_src/portal-client-info';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { getProjectForPortalAccess } from '@/packages/lib/helpers/get-project-by-id';
@@ -72,13 +71,13 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
       <div className="min-h-screen">
         <PortalHeader projectStatus={project.status} isOwner={effectiveIsOwner} />
 
-        <main className="container mx-auto py-2 lg:py-0 lg:px-16 px-4 mb-16">
-          <div className="flex gap-4 max-h-screen-minus-header">
-            <div className="lg:w-[70%] border border-border rounded-lg shadow-md flex flex-col h-screen-minus-header">
+        <main className="container mx-auto py-2 xl:py-0 xl:px-16 px-4 mb-16">
+          <div className="xl:flex space-y-4 xl:space-y-0 xl:gap-4 max-h-screen-minus-header">
+            <div className="xl:w-[70%] border border-border rounded-lg shadow-md flex flex-col max-h-screen-minus-header">
               <ProjectTimeline projectId={resolvedParams.id} isOwner={effectiveIsOwner} />
             </div>
 
-            <div className="lg:w-[30%] flex flex-col gap-4 h-full">
+            <div className="xl:w-[30%] flex flex-col gap-4 h-full">
               {isOwner && !isPreviewMode && (
                 <div className="border border-border rounded-lg shadow-md flex-shrink-0">
                   <PortalClientInfo client={project.client} />

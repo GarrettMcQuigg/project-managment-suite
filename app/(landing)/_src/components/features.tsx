@@ -73,7 +73,7 @@ export function FeaturesSection() {
   }, []);
 
   return (
-    <section className="py-32 px-4 bg-gradient-to-b from-background via-muted/20 to-background">
+    <section className="py-32 sm:px-4 bg-gradient-to-b from-background via-muted/20 to-background">
       <div className="container mx-auto max-w-7xl">
         {/* Section Header */}
         <div className="text-center space-y-6 mb-20">
@@ -103,15 +103,19 @@ export function FeaturesSection() {
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
                 <Card className="group h-full hover:shadow-xl transition-all duration-500 border-border/50 hover:border-primary/30 hover:-translate-y-1 bg-card/50 backdrop-blur-sm">
-                  <CardHeader className="space-y-4 pb-4">
-                    <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300 border border-primary/10">
-                      <feature.icon className="w-7 h-7 text-primary" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl mb-3 group-hover:text-primary transition-colors">{feature.title}</CardTitle>
-                      <CardDescription className="text-base leading-relaxed">{feature.description}</CardDescription>
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300 border border-primary/10">
+                        <feature.icon className="w-7 h-7 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl group-hover:text-primary transition-colors">{feature.title}</CardTitle>
+                      </div>
                     </div>
                   </CardHeader>
+                  <div className="px-6 pb-4">
+                    <CardDescription className="text-base leading-relaxed">{feature.description}</CardDescription>
+                  </div>
                   <CardContent>
                     <ul className="space-y-3">
                       {feature.benefits.map((benefit, benefitIndex) => (

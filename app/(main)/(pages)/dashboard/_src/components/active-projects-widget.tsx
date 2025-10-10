@@ -115,7 +115,7 @@ export function ActiveProjectsWidget({ projects }: ActiveProjectsWidgetProps) {
               return (
                 <Card
                   key={project.id}
-                  className="relative overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all hover:shadow-lg dark:hover:bg-foreground/5 cursor-pointer p-4"
+                  className="relative overflow-hidden rounded-lg border text-card-foreground shadow-sm transition-all hover:shadow-lg dark:hover:bg-foreground/5 cursor-pointer p-4"
                   onClick={() => handleViewDetails(project)}
                 >
                   <CardHeader className="p-0">
@@ -136,9 +136,9 @@ export function ActiveProjectsWidget({ projects }: ActiveProjectsWidgetProps) {
                             </Badge>
                           </Link>
                         )}
-                        <Badge variant={project.status === ProjectStatus.ACTIVE ? 'secondary' : 'default'}>
+                        <Badge variant={project.status === ProjectStatus.ACTIVE ? 'secondary' : 'outlinePrimary'}>
                           {getProjectStatusIcon(project.status)}
-                          {project.status.toLowerCase()}
+                          <span className="capitalize">{project.status.toLowerCase()}</span>
                         </Badge>
                         <Badge variant="outline">
                           <Calendar className="mr-1 h-3 w-3" />

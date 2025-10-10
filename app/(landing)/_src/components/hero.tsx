@@ -22,7 +22,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative min-h-[90vh] flex items-center justify-center px-4 pt-32 md:pt-24 pb-20 overflow-hidden">
+    <section ref={sectionRef} className="relative min-h-[90vh] flex items-center justify-center sm:px-4 sm:pt-32 pt-12 md:pt-24 pb-20 overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
         {/* Main gradient mesh */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-primary/20 via-primary/5 to-transparent blur-3xl opacity-60" />

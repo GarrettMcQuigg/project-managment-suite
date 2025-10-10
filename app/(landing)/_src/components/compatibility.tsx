@@ -7,10 +7,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { AUTH_SIGNIN_ROUTE, DASHBOARD_ROUTE } from '@/packages/lib/routes';
 import { useEffect, useRef, useState } from 'react';
+import { useTheme } from 'next-themes';
 
 export function CompatibilitySection({ currentUser }: { currentUser: User | null }) {
   const [isVisible, setIsVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -54,27 +61,33 @@ export function CompatibilitySection({ currentUser }: { currentUser: User | null
           </div>
 
           {/* Right Side - Device Screenshots */}
-          <div className={`relative transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
+          <div className={`min-h-[400px] relative transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
             {/* Desktop Screenshot (Bottom Layer) */}
-            <div className="relative z-10 ml-auto max-w-[85%] will-change-transform">
+            <div className="hidden sm:block relative z-10 ml-auto sm:max-w-[85%]">
               {/* Decorative blur */}
-              <div className="absolute -inset-6 bg-primary/10 rounded-2xl blur-3xl opacity-20" />
+              <div className="absolute -inset-6 bg-primary/10 rounded-lg blur-3xl opacity-20" />
 
               <Image
-                src="/modern-desktop-dashboard-interface.jpg"
+                src={mounted && theme === 'dark' ? '/images/landing/desktop-dashboard-view-dark.png' : '/images/landing/desktop-dashboard-view.png'}
                 alt="Desktop interface"
-                width={600}
-                height={400}
-                className="relative rounded-2xl shadow-2xl border border-border/30"
+                width={1200}
+                height={1200}
+                className="relative rounded-lg shadow-2xl border border-border/30"
               />
             </div>
 
             {/* Mobile Screenshot (Top Layer) */}
-            <div className="absolute left-0 top-20 z-20 w-[45%] max-w-[250px] will-change-transform hover:scale-105 transition-transform duration-500">
+            <div className="sm:absolute sm:left-0 sm:top-20 z-20 max-h-[250px]">
               {/* Decorative blur */}
-              <div className="absolute -inset-4 bg-secondary/20 rounded-2xl blur-2xl opacity-30" />
+              <div className="absolute -inset-4 bg-secondary/20 rounded-lg blur-2xl opacity-30" />
 
-              <Image src="/mobile-app-interface.png" alt="Mobile interface" width={200} height={400} className="relative rounded-2xl shadow-2xl border border-border/30" />
+              <Image
+                src={mounted && theme === 'dark' ? '/images/landing/mobile-dashboard-view-dark.png' : '/images/landing/mobile-dashboard-view.png'}
+                alt="Mobile interface"
+                width={200}
+                height={400}
+                className="relative rounded-lg shadow-2xl border border-border/30 sm:mx-0 mx-auto"
+              />
             </div>
           </div>
         </div>

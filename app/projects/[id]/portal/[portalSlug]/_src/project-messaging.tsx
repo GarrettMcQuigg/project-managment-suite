@@ -37,10 +37,11 @@ interface ProjectMessagingProps {
   project: ProjectWithMetadata;
   isOwner?: boolean;
   context: PortalContext;
+  showClientInfo?: boolean;
   // onScrollToCheckpoint?: (checkpointId: string) => void;
 }
 
-export default function ProjectMessaging({ project, isOwner = false, context }: ProjectMessagingProps) {
+export default function ProjectMessaging({ project, isOwner = false, context, showClientInfo = false }: ProjectMessagingProps) {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -203,7 +204,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
   // };
 
   return (
-    <div className="flex flex-col h-full max-h-[400px] sm:max-h-[500px] lg:max-h-[780px]">
+    <div className={`flex flex-col h-full ${showClientInfo ? 'max-h-[350px] sm:max-h-[400px] lg:max-h-[685px]' : 'max-h-[400px] sm:max-h-[500px] lg:max-h-[780px]'}`}>
       {/* Header */}
       <div className="border-b border-border px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">

@@ -70,9 +70,9 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
       <div className="min-h-screen">
         <PortalHeader projectStatus={project.status} isOwner={effectiveIsOwner} />
 
-        <main className="container mx-auto py-2 lg:px-16 px-4 mb-16">
-          <div className="flex gap-4 max-h-full">
-            <div className="lg:w-[70%] border border-border rounded-lg shadow-md flex flex-col h-full">
+        <main className="container mx-auto py-2 lg:py-0 lg:px-16 px-4 mb-16">
+          <div className="flex gap-4 max-h-screen-minus-header">
+            <div className="lg:w-[70%] border border-border rounded-lg shadow-md flex flex-col h-screen-minus-header">
               <ProjectTimeline projectId={resolvedParams.id} isOwner={effectiveIsOwner} />
             </div>
 
@@ -84,7 +84,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
               )}
 
               <div className="flex-1 border border-border rounded-lg shadow-lg overflow-hidden min-h-[400px]">
-                <ProjectMessaging project={project} isOwner={effectiveIsOwner} context={context as PortalContext} />
+                <ProjectMessaging project={project} isOwner={effectiveIsOwner} context={context as PortalContext} showClientInfo={isOwner && !isPreviewMode} />
               </div>
             </div>
           </div>

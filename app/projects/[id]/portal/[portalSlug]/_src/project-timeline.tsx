@@ -376,9 +376,9 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
   };
 
   return (
-    <div className="h-full flex flex-col space-y-4 sm:p-4">
+    <div className="h-full flex flex-col sm:p-4">
       {/* Header */}
-      <div className="space-y-3 p-2 sm:px-0">
+      <div className="space-y-3 pb-2 sm:px-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-indigo-500/80 rounded-xl flex items-center justify-center shadow-lg">
@@ -432,7 +432,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
       </div>
 
       {/* Timeline */}
-      <div className="flex-1 px-1 max-h-[550px] overflow-y-auto overscroll-contain">
+      <div className="flex-1 px-1 max-h-[570px] overflow-y-auto overscroll-contain">
         <div className="space-y-6 mt-4 pb-4">
           {project.checkpoints
             .sort((a, b) => a.order - b.order)

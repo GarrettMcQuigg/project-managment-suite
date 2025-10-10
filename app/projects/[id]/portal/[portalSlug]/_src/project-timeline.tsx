@@ -73,6 +73,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
   const [checkpointFiles, setCheckpointFiles] = useState<{ [key: string]: File[] }>({});
   const [previewFile, setPreviewFile] = useState<File | null>(null);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  const textInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const checkpointRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const messageContainerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
@@ -249,6 +250,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
       // Scroll to bottom after sending message with delay to ensure message is loaded
       setTimeout(() => {
         scrollMessagesToBottom(checkpointId);
+        textInputRefs.current[checkpointId]?.focus();
       }, 1000);
 
       toast.success('Message sent successfully');
@@ -779,6 +781,9 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
 
                                 <input
                                   type="text"
+                                  ref={(el) => {
+                                    textInputRefs.current[checkpoint.id] = el;
+                                  }}
                                   value={newMessages[checkpoint.id] || ''}
                                   onChange={(e) => setNewMessages((prev) => ({ ...prev, [checkpoint.id]: e.target.value }))}
                                   placeholder="Add a message about this checkpoint..."

@@ -6,7 +6,9 @@ import { Progress } from '@/packages/lib/components/progress';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { CheckpointStatus, ProjectStatus } from '@prisma/client';
 import { useRouter } from 'next/navigation';
-import { PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import { PROJECT_DETAILS_ROUTE, PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
+import { ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 interface MobileActiveProjectsProps {
   projects: ProjectWithMetadata[];
@@ -30,11 +32,11 @@ export function MobileActiveProjects({ projects, statusColors }: MobileActivePro
 
   return (
     <Card className="border-border/80 hover:border-border hover:shadow-md transition-all duration-200 group md:hidden">
-      <CardHeader>
+      <CardHeader className="p-3">
         <CardTitle className="text-lg font-semibold">Active Projects</CardTitle>
         <CardDescription>Current project progress</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 p-3">
         {sortedProjects.map((project) => {
           const checkpoints = project.checkpoints || [];
           const completedCount = checkpoints.filter((checkpoint) => checkpoint.status === CheckpointStatus.COMPLETED).length;
@@ -43,7 +45,7 @@ export function MobileActiveProjects({ projects, statusColors }: MobileActivePro
           return (
             <div
               key={project.id}
-              className="space-y-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/20 p-2 rounded-md transition-colors"
+              className="space-y-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/20 rounded-md transition-colors border border-border rounded-md p-3"
               onClick={() => handleViewDetails(project.id)}
             >
               <div className="flex items-start justify-between">
@@ -52,14 +54,22 @@ export function MobileActiveProjects({ projects, statusColors }: MobileActivePro
                   <p className="text-muted-foreground">{project.client?.name || 'No client'}</p>
                 </div>
                 <Badge
-                  className="text-xs capitalize flex items-center space-x-1 transition-all duration-300"
+                  className="text-xs capitalize flex items-center space-x-1 transition-all duration-300 gap-2"
                   style={statusColors ? { backgroundColor: statusColors[project.status], color: project.status === ProjectStatus.DRAFT ? '#000000' : '#ffffff' } : {}}
                   variant={!statusColors && project.status === ProjectStatus.ACTIVE ? 'default' : 'secondary'}
                 >
                   <span className="relative w-2 h-2 rounded-full overflow-hidden">
                     <div className="absolute inset-0 bg-white/20 w-full h-full transform -translate-x-full animate-shimmer" />
                   </span>
-                  <span>{project.status.toLowerCase()}</span>
+                  {project.portalEnabled && project.portalSlug && (
+                    <Link
+                      href={routeWithParam(PROJECT_PORTAL_ROUTE, { id: project.id, portalSlug: project.portalSlug })}
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-block"
+                    >
+                      <span className="text-xs">View Portal</span>
+                    </Link>
+                  )}
                 </Badge>
               </div>
               <div className="space-y-1">

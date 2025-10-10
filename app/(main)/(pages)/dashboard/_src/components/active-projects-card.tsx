@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, FolderOpen } from 'lucide-react';
 import { Card, CardContent } from '@/packages/lib/components/card';
-import { Project } from '@prisma/client';
+import { Project, ProjectStatus } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { PROJECTS_ROUTE } from '@/packages/lib/routes';
 
@@ -12,7 +12,7 @@ interface ActiveProjectsCardProps {
 
 export function ActiveProjectsCard({ projects }: ActiveProjectsCardProps) {
   const router = useRouter();
-  const activeProjects = projects.filter((project) => project.createdAt < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)); // Projects created more than a week ago
+  const activeProjects = projects.filter((project) => project.status === ProjectStatus.ACTIVE); // Projects created more than a week ago
   const newProjects = projects.filter((project) => project.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)); // Projects created in the last week
 
   return (

@@ -379,13 +379,13 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
     <div className="max-h-full flex flex-col p-4 overflow-y-auto overscroll-contain">
       {/* Header */}
       <div className="space-y-3 pb-2">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <div className="flex gap-3">
             <div className="w-fit h-fit bg-gradient-to-br from-primary to-indigo-500/80 rounded-xl shadow-lg mt-1">
               <Target className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h2 className="text-md sm:text-lg font-bold text-card-foreground capitalize">{project.name} Timeline</h2>
+              <h2 className="text-md sm:text-lg font-bold text-card-foreground capitalize">{project.name} - Timeline</h2>
               <p className="text-sm text-muted-foreground hidden sm:block">{project.description}</p>
             </div>
           </div>

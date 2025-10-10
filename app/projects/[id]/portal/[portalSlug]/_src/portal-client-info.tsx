@@ -9,7 +9,7 @@ export default function PortalClientInfo({ client }: { client: Client }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-card/80 backdrop-blur-md">
+    <div className="rounded-lg">
       {/* Trigger Button */}
       <button onClick={() => setIsExpanded(!isExpanded)} className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors group">
         <div className="flex items-center gap-4">

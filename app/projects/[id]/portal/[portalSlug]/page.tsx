@@ -69,7 +69,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
   return (
     <div className="min-h-screen">
       <div className="min-h-screen">
-        <PortalHeader projectStatus={project.status} isOwner={isOwner} projectId={resolvedParams.id} portalSlug={resolvedParams.portalSlug} />
+        <PortalHeader isOwner={isOwner} projectId={resolvedParams.id} portalSlug={resolvedParams.portalSlug} />
 
         <main className="container mx-auto py-2 xl:py-0 xl:px-16 px-4 mb-16">
           <div className="xl:flex space-y-4 xl:space-y-0 xl:gap-4 max-h-screen-minus-header">

@@ -9,13 +9,12 @@ import { PROJECT_PORTAL_ROUTE } from '@/packages/lib/routes';
 import { Button } from '@/packages/lib/components/button';
 
 interface PortalHeaderProps {
-  projectStatus: string;
   isOwner: boolean;
   projectId: string;
   portalSlug: string;
 }
 
-export default function PortalHeader({ projectStatus, isOwner, projectId, portalSlug }: PortalHeaderProps) {
+export default function PortalHeader({ isOwner, projectId, portalSlug }: PortalHeaderProps) {
   const router = useRouter();
   // TODO : Implement preview mode
   const { theme, setTheme } = useTheme();

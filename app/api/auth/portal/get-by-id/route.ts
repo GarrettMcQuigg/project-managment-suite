@@ -1,5 +1,5 @@
 import { db } from '@packages/lib/prisma/client';
-import { handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
+import { handleError, handleSuccess } from '@packages/lib/helpers/api-response-handlers';
 import { getCurrentUser } from '@/packages/lib/helpers/get-current-user';
 import { NextRequest } from 'next/server';
 import { validateProjectAccess } from '@/packages/lib/helpers/portal/project-portals';

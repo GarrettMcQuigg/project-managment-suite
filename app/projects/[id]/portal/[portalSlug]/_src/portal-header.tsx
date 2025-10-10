@@ -4,36 +4,41 @@ import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { Crown, ArrowLeft, Eye, MoonIcon, SunIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { routeWithParam } from '@/packages/lib/routes';
+import { PROJECT_PORTAL_ROUTE } from '@/packages/lib/routes';
+import { Button } from '@/packages/lib/components/button';
 
 interface PortalHeaderProps {
   projectStatus: string;
   isOwner: boolean;
+  projectId: string;
+  portalSlug: string;
 }
 
-export default function PortalHeader({ projectStatus, isOwner }: PortalHeaderProps) {
+export default function PortalHeader({ projectStatus, isOwner, projectId, portalSlug }: PortalHeaderProps) {
   const router = useRouter();
   // TODO : Implement preview mode
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  // const [previewMode, setPreviewMode] = useState(false);
+  const [previewMode, setPreviewMode] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // const handleToggleView = () => {
-  //   if (isOwner) {
-  //     const newPreviewMode = !previewMode;
-  //     setPreviewMode(newPreviewMode);
+  const handleToggleView = () => {
+    if (isOwner) {
+      const newPreviewMode = !previewMode;
+      setPreviewMode(newPreviewMode);
 
-  //     const url =
-  //       routeWithParam(PROJECT_PORTAL_ROUTE, {
-  //         id: project.id,
-  //         portalSlug: portalSlug
-  //       }) + (newPreviewMode ? '?preview=true' : '');
+      const url =
+        routeWithParam(PROJECT_PORTAL_ROUTE, {
+          id: projectId,
+          portalSlug: portalSlug
+        }) + (newPreviewMode ? '?preview=true' : '');
 
-  //     router.push(url);
-  //   }
-  // };
+      router.push(url);
+    }
+  };
 
   // const viewText = isOwner ? (previewMode ? 'Client View Preview' : 'Owner View') : 'Client Portal';
 
@@ -58,20 +63,16 @@ export default function PortalHeader({ projectStatus, isOwner }: PortalHeaderPro
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div
-              className={`hidden xs:block px-3 py-1.5 rounded-full text-xs font-medium border ${
-                projectStatus === 'ACTIVE' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-border'
-              }`}
-            >
-              {projectStatus}
-            </div>
-
+          <div className="flex items-center space-x-6">
             {isOwner && (
-              <div className="hidden xs:flex items-center space-x-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-xs font-medium border border-primary/20">
+              <Button
+                onClick={handleToggleView}
+                variant="outline"
+                className={`md:flex hidden ${previewMode ? 'bg-red-500 text-white hover:text-white hover:bg-red-500/90 ' : 'bg-primary text-white hover:text-white hover:bg-primary/90'}`}
+              >
                 <Eye className="h-3 w-3" />
-                <span>Owner View</span>
-              </div>
+                <span>{previewMode ? 'Client View' : 'Owner View'}</span>
+              </Button>
             )}
 
             {mounted && (

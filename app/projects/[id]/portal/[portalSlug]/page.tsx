@@ -69,7 +69,7 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
   return (
     <div className="min-h-screen">
       <div className="min-h-screen">
-        <PortalHeader projectStatus={project.status} isOwner={effectiveIsOwner} />
+        <PortalHeader projectStatus={project.status} isOwner={isOwner} projectId={resolvedParams.id} portalSlug={resolvedParams.portalSlug} />
 
         <main className="container mx-auto py-2 xl:py-0 xl:px-16 px-4 mb-16">
           <div className="xl:flex space-y-4 xl:space-y-0 xl:gap-4 max-h-screen-minus-header">
@@ -90,6 +90,38 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
             </div>
           </div>
         </main>
+        <div className="hidden md:block fixed bottom-0 left-0 w-full z-50">
+          {/* Owner badge - only visible in owner mode, not in preview mode */}
+          {effectiveIsOwner && (
+            <div className="w-full bg-primary/50 p-2 border-t shadow-md">
+              <div className="container mx-auto flex items-center justify-between">
+                <span className="text-sm text-black dark:text-white">Viewing as project owner</span>
+                <div className="block xs:hidden">
+                  <a href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: resolvedParams.id })} className="text-sm text-text-gray-800 dark:text-gray-200 underline">
+                    Back to Project Details
+                  </a>
+                </div>
+                <div className="hidden xs:block">
+                  <a href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: resolvedParams.id })} className="text-sm text-text-gray-800 dark:text-gray-200 underline">
+                    Back
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Preview mode indicator - only visible when in preview mode */}
+          {isOwner && isPreviewMode && (
+            <div className="w-full bg-red-500/50 p-3 border-t shadow-md">
+              <div className="container mx-auto flex items-center justify-between">
+                <span className="text-sm">Client view preview mode</span>
+                <a href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: resolvedParams.id })} className="text-sm text-text-gray-800 dark:text-gray-200 underline">
+                  Back to Project Details
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

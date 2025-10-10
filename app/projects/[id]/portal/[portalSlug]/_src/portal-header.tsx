@@ -39,7 +39,7 @@ export default function PortalHeader({ projectStatus, isOwner }: PortalHeaderPro
 
   return (
     <header className="z-50">
-      <div className="container mx-auto py-4 lg:px-12 px-3">
+      <div className="container mx-auto py-4 lg:px-16 px-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button onClick={() => router.back()} className="block xs:hidden p-2 rounded-lg hover:bg-muted transition-colors">

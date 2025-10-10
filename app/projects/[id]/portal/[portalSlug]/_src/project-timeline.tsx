@@ -353,8 +353,8 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
     );
   }
 
-  // const completedCheckpoints = project.checkpoints.filter((c) => c.status === CheckpointStatus.COMPLETED).length;
-  // const totalCheckpoints = project.checkpoints.length;
+  const completedCheckpoints = project.checkpoints.filter((c) => c.status === CheckpointStatus.COMPLETED).length;
+  const totalCheckpoints = project.checkpoints.length;
 
   const getCheckpointIcon = (status: string) => {
     switch (status) {
@@ -396,31 +396,24 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
           </button>
         </div>
 
-        {/* <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center justify-center gap-3 p-3 rounded-lg bg-card border">
-            <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <TrendingUp className="sm:h-5 sm:w-5 h-4 w-4 text-primary" /> Progress
-              </div>
-              <div className="font-semibold text-center">
-                <span>
-                  {completedCheckpoints} of {totalCheckpoints}
-                </span>
-              </div>
+        <div className="sm:flex sm:justify-between sm:items-center sm:gap-3 space-y-3 sm:space-y-0 px-2">
+          <div className="w-full flex flex-col items-center justify-center gap-1 p-3 rounded-lg bg-card border">
+            <Calendar className="h-4 w-4 text-primary" />
+            <div className="text-xs text-muted-foreground text-center">
+              {format(new Date(project.startDate), 'MMM d')} - {format(new Date(project.endDate), 'MMM d, yyyy')}
             </div>
           </div>
-          <div className="flex items-center justify-center gap-3 rounded-lg bg-card border">
-            <div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Calendar className="sm:h-5 sm:w-5 h-4 w-4 text-indigo-500" /> Checkpoints
-              </div>
-              <div className="font-semibold text-center">
-                {totalCheckpoints}
-                <span className="hidden sm:inline"> total</span>
-              </div>
+          <div className="w-full flex flex-col items-center justify-center gap-1 p-3 rounded-lg bg-card border">
+            <Target className="h-4 w-4 text-primary" />
+            <div className="text-xs text-muted-foreground text-center">
+              {completedCheckpoints} of {totalCheckpoints} checkpoints
             </div>
           </div>
-        </div> */}
+          <div className="w-full flex flex-col items-center justify-center gap-1 p-3 rounded-lg bg-card border">
+            <CheckCircle className="h-4 w-4 text-primary" />
+            <div className="text-xs text-muted-foreground text-center">{progressPercentage.toFixed(0)}% complete</div>
+          </div>
+        </div>
 
         {/* Progress Bar */}
         <div className="px-2">

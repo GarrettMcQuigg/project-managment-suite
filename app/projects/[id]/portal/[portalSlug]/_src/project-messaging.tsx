@@ -46,6 +46,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
   const [files, setFiles] = useState<File[]>([]);
   const [previewFile, setPreviewFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textInputRef = useRef<HTMLInputElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -121,7 +122,10 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
       setFiles([]);
       mutate(endpoint);
 
-      setTimeout(scrollToBottom, 100);
+      setTimeout(() => {
+        scrollToBottom();
+        textInputRef.current?.focus();
+      }, 100);
 
       toast.success('Message sent successfully');
     } catch (error) {
@@ -199,7 +203,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
   // };
 
   return (
-    <div className="flex flex-col h-full max-h-[400px] sm:max-h-[500px] lg:max-h-[770px]">
+    <div className="flex flex-col h-full max-h-[400px] sm:max-h-[500px] lg:max-h-[780px]">
       {/* Header */}
       <div className="border-b border-border px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -310,7 +314,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
                                       width={288}
                                       height={192}
                                       loader={ImageLoader}
-                                      className="rounded-xl sm:max-w-72 sm:max-h-48 object-cover transition-transform hover:scale-[1.02] shadow-lg"
+                                      className="rounded-xl sm:max-w-48 sm:max-h-36 object-cover transition-transform hover:scale-[1.02] shadow-lg"
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 rounded-xl transition-colors"></div>
                                   </div>
@@ -470,6 +474,7 @@ export default function ProjectMessaging({ project, isOwner = false, context }: 
 
             <input
               type="text"
+              ref={textInputRef}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Type your message..."

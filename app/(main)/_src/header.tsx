@@ -1,78 +1,43 @@
-"use client"
+'use client';
 
-import { MessageSquare, Search, Menu } from "lucide-react"
-import { useEffect, useState } from "react"
-import { Button } from "@/packages/lib/components/button"
-import type { User } from "@prisma/client"
-import UserDropdown from "@/app/(main)/_src/user-dropdown"
-import {
-  CommandDialog,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandSeparator,
-} from "@/packages/lib/components/command"
-import { useRouter } from "next/navigation"
-import {
-  FileText,
-  Users,
-  Receipt,
-  Settings,
-  Calendar,
-  Clock,
-  Star,
-  Briefcase,
-  AlertCircle,
-  BarChart3,
-  LayoutDashboard,
-  Plus,
-  Sparkles,
-} from "lucide-react"
-import { DialogTitle } from "@/packages/lib/components/dialog"
-import { DASHBOARD_ROUTE } from "@/packages/lib/routes"
+import { MessageSquare, Search, Menu } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Button } from '@/packages/lib/components/button';
+import type { User } from '@prisma/client';
+import UserDropdown from '@/app/(main)/_src/user-dropdown';
+import { CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from '@/packages/lib/components/command';
+import { useRouter } from 'next/navigation';
+import { FileText, Users, Receipt, Settings, Calendar, Clock, Star, Briefcase, AlertCircle, BarChart3, LayoutDashboard, Plus, Sparkles } from 'lucide-react';
+import { DialogTitle } from '@/packages/lib/components/dialog';
+import { DASHBOARD_ROUTE } from '@/packages/lib/routes';
 
-export function Header({
-  currentUser,
-  setSidebarOpen,
-  sidebarOpen,
-}: {
-  currentUser: User
-  setSidebarOpen: (open: boolean) => void
-  sidebarOpen: boolean
-}) {
-  const [open, setOpen] = useState(false)
-  const router = useRouter()
+export function Header({ currentUser, setSidebarOpen, sidebarOpen }: { currentUser: User; setSidebarOpen: (open: boolean) => void; sidebarOpen: boolean }) {
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   const runCommand = (command: () => void) => {
-    setOpen(false)
-    command()
-  }
+    setOpen(false);
+    command();
+  };
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setOpen((open) => !open)
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
       }
-    }
-    document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
-  }, [])
+    };
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-border/40 dark:border-white/[0.08] bg-white/80 dark:bg-[#0a1a1a]/80 backdrop-blur-xl px-2 sm:px-6 transition-all duration-300">
+    <header className="sticky top-0 z-50 flex gap-2 h-16 items-center justify-between border-b border-border/40 dark:border-white/[0.08] bg-white/80 dark:bg-[#0a1a1a]/80 backdrop-blur-xl px-2 sm:px-6 transition-all duration-300">
       <div className="flex items-center gap-6">
         {/* Mobile hamburger menu */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 hover:bg-accent/50 transition-colors duration-200"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        >
+        <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-accent/50 transition-colors duration-200" onClick={() => setSidebarOpen(!sidebarOpen)}>
           <Menu className="h-5 w-5" />
-          <span className="sr-only">{sidebarOpen ? "Close" : "Open"} sidebar</span>
+          <span className="sr-only">{sidebarOpen ? 'Close' : 'Open'} sidebar</span>
         </Button>
 
         <div
@@ -82,14 +47,12 @@ export function Header({
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
             <Sparkles className="h-4 w-4 text-white" />
           </div>
-          <span className="bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-            Solira
-          </span>
+          <span className="bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Solira</span>
         </div>
       </div>
 
       {/* Enhanced Search Bar */}
-      <div className="flex-1 max-w-2xl sm:mx-8 mr-6 ml-3">
+      <div className="flex-1 max-w-2xl sm:mx-8">
         <Button
           variant="ghost"
           className="w-full h-10 justify-start text-muted-foreground bg-gradient-to-r from-muted/50 to-muted/30 dark:from-gray-800/50 dark:to-gray-700/30 hover:from-muted/70 hover:to-muted/50 dark:hover:from-gray-800/70 dark:hover:to-gray-700/50 border border-border/50 hover:border-border/80 hover:text-foreground rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group"
@@ -109,10 +72,7 @@ export function Header({
       <CommandDialog open={open} onOpenChange={setOpen}>
         <DialogTitle className="sr-only">Search Commands</DialogTitle>
         <div className="border-b border-border/50">
-          <CommandInput
-            placeholder="Search your universe..."
-            className="text-base py-4 border-0 focus:ring-0 bg-transparent"
-          />
+          <CommandInput placeholder="Search your universe..." className="text-base py-4 border-0 focus:ring-0 bg-transparent" />
         </div>
         <CommandList className="px-4 py-3 max-h-[70vh]">
           <CommandEmpty className="py-8 text-center text-muted-foreground">
@@ -136,7 +96,7 @@ export function Header({
               </CommandItem>
 
               <CommandItem
-                onSelect={() => runCommand(() => router.push("/projects/recent"))}
+                onSelect={() => runCommand(() => router.push('/projects/recent'))}
                 className="flex items-center cursor-pointer p-4 rounded-xl hover:bg-accent/50 border border-transparent hover:border-border/50 transition-all duration-200"
               >
                 <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-orange-500/10 mr-3">
@@ -149,7 +109,7 @@ export function Header({
               </CommandItem>
 
               <CommandItem
-                onSelect={() => runCommand(() => router.push("/clients/starred"))}
+                onSelect={() => runCommand(() => router.push('/clients/starred'))}
                 className="flex items-center cursor-pointer p-4 rounded-xl hover:bg-accent/50 border border-transparent hover:border-border/50 transition-all duration-200"
               >
                 <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-yellow-500/10 mr-3">
@@ -162,7 +122,7 @@ export function Header({
               </CommandItem>
 
               <CommandItem
-                onSelect={() => runCommand(() => router.push("/invoices/overdue"))}
+                onSelect={() => runCommand(() => router.push('/invoices/overdue'))}
                 className="flex items-center cursor-pointer p-4 rounded-xl hover:bg-accent/50 border border-transparent hover:border-border/50 transition-all duration-200"
               >
                 <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-red-500/10 mr-3">
@@ -181,7 +141,7 @@ export function Header({
           <CommandGroup heading="Navigation" className="py-2">
             <div className="grid grid-cols-4 gap-2">
               <CommandItem
-                onSelect={() => runCommand(() => router.push("/projects"))}
+                onSelect={() => runCommand(() => router.push('/projects'))}
                 className="flex flex-col items-center justify-center cursor-pointer p-4 rounded-xl hover:bg-accent/50 transition-all duration-200 min-h-[80px]"
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-500/10 mb-2">
@@ -191,7 +151,7 @@ export function Header({
               </CommandItem>
 
               <CommandItem
-                onSelect={() => runCommand(() => router.push("/clients"))}
+                onSelect={() => runCommand(() => router.push('/clients'))}
                 className="flex flex-col items-center justify-center cursor-pointer p-4 rounded-xl hover:bg-accent/50 transition-all duration-200 min-h-[80px]"
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-500/10 mb-2">
@@ -201,7 +161,7 @@ export function Header({
               </CommandItem>
 
               <CommandItem
-                onSelect={() => runCommand(() => router.push("/invoices"))}
+                onSelect={() => runCommand(() => router.push('/invoices'))}
                 className="flex flex-col items-center justify-center cursor-pointer p-4 rounded-xl hover:bg-accent/50 transition-all duration-200 min-h-[80px]"
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/10 mb-2">
@@ -211,7 +171,7 @@ export function Header({
               </CommandItem>
 
               <CommandItem
-                onSelect={() => runCommand(() => router.push("/analytics"))}
+                onSelect={() => runCommand(() => router.push('/analytics'))}
                 className="flex flex-col items-center justify-center cursor-pointer p-4 rounded-xl hover:bg-accent/50 transition-all duration-200 min-h-[80px]"
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/10 mb-2">
@@ -228,7 +188,7 @@ export function Header({
             <CommandGroup heading="Create New">
               <div className="space-y-1">
                 <CommandItem
-                  onSelect={() => runCommand(() => router.push("/projects/new"))}
+                  onSelect={() => runCommand(() => router.push('/projects/new'))}
                   className="flex items-center cursor-pointer py-3 px-3 rounded-lg hover:bg-green-500/10 border border-transparent hover:border-green-500/20 transition-all duration-200"
                 >
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-500/10 mr-3">
@@ -238,7 +198,7 @@ export function Header({
                 </CommandItem>
 
                 <CommandItem
-                  onSelect={() => runCommand(() => router.push("/clients/new"))}
+                  onSelect={() => runCommand(() => router.push('/clients/new'))}
                   className="flex items-center cursor-pointer py-3 px-3 rounded-lg hover:bg-green-500/10 border border-transparent hover:border-green-500/20 transition-all duration-200"
                 >
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-500/10 mr-3">
@@ -248,7 +208,7 @@ export function Header({
                 </CommandItem>
 
                 <CommandItem
-                  onSelect={() => runCommand(() => router.push("/invoices/new"))}
+                  onSelect={() => runCommand(() => router.push('/invoices/new'))}
                   className="flex items-center cursor-pointer py-3 px-3 rounded-lg hover:bg-green-500/10 border border-transparent hover:border-green-500/20 transition-all duration-200"
                 >
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-500/10 mr-3">
@@ -262,7 +222,7 @@ export function Header({
             <CommandGroup heading="Utilities">
               <div className="space-y-1">
                 <CommandItem
-                  onSelect={() => runCommand(() => router.push("/calendar"))}
+                  onSelect={() => runCommand(() => router.push('/calendar'))}
                   className="flex items-center cursor-pointer py-3 px-3 rounded-lg hover:bg-accent/50 transition-all duration-200"
                 >
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/10 mr-3">
@@ -272,7 +232,7 @@ export function Header({
                 </CommandItem>
 
                 <CommandItem
-                  onSelect={() => runCommand(() => router.push("/documents"))}
+                  onSelect={() => runCommand(() => router.push('/documents'))}
                   className="flex items-center cursor-pointer py-3 px-3 rounded-lg hover:bg-accent/50 transition-all duration-200"
                 >
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-500/10 mr-3">
@@ -282,7 +242,7 @@ export function Header({
                 </CommandItem>
 
                 <CommandItem
-                  onSelect={() => runCommand(() => router.push("/settings"))}
+                  onSelect={() => runCommand(() => router.push('/settings'))}
                   className="flex items-center cursor-pointer py-3 px-3 rounded-lg hover:bg-accent/50 transition-all duration-200"
                 >
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-500/10 mr-3">
@@ -298,7 +258,7 @@ export function Header({
 
       <div className="flex items-center sm:gap-4 gap-2">
         {/* Enhanced Notification Button */}
-        <div className="relative">
+        {/* <div className="relative">
           <Button
             variant="ghost"
             className="relative h-10 w-10 rounded-xl bg-muted/50 hover:bg-muted/80 border border-border/50 hover:border-border/80 transition-all duration-200 group"
@@ -308,12 +268,12 @@ export function Header({
               4
             </span>
           </Button>
-        </div>
+        </div> */}
 
-        <div className="mr-2 sm:mr-0">
+        <div>
           <UserDropdown currentUser={currentUser} />
         </div>
       </div>
     </header>
-  )
+  );
 }

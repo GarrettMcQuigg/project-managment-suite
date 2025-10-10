@@ -1,5 +1,5 @@
 import { db } from '@packages/lib/prisma/client';
-import { put } from '@vercel/blob';
+import { createAdminClient } from '@/packages/lib/utils/supabase/client';
 import { getCurrentUser } from '@packages/lib/helpers/get-current-user';
 import { handleError, handleSuccess, handleUnauthorized } from '@packages/lib/helpers/api-response-handlers';
 
@@ -20,16 +20,65 @@ export async function POST(request: Request) {
     const location = formData.get('location') as string;
     const bio = formData.get('bio') as string;
 
-    let profileImgBlob, coverImgBlob;
+    let profileImgUrl: string | undefined;
+    let coverImgUrl: string | undefined;
+
+    const supabase = await createAdminClient();
 
     const profileImg = formData.get('profileImg') as File | null;
     if (profileImg) {
-      profileImgBlob = await put(`profile_images/${currentUser.id}-${profileImg.name}`, profileImg, { access: 'public' });
+      try {
+        const filePath = `profile-images/${currentUser.id}-${profileImg.name}`;
+        const fileBuffer = await profileImg.arrayBuffer();
+
+        const { error: storageError } = await supabase.storage.from('blob-storage').upload(filePath, fileBuffer, {
+          contentType: profileImg.type,
+          upsert: true
+        });
+
+        if (storageError) {
+          throw storageError;
+        }
+
+        // Generate a signed URL valid for 90 days
+        const { data: signedUrlData, error: signedUrlError } = await supabase.storage.from('blob-storage').createSignedUrl(filePath, 7776000); // 90 days in seconds
+
+        if (signedUrlError) {
+          throw signedUrlError;
+        }
+
+        profileImgUrl = signedUrlData.signedUrl;
+      } catch (error) {
+        console.error('Error uploading profile image:', error);
+      }
     }
 
     const coverImg = formData.get('coverImg') as File | null;
     if (coverImg) {
-      coverImgBlob = await put(`cover_images/${currentUser.id}-${coverImg.name}`, coverImg, { access: 'public' });
+      try {
+        const filePath = `cover-images/${currentUser.id}-${coverImg.name}`;
+        const fileBuffer = await coverImg.arrayBuffer();
+
+        const { error: storageError } = await supabase.storage.from('blob-storage').upload(filePath, fileBuffer, {
+          contentType: coverImg.type,
+          upsert: true
+        });
+
+        if (storageError) {
+          throw storageError;
+        }
+
+        // Generate a signed URL valid for 90 days
+        const { data: signedUrlData, error: signedUrlError } = await supabase.storage.from('blob-storage').createSignedUrl(filePath, 7776000); // 90 days in seconds
+
+        if (signedUrlError) {
+          throw signedUrlError;
+        }
+
+        coverImgUrl = signedUrlData.signedUrl;
+      } catch (error) {
+        console.error('Error uploading cover image:', error);
+      }
     }
 
     await db.user.update({
@@ -42,8 +91,8 @@ export async function POST(request: Request) {
         dateOfBirth,
         location,
         bio,
-        profileImg: profileImgBlob?.url ?? undefined,
-        coverImg: coverImgBlob?.url ?? undefined
+        profileImg: profileImgUrl ?? undefined,
+        coverImg: coverImgUrl ?? undefined
       }
     });
 

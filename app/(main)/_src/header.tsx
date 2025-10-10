@@ -258,7 +258,7 @@ export function Header({ currentUser, setSidebarOpen, sidebarOpen }: { currentUs
 
       <div className="flex items-center sm:gap-4 gap-2">
         {/* Enhanced Notification Button */}
-        {/* <div className="relative">
+        <div className="relative">
           <Button
             variant="ghost"
             className="relative h-10 w-10 rounded-xl bg-muted/50 hover:bg-muted/80 border border-border/50 hover:border-border/80 transition-all duration-200 group"
@@ -268,7 +268,7 @@ export function Header({ currentUser, setSidebarOpen, sidebarOpen }: { currentUs
               4
             </span>
           </Button>
-        </div> */}
+        </div>
 
         <div>
           <UserDropdown currentUser={currentUser} />

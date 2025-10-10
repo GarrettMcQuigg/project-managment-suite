@@ -7,7 +7,6 @@ import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { CheckpointStatus, ProjectStatus } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { PROJECT_DETAILS_ROUTE, PROJECT_PORTAL_ROUTE, routeWithParam } from '@/packages/lib/routes';
-import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
 interface MobileActiveProjectsProps {

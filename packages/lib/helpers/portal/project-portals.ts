@@ -8,7 +8,6 @@ export { generateSecurePassword, generatePortalSlug, generateUniquePortalId } fr
 
 /**
  * Validates if a user or portal visitor has access to a project
- * @deprecated Use validatePortalSessionForProject from portal-session.ts instead
  */
 export async function validateProjectAccess(
   projectId: string,
@@ -30,9 +29,10 @@ export async function validateProjectAccess(
   // Get cookie store
   const cookieJar = cookieStore || (await cookies());
 
-  // Check for portal session using new session system
-  const { validatePortalSessionForProject, PORTAL_SESSION_COOKIE } = await import('./portal-session');
-  const sessionCookie = cookieJar.get(PORTAL_SESSION_COOKIE);
+  // Check for portal session using new session system with project-specific cookie name
+  const { validatePortalSessionForProject, getPortalSessionCookieName } = await import('./portal-session');
+  const sessionCookieName = getPortalSessionCookieName(projectId);
+  const sessionCookie = cookieJar.get(sessionCookieName);
 
   if (!sessionCookie?.value) {
     return false;

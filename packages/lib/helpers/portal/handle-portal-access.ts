@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PORTAL_SESSION_COOKIE, PORTAL_PROJECT_COOKIE } from './portal-session';
+import { getPortalSessionCookieName, getPortalProjectCookieName } from './portal-session';
 import { isUserAuthenticated } from './is-user-authenticated';
 
 export function handlePortalAccess(request: NextRequest, projectId: string, portalSlug: string): NextResponse {
   const { pathname } = request.nextUrl;
-  const portalSessionCookie = request.cookies.get(PORTAL_SESSION_COOKIE);
-  const portalProjectCookie = request.cookies.get(PORTAL_PROJECT_COOKIE);
+  const sessionCookieName = getPortalSessionCookieName(projectId);
+  const projectCookieName = getPortalProjectCookieName(projectId);
+  const portalSessionCookie = request.cookies.get(sessionCookieName);
+  const portalProjectCookie = request.cookies.get(projectCookieName);
   const isAuthenticated = isUserAuthenticated(request);
 
   // Validate portal session matches the project

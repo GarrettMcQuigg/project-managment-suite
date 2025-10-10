@@ -5,6 +5,20 @@ export const PORTAL_SESSION_COOKIE = 'portal_session_id';
 export const PORTAL_PROJECT_COOKIE = 'portal_project_id';
 
 /**
+ * Gets the unique cookie name for a specific project's portal session
+ */
+export function getPortalSessionCookieName(projectId: string): string {
+  return `${PORTAL_SESSION_COOKIE}_${projectId}`;
+}
+
+/**
+ * Gets the unique cookie name for a specific project's portal project cookie
+ */
+export function getPortalProjectCookieName(projectId: string): string {
+  return `${PORTAL_PROJECT_COOKIE}_${projectId}`;
+}
+
+/**
  * Creates a new portal session for a visitor
  */
 export async function createPortalSession(params: {

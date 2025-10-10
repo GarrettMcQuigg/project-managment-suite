@@ -42,9 +42,11 @@ export default function PortalHeader({ projectStatus, isOwner }: PortalHeaderPro
       <div className="container mx-auto py-4 lg:px-16 px-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <button onClick={() => router.back()} className="block xs:hidden p-2 rounded-lg hover:bg-muted transition-colors">
-              <ArrowLeft className="h-5 w-5 text-muted-foreground" />
-            </button>
+            {isOwner && (
+              <button onClick={() => router.back()} className="block xs:hidden p-2 rounded-lg hover:bg-muted transition-colors">
+                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+              </button>
+            )}
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Crown className="h-4 w-4 text-white" />

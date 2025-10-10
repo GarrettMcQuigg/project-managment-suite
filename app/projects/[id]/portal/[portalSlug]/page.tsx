@@ -9,14 +9,13 @@ import ProjectOverview from './_src/project-overview';
 import PortalClientInfo from './_src/portal-client-info';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { getProjectForPortalAccess } from '@/packages/lib/helpers/get-project-by-id';
-import { validatePortalSessionForProject, PORTAL_SESSION_COOKIE } from '@/packages/lib/helpers/portal/portal-session';
+import { validatePortalSessionForProject, getPortalSessionCookieName } from '@/packages/lib/helpers/portal/portal-session';
 
 export default async function ProjectPortalPage({ params, searchParams }: { params: Promise<{ id: string; portalSlug: string }>; searchParams: Promise<{ preview?: string }> }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
   const cookieStore = await cookies();
   const context = await getSessionContext();
-  const sessionCookie = cookieStore.get(PORTAL_SESSION_COOKIE);
 
   const isPreviewMode = resolvedSearchParams.preview === 'true';
   const project: ProjectWithMetadata | null = await getProjectForPortalAccess(resolvedParams.id);
@@ -33,6 +32,9 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
 
   let portalSession = null;
   // let visitorName = 'Portal Visitor';
+
+  const sessionCookieName = getPortalSessionCookieName(resolvedParams.id);
+  const sessionCookie = cookieStore.get(sessionCookieName);
 
   if (sessionCookie?.value) {
     portalSession = await validatePortalSessionForProject(sessionCookie.value, resolvedParams.id);

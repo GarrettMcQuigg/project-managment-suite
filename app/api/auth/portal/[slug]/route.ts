@@ -5,7 +5,7 @@ import { handleError } from '@/packages/lib/helpers/api-response-handlers';
 import { compare } from 'bcrypt';
 import { TOKEN_COOKIE_KEY } from '@/packages/lib/constants/cookie-keys';
 import { DASHBOARD_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
-import { createPortalSession, PORTAL_SESSION_COOKIE, PORTAL_PROJECT_COOKIE } from '@/packages/lib/helpers/portal/portal-session';
+import { createPortalSession, getPortalSessionCookieName, getPortalProjectCookieName } from '@/packages/lib/helpers/portal/portal-session';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
@@ -406,8 +406,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const response = NextResponse.json({ success: true, redirect }, { status: 200 });
 
-    // Set session ID cookie
-    response.cookies.set(PORTAL_SESSION_COOKIE, session.id, {
+    // Set session ID cookie with project-specific name
+    const sessionCookieName = getPortalSessionCookieName(project.id);
+    response.cookies.set(sessionCookieName, session.id, {
       httpOnly: true,
       maxAge: 60 * 60 * 24,
       path: '/',
@@ -415,8 +416,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       secure: process.env.NODE_ENV === 'production'
     });
 
-    // Set project ID cookie for middleware validation (non-httpOnly so middleware can read it)
-    response.cookies.set(PORTAL_PROJECT_COOKIE, project.id, {
+    // Set project ID cookie for middleware validation with project-specific name
+    const projectCookieName = getPortalProjectCookieName(project.id);
+    response.cookies.set(projectCookieName, project.id, {
       httpOnly: true,
       maxAge: 60 * 60 * 24,
       path: '/',

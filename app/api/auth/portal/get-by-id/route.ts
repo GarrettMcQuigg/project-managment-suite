@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     const hasAccess = validateProjectAccess(project.id, project.portalSlug, currentUser?.id, project.userId, request.cookies);
 
     if (!hasAccess) {
-      return handleUnauthorized();
+      return handleError({ message: 'Access denied' });
     }
 
     const portalProjectData = {

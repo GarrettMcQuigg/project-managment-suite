@@ -44,8 +44,11 @@ export default async function middleware(request: NextRequest) {
 
   if (!isAuthenticated) {
     // Block portal visitors from accessing non-portal routes
-    const portalSessionCookie = request.cookies.get(PORTAL_SESSION_COOKIE);
-    if (portalSessionCookie) {
+    // Check if any portal session cookie exists (they start with the PORTAL_SESSION_COOKIE prefix)
+    const hasPortalSessionCookie = Array.from(request.cookies.getAll()).some(cookie =>
+      cookie.name.startsWith(PORTAL_SESSION_COOKIE)
+    );
+    if (hasPortalSessionCookie) {
       const errorUrl = new URL('/auth/signin', request.url);
       errorUrl.searchParams.set('error', 'portal_access_denied');
       errorUrl.searchParams.set('message', 'Portal access is restricted to your project portal only');

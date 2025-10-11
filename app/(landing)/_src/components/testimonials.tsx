@@ -49,16 +49,14 @@ export function TestimonialsSection() {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setVisibleCards((prev) => {
-                const newState = [...prev];
-                newState[index] = true;
-                return newState;
-              });
-            }
+            setVisibleCards((prev) => {
+              const newState = [...prev];
+              newState[index] = entry.isIntersecting;
+              return newState;
+            });
           });
         },
-        { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+        { threshold: 0.2, rootMargin: '0px' }
       );
 
       observer.observe(card);
@@ -71,7 +69,7 @@ export function TestimonialsSection() {
   }, []);
 
   return (
-    <section className="py-32 px-4 relative overflow-hidden">
+    <section className="py-32 px-4 relative overflow-hidden cursor-default">
       {/* Gradient background */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/40 via-muted/20 to-transparent" />
 
@@ -101,7 +99,7 @@ export function TestimonialsSection() {
               className={`transition-all duration-700 ${visibleCards[index] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
               style={{ transitionDelay: `${index * 150}ms` }}
             >
-              <Card className="group h-full hover:shadow-xl transition-all duration-500 border-border/50 hover:border-primary/30 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
+              <Card className="group h-full hover:shadow-xl transition-all duration-500 border-border/50 hover:border-primary/30 hover:-translate-y-1 bg-card/80 backdrop-blur-sm cursor-default">
                 <CardContent className="p-8 space-y-6 relative">
                   {/* Quote Icon */}
                   <Quote className="w-10 h-10 text-primary/10 absolute top-6 right-6 group-hover:text-primary/20 transition-colors" />

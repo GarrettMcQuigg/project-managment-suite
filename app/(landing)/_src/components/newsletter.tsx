@@ -43,7 +43,7 @@ export function NewsletterSection() {
   };
 
   return (
-    <section ref={sectionRef} className="py-32 px-4">
+    <section ref={sectionRef} className="py-32 px-4 cursor-default">
       <div className="container mx-auto max-w-4xl">
         <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           <Card className="border-border/50 hover:border-primary/30 transition-all duration-500 bg-gradient-to-br from-card/80 to-card/50 backdrop-blur-sm shadow-xl">

@@ -39,7 +39,7 @@ export function CompatibilitySection({ currentUser }: { currentUser: User | null
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-32 px-4 bg-muted/30">
+    <section ref={sectionRef} className="py-32 px-4 bg-muted/30 cursor-default">
       <div className="container mx-auto max-w-7xl">
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left Side - Text Content */}

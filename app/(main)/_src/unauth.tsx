@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@pack
 import { useEffect } from 'react';
 import { API_AUTH_SIGNOUT_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
 import PageContent from '@/packages/lib/components/page-content';
-import { LandingBackground} from '@/packages/lib/components/custom-background';
 
 export function Unauth() {
   useEffect(() => {
@@ -18,8 +17,6 @@ export function Unauth() {
 
   return (
     <div className="relative flex justify-center items-center h-full mt-24">
-      <LandingBackground />
-
       <PageContent>
         <Card>
           <CardHeader className="flex flex-col items-center">

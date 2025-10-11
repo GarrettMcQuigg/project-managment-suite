@@ -1,11 +1,8 @@
 import React from 'react';
-import { LandingBackground } from '@/packages/lib/components/custom-background';
 
 export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen">
-      <LandingBackground />
-
       <div className="relative pt-24 px-4 pb-16">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-6 gap-8">
@@ -47,8 +44,9 @@ export default function PrivacyPolicy() {
               <div className="space-y-3">
                 <h2 className="text-2xl font-semibold text-foreground">Data Security</h2>
                 <p className="text-md text-muted-foreground leading-relaxed">
-                  We implement appropriate technical and organizational security measures to protect your personal information and business data. These measures include encrypted data storage, secure servers,
-                  and regular security assessments. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.
+                  We implement appropriate technical and organizational security measures to protect your personal information and business data. These measures include encrypted
+                  data storage, secure servers, and regular security assessments. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee
+                  absolute security.
                 </p>
               </div>
 
@@ -56,8 +54,9 @@ export default function PrivacyPolicy() {
               <div className="space-y-3">
                 <h2 className="text-2xl font-semibold text-foreground">Data Sharing and Third Parties</h2>
                 <p className="text-md text-muted-foreground leading-relaxed">
-                  We do not sell your personal information or business data. We may share your information with third-party service providers who assist us in operating our platform, processing
-                  payments, enabling collaboration features, and analyzing our services. These providers are contractually obligated to protect your information and can only use it for specified purposes.
+                  We do not sell your personal information or business data. We may share your information with third-party service providers who assist us in operating our
+                  platform, processing payments, enabling collaboration features, and analyzing our services. These providers are contractually obligated to protect your
+                  information and can only use it for specified purposes.
                 </p>
               </div>
 
@@ -77,8 +76,9 @@ export default function PrivacyPolicy() {
               <div className="space-y-3">
                 <h2 className="text-2xl font-semibold text-foreground">Cookie Policy</h2>
                 <p className="text-md text-muted-foreground leading-relaxed">
-                  We use cookies and similar tracking technologies to enhance your experience on our platform. These technologies help us remember your preferences, analyze usage patterns, and enable collaborative features. You can control cookie preferences through your browser settings.
-                  Essential cookies required for basic functionality cannot be disabled.
+                  We use cookies and similar tracking technologies to enhance your experience on our platform. These technologies help us remember your preferences, analyze usage
+                  patterns, and enable collaborative features. You can control cookie preferences through your browser settings. Essential cookies required for basic functionality
+                  cannot be disabled.
                 </p>
               </div>
 

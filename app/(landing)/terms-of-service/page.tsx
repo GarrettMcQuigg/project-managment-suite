@@ -1,11 +1,8 @@
 import React from 'react';
-import { LandingBackground } from '@/packages/lib/components/custom-background';
 
 export default function TermsOfService() {
   return (
     <div className="min-h-screen">
-      <LandingBackground />
-
       <div className="relative pt-24 px-4 pb-16">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-6 gap-8">

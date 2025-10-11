@@ -20,7 +20,9 @@ export function handlePortalAccess(request: NextRequest, projectId: string, port
     }
 
     // Session exists but doesn't match this project - redirect to auth
-    const authUrl = new URL(`/api/auth/portal/${portalSlug}`, request.url);
+    const authUrl = new URL('/auth/portal/signin', request.url);
+    authUrl.searchParams.set('slug', portalSlug);
+    authUrl.searchParams.set('projectId', projectId);
     authUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(authUrl);
   }
@@ -30,8 +32,10 @@ export function handlePortalAccess(request: NextRequest, projectId: string, port
     return NextResponse.next();
   }
 
-  // No valid session - redirect to portal auth
-  const authUrl = new URL(`/api/auth/portal/${portalSlug}`, request.url);
+  // No valid session - redirect to portal signin
+  const authUrl = new URL('/auth/portal/signin', request.url);
+  authUrl.searchParams.set('slug', portalSlug);
+  authUrl.searchParams.set('projectId', projectId);
   authUrl.searchParams.set('redirect', pathname);
   return NextResponse.redirect(authUrl);
 }

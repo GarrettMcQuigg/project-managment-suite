@@ -9,32 +9,15 @@ import {
   PROJECTS_ROUTE,
   API_PROJECT_UPDATE_CHECKPOINT_STATUS_ROUTE,
   API_PROJECT_GET_BY_ID_ROUTE,
-  API_PROJECT_CHECKPOINT_MESSAGES_SEND_ROUTE
+  PROJECT_PORTAL_CHECKPOINT_ROUTE
 } from '@/packages/lib/routes';
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
-import {
-  CheckCircle,
-  Clock,
-  Circle,
-  Calendar,
-  Target,
-  Zap,
-  ChevronDown,
-  Minimize2,
-  Maximize2,
-  MessageCircle,
-  Paperclip,
-  Send,
-  X,
-  File,
-  Image as ImageIcon,
-  Download
-} from 'lucide-react';
-import Image from 'next/image';
-import ImageLoader from './image-loader';
+import { CheckCircle, Clock, Circle, Calendar, Target, Zap, ChevronDown, Minimize2, Maximize2, MessageCircle, ExternalLink } from 'lucide-react';
 import { Checkpoint, CheckpointStatus } from '@prisma/client';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
+import { routeWithParam } from '@/packages/lib/routes';
 
 interface CheckpointMessage {
   id: string;
@@ -54,9 +37,10 @@ interface ProjectTimelineProps {
   projectId: string;
   isOwner: boolean;
   onScrollToCheckpoint?: (scrollFn: (checkpointId: string) => void) => void;
+  portalSlug: string;
 }
 
-export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoint }: ProjectTimelineProps) {
+export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoint, portalSlug }: ProjectTimelineProps) {
   const endpoint = API_AUTH_PORTAL_GET_BY_ID_ROUTE + projectId;
   const { data, error } = useSWR(endpoint, swrFetcher);
   const [project, setProject] = useState<ProjectWithMetadata | null>(null);
@@ -65,17 +49,9 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
   const [isGloballyCollapsed, setIsGloballyCollapsed] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
-  const [collapsedDiscussions, setCollapsedDiscussions] = useState<Set<string>>(new Set());
 
   const [checkpointMessages, setCheckpointMessages] = useState<{ [key: string]: CheckpointMessage[] }>({});
-  const [newMessages, setNewMessages] = useState<{ [key: string]: string }>({});
-  const [sendingMessages, setSendingMessages] = useState<{ [key: string]: boolean }>({});
-  const [checkpointFiles, setCheckpointFiles] = useState<{ [key: string]: File[] }>({});
-  const [previewFile, setPreviewFile] = useState<File | null>(null);
-  const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
-  const textInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const checkpointRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-  const messageContainerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const scrollToCheckpoint = (checkpointId: string) => {
     const checkpointRef = checkpointRefs.current[checkpointId];
@@ -86,18 +62,6 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
         checkpointRef.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
-        });
-      }, 100);
-    }
-  };
-
-  const scrollMessagesToBottom = (checkpointId: string) => {
-    const messageContainer = messageContainerRefs.current[checkpointId];
-    if (messageContainer) {
-      setTimeout(() => {
-        messageContainer.scrollTo({
-          top: messageContainer.scrollHeight,
-          behavior: 'smooth'
         });
       }, 100);
     }
@@ -180,88 +144,6 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
     });
   };
 
-  const toggleDiscussionCollapse = (checkpointId: string) => {
-    setCollapsedDiscussions((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(checkpointId)) {
-        newSet.delete(checkpointId);
-      } else {
-        newSet.add(checkpointId);
-      }
-      return newSet;
-    });
-  };
-
-  const handleFileChange = (checkpointId: string, e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setCheckpointFiles((prev) => ({
-        ...prev,
-        [checkpointId]: [...(prev[checkpointId] || []), ...newFiles]
-      }));
-      if (fileInputRefs.current[checkpointId]) {
-        fileInputRefs.current[checkpointId]!.value = '';
-      }
-    }
-  };
-
-  const removeFileFromCheckpoint = (checkpointId: string, indexToRemove: number) => {
-    setCheckpointFiles((prev) => ({
-      ...prev,
-      [checkpointId]: (prev[checkpointId] || []).filter((_, index) => index !== indexToRemove)
-    }));
-  };
-
-  const handleSubmitCheckpointMessage = async (checkpointId: string, e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const messageText = newMessages[checkpointId]?.trim();
-    const files = checkpointFiles[checkpointId] || [];
-
-    if (!messageText && files.length === 0) return;
-    if (sendingMessages[checkpointId]) return;
-
-    setSendingMessages((prev) => ({ ...prev, [checkpointId]: true }));
-
-    try {
-      const formData = new FormData();
-      formData.append('projectId', project?.id || '');
-      formData.append('checkpointId', checkpointId);
-      formData.append('text', messageText || '');
-
-      files.forEach((file) => {
-        formData.append('attachments', file);
-      });
-
-      const response = await fetcher({
-        url: API_PROJECT_CHECKPOINT_MESSAGES_SEND_ROUTE,
-        formData
-      });
-
-      if (response.err) {
-        toast.error('Failed to send message');
-        return;
-      }
-
-      setNewMessages((prev) => ({ ...prev, [checkpointId]: '' }));
-      setCheckpointFiles((prev) => ({ ...prev, [checkpointId]: [] }));
-
-      mutate(endpoint);
-
-      // Scroll to bottom after sending message with delay to ensure message is loaded
-      setTimeout(() => {
-        scrollMessagesToBottom(checkpointId);
-        textInputRefs.current[checkpointId]?.focus();
-      }, 1000);
-
-      toast.success('Message sent successfully');
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('An error occurred while sending your message');
-    } finally {
-      setSendingMessages((prev) => ({ ...prev, [checkpointId]: false }));
-    }
-  };
-
   const handleToggleCheckpoint = async (checkpointId: string) => {
     if (!project || isUpdating) return;
 
@@ -334,17 +216,6 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
       }
       return !prev;
     });
-  };
-
-  // Helper to create a File-like object from message attachment for preview
-  const createPreviewFileFromAttachment = (attachment: { blobUrl: string; pathname: string; contentType: string }) => {
-    const fileName = attachment.pathname.split('/').pop() || 'Attachment';
-    return {
-      name: fileName,
-      type: attachment.contentType,
-      size: 0, // Size not available for message attachments
-      blobUrl: attachment.blobUrl
-    };
   };
 
   if (!project) {
@@ -610,200 +481,26 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
                           </div>
                         </div>
 
-                        {/* Checkpoint Messages Section */}
-                        <div className="border border-border bg-card p-3 rounded-lg">
-                          <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleDiscussionCollapse(checkpoint.id)}>
-                            <div className="flex items-center gap-2">
-                              <MessageCircle className="h-4 w-4 text-primary" />
-                              <span className="font-medium text-sm">
-                                <span className="hidden sm:inline">Checkpoint</span> Discussion
-                              </span>
-                              {messages.length > 0 && (
-                                <span className="sm:block hidden text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                                  {messages.length} message{messages.length !== 1 ? 's' : ''}
-                                </span>
-                              )}
-                            </div>
-                            <div
-                              className={`
-                                p-1 rounded-full transition-all duration-300
-                                ${!collapsedDiscussions.has(checkpoint.id) ? 'rotate-180 bg-primary/10 text-primary' : 'bg-muted/50 text-muted-foreground hover:bg-muted'}
-                              `}
-                            >
-                              <ChevronDown className="h-4 w-4" />
-                            </div>
-                          </div>
-
-                          <div
-                            className={`
-                              transition-all duration-300 overflow-hidden
-                              ${!collapsedDiscussions.has(checkpoint.id) ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}
-                            `}
-                          >
-                            {messages.length > 0 && (
-                              <div
-                                ref={(el) => {
-                                  messageContainerRefs.current[checkpoint.id] = el;
-                                }}
-                                className="space-y-3 my-4 max-h-[400px] overflow-y-auto"
-                              >
-                                {messages.map((message) => {
-                                  const isOwn = isOwner && (message.sender === 'Owner' || message.sender?.includes('McQuigg'));
-
-                                  return (
-                                    <div key={message.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                                      <div className={`max-w-[85%]`}>
-                                        {!isOwn && <p className="text-xs font-medium text-muted-foreground px-3 mb-1">{message.sender || 'Anonymous'}</p>}
-
-                                        <div
-                                          className={`px-3 py-2 rounded-xl shadow-sm ${isOwn ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}
-                                        >
-                                          {message.text && message.text.trim() && <p className="text-sm leading-relaxed break-words">{message.text}</p>}
-
-                                          {message.attachments && message.attachments.length > 0 && (
-                                            <div className={`space-y-3 ${message.text ? 'mt-3' : ''}`}>
-                                              {message.attachments.map((attachment) => {
-                                                const isImage = attachment.contentType.startsWith('image/');
-                                                const fileName = attachment.pathname.split('/').pop() || 'Attachment';
-
-                                                return isImage ? (
-                                                  <div
-                                                    key={attachment.id}
-                                                    className="relative group/image cursor-pointer"
-                                                    onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
-                                                  >
-                                                    <Image
-                                                      src={attachment.blobUrl || '/placeholder.svg'}
-                                                      alt={fileName}
-                                                      width={288}
-                                                      height={192}
-                                                      loader={ImageLoader}
-                                                      className="rounded-xl sm:max-w-72 sm:max-h-48 object-cover transition-transform hover:scale-[1.02] shadow-lg"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 rounded-xl transition-colors"></div>
-                                                  </div>
-                                                ) : (
-                                                  <div
-                                                    key={attachment.id}
-                                                    onClick={() => setPreviewFile(createPreviewFileFromAttachment(attachment) as File & { blobUrl: string })}
-                                                    className={`inline-flex items-center space-x-3 px-4 py-3 rounded-xl text-sm transition-all hover:scale-[1.02] shadow-sm hover:shadow-md cursor-pointer ${
-                                                      isOwn
-                                                        ? 'bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground'
-                                                        : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border'
-                                                    }`}
-                                                  >
-                                                    <File className="h-5 w-5" />
-                                                    <span className="truncate max-w-40 font-medium">{fileName}</span>
-                                                  </div>
-                                                );
-                                              })}
-                                            </div>
-                                          )}
-
-                                          <p className={`text-xs mt-1 ${isOwn ? 'text-white/70' : 'text-muted-foreground'}`}>
-                                            {format(new Date(message.createdAt), 'MMM d, h:mm a')}
-                                          </p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-
-                            {/* File preview for checkpoint */}
-                            {(checkpointFiles[checkpoint.id] || []).length > 0 && (
-                              <div className="space-y-3">
-                                <div className="flex items-center text-sm text-muted-foreground">
-                                  <ImageIcon className="h-4 w-4 text-primary" />
-                                  <span className="font-medium">
-                                    {(checkpointFiles[checkpoint.id] || []).length} file{(checkpointFiles[checkpoint.id] || []).length > 1 ? 's' : ''} ready to send
+                        {/* Checkpoint Discussion Link */}
+                        <Link
+                          href={routeWithParam(PROJECT_PORTAL_CHECKPOINT_ROUTE, { id: projectId, portalSlug: portalSlug, checkpointId: checkpoint.id })}
+                          className="block border border-border bg-card p-4 rounded-lg hover:bg-accent transition-colors group"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <MessageCircle className="h-5 w-5 text-primary" />
+                              <div>
+                                <span className="font-medium text-sm block">View Checkpoint Discussion</span>
+                                {messages.length > 0 && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {messages.length} message{messages.length !== 1 ? 's' : ''}
                                   </span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {(checkpointFiles[checkpoint.id] || []).map((file, index) => {
-                                    const isImage = file.type.startsWith('image/');
-                                    return (
-                                      <div
-                                        key={index}
-                                        className="relative bg-card/80 backdrop-blur-sm rounded-lg border border-border/30 shadow-sm hover:shadow-md transition-shadow overflow-hidden group"
-                                      >
-                                        <button
-                                          type="button"
-                                          onClick={() => removeFileFromCheckpoint(checkpoint.id, index)}
-                                          className="absolute top-1 right-1 z-20 w-5 h-5 rounded-full bg-destructive/80 hover:bg-destructive text-destructive-foreground flex items-center justify-center text-xs transition-all hover:scale-110 opacity-0 group-hover:opacity-100"
-                                        >
-                                          ×
-                                        </button>
-                                        {isImage ? (
-                                          <div className="relative">
-                                            <Image src={URL.createObjectURL(file)} alt={file.name} className="w-16 h-16 object-cover rounded-t-lg" width={64} height={64} />
-                                            <div className="px-2 py-1 bg-card/90">
-                                              <span className="text-xs font-medium text-card-foreground truncate block max-w-12">{file.name}</span>
-                                            </div>
-                                          </div>
-                                        ) : (
-                                          <div className="flex flex-col items-center p-2 w-16">
-                                            <File className="h-6 w-6 text-muted-foreground mb-1" />
-                                            <span className="text-xs font-medium text-card-foreground truncate block max-w-12 text-center">{file.name}</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
+                                )}
                               </div>
-                            )}
-
-                            {/* Message Input */}
-                            <div className="space-y-3 mt-2">
-                              <form onSubmit={(e) => handleSubmitCheckpointMessage(checkpoint.id, e)} className="flex items-center sm:space-x-2">
-                                <input
-                                  type="file"
-                                  ref={(el) => {
-                                    fileInputRefs.current[checkpoint.id] = el;
-                                  }}
-                                  onChange={(e) => handleFileChange(checkpoint.id, e)}
-                                  className="hidden"
-                                  multiple
-                                  accept="image/*,.pdf,.doc,.docx,.txt"
-                                />
-
-                                <button
-                                  type="button"
-                                  onClick={() => fileInputRefs.current[checkpoint.id]?.click()}
-                                  className="flex-shrink-0 sm:px-2 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-colors"
-                                >
-                                  <Paperclip className="sm:h-5 sm:w-5 h-4 w-4 mr-2 sm:mr-0" />
-                                </button>
-
-                                <input
-                                  type="text"
-                                  ref={(el) => {
-                                    textInputRefs.current[checkpoint.id] = el;
-                                  }}
-                                  value={newMessages[checkpoint.id] || ''}
-                                  onChange={(e) => setNewMessages((prev) => ({ ...prev, [checkpoint.id]: e.target.value }))}
-                                  placeholder="Add a message about this checkpoint..."
-                                  className="flex-1 sm:w-full w-1/2 px-3 py-2 sm:mr-0 mr-2 rounded-lg border border-input focus:border-ring focus:outline-none bg-background text-foreground placeholder-muted-foreground text-sm"
-                                  disabled={sendingMessages[checkpoint.id]}
-                                />
-
-                                <button
-                                  type="submit"
-                                  disabled={sendingMessages[checkpoint.id] || (!newMessages[checkpoint.id]?.trim() && (checkpointFiles[checkpoint.id] || []).length === 0)}
-                                  className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                >
-                                  {sendingMessages[checkpoint.id] ? (
-                                    <div className="sm:w-5 sm:h-5 w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                  ) : (
-                                    <Send className="sm:h-5 sm:w-5 h-4 w-4" />
-                                  )}
-                                </button>
-                              </form>
                             </div>
+                            <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                           </div>
-                        </div>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -812,83 +509,6 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
             })}
         </div>
       </div>
-
-      {/* File Preview Dialog */}
-      {previewFile && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setPreviewFile(null)}>
-          <div className="relative bg-card rounded-2xl shadow-2xl max-w-4xl max-h-[90vh] w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  {previewFile.type.startsWith('image/') ? <ImageIcon className="h-5 w-5 text-primary" /> : <File className="h-5 w-5 text-primary" />}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">{previewFile.name}</h3>
-                  <p className="text-sm text-muted-foreground">{previewFile.size > 0 ? `${(previewFile.size / 1024 / 1024).toFixed(2)} MB` : 'Size unknown'}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    const url = (previewFile as File & { blobUrl: string }).blobUrl || URL.createObjectURL(previewFile);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = previewFile.name;
-                    a.click();
-                    if (!(previewFile as File & { blobUrl: string }).blobUrl) {
-                      URL.revokeObjectURL(url);
-                    }
-                  }}
-                  className="p-2 hover:bg-secondary rounded-lg transition-colors"
-                >
-                  <Download className="h-5 w-5 text-muted-foreground hover:text-foreground" />
-                </button>
-                <button onClick={() => setPreviewFile(null)} className="p-2 hover:bg-secondary rounded-lg transition-colors">
-                  <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
-                </button>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="p-6 max-h-[calc(90vh-80px)] overflow-auto">
-              {previewFile.type.startsWith('image/') ? (
-                <div className="flex items-center justify-center">
-                  <Image
-                    src={(previewFile as File & { blobUrl: string }).blobUrl || URL.createObjectURL(previewFile)}
-                    alt={previewFile.name}
-                    className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
-                    width={800}
-                    height={600}
-                    loader={(previewFile as File & { blobUrl: string }).blobUrl ? ImageLoader : undefined}
-                  />
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <File className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">File Preview</h3>
-                  <p className="text-muted-foreground mb-4">This file type cannot be previewed directly. Download to view the content.</p>
-                  <button
-                    onClick={() => {
-                      const url = (previewFile as File & { blobUrl: string }).blobUrl || URL.createObjectURL(previewFile);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = previewFile.name;
-                      a.click();
-                      if (!(previewFile as File & { blobUrl: string }).blobUrl) {
-                        URL.revokeObjectURL(url);
-                      }
-                    }}
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    Download File
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

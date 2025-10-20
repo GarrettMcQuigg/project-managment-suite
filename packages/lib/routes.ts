@@ -28,6 +28,7 @@ export const SETTINGS_ROUTE = '/settings';
 // Project pages
 export const PROJECT_DETAILS_ROUTE = `${PROJECTS_ROUTE}/:id`;
 export const PROJECT_PORTAL_ROUTE = `${PROJECTS_ROUTE}/:id/portal/:portalSlug`;
+export const PROJECT_PORTAL_CHECKPOINT_ROUTE = `${PROJECTS_ROUTE}/:id/portal/:portalSlug/:checkpointId`;
 
 // Client pages
 export const CLIENT_DETAILS_ROUTE = `${CLIENTS_ROUTE}/:id`;

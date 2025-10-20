@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { Crown, ArrowLeft, Eye, MoonIcon, SunIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { routeWithParam } from '@/packages/lib/routes';
+import { PROJECT_DETAILS_ROUTE, routeWithParam } from '@/packages/lib/routes';
 import { PROJECT_PORTAL_ROUTE } from '@/packages/lib/routes';
 import { Button } from '@/packages/lib/components/button';
+import Link from 'next/link';
 
 interface PortalHeaderProps {
   isOwner: boolean;
@@ -43,13 +44,16 @@ export default function PortalHeader({ isOwner, projectId, portalSlug }: PortalH
 
   return (
     <header className="z-50">
-      <div className="container mx-auto py-4 lg:px-16 px-4">
+      <div className="py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             {isOwner && (
-              <button onClick={() => router.back()} className="block xs:hidden p-2 rounded-lg hover:bg-muted transition-colors">
+              <Link
+                href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: projectId })}
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-all duration-300 hover:gap-3 mb-4 group"
+              >
                 <ArrowLeft className="h-5 w-5 text-muted-foreground" />
-              </button>
+              </Link>
             )}
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">

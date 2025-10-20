@@ -61,7 +61,7 @@ export function ProjectInfo({ projectId }: { projectId: string }) {
     <>
       <div className="space-y-16">
         <ProjectDetails projectId={projectId} onEditClick={() => setIsEditDialogOpen(true)} />
-        {project && <ProjectTimeline projectId={project.id} isOwner={true} />}
+        {project && <ProjectTimeline projectId={project.id} isOwner={true} portalSlug={project.portalSlug} />}
       </div>
       {project && <UnifiedProjectWorkflow open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} onComplete={handleProjectUpdate} mode="edit" defaultValues={project} />}
     </>

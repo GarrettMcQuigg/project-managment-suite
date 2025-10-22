@@ -70,6 +70,14 @@ export const API_PROJECT_MESSAGES_SEND_ROUTE = `${API_PROJECT_ROUTE}/messages/se
 export const API_PROJECT_MESSAGES_LIST_ROUTE = `${API_PROJECT_ROUTE}/messages/list?id=`;
 export const API_PROJECT_CHECKPOINT_MESSAGES_SEND_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/messages/send`;
 
+// Markup API routes
+export const API_PROJECT_CHECKPOINT_MARKUPS_CREATE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/create`;
+export const API_PROJECT_CHECKPOINT_MARKUPS_LIST_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/list`;
+export const API_PROJECT_CHECKPOINT_MARKUPS_UPDATE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/update`;
+export const API_PROJECT_CHECKPOINT_MARKUPS_DELETE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/delete`;
+export const API_PROJECT_CHECKPOINT_MARKUPS_COMMENTS_CREATE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/comments/create`;
+export const API_PROJECT_CHECKPOINT_MARKUPS_COMMENTS_DELETE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/comments/delete`;
+
 export const API_CLIENT_ROUTE = `${API_ROUTE}/client`;
 export const API_CLIENT_ADD_ROUTE = `${API_CLIENT_ROUTE}/add`;
 export const API_CLIENT_UPDATE_ROUTE = `${API_CLIENT_ROUTE}/update`;

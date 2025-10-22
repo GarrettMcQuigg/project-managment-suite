@@ -165,13 +165,54 @@ model ProjectAttachment {
 }
 
 model ProjectMessageAttachment {
-  id          String         @id @default(uuid())
-  messageId   String
-  blobUrl     String
-  pathname    String
-  contentType String
-  createdAt   DateTime       @default(now())
-  message     ProjectMessage @relation(fields: [messageId], references: [id])
+  id               String                       @id @default(uuid())
+  messageId        String
+  blobUrl          String
+  pathname         String
+  contentType      String
+  hasUnreadMarkups Boolean                      @default(false)
+  lastMarkupAt     DateTime?
+  createdAt        DateTime                     @default(now())
+  message          ProjectMessage               @relation(fields: [messageId], references: [id])
+  markups          AttachmentMarkup[]
+  comments         AttachmentMarkupComment[]
+}
+
+model AttachmentMarkup {
+  id           String                     @id @default(uuid())
+  attachmentId String
+  attachment   ProjectMessageAttachment   @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  userId       String?
+  visitorName  String?
+  type         MarkupType
+  canvasData   Json
+  position     Json?
+  color        String?
+  strokeWidth  Int?
+  visible      Boolean                    @default(true)
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+  comments     AttachmentMarkupComment[]
+
+  @@index([attachmentId])
+  @@index([createdAt])
+}
+
+model AttachmentMarkupComment {
+  id           String                   @id @default(uuid())
+  markupId     String?
+  markup       AttachmentMarkup?        @relation(fields: [markupId], references: [id], onDelete: Cascade)
+  attachmentId String?
+  attachment   ProjectMessageAttachment? @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  userId       String?
+  visitorName  String?
+  text         String                   @db.Text
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+
+  @@index([markupId])
+  @@index([attachmentId])
+  @@index([createdAt])
 }
 
 model Client {
@@ -707,4 +748,12 @@ enum Pages {
   PROJECT_BOARD
   SUPPORT
   SETTINGS
+}
+
+enum MarkupType {
+  COMMENT
+  DRAWING
+  HIGHLIGHT
+  SHAPE
+  TEXT
 }

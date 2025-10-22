@@ -13,6 +13,8 @@ import type { Checkpoint } from '@prisma/client';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { routeWithParam, PROJECT_PORTAL_ROUTE } from '@/packages/lib/routes';
+import AttachmentPreviewModal from './attachment-preview-modal';
+import MessageAttachment from './message-attachment';
 
 interface CheckpointMessage {
   id: string;
@@ -44,6 +46,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
   const [sendingMessage, setSendingMessage] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [selectedAttachment, setSelectedAttachment] = useState<any>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const textInputRef = useRef<HTMLInputElement | null>(null);
@@ -140,16 +143,6 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
     }
   };
 
-  const createPreviewFileFromAttachment = (attachment: { blobUrl: string; pathname: string; contentType: string }) => {
-    const fileName = attachment.pathname.split('/').pop() || 'Attachment';
-    return {
-      name: fileName,
-      type: attachment.contentType,
-      size: 0,
-      blobUrl: attachment.blobUrl
-    };
-  };
-
   const checkpointIndex = project.checkpoints.sort((a, b) => a.order - b.order).findIndex((c) => c.id === checkpoint.id);
 
   return (
@@ -231,53 +224,14 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
 
                         {message.attachments && message.attachments.length > 0 && (
                           <div className={`space-y-3 ${message.text ? 'mt-3' : ''}`}>
-                            {message.attachments.map((attachment) => {
-                              const isImage = attachment.contentType.startsWith('image/');
-                              const fileName = attachment.pathname.split('/').pop() || 'Attachment';
-
-                              return isImage ? (
-                                <div
-                                  key={attachment.id}
-                                  className="relative group/image cursor-pointer"
-                                  onClick={() =>
-                                    setPreviewFile(
-                                      createPreviewFileFromAttachment(attachment) as File & {
-                                        blobUrl: string;
-                                      }
-                                    )
-                                  }
-                                >
-                                  <Image
-                                    src={attachment.blobUrl || '/placeholder.svg'}
-                                    alt={fileName}
-                                    width={288}
-                                    height={192}
-                                    loader={ImageLoader}
-                                    className="rounded-xl sm:max-w-48 sm:max-h-36 object-cover transition-transform hover:scale-[1.02] shadow-md"
-                                  />
-                                  <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 rounded-xl transition-colors"></div>
-                                </div>
-                              ) : (
-                                <div
-                                  key={attachment.id}
-                                  onClick={() =>
-                                    setPreviewFile(
-                                      createPreviewFileFromAttachment(attachment) as File & {
-                                        blobUrl: string;
-                                      }
-                                    )
-                                  }
-                                  className={`inline-flex items-center space-x-3 px-4 py-3 rounded-xl text-sm transition-all hover:scale-[1.02] shadow-sm hover:shadow-md cursor-pointer ${
-                                    isOwner
-                                      ? 'bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground'
-                                      : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border'
-                                  }`}
-                                >
-                                  <File className="h-5 w-5" />
-                                  <span className="truncate max-w-40 font-medium">{fileName}</span>
-                                </div>
-                              );
-                            })}
+                            {message.attachments.map((attachment) => (
+                              <MessageAttachment
+                                key={attachment.id}
+                                attachment={attachment}
+                                isOwnerMessage={isOwner}
+                                onClick={() => setSelectedAttachment(attachment)}
+                              />
+                            ))}
                           </div>
                         )}
 
@@ -494,6 +448,17 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
             </div>
           </div>
         </div>
+      )}
+
+      {/* Attachment Preview Modal with Markup Tools */}
+      {selectedAttachment && (
+        <AttachmentPreviewModal
+          attachment={selectedAttachment}
+          projectId={projectId}
+          checkpointId={checkpoint.id}
+          isOwner={isOwner}
+          onClose={() => setSelectedAttachment(null)}
+        />
       )}
     </div>
   );

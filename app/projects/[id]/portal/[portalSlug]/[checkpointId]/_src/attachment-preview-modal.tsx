@@ -25,7 +25,9 @@ export default function AttachmentPreviewModal({
 }: AttachmentPreviewModalProps) {
   const [showMarkups, setShowMarkups] = useState(true);
   const [markups, setMarkups] = useState<any[]>([]);
+  const [generalComments, setGeneralComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
 
   const fileName = attachment.pathname.split('/').pop() || 'File';
   const fileType = attachment.contentType;
@@ -40,9 +42,11 @@ export default function AttachmentPreviewModal({
       setLoading(true);
       const data = await swrFetcher(`${API_PROJECT_CHECKPOINT_MARKUPS_LIST_ROUTE}?attachmentId=${attachment.id}`);
       setMarkups(data.content.markups || []);
+      setGeneralComments(data.content.generalComments || []);
     } catch (error) {
       console.error('Error loading markups:', error);
       setMarkups([]);
+      setGeneralComments([]);
     } finally {
       setLoading(false);
     }
@@ -75,7 +79,25 @@ export default function AttachmentPreviewModal({
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Save Status Indicator */}
+          <div className="flex items-center gap-3">
+            {saveStatus !== 'saved' && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg text-xs">
+                {saveStatus === 'saving' ? (
+                  <>
+                    <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    <span className="text-muted-foreground">Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                    <span className="text-muted-foreground">Unsaved changes</span>
+                  </>
+                )}
+              </div>
+            )}
+
             <button
               onClick={() => setShowMarkups(!showMarkups)}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
@@ -107,6 +129,7 @@ export default function AttachmentPreviewModal({
               onMarkupCreated={handleMarkupCreated}
               onMarkupDeleted={handleMarkupDeleted}
               onMarkupsUpdated={loadMarkups}
+              onSaveStatusChange={setSaveStatus}
             />
           </div>
 
@@ -115,6 +138,7 @@ export default function AttachmentPreviewModal({
             <MarkupActivityLog
               attachment={attachment}
               markups={markups}
+              generalComments={generalComments}
               projectId={projectId}
               checkpointId={checkpointId}
               isOwner={isOwner}

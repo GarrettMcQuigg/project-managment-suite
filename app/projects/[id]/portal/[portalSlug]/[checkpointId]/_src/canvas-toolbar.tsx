@@ -10,10 +10,12 @@ import {
   Circle,
   ArrowRight,
   Undo,
-  Trash2
+  Redo,
+  Trash2,
+  Eraser
 } from 'lucide-react';
 
-type ToolType = 'select' | 'comment' | 'draw' | 'highlight' | 'rectangle' | 'circle' | 'arrow';
+type ToolType = 'select' | 'comment' | 'draw' | 'highlight' | 'rectangle' | 'circle' | 'arrow' | 'eraser';
 
 interface CanvasToolbarProps {
   activeTool: ToolType;
@@ -23,6 +25,7 @@ interface CanvasToolbarProps {
   onColorChange: (color: string) => void;
   onStrokeWidthChange: (width: number) => void;
   onUndo: () => void;
+  onRedo?: () => void;
   onClearAll: () => void;
 }
 
@@ -34,6 +37,7 @@ export default function CanvasToolbar({
   onColorChange,
   onStrokeWidthChange,
   onUndo,
+  onRedo,
   onClearAll
 }: CanvasToolbarProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -45,7 +49,8 @@ export default function CanvasToolbar({
     { id: 'highlight' as ToolType, icon: Highlighter, label: 'Highlight' },
     { id: 'rectangle' as ToolType, icon: Square, label: 'Rectangle' },
     { id: 'circle' as ToolType, icon: Circle, label: 'Circle' },
-    { id: 'arrow' as ToolType, icon: ArrowRight, label: 'Arrow' }
+    { id: 'arrow' as ToolType, icon: ArrowRight, label: 'Arrow' },
+    { id: 'eraser' as ToolType, icon: Eraser, label: 'Eraser' }
   ];
 
   const presetColors = [
@@ -147,10 +152,19 @@ export default function CanvasToolbar({
         <button
           onClick={onUndo}
           className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-          title="Undo"
+          title="Undo (Ctrl+Z)"
         >
           <Undo className="h-4 w-4" />
         </button>
+        {onRedo && (
+          <button
+            onClick={onRedo}
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+            title="Redo (Ctrl+Y)"
+          >
+            <Redo className="h-4 w-4" />
+          </button>
+        )}
         <button
           onClick={onClearAll}
           className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"

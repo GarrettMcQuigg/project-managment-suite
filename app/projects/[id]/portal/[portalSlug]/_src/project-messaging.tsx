@@ -204,7 +204,7 @@ export default function ProjectMessaging({ project, isOwner = false, context, sh
   // };
 
   return (
-    <div className={`flex flex-col min-h-[400px] ${showClientInfo ? 'max-h-[350px] sm:max-h-[400px] lg:max-h-[727px]' : 'max-h-[400px] sm:max-h-[500px] lg:max-h-[820px]'}`}>
+    <div className={`flex flex-col min-h-[400px] ${showClientInfo ? 'max-h-[550px] sm:max-h-[550px] lg:max-h-[727px]' : 'max-h-[550px] sm:max-h-[550px] lg:max-h-[820px]'}`}>
       {/* Header */}
       <div className="border-b border-border px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">

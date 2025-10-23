@@ -24,10 +24,7 @@ export default function MessageAttachment({ attachment, isOwnerMessage, onClick 
 
   if (isImage) {
     return (
-      <div
-        className="relative group/image cursor-pointer"
-        onClick={onClick}
-      >
+      <div className="relative group/image cursor-pointer" onClick={onClick}>
         <Image
           src={attachment.blobUrl || '/placeholder.svg'}
           alt={fileName}
@@ -51,7 +48,8 @@ export default function MessageAttachment({ attachment, isOwnerMessage, onClick 
       }`}
     >
       <File className="h-5 w-5" />
-      <span className="truncate max-w-40 font-medium">{fileName}</span>
+      <span className="hidden sm:block truncate max-w-40 font-medium">{fileName}</span>
+      <span className="block sm:hidden truncate max-w-20 font-medium">Attachment</span>
     </div>
   );
 }

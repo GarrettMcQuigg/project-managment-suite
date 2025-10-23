@@ -247,7 +247,7 @@ export default function ProjectTimeline({ projectId, isOwner, onScrollToCheckpoi
   };
 
   return (
-    <div className="max-h-full flex flex-col p-4 overflow-y-auto overscroll-contain">
+    <div className="max-h-full flex flex-col p-1 sm:p-4 overflow-y-auto overscroll-contain">
       {/* Header */}
       <div className="space-y-3 pb-2">
         <div className="flex items-center justify-between gap-4">

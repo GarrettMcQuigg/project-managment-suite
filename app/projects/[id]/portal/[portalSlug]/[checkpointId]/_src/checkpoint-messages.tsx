@@ -146,7 +146,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
   const checkpointIndex = project.checkpoints.sort((a, b) => a.order - b.order).findIndex((c) => c.id === checkpoint.id);
 
   return (
-    <div className="max-h-screen-minus-header">
+    <>
       <div className="mb-4">
         <Link
           href={routeWithParam(PROJECT_PORTAL_ROUTE, {
@@ -158,29 +158,6 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
           <ArrowLeft className="h-4 w-4" />
           <span className="font-medium">Back to Timeline</span>
         </Link>
-
-        <div className="relative border border-border rounded-lg p-6 shadow-md overflow-hidden">
-          <div className="relative z-10 flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="relative">
-                  <div className="w-fit h-fit bg-primary rounded-lg p-3 shadow-md shadow-primary/25">
-                    <Target className="h-6 w-6 text-white" />
-                  </div>
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold">{checkpoint.name || `Checkpoint ${checkpointIndex + 1}`}</h1>
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-                    <span className="text-sm font-medium text-primary">Active Discussion</span>
-                  </div>
-                </div>
-              </div>
-
-              {checkpoint.description && <p className="text-muted-foreground leading-relaxed text-lg">{checkpoint.description}</p>}
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Main Content - Chat Focus */}
@@ -211,7 +188,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
           </div>
 
           {/* Messages */}
-          <div ref={messageContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div ref={messageContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 lg:min-h-[550px] lg:max-h-[650px] max-h-[550px]">
             {messages.length > 0 ? (
               messages.map((message) => {
                 return (
@@ -225,12 +202,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
                         {message.attachments && message.attachments.length > 0 && (
                           <div className={`space-y-3 ${message.text ? 'mt-3' : ''}`}>
                             {message.attachments.map((attachment) => (
-                              <MessageAttachment
-                                key={attachment.id}
-                                attachment={attachment}
-                                isOwnerMessage={isOwner}
-                                onClick={() => setSelectedAttachment(attachment)}
-                              />
+                              <MessageAttachment key={attachment.id} attachment={attachment} isOwnerMessage={isOwner} onClick={() => setSelectedAttachment(attachment)} />
                             ))}
                           </div>
                         )}
@@ -334,12 +306,16 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
 
         <div className="xl:col-span-1 space-y-4">
           <div className="border border-border rounded-lg p-5 shadow-md">
-            <h3 className="font-bold mb-4 flex items-center gap-2 text-lg">
-              <div className="p-1.5 bg-primary rounded-lg">
-                <Target className="h-4 w-4 text-white" />
-              </div>
-              Checkpoint Info
-            </h3>
+            <p className="font-bold text-foreground mb-1 text-lg">{project.name}</p>
+            {project.description && <p className="text-muted-foreground text-xs leading-relaxed">{project.description}</p>}
+          </div>
+
+          <div className="border border-border rounded-lg p-5 shadow-md">
+            <p className="font-bold text-foreground mb-1 text-lg">{checkpoint.name || `Checkpoint ${checkpointIndex + 1}`}</p>
+            <p className="text-muted-foreground text-xs leading-relaxed">{checkpoint.description || 'No description'}</p>
+          </div>
+          <div className="border border-border rounded-lg p-5 shadow-md">
+            <h3 className="font-bold mb-2 flex items-center gap-2 text-lg">Checkpoint Info</h3>
             <div className="space-y-4 text-sm">
               <div className="p-3 bg-card/80 backdrop-blur-sm rounded-xl border border-border/50">
                 <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">Status</p>
@@ -359,11 +335,6 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
                 <p className="font-semibold text-foreground">Checkpoint {checkpointIndex + 1}</p>
               </div>
             </div>
-          </div>
-
-          <div className="border border-border rounded-lg p-5 shadow-md">
-            <p className="font-semibold text-foreground mb-1 text-lg">{project.name}</p>
-            {project.description && <p className="text-muted-foreground text-xs leading-relaxed">{project.description}</p>}
           </div>
         </div>
       </div>
@@ -452,14 +423,8 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
 
       {/* Attachment Preview Modal with Markup Tools */}
       {selectedAttachment && (
-        <AttachmentPreviewModal
-          attachment={selectedAttachment}
-          projectId={projectId}
-          checkpointId={checkpoint.id}
-          isOwner={isOwner}
-          onClose={() => setSelectedAttachment(null)}
-        />
+        <AttachmentPreviewModal attachment={selectedAttachment} projectId={projectId} checkpointId={checkpoint.id} isOwner={isOwner} onClose={() => setSelectedAttachment(null)} />
       )}
-    </div>
+    </>
   );
 }

@@ -6,7 +6,6 @@ import { fetcher } from '@/packages/lib/helpers/fetcher';
 import {
   API_PROJECT_CHECKPOINT_MARKUPS_CREATE_ROUTE,
   API_PROJECT_CHECKPOINT_MARKUPS_BATCH_CREATE_ROUTE,
-  API_PROJECT_CHECKPOINT_MARKUPS_DELETE_ROUTE,
   API_PROJECT_CHECKPOINT_MARKUPS_BATCH_DELETE_ROUTE,
   API_PROJECT_CHECKPOINT_MARKUPS_COMMENTS_CREATE_ROUTE
 } from '@/packages/lib/routes';
@@ -53,9 +52,13 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
   const [shapes, setShapes] = useState<Array<{ type: ToolType; start: Point; end: Point; color: string; width: number; id?: string }>>([]);
   const [unsavedShapes, setUnsavedShapes] = useState<Array<{ type: ToolType; start: Point; end: Point; color: string; width: number }>>([]);
 
-  // Undo/Redo state
-  const [history, setHistory] = useState<Array<{ points: Point[]; color: string; width: number }>>([]);
-  const [redoStack, setRedoStack] = useState<Array<{ points: Point[]; color: string; width: number }>>([]);
+  // Undo/Redo state - unified history for all markup types
+  type HistoryItem =
+    | { type: 'path'; data: { points: Point[]; color: string; width: number; isHighlight?: boolean }; id?: string }
+    | { type: 'shape'; data: { type: ToolType; start: Point; end: Point; color: string; width: number }; id?: string };
+
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [redoStack, setRedoStack] = useState<HistoryItem[]>([]);
 
   // Save state
   const [isSaving, setIsSaving] = useState(false);
@@ -534,7 +537,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         unsavedPathsRef.current = updated;
         return updated;
       });
-      setHistory((prev) => [...prev, pathData]);
+      setHistory((prev) => [...prev, { type: 'path', data: pathData }]);
       setRedoStack([]); // Clear redo stack when new action is made
       updateSaveStatus('unsaved');
 
@@ -578,6 +581,8 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         unsavedShapesRef.current = updated;
         return updated;
       });
+      setHistory((prev) => [...prev, { type: 'shape', data: shapeData }]);
+      setRedoStack([]); // Clear redo stack when new action is made
       updateSaveStatus('unsaved');
 
       // Add temporary markup to activity log
@@ -720,6 +725,30 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         return newShapes;
       });
 
+      // Update history items with IDs from server
+      setHistory((prev) => {
+        const newHistory = [...prev];
+        let pathCount = 0;
+        let shapeCount = 0;
+
+        // Go through history in reverse to find unsaved items and update with IDs
+        for (let i = newHistory.length - 1; i >= 0; i--) {
+          const item = newHistory[i];
+          if (!item.id) {
+            if (item.type === 'path' && pathCount < currentUnsavedPaths.length) {
+              const markupIndex = currentUnsavedPaths.length - 1 - pathCount;
+              newHistory[i] = { ...item, id: allSavedMarkups[markupIndex]?.id };
+              pathCount++;
+            } else if (item.type === 'shape' && shapeCount < currentUnsavedShapes.length) {
+              const markupIndex = currentUnsavedPaths.length + (currentUnsavedShapes.length - 1 - shapeCount);
+              newHistory[i] = { ...item, id: allSavedMarkups[markupIndex]?.id };
+              shapeCount++;
+            }
+          }
+        }
+        return newHistory;
+      });
+
       // Clear unsaved items and pending deletes
       setUnsavedPaths([]);
       setUnsavedShapes([]);
@@ -807,72 +836,162 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
   const handleUndo = () => {
     if (history.length === 0) return;
 
-    const lastPath = history[history.length - 1];
+    const lastItem = history[history.length - 1];
 
     // Remove from history and add to redo stack
     setHistory((prev) => prev.slice(0, -1));
-    setRedoStack((prev) => [...prev, lastPath]);
 
-    // Remove from paths
-    setPaths((prev) => prev.slice(0, -1));
+    // When adding to redo stack, clear the ID since if we redo it will get a new ID
+    // This prevents trying to delete non-existent IDs
+    const itemForRedo = { ...lastItem, id: undefined };
+    setRedoStack((prev) => [...prev, itemForRedo]);
 
-    // Find and remove the last DRAWING markup from activity log
-    const drawingMarkups = markups.filter((m) => m.type === 'DRAWING');
-    if (drawingMarkups.length > 0) {
-      const lastDrawingMarkup = drawingMarkups[drawingMarkups.length - 1];
-      onMarkupDeleted(lastDrawingMarkup.id);
-    }
+    if (lastItem.type === 'path') {
+      // Remove from paths immediately for visual feedback
+      setPaths((prev) => prev.slice(0, -1));
 
-    // If it was unsaved, remove from unsaved paths
-    setUnsavedPaths((prev) => {
-      const index = prev.findIndex((p) => p === lastPath);
-      if (index !== -1) {
-        const updated = prev.filter((_, i) => i !== index);
-        unsavedPathsRef.current = updated;
-        return updated;
+      // If it was unsaved, remove from unsaved paths
+      setUnsavedPaths((prev) => {
+        const index = prev.findIndex((p) => p === lastItem.data);
+        if (index !== -1) {
+          const updated = prev.filter((_, i) => i !== index);
+          unsavedPathsRef.current = updated;
+          return updated;
+        }
+        return prev;
+      });
+
+      // If it has an ID, add to pending deletes for batch API call (avoid duplicates)
+      if (lastItem.id) {
+        setPendingDeletes((prev) => {
+          if (!prev.includes(lastItem.id!)) {
+            const updated = [...prev, lastItem.id!];
+            pendingDeletesRef.current = updated;
+            return updated;
+          }
+          return prev;
+        });
+        // Hide from UI immediately
+        onMarkupDeleted(lastItem.id);
+        updateSaveStatus('unsaved');
+        scheduleDebouncedSave();
       }
-      return prev;
-    });
+    } else if (lastItem.type === 'shape') {
+      // Remove from shapes immediately for visual feedback
+      setShapes((prev) => prev.slice(0, -1));
 
-    redrawCanvas();
+      // If it was unsaved, remove from unsaved shapes
+      setUnsavedShapes((prev) => {
+        const index = prev.findIndex((s) => s === lastItem.data);
+        if (index !== -1) {
+          const updated = prev.filter((_, i) => i !== index);
+          unsavedShapesRef.current = updated;
+          return updated;
+        }
+        return prev;
+      });
+
+      // If it has an ID, add to pending deletes for batch API call (avoid duplicates)
+      if (lastItem.id) {
+        setPendingDeletes((prev) => {
+          if (!prev.includes(lastItem.id!)) {
+            const updated = [...prev, lastItem.id!];
+            pendingDeletesRef.current = updated;
+            return updated;
+          }
+          return prev;
+        });
+        // Hide from UI immediately
+        onMarkupDeleted(lastItem.id);
+        updateSaveStatus('unsaved');
+        scheduleDebouncedSave();
+      }
+    }
   };
 
   const handleRedo = () => {
     if (redoStack.length === 0) return;
 
-    const pathToRedo = redoStack[redoStack.length - 1];
+    const itemToRedo = redoStack[redoStack.length - 1];
 
     // Remove from redo stack and add back to history
     setRedoStack((prev) => prev.slice(0, -1));
-    setHistory((prev) => [...prev, pathToRedo]);
+    setHistory((prev) => [...prev, itemToRedo]);
 
-    // Add back to paths
-    setPaths((prev) => [...prev, pathToRedo]);
+    if (itemToRedo.type === 'path') {
+      // Add back to paths immediately for visual feedback
+      setPaths((prev) => [...prev, itemToRedo.data]);
 
-    // Add temporary markup back to activity log
-    const tempMarkup = {
-      id: `temp-${Date.now()}`,
-      type: 'DRAWING',
-      color: pathToRedo.color,
-      strokeWidth: pathToRedo.width,
-      createdAt: new Date().toISOString(),
-      userId: isOwner ? 'current-user' : null,
-      visitorName: isOwner ? null : 'You',
-      canvasData: pathToRedo,
-      comments: []
-    };
-    onMarkupCreated(tempMarkup);
+      // Add temporary markup back to activity log
+      const tempMarkup = {
+        id: `temp-${Date.now()}`,
+        type: itemToRedo.data.isHighlight ? 'HIGHLIGHT' : 'DRAWING',
+        color: itemToRedo.data.color,
+        strokeWidth: itemToRedo.data.width,
+        createdAt: new Date().toISOString(),
+        userId: isOwner ? 'current-user' : null,
+        visitorName: isOwner ? null : 'You',
+        canvasData: itemToRedo.data,
+        comments: []
+      };
+      onMarkupCreated(tempMarkup);
 
-    // Mark as unsaved
-    setUnsavedPaths((prev) => {
-      const updated = [...prev, pathToRedo];
-      unsavedPathsRef.current = updated;
-      return updated;
-    });
+      // Mark as unsaved
+      setUnsavedPaths((prev) => {
+        const updated = [...prev, itemToRedo.data];
+        unsavedPathsRef.current = updated;
+        return updated;
+      });
+
+      // If this was previously deleted, remove from pending deletes
+      if (itemToRedo.id) {
+        setPendingDeletes((prev) => {
+          const updated = prev.filter(id => id !== itemToRedo.id);
+          pendingDeletesRef.current = updated;
+          return updated;
+        });
+      }
+    } else if (itemToRedo.type === 'shape') {
+      // Add back to shapes immediately for visual feedback
+      setShapes((prev) => [...prev, itemToRedo.data]);
+
+      // Add temporary markup back to activity log
+      const tempMarkup = {
+        id: `temp-${Date.now()}`,
+        type: 'SHAPE',
+        color: itemToRedo.data.color,
+        strokeWidth: itemToRedo.data.width,
+        createdAt: new Date().toISOString(),
+        userId: isOwner ? 'current-user' : null,
+        visitorName: isOwner ? null : 'You',
+        canvasData: {
+          shapeType: itemToRedo.data.type,
+          start: itemToRedo.data.start,
+          end: itemToRedo.data.end
+        },
+        comments: []
+      };
+      onMarkupCreated(tempMarkup);
+
+      // Mark as unsaved
+      setUnsavedShapes((prev) => {
+        const updated = [...prev, itemToRedo.data];
+        unsavedShapesRef.current = updated;
+        return updated;
+      });
+
+      // If this was previously deleted, remove from pending deletes
+      if (itemToRedo.id) {
+        setPendingDeletes((prev) => {
+          const updated = prev.filter(id => id !== itemToRedo.id);
+          pendingDeletesRef.current = updated;
+          return updated;
+        });
+      }
+    }
+
     updateSaveStatus('unsaved');
     scheduleDebouncedSave();
-
-    redrawCanvas();
   };
 
   // Keyboard shortcuts for undo/redo
@@ -892,23 +1011,45 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
   }, [history, redoStack]);
 
   const handleClearAll = async () => {
-    if (markups.length === 0) return;
+    const totalMarkups = markups.length + paths.length + shapes.length;
+    if (totalMarkups === 0) return;
 
     if (!confirm('Are you sure you want to delete all markups?')) return;
 
     try {
-      for (const markup of markups) {
-        await fetcher({
-          url: API_PROJECT_CHECKPOINT_MARKUPS_DELETE_ROUTE,
+      // Collect all markup IDs (both from database and local)
+      const markupIds = markups.map((m) => m.id);
+      const localPathIds = paths.filter((p) => p.id).map((p) => p.id!);
+      const localShapeIds = shapes.filter((s) => s.id).map((s) => s.id!);
+      const allIds = [...markupIds, ...localPathIds, ...localShapeIds];
+
+      // Use batch delete API if there are any saved markups
+      if (allIds.length > 0) {
+        const result = await fetcher({
+          url: API_PROJECT_CHECKPOINT_MARKUPS_BATCH_DELETE_ROUTE,
           requestBody: {
-            markupId: markup.id
+            markupIds: allIds
           }
         });
+
+        if (result.err) {
+          throw new Error('Failed to delete markups');
+        }
       }
 
-      onMarkupsUpdated();
+      // Clear all local state
       setPaths([]);
       setShapes([]);
+      setUnsavedPaths([]);
+      setUnsavedShapes([]);
+      setPendingDeletes([]);
+      unsavedPathsRef.current = [];
+      unsavedShapesRef.current = [];
+      pendingDeletesRef.current = [];
+      setHistory([]);
+      setRedoStack([]);
+
+      onMarkupsUpdated();
       toast.success('All markups cleared');
     } catch (error) {
       console.error('Error clearing markups:', error);

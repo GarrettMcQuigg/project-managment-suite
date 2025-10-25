@@ -185,13 +185,11 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
 
   return (
     <div className="h-full flex flex-col bg-background">
-      <div className="border-b border-border px-6 py-4 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-foreground">Activity</h3>
-          <span className="text-sm text-muted-foreground">
-            {allComments.length} {allComments.length === 1 ? 'comment' : 'comments'}
-          </span>
-        </div>
+      <div className="border-b border-border px-6 h-16 flex items-center justify-between flex-shrink-0">
+        <h3 className="font-semibold text-foreground">Activity</h3>
+        <span className="text-sm text-muted-foreground">
+          {allComments.length} {allComments.length === 1 ? 'comment' : 'comments'}
+        </span>
       </div>
 
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">

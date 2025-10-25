@@ -146,7 +146,7 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
       <div className="relative bg-card rounded-2xl shadow-2xl w-full h-[90vh] max-w-[95vw] overflow-hidden border border-border flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur flex-shrink-0">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="flex items-center gap-3">
             <div>
               <h3 className="font-bold text-foreground truncate">{fileName}</h3>
               <p className="text-sm text-muted-foreground">
@@ -156,7 +156,7 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
           </div>
 
           {/* Save Status Indicator */}
-          <div className="flex items-center gap-3">
+          <div>
             {saveStatus !== 'saved' && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg text-xs">
                 {saveStatus === 'saving' ? (
@@ -172,7 +172,9 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
                 )}
               </div>
             )}
+          </div>
 
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setShowMarkups(!showMarkups)}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${

@@ -1,19 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  MousePointer2,
-  MessageSquare,
-  Pencil,
-  Highlighter,
-  Square,
-  Circle,
-  ArrowRight,
-  Undo,
-  Redo,
-  Trash2,
-  Eraser
-} from 'lucide-react';
+import { MousePointer2, MessageSquare, Pencil, Highlighter, Square, Circle, ArrowRight, Undo, Redo, Trash2, Eraser } from 'lucide-react';
 
 type ToolType = 'select' | 'comment' | 'draw' | 'highlight' | 'rectangle' | 'circle' | 'arrow' | 'eraser';
 
@@ -29,17 +17,7 @@ interface CanvasToolbarProps {
   onClearAll: () => void;
 }
 
-export default function CanvasToolbar({
-  activeTool,
-  color,
-  strokeWidth,
-  onToolChange,
-  onColorChange,
-  onStrokeWidthChange,
-  onUndo,
-  onRedo,
-  onClearAll
-}: CanvasToolbarProps) {
+export default function CanvasToolbar({ activeTool, color, strokeWidth, onToolChange, onColorChange, onStrokeWidthChange, onUndo, onRedo, onClearAll }: CanvasToolbarProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   const tools = [
@@ -53,14 +31,10 @@ export default function CanvasToolbar({
     { id: 'eraser' as ToolType, icon: Eraser, label: 'Eraser' }
   ];
 
-  const presetColors = [
-    '#FF0000', '#00FF00', '#0000FF', '#FFFF00',
-    '#FF00FF', '#00FFFF', '#FFA500', '#800080',
-    '#000000', '#FFFFFF', '#808080', '#FFC0CB'
-  ];
+  const presetColors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080', '#000000', '#FFFFFF', '#808080', '#FFC0CB'];
 
   return (
-    <div className="border-b border-border bg-card p-3 flex items-center gap-3 flex-wrap">
+    <div className="border-b border-border bg-card h-16 px-3 flex items-center gap-3 flex-wrap">
       {/* Tools */}
       <div className="flex items-center gap-1 border-r border-border pr-3">
         {tools.map((tool) => {
@@ -70,9 +44,7 @@ export default function CanvasToolbar({
               key={tool.id}
               onClick={() => onToolChange(tool.id)}
               className={`p-2 rounded-lg transition-colors ${
-                activeTool === tool.id
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                activeTool === tool.id ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
               title={tool.label}
             >
@@ -93,10 +65,7 @@ export default function CanvasToolbar({
           />
           {showColorPicker && (
             <div className="absolute top-full left-0 mt-2 z-50">
-              <div
-                className="fixed inset-0"
-                onClick={() => setShowColorPicker(false)}
-              />
+              <div className="fixed inset-0" onClick={() => setShowColorPicker(false)} />
               <div className="relative bg-card border border-border rounded-lg shadow-lg p-3">
                 <div className="grid grid-cols-4 gap-2 mb-3">
                   {presetColors.map((presetColor) => (
@@ -113,12 +82,7 @@ export default function CanvasToolbar({
                   ))}
                 </div>
                 <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={color}
-                    onChange={(e) => onColorChange(e.target.value)}
-                    className="w-full h-8 rounded cursor-pointer"
-                  />
+                  <input type="color" value={color} onChange={(e) => onColorChange(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
                   <input
                     type="text"
                     value={color}
@@ -136,40 +100,21 @@ export default function CanvasToolbar({
       {/* Stroke Width */}
       <div className="flex items-center gap-2 border-r border-border pr-3">
         <span className="text-sm text-muted-foreground">Width:</span>
-        <input
-          type="range"
-          min="1"
-          max="20"
-          value={strokeWidth}
-          onChange={(e) => onStrokeWidthChange(Number(e.target.value))}
-          className="w-20"
-        />
+        <input type="range" min="1" max="20" value={strokeWidth} onChange={(e) => onStrokeWidthChange(Number(e.target.value))} className="w-20" />
         <span className="text-sm text-muted-foreground w-6">{strokeWidth}</span>
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-1">
-        <button
-          onClick={onUndo}
-          className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-          title="Undo (Ctrl+Z)"
-        >
+        <button onClick={onUndo} className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors" title="Undo (Ctrl+Z)">
           <Undo className="h-4 w-4" />
         </button>
         {onRedo && (
-          <button
-            onClick={onRedo}
-            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-            title="Redo (Ctrl+Y)"
-          >
+          <button onClick={onRedo} className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors" title="Redo (Ctrl+Y)">
             <Redo className="h-4 w-4" />
           </button>
         )}
-        <button
-          onClick={onClearAll}
-          className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
-          title="Clear All"
-        >
+        <button onClick={onClearAll} className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors" title="Clear All">
           <Trash2 className="h-4 w-4" />
         </button>
       </div>

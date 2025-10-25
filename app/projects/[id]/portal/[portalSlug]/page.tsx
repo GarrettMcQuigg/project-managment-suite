@@ -30,16 +30,12 @@ export default async function ProjectPortalPage({ params, searchParams }: { para
   const isOwner = context.type === 'user' && context.user.id === project.userId;
 
   let portalSession = null;
-  // let visitorName = 'Portal Visitor';
 
   const sessionCookieName = getPortalSessionCookieName(resolvedParams.id);
   const sessionCookie = cookieStore.get(sessionCookieName);
 
   if (sessionCookie?.value) {
     portalSession = await validatePortalSessionForProject(sessionCookie.value, resolvedParams.id);
-    // if (portalSession) {
-    //   visitorName = portalSession.visitorName;
-    // }
   }
 
   const hasPortalAccess = !!portalSession;

@@ -36,9 +36,10 @@ interface CheckpointMessagesProps {
   project: ProjectWithMetadata;
   isOwner: boolean;
   ownerName: string;
+  currentUserName: string;
 }
 
-export default function CheckpointMessages({ projectId, checkpoint, project, isOwner, ownerName }: CheckpointMessagesProps) {
+export default function CheckpointMessages({ projectId, checkpoint, project, isOwner, ownerName, currentUserName }: CheckpointMessagesProps) {
   const endpoint = API_AUTH_PORTAL_GET_BY_ID_ROUTE + projectId;
   const { data } = useSWR(endpoint, swrFetcher);
 
@@ -192,23 +193,24 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
           <div ref={messageContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 lg:min-h-[550px] lg:max-h-[650px] max-h-[550px]">
             {messages.length > 0 ? (
               messages.map((message) => {
+                const isOwnMessage = message.sender === currentUserName;
                 return (
-                  <div key={message.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
+                  <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
                     <div className="max-w-[85%]">
-                      {!isOwner && <p className="text-xs font-medium text-muted-foreground px-3 mb-1">{message.sender || 'Anonymous'}</p>}
+                      {!isOwnMessage && <p className="text-xs font-medium text-muted-foreground px-3 mb-1">{message.sender || 'Anonymous'}</p>}
 
-                      <div className={`px-3 py-2 rounded-xl shadow-sm ${isOwner ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}>
+                      <div className={`px-3 py-2 rounded-xl shadow-sm ${isOwnMessage ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}>
                         {message.text && message.text.trim() && <p className="text-sm leading-relaxed break-words">{message.text}</p>}
 
                         {message.attachments && message.attachments.length > 0 && (
                           <div className={`space-y-3 ${message.text ? 'mt-3' : ''}`}>
                             {message.attachments.map((attachment) => (
-                              <MessageAttachment key={attachment.id} attachment={attachment} isOwnerMessage={isOwner} onClick={() => setSelectedAttachment(attachment)} />
+                              <MessageAttachment key={attachment.id} attachment={attachment} isOwnerMessage={isOwnMessage} onClick={() => setSelectedAttachment(attachment)} />
                             ))}
                           </div>
                         )}
 
-                        <p className={`text-xs mt-1 ${isOwner ? 'text-white/70' : 'text-muted-foreground'}`}>{format(new Date(message.createdAt), 'MMM d, h:mm a')}</p>
+                        <p className={`text-xs mt-1 ${isOwnMessage ? 'text-white/70' : 'text-muted-foreground'}`}>{format(new Date(message.createdAt), 'MMM d, h:mm a')}</p>
                       </div>
                     </div>
                   </div>
@@ -430,6 +432,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
           checkpointId={checkpoint.id}
           isOwner={isOwner}
           ownerName={ownerName}
+          currentUserName={currentUserName}
           onClose={() => setSelectedAttachment(null)}
         />
       )}

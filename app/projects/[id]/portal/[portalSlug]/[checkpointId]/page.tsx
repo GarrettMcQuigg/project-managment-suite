@@ -6,6 +6,7 @@ import { getProjectForPortalAccess } from '@/packages/lib/helpers/get-project-by
 import { validatePortalSessionForProject, getPortalSessionCookieName } from '@/packages/lib/helpers/portal/portal-session';
 import CheckpointMessages from './_src/checkpoint-messages';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
+import { handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 
 export default async function CheckpointDetailsPage({ params }: { params: Promise<{ id: string; portalSlug: string; checkpointId: string }> }) {
   const resolvedParams = await params;
@@ -23,6 +24,7 @@ export default async function CheckpointDetailsPage({ params }: { params: Promis
   }
 
   const isOwner = context.type === 'user' && context.user.id === project.userId;
+  const currentUserName = context.type === 'user' ? context.user.firstname + ' ' + context.user.lastname : context.type === 'portal' ? context.visitor.name : handleUnauthorized();
 
   let portalSession = null;
 
@@ -74,6 +76,7 @@ export default async function CheckpointDetailsPage({ params }: { params: Promis
           project={project}
           isOwner={isOwner}
           ownerName={context.type === 'user' ? context.user.firstname + ' ' + context.user.lastname : ''}
+          currentUserName={currentUserName as string}
         />
       </main>
     </div>

@@ -14,10 +14,11 @@ interface AttachmentPreviewModalProps {
   checkpointId: string;
   isOwner: boolean;
   ownerName: string;
+  currentUserName: string;
   onClose: () => void;
 }
 
-export default function AttachmentPreviewModal({ attachment, projectId, checkpointId, isOwner, ownerName, onClose }: AttachmentPreviewModalProps) {
+export default function AttachmentPreviewModal({ attachment, projectId, checkpointId, isOwner, ownerName, currentUserName, onClose }: AttachmentPreviewModalProps) {
   const [showMarkups, setShowMarkups] = useState(true);
   const [markups, setMarkups] = useState<any[]>([]);
   const [generalComments, setGeneralComments] = useState<any[]>([]);
@@ -128,6 +129,7 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
               isOwner={isOwner}
               loading={loading}
               ownerName={ownerName}
+              currentUserName={currentUserName}
             />
           </div>
         </div>

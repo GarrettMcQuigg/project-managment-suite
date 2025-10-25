@@ -19,7 +19,7 @@ export type GeneralComment = {
   updatedAt: Date;
   text: string;
   userId: string | null;
-  visitorName: string | null;
+  name: string | null;
   attachmentId: string;
   markupId: string | null;
   comments?: { text: string }[];

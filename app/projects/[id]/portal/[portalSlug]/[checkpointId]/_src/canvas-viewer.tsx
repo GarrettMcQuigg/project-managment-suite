@@ -548,7 +548,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         strokeWidth,
         createdAt: new Date().toISOString(),
         userId: isOwner ? 'current-user' : null,
-        visitorName: isOwner ? null : 'You',
+        name: 'You',
         canvasData: pathData,
         comments: []
       };
@@ -588,7 +588,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         strokeWidth,
         createdAt: new Date().toISOString(),
         userId: isOwner ? 'current-user' : null,
-        visitorName: isOwner ? null : 'You',
+        name: 'You',
         canvasData: { shapeType: activeTool, start: shapeStart, end: shapeEnd },
         comments: []
       };
@@ -918,7 +918,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         strokeWidth: itemToRedo.data.width,
         createdAt: new Date().toISOString(),
         userId: isOwner ? 'current-user' : null,
-        visitorName: isOwner ? null : 'You',
+        name: 'You',
         canvasData: itemToRedo.data,
         comments: []
       };
@@ -951,7 +951,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         strokeWidth: itemToRedo.data.width,
         createdAt: new Date().toISOString(),
         userId: isOwner ? 'current-user' : null,
-        visitorName: isOwner ? null : 'You',
+        name: 'You',
         canvasData: {
           shapeType: itemToRedo.data.type,
           start: itemToRedo.data.start,
@@ -1166,7 +1166,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
                   top: Math.max(20, commentTooltipPos.y - 20)
                 }}
               >
-                <div className="text-xs font-semibold text-foreground mb-1">{hoveredComment.userId ? 'You' : hoveredComment.visitorName || 'Anonymous'}</div>
+                <div className="text-xs font-semibold text-foreground mb-1">{hoveredComment.userId && isOwner ? 'You' : hoveredComment.name || 'Anonymous'}</div>
                 <div className="text-xs text-muted-foreground">{hoveredComment.comments[0].text}</div>
               </div>
             )}

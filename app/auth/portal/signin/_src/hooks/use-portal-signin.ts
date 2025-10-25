@@ -38,7 +38,7 @@ export const usePortalSignin = () => {
       const result = await response.json();
 
       if (response.ok) {
-        toast.success('Access granted!');
+        toast.success('Welcome, ' + data.visitorName + '!');
         router.push(result.redirect || redirect);
       } else {
         toast.error(result.error || 'Invalid credentials');

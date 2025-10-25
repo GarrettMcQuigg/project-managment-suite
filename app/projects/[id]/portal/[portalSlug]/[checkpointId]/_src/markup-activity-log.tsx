@@ -2,11 +2,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Pencil, Highlighter, Square, Send } from 'lucide-react';
-import { format } from 'date-fns';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import { API_PROJECT_CHECKPOINT_MARKUPS_COMMENTS_CREATE_ROUTE } from '@/packages/lib/routes';
 import { toast } from 'react-toastify';
 import type { ProjectMessageAttachment } from '@prisma/client';
+import MessageBubble from '../../../../../../../packages/lib/components/message-bubble';
 
 interface MarkupActivityLogProps {
   attachment: ProjectMessageAttachment;
@@ -17,9 +17,10 @@ interface MarkupActivityLogProps {
   isOwner: boolean;
   loading: boolean;
   ownerName: string;
+  currentUserName: string;
 }
 
-export default function MarkupActivityLog({ attachment, markups, generalComments, isOwner, loading, ownerName }: MarkupActivityLogProps) {
+export default function MarkupActivityLog({ attachment, markups, generalComments, isOwner, loading, ownerName, currentUserName }: MarkupActivityLogProps) {
   const [newComment, setNewComment] = useState('');
   const [sendingComment, setSendingComment] = useState(false);
   const [optimisticComments, setOptimisticComments] = useState<any[]>([]);
@@ -33,7 +34,7 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
       type: 'MESSAGE' as const,
       createdAt: comment.createdAt,
       userId: comment.userId,
-      visitorName: comment.visitorName,
+      name: comment.name,
       comments: [{ text: comment.text }]
     })),
     ...optimisticComments
@@ -75,7 +76,7 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
       type: 'MESSAGE' as const,
       createdAt: new Date().toISOString(),
       userId: isOwner ? 'current-user' : null,
-      visitorName: isOwner ? null : 'You',
+      name: currentUserName,
       comments: [{ text: commentText }]
     };
 
@@ -100,8 +101,6 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
         setNewComment(commentText); // Restore the text
         return;
       }
-
-      toast.success('Comment sent successfully');
     } catch (error) {
       console.error('Error sending comment:', error);
       toast.error('An error occurred while sending your comment');
@@ -113,22 +112,46 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
     }
   };
 
-  const getAvatarData = (author: string, isOwn: boolean) => {
-    if (isOwn) author = ownerName;
-    const initials = author
+  const getAvatarData = (author: string) => {
+    // Handle single-segment names (e.g., "John") and multi-segment names (e.g., "John Doe")
+    const nameParts = author
+      .trim()
       .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+      .filter((part) => part.length > 0);
+    let initials: string;
+
+    if (nameParts.length === 0) {
+      // Fallback for empty names
+      initials = '?';
+    } else if (nameParts.length === 1) {
+      // Single segment: take first 2 characters (e.g., "John" -> "JO")
+      initials = nameParts[0].slice(0, 2).toUpperCase();
+    } else {
+      // Multiple segments: take first letter of first 2 parts (e.g., "John Doe" -> "JD")
+      initials = nameParts
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase();
+    }
 
     // Generate consistent color based on name
-    const colors = ['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-orange-500', 'bg-teal-500', 'bg-indigo-500'];
+    const colors = [
+      'bg-indigo-500/80',
+      'bg-blue-500/80',
+      'bg-green-500/80',
+      'bg-yellow-500/80',
+      'bg-amber-500/80',
+      'bg-red-500/80',
+      'bg-pink-500/80',
+      'bg-orange-500/80',
+      'bg-purple-500/80'
+    ];
     const colorIndex = author.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
 
     return {
       initials,
-      color: isOwn ? 'bg-primary' : colors[colorIndex]
+      color: author === currentUserName ? 'bg-primary' : colors[colorIndex]
     };
   };
 
@@ -157,40 +180,23 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
           </div>
         ) : (
           allComments.map((item) => {
+            if (!item.comments || item.comments.length === 0) return null;
+
             const Icon = getMarkupIcon(item.type);
-            const author = item.userId ? 'You' : item.visitorName || 'Anonymous';
-            const isOwn = isOwner && item.userId;
-            const avatarData = getAvatarData(author, isOwn);
+            const author = item.name;
+            const avatarData = getAvatarData(author);
 
             return (
-              <div key={item.id} className="group flex gap-3 -mx-2 px-2 py-2 rounded-lg transition-colors">
-                {/* Avatar */}
-                <div className="flex-shrink-0">
-                  <div className={`w-9 h-9 rounded-full ${avatarData.color} flex items-center justify-center text-white text-xs font-semibold shadow-sm`}>
-                    {avatarData.initials}
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0 pt-0.5">
-                  {/* Header row */}
-                  <div className="flex items-baseline gap-3 mb-1">
-                    <span className="font-semibold text-sm text-foreground">{author}</span>
-                    <span className="text-xs text-muted-foreground">{format(new Date(item.createdAt), "h:mm a',' MMM d")}</span>
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground">
-                      <Icon className="h-2.5 w-2.5" />
-                      {item.type === 'MESSAGE' ? 'message' : item.type.toLowerCase()}
-                    </span>
-                  </div>
-
-                  {/* Comment bubble */}
-                  {item.comments && item.comments.length > 0 && (
-                    <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-sm hover:shadow-md transition-all break-words cursor-default">
-                      <p className="text-sm text-foreground leading-relaxed">{item.comments[0].text}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <MessageBubble
+                key={item.id}
+                author={author}
+                currentUserName={currentUserName}
+                timestamp={item.createdAt}
+                message={item.comments[0].text}
+                avatarInitials={avatarData.initials}
+                avatarColor={avatarData.color}
+                icon={Icon}
+              />
             );
           })
         )}

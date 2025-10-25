@@ -10,14 +10,15 @@ export async function POST(request: Request) {
 
     let currentUser: User | PortalVisitor | null = null;
     let userId: string | null = null;
-    let visitorName: string | null = null;
+    let name: string | null = null;
 
     if (context.type === 'user') {
       currentUser = context.user as User;
       userId = currentUser.id;
+      name = `${currentUser.firstname} ${currentUser.lastname}`.trim();
     } else if (context.type === 'portal') {
       currentUser = context.visitor as PortalVisitor;
-      visitorName = currentUser.name;
+      name = currentUser.name;
     }
 
     if (!currentUser) {
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
           markupId,
           attachmentId: markup.attachmentId,
           userId,
-          visitorName,
+          name,
           text: text.trim()
         }
       });
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
       data: {
         attachmentId,
         userId,
-        visitorName,
+        name,
         text: text.trim()
       }
     });

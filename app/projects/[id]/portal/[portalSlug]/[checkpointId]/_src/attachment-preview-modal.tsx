@@ -28,17 +28,88 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
   const fileName = attachment.pathname.split('/').pop() || 'File';
   const fileType = attachment.contentType;
 
-  // Load markups when modal opens and poll every 3 seconds
+  // Smart polling with visibility API and inactivity detection
   useEffect(() => {
     loadMarkups();
 
-    // Set up polling interval (don't show loading state on polls)
-    const pollInterval = setInterval(() => {
-      loadMarkups(false);
-    }, 3000);
+    let pollInterval: NodeJS.Timeout;
+    let lastInteractionTime = Date.now();
+    let currentPollInterval = 3000; // Track current interval
 
-    // Clean up interval on unmount
-    return () => clearInterval(pollInterval);
+    // Track user interactions to reset inactivity timer
+    const resetInactivityTimer = () => {
+      const wasInactive = Date.now() - lastInteractionTime > 60000;
+      lastInteractionTime = Date.now();
+
+      // If we were inactive and just became active, restart polling at 3s interval
+      if (wasInactive && currentPollInterval === 15000) {
+        startPolling();
+      }
+    };
+
+    // Function to start polling with appropriate interval
+    const startPolling = () => {
+      clearInterval(pollInterval);
+
+      const timeSinceLastInteraction = Date.now() - lastInteractionTime;
+      const isInactive = timeSinceLastInteraction > 60000;
+      currentPollInterval = isInactive ? 15000 : 3000;
+
+      pollInterval = setInterval(() => {
+        // Check inactivity on every poll
+        const timeSinceInteraction = Date.now() - lastInteractionTime;
+        const shouldBeInactive = timeSinceInteraction > 60000;
+
+        // If inactivity status changed, restart polling with new interval
+        if (shouldBeInactive && currentPollInterval === 3000) {
+          // Just became inactive - switch to slow polling
+          startPolling();
+          return;
+        } else if (!shouldBeInactive && currentPollInterval === 15000) {
+          // Just became active - switch to fast polling
+          startPolling();
+          return;
+        }
+
+        // Only poll if tab is visible
+        if (!document.hidden) {
+          loadMarkups(false);
+        }
+      }, currentPollInterval);
+    };
+
+    // Event listeners for user interaction (use capture phase to catch all events)
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'input', 'focus'];
+    events.forEach((event) => {
+      window.addEventListener(event, resetInactivityTimer, { passive: true, capture: true });
+    });
+
+    // Check visibility changes
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Tab became visible - fetch immediately and resume polling
+        lastInteractionTime = Date.now(); // Reset timer when tab becomes visible
+        loadMarkups(false);
+        startPolling();
+      } else {
+        // Tab hidden - stop polling to save resources
+        clearInterval(pollInterval);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Start initial polling
+    startPolling();
+
+    // Clean up on unmount
+    return () => {
+      clearInterval(pollInterval);
+      events.forEach((event) => {
+        window.removeEventListener(event, resetInactivityTimer);
+      });
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [attachment.id]);
 
   const loadMarkups = async (showLoadingState = true) => {

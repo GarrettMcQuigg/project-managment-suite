@@ -1,6 +1,7 @@
 import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from '@/packages/lib/helpers/api-response-handlers';
 import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
+import { AttachmentMarkup, AttachmentMarkupComment } from '@prisma/client';
 
 export async function GET(request: Request) {
   try {
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
     }
 
     // Get all markups for this attachment with their comments
-    const markups = await db.attachmentMarkup.findMany({
+    const markups: AttachmentMarkup[] = await db.attachmentMarkup.findMany({
       where: { attachmentId },
       include: {
         comments: {
@@ -42,7 +43,7 @@ export async function GET(request: Request) {
     });
 
     // Also get general file comments (not tied to specific markup)
-    const generalComments = await db.attachmentMarkupComment.findMany({
+    const generalComments: AttachmentMarkupComment[] = await db.attachmentMarkupComment.findMany({
       where: {
         attachmentId,
         markupId: null

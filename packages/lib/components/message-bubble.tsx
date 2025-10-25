@@ -26,8 +26,8 @@ export default function MessageBubble({ author, currentUserName, timestamp, mess
 
       {/* Message Container */}
       <div
-        className={`flex flex-col w-full max-w-[320px] leading-relaxed p-4 border border-border bg-card shadow-sm ${
-          isOwnMessage ? 'rounded-s-xl rounded-ee-xl' : 'rounded-e-xl rounded-es-xl'
+        className={`flex flex-col w-full max-w-[320px] leading-relaxed p-4 border border-border shadow-sm ${
+          isOwnMessage ? 'rounded-s-xl rounded-ee-xl text-foreground' : 'rounded-e-xl rounded-es-xl bg-gray-300/30 dark:bg-card/50'
         }`}
       >
         {/* Header */}

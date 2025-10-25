@@ -28,14 +28,24 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
   const fileName = attachment.pathname.split('/').pop() || 'File';
   const fileType = attachment.contentType;
 
-  // Load markups when modal opens
+  // Load markups when modal opens and poll every 3 seconds
   useEffect(() => {
     loadMarkups();
+
+    // Set up polling interval (don't show loading state on polls)
+    const pollInterval = setInterval(() => {
+      loadMarkups(false);
+    }, 3000);
+
+    // Clean up interval on unmount
+    return () => clearInterval(pollInterval);
   }, [attachment.id]);
 
-  const loadMarkups = async () => {
+  const loadMarkups = async (showLoadingState = true) => {
     try {
-      setLoading(true);
+      if (showLoadingState) {
+        setLoading(true);
+      }
       const data = await swrFetcher(`${API_PROJECT_CHECKPOINT_MARKUPS_LIST_ROUTE}?attachmentId=${attachment.id}`);
       setMarkups(data.content.markups || []);
       setGeneralComments(data.content.generalComments || []);
@@ -44,7 +54,9 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
       setMarkups([]);
       setGeneralComments([]);
     } finally {
-      setLoading(false);
+      if (showLoadingState) {
+        setLoading(false);
+      }
     }
   };
 

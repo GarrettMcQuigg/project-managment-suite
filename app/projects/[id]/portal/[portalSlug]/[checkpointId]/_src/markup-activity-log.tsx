@@ -40,6 +40,34 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
     ...optimisticComments
   ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
+  // Remove optimistic comments when real server versions arrive
+  useEffect(() => {
+    if (optimisticComments.length === 0) return;
+
+    const serverCommentTexts = generalComments.map((c) => c.text.trim().toLowerCase());
+
+    // Filter out optimistic comments that now exist in server data
+    setOptimisticComments((prev) =>
+      prev.filter((optimistic) => {
+        const optimisticText = optimistic.comments[0].text.trim().toLowerCase();
+        const existsOnServer = serverCommentTexts.includes(optimisticText);
+
+        // If it exists on server, check if it was created recently (within last 10 seconds)
+        // to avoid removing old optimistic comments that happen to have same text
+        if (existsOnServer) {
+          const optimisticTime = new Date(optimistic.createdAt).getTime();
+          const now = Date.now();
+          const wasRecentlyCreated = now - optimisticTime < 10000; // 10 seconds
+
+          // Remove if it was recently created and now exists on server
+          return !wasRecentlyCreated;
+        }
+
+        return true; // Keep if not on server yet
+      })
+    );
+  }, [generalComments]);
+
   // Auto-scroll to bottom when new comments are added
   useEffect(() => {
     if (scrollContainerRef.current) {

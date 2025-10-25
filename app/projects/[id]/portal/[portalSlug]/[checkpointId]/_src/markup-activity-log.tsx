@@ -16,11 +16,11 @@ interface MarkupActivityLogProps {
   checkpointId: string;
   isOwner: boolean;
   loading: boolean;
-  ownerName: string;
+  isInitialLoading: boolean;
   currentUserName: string;
 }
 
-export default function MarkupActivityLog({ attachment, markups, generalComments, isOwner, loading, ownerName, currentUserName }: MarkupActivityLogProps) {
+export default function MarkupActivityLog({ attachment, markups, generalComments, isOwner, loading, isInitialLoading, currentUserName }: MarkupActivityLogProps) {
   const [newComment, setNewComment] = useState('');
   const [sendingComment, setSendingComment] = useState(false);
   const [optimisticComments, setOptimisticComments] = useState<any[]>([]);
@@ -195,7 +195,7 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
       </div>
 
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-        {loading ? (
+        {loading && isInitialLoading ? (
           <div className="flex items-center justify-center h-32">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>

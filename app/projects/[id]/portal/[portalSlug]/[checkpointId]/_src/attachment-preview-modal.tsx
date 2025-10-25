@@ -23,6 +23,7 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
   const [markups, setMarkups] = useState<any[]>([]);
   const [generalComments, setGeneralComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
 
   const fileName = attachment.pathname.split('/').pop() || 'File';
@@ -120,6 +121,7 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
       const data = await swrFetcher(`${API_PROJECT_CHECKPOINT_MARKUPS_LIST_ROUTE}?attachmentId=${attachment.id}`);
       setMarkups(data.content.markups || []);
       setGeneralComments(data.content.generalComments || []);
+      setIsInitialLoading(false);
     } catch (error) {
       console.error('Error loading markups:', error);
       setMarkups([]);
@@ -211,7 +213,7 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
               checkpointId={checkpointId}
               isOwner={isOwner}
               loading={loading}
-              ownerName={ownerName}
+              isInitialLoading={isInitialLoading}
               currentUserName={currentUserName}
             />
           </div>

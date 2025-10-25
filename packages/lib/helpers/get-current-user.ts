@@ -22,9 +22,6 @@ export async function getCurrentUser(): Promise<UserWithMetadata | null> {
       return null;
     }
 
-    console.log('decodedUser', decodedUser);
-    console.log('decodedToken', decodedToken);
-
     const user = await db.user.findUnique({
       where: {
         id: decodedToken.userId,

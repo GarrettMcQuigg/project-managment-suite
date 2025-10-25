@@ -72,9 +72,11 @@ export const API_PROJECT_CHECKPOINT_MESSAGES_SEND_ROUTE = `${API_PROJECT_ROUTE}/
 
 // Markup API routes
 export const API_PROJECT_CHECKPOINT_MARKUPS_CREATE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/create`;
+export const API_PROJECT_CHECKPOINT_MARKUPS_BATCH_CREATE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/batch-create`;
 export const API_PROJECT_CHECKPOINT_MARKUPS_LIST_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/list`;
 export const API_PROJECT_CHECKPOINT_MARKUPS_UPDATE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/update`;
 export const API_PROJECT_CHECKPOINT_MARKUPS_DELETE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/delete`;
+export const API_PROJECT_CHECKPOINT_MARKUPS_BATCH_DELETE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/batch-delete`;
 export const API_PROJECT_CHECKPOINT_MARKUPS_COMMENTS_CREATE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/comments/create`;
 export const API_PROJECT_CHECKPOINT_MARKUPS_COMMENTS_DELETE_ROUTE = `${API_PROJECT_ROUTE}/checkpoint/markups/comments/delete`;
 

@@ -5,7 +5,9 @@ import CanvasToolbar from './canvas-toolbar';
 import { fetcher } from '@/packages/lib/helpers/fetcher';
 import {
   API_PROJECT_CHECKPOINT_MARKUPS_CREATE_ROUTE,
+  API_PROJECT_CHECKPOINT_MARKUPS_BATCH_CREATE_ROUTE,
   API_PROJECT_CHECKPOINT_MARKUPS_DELETE_ROUTE,
+  API_PROJECT_CHECKPOINT_MARKUPS_BATCH_DELETE_ROUTE,
   API_PROJECT_CHECKPOINT_MARKUPS_COMMENTS_CREATE_ROUTE
 } from '@/packages/lib/routes';
 import { toast } from 'react-toastify';
@@ -58,6 +60,11 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
   // Save state
   const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Refs to track current unsaved state (for closure issues with setTimeout)
+  const unsavedPathsRef = useRef<typeof unsavedPaths>([]);
+  const unsavedShapesRef = useRef<typeof unsavedShapes>([]);
+  const pendingDeletesRef = useRef<string[]>([]);
 
   // Notify parent of save status changes
   const updateSaveStatus = (status: 'saved' | 'saving' | 'unsaved') => {
@@ -254,15 +261,9 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
         ctx.beginPath();
         ctx.moveTo(end.x, end.y);
-        ctx.lineTo(
-          end.x - arrowLength * Math.cos(angle - arrowWidth),
-          end.y - arrowLength * Math.sin(angle - arrowWidth)
-        );
+        ctx.lineTo(end.x - arrowLength * Math.cos(angle - arrowWidth), end.y - arrowLength * Math.sin(angle - arrowWidth));
         ctx.moveTo(end.x, end.y);
-        ctx.lineTo(
-          end.x - arrowLength * Math.cos(angle + arrowWidth),
-          end.y - arrowLength * Math.sin(angle + arrowWidth)
-        );
+        ctx.lineTo(end.x - arrowLength * Math.cos(angle + arrowWidth), end.y - arrowLength * Math.sin(angle + arrowWidth));
         ctx.stroke();
         break;
     }
@@ -312,10 +313,8 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         const bottom = Math.max(start.y, end.y);
 
         return (
-          (point.x >= left - threshold && point.x <= right + threshold &&
-           (Math.abs(point.y - top) <= threshold || Math.abs(point.y - bottom) <= threshold)) ||
-          (point.y >= top - threshold && point.y <= bottom + threshold &&
-           (Math.abs(point.x - left) <= threshold || Math.abs(point.x - right) <= threshold))
+          (point.x >= left - threshold && point.x <= right + threshold && (Math.abs(point.y - top) <= threshold || Math.abs(point.y - bottom) <= threshold)) ||
+          (point.y >= top - threshold && point.y <= bottom + threshold && (Math.abs(point.x - left) <= threshold || Math.abs(point.x - right) <= threshold))
         );
 
       case 'circle':
@@ -389,7 +388,15 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
       if (foundComment) {
         setHoveredComment(foundComment);
-        setCommentTooltipPos(pos);
+        // Convert canvas coordinates to viewport coordinates
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect();
+          setCommentTooltipPos({
+            x: rect.left + pos.x,
+            y: rect.top + pos.y
+          });
+        }
       } else {
         setHoveredComment(null);
         setCommentTooltipPos(null);
@@ -476,19 +483,32 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       // Delete from local state immediately for instant feedback
       if (localPathIndices.length > 0) {
         setPaths((prev) => prev.filter((_, index) => !localPathIndices.includes(index)));
-        setUnsavedPaths((prev) => prev.filter((_, index) => !localPathIndices.includes(index)));
+        setUnsavedPaths((prev) => {
+          const updated = prev.filter((_, index) => !localPathIndices.includes(index));
+          unsavedPathsRef.current = updated;
+          return updated;
+        });
       }
 
       if (localShapeIndices.length > 0) {
         setShapes((prev) => prev.filter((_, index) => !localShapeIndices.includes(index)));
-        setUnsavedShapes((prev) => prev.filter((_, index) => !localShapeIndices.includes(index)));
+        setUnsavedShapes((prev) => {
+          const updated = prev.filter((_, index) => !localShapeIndices.includes(index));
+          unsavedShapesRef.current = updated;
+          return updated;
+        });
       }
 
+      console.log('dbMarkupIds', dbMarkupIds);
       // Add database markups to pending deletes and hide them locally
       if (dbMarkupIds.length > 0) {
-        setPendingDeletes((prev) => [...prev, ...dbMarkupIds]);
+        setPendingDeletes((prev) => {
+          const updated = [...prev, ...dbMarkupIds];
+          pendingDeletesRef.current = updated;
+          return updated;
+        });
         // Hide deleted markups from view by removing from local markup list
-        dbMarkupIds.forEach(id => onMarkupDeleted(id));
+        dbMarkupIds.forEach((id) => onMarkupDeleted(id));
         updateSaveStatus('unsaved');
         scheduleDebouncedSave();
       }
@@ -509,10 +529,16 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
       // Save to local state immediately for instant feedback
       setPaths((prev) => [...prev, pathData]);
-      setUnsavedPaths((prev) => [...prev, pathData]);
+      setUnsavedPaths((prev) => {
+        const updated = [...prev, pathData];
+        unsavedPathsRef.current = updated;
+        return updated;
+      });
       setHistory((prev) => [...prev, pathData]);
       setRedoStack([]); // Clear redo stack when new action is made
       updateSaveStatus('unsaved');
+
+      console.log('unsavedPaths', unsavedPaths);
 
       // Add temporary markup to activity log
       const tempMarkup = {
@@ -527,6 +553,8 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         comments: []
       };
       onMarkupCreated(tempMarkup);
+
+      console.log('tempMarkup', tempMarkup);
 
       // Debounce the API save
       scheduleDebouncedSave();
@@ -545,7 +573,11 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
       // Save to local state immediately
       setShapes((prev) => [...prev, shapeData]);
-      setUnsavedShapes((prev) => [...prev, shapeData]);
+      setUnsavedShapes((prev) => {
+        const updated = [...prev, shapeData];
+        unsavedShapesRef.current = updated;
+        return updated;
+      });
       updateSaveStatus('unsaved');
 
       // Add temporary markup to activity log
@@ -571,6 +603,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
   // Debounced save function
   const scheduleDebouncedSave = () => {
+    console.log('saveTimeoutRef.current', saveTimeoutRef.current);
     // Clear existing timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -578,57 +611,55 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
     // Schedule new save after 2.5 seconds of inactivity
     saveTimeoutRef.current = setTimeout(() => {
+      console.log('saving');
       saveAllPendingDrawings();
     }, 2500);
   };
 
   // Save all unsaved drawings and deletions to database
   const saveAllPendingDrawings = async () => {
-    if (unsavedPaths.length === 0 && unsavedShapes.length === 0 && pendingDeletes.length === 0) return;
+    // Use refs to get current state values (avoids stale closure)
+    const currentUnsavedPaths = unsavedPathsRef.current;
+    const currentUnsavedShapes = unsavedShapesRef.current;
+    const currentPendingDeletes = pendingDeletesRef.current;
+
+    console.log('unsavedPaths', currentUnsavedPaths);
+    console.log('unsavedShapes', currentUnsavedShapes);
+    console.log('pendingDeletes', currentPendingDeletes);
+
+    if (currentUnsavedPaths.length === 0 && currentUnsavedShapes.length === 0 && currentPendingDeletes.length === 0) return;
 
     setIsSaving(true);
     updateSaveStatus('saving');
 
     try {
-      // Delete all pending markups in parallel
-      const deletePromises = pendingDeletes.map(async (markupId) => {
-        const response = await fetcher({
-          url: API_PROJECT_CHECKPOINT_MARKUPS_DELETE_ROUTE,
-          requestBody: { markupId }
-        });
+      console.log('in try block');
+      const promises = [];
 
-        if (response.err) {
-          throw new Error('Failed to delete markup');
-        }
+      // Batch delete all pending markups in a single API call
+      if (currentPendingDeletes.length > 0) {
+        promises.push(
+          fetcher({
+            url: API_PROJECT_CHECKPOINT_MARKUPS_BATCH_DELETE_ROUTE,
+            requestBody: {
+              markupIds: currentPendingDeletes
+            }
+          })
+        );
+      }
 
-        return markupId;
-      });
-
-      // Save all unsaved paths in parallel
-      const pathPromises = unsavedPaths.map(async (pathData) => {
-        const response = await fetcher({
-          url: API_PROJECT_CHECKPOINT_MARKUPS_CREATE_ROUTE,
-          requestBody: {
+      // Batch create all unsaved markups in a single API call
+      if (currentUnsavedPaths.length > 0 || currentUnsavedShapes.length > 0) {
+        // Combine paths and shapes into one markups array
+        const markupsToCreate = [
+          ...currentUnsavedPaths.map((pathData) => ({
             attachmentId: attachment.id,
             type: pathData.isHighlight ? 'HIGHLIGHT' : 'DRAWING',
             canvasData: pathData,
             color: pathData.color,
             strokeWidth: pathData.width
-          }
-        });
-
-        if (response.err) {
-          throw new Error('Failed to save markup');
-        }
-
-        return response.content;
-      });
-
-      // Save all unsaved shapes in parallel
-      const shapePromises = unsavedShapes.map(async (shapeData) => {
-        const response = await fetcher({
-          url: API_PROJECT_CHECKPOINT_MARKUPS_CREATE_ROUTE,
-          requestBody: {
+          })),
+          ...currentUnsavedShapes.map((shapeData) => ({
             attachmentId: attachment.id,
             type: shapeData.type === 'highlight' ? 'HIGHLIGHT' : 'SHAPE',
             canvasData: {
@@ -638,31 +669,38 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
             },
             color: shapeData.color,
             strokeWidth: shapeData.width
-          }
-        });
+          }))
+        ];
 
-        if (response.err) {
-          throw new Error('Failed to save shape');
+        promises.push(
+          fetcher({
+            url: API_PROJECT_CHECKPOINT_MARKUPS_BATCH_CREATE_ROUTE,
+            requestBody: {
+              markups: markupsToCreate
+            }
+          })
+        );
+      }
+
+      // Execute delete and create in parallel (2 API calls max instead of N+M calls)
+      const results = await Promise.all(promises);
+
+      // Check for errors
+      for (const result of results) {
+        if (result.err) {
+          throw new Error('Failed to save/delete markups');
         }
+      }
 
-        return response.content;
-      });
-
-      // Execute all operations in parallel
-      const [deletedIds, ...savedMarkups] = await Promise.all([
-        Promise.all(deletePromises),
-        Promise.all(pathPromises),
-        Promise.all(shapePromises)
-      ]);
-
-      // Flatten saved markups
-      const allSavedMarkups = savedMarkups.flat();
+      // Get created markups from the batch create response
+      const createResponse = results.find((r) => r.content && Array.isArray(r.content));
+      const allSavedMarkups = createResponse?.content || [];
 
       // Update paths with IDs from server
       setPaths((prev) => {
         const newPaths = [...prev];
-        allSavedMarkups.slice(0, unsavedPaths.length).forEach((markup, index) => {
-          const pathIndex = newPaths.length - unsavedPaths.length + index;
+        allSavedMarkups.slice(0, currentUnsavedPaths.length).forEach((markup: any, index: number) => {
+          const pathIndex = newPaths.length - currentUnsavedPaths.length + index;
           if (newPaths[pathIndex]) {
             newPaths[pathIndex] = { ...newPaths[pathIndex], id: markup.id };
           }
@@ -673,8 +711,8 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       // Update shapes with IDs from server
       setShapes((prev) => {
         const newShapes = [...prev];
-        allSavedMarkups.slice(unsavedPaths.length).forEach((markup, index) => {
-          const shapeIndex = newShapes.length - unsavedShapes.length + index;
+        allSavedMarkups.slice(currentUnsavedPaths.length).forEach((markup: any, index: number) => {
+          const shapeIndex = newShapes.length - currentUnsavedShapes.length + index;
           if (newShapes[shapeIndex]) {
             newShapes[shapeIndex] = { ...newShapes[shapeIndex], id: markup.id };
           }
@@ -686,6 +724,9 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       setUnsavedPaths([]);
       setUnsavedShapes([]);
       setPendingDeletes([]);
+      unsavedPathsRef.current = [];
+      unsavedShapesRef.current = [];
+      pendingDeletesRef.current = [];
       updateSaveStatus('saved');
 
       // Notify parent to refresh
@@ -786,7 +827,9 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
     setUnsavedPaths((prev) => {
       const index = prev.findIndex((p) => p === lastPath);
       if (index !== -1) {
-        return prev.filter((_, i) => i !== index);
+        const updated = prev.filter((_, i) => i !== index);
+        unsavedPathsRef.current = updated;
+        return updated;
       }
       return prev;
     });
@@ -821,7 +864,11 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
     onMarkupCreated(tempMarkup);
 
     // Mark as unsaved
-    setUnsavedPaths((prev) => [...prev, pathToRedo]);
+    setUnsavedPaths((prev) => {
+      const updated = [...prev, pathToRedo];
+      unsavedPathsRef.current = updated;
+      return updated;
+    });
     updateSaveStatus('unsaved');
     scheduleDebouncedSave();
 
@@ -958,41 +1005,43 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
             </a>
           </div>
         ) : (
-          <div className="relative border border-border rounded-lg shadow-lg overflow-hidden" style={{ width: 800, height: 600 }}>
-            {fileType === 'pdf' && (
-              <iframe
-                ref={iframeRef}
-                src={`${attachment.blobUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-                className="absolute inset-0 w-full h-full"
-                style={{ pointerEvents: activeTool === 'draw' ? 'none' : 'auto' }}
+          <>
+            <div className="relative border border-border rounded-lg shadow-lg overflow-hidden" style={{ width: 800, height: 600 }}>
+              {fileType === 'pdf' && (
+                <iframe
+                  ref={iframeRef}
+                  src={`${attachment.blobUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                  className="absolute inset-0 w-full h-full"
+                  style={{ pointerEvents: activeTool === 'draw' ? 'none' : 'auto' }}
+                />
+              )}
+              <canvas
+                ref={canvasRef}
+                width={800}
+                height={600}
+                className={`absolute inset-0 ${fileType === 'pdf' ? 'bg-transparent' : 'bg-muted'} ${['draw', 'comment', 'highlight', 'rectangle', 'circle', 'arrow'].includes(activeTool) ? 'cursor-crosshair' : activeTool === 'eraser' ? 'cursor-pointer' : 'cursor-default'}`}
+                style={{ pointerEvents: ['select', 'draw', 'comment', 'highlight', 'rectangle', 'circle', 'arrow', 'eraser'].includes(activeTool) ? 'auto' : 'none' }}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
               />
-            )}
-            <canvas
-              ref={canvasRef}
-              width={800}
-              height={600}
-              className={`absolute inset-0 ${fileType === 'pdf' ? 'bg-transparent' : 'bg-muted'} ${['draw', 'comment', 'highlight', 'rectangle', 'circle', 'arrow'].includes(activeTool) ? 'cursor-crosshair' : activeTool === 'eraser' ? 'cursor-pointer' : 'cursor-default'}`}
-              style={{ pointerEvents: ['select', 'draw', 'comment', 'highlight', 'rectangle', 'circle', 'arrow', 'eraser'].includes(activeTool) ? 'auto' : 'none' }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-            />
+            </div>
 
-            {/* Comment Tooltip */}
+            {/* Comment Tooltip - positioned outside container to avoid clipping */}
             {hoveredComment && commentTooltipPos && hoveredComment.comments && hoveredComment.comments.length > 0 && (
               <div
-                className="absolute bg-card border border-border rounded-lg shadow-xl p-3 max-w-xs z-50 pointer-events-none"
+                className="fixed bg-card border border-border rounded-lg shadow-xl p-3 max-w-xs z-50 pointer-events-none"
                 style={{
-                  left: commentTooltipPos.x + 20,
-                  top: commentTooltipPos.y - 20
+                  left: Math.min(commentTooltipPos.x + 20, window.innerWidth - 250),
+                  top: Math.max(20, commentTooltipPos.y - 20)
                 }}
               >
                 <div className="text-xs font-semibold text-foreground mb-1">{hoveredComment.userId ? 'You' : hoveredComment.visitorName || 'Anonymous'}</div>
                 <div className="text-xs text-muted-foreground">{hoveredComment.comments[0].text}</div>
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
 

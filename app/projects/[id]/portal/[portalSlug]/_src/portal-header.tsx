@@ -50,7 +50,7 @@ export default function PortalHeader({ isOwner, projectId, portalSlug }: PortalH
             {isOwner && (
               <Link
                 href={routeWithParam(PROJECT_DETAILS_ROUTE, { id: projectId })}
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-all duration-300 hover:gap-3 mb-4 group"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-all duration-300 hover:gap-3 group"
               >
                 <ArrowLeft className="h-5 w-5 text-muted-foreground" />
               </Link>

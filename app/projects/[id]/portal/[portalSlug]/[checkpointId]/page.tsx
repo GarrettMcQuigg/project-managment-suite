@@ -68,7 +68,13 @@ export default async function CheckpointDetailsPage({ params }: { params: Promis
   return (
     <div className="min-h-screen max-w-[80%] mx-auto">
       <main className="py-6">
-        <CheckpointMessages projectId={resolvedParams.id} checkpoint={checkpoint} project={project} isOwner={isOwner} />
+        <CheckpointMessages
+          projectId={resolvedParams.id}
+          checkpoint={checkpoint}
+          project={project}
+          isOwner={isOwner}
+          ownerName={context.type === 'user' ? context.user.firstname + ' ' + context.user.lastname : ''}
+        />
       </main>
     </div>
   );

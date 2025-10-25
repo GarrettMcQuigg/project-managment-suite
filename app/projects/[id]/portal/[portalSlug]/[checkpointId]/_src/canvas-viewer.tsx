@@ -502,7 +502,6 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         });
       }
 
-      console.log('dbMarkupIds', dbMarkupIds);
       // Add database markups to pending deletes and hide them locally
       if (dbMarkupIds.length > 0) {
         setPendingDeletes((prev) => {
@@ -541,8 +540,6 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       setRedoStack([]); // Clear redo stack when new action is made
       updateSaveStatus('unsaved');
 
-      console.log('unsavedPaths', unsavedPaths);
-
       // Add temporary markup to activity log
       const tempMarkup = {
         id: `temp-${Date.now()}`,
@@ -556,8 +553,6 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         comments: []
       };
       onMarkupCreated(tempMarkup);
-
-      console.log('tempMarkup', tempMarkup);
 
       // Debounce the API save
       scheduleDebouncedSave();
@@ -608,7 +603,6 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
   // Debounced save function
   const scheduleDebouncedSave = () => {
-    console.log('saveTimeoutRef.current', saveTimeoutRef.current);
     // Clear existing timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -616,7 +610,6 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
     // Schedule new save after 2.5 seconds of inactivity
     saveTimeoutRef.current = setTimeout(() => {
-      console.log('saving');
       saveAllPendingDrawings();
     }, 2500);
   };
@@ -628,17 +621,12 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
     const currentUnsavedShapes = unsavedShapesRef.current;
     const currentPendingDeletes = pendingDeletesRef.current;
 
-    console.log('unsavedPaths', currentUnsavedPaths);
-    console.log('unsavedShapes', currentUnsavedShapes);
-    console.log('pendingDeletes', currentPendingDeletes);
-
     if (currentUnsavedPaths.length === 0 && currentUnsavedShapes.length === 0 && currentPendingDeletes.length === 0) return;
 
     setIsSaving(true);
     updateSaveStatus('saving');
 
     try {
-      console.log('in try block');
       const promises = [];
 
       // Batch delete all pending markups in a single API call
@@ -946,7 +934,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       // If this was previously deleted, remove from pending deletes
       if (itemToRedo.id) {
         setPendingDeletes((prev) => {
-          const updated = prev.filter(id => id !== itemToRedo.id);
+          const updated = prev.filter((id) => id !== itemToRedo.id);
           pendingDeletesRef.current = updated;
           return updated;
         });
@@ -983,7 +971,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       // If this was previously deleted, remove from pending deletes
       if (itemToRedo.id) {
         setPendingDeletes((prev) => {
-          const updated = prev.filter(id => id !== itemToRedo.id);
+          const updated = prev.filter((id) => id !== itemToRedo.id);
           pendingDeletesRef.current = updated;
           return updated;
         });

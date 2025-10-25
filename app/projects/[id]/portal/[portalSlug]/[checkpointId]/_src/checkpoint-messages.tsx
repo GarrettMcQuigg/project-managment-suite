@@ -35,9 +35,10 @@ interface CheckpointMessagesProps {
   checkpoint: Checkpoint;
   project: ProjectWithMetadata;
   isOwner: boolean;
+  ownerName: string;
 }
 
-export default function CheckpointMessages({ projectId, checkpoint, project, isOwner }: CheckpointMessagesProps) {
+export default function CheckpointMessages({ projectId, checkpoint, project, isOwner, ownerName }: CheckpointMessagesProps) {
   const endpoint = API_AUTH_PORTAL_GET_BY_ID_ROUTE + projectId;
   const { data } = useSWR(endpoint, swrFetcher);
 
@@ -423,7 +424,14 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
 
       {/* Attachment Preview Modal with Markup Tools */}
       {selectedAttachment && (
-        <AttachmentPreviewModal attachment={selectedAttachment} projectId={projectId} checkpointId={checkpoint.id} isOwner={isOwner} onClose={() => setSelectedAttachment(null)} />
+        <AttachmentPreviewModal
+          attachment={selectedAttachment}
+          projectId={projectId}
+          checkpointId={checkpoint.id}
+          isOwner={isOwner}
+          ownerName={ownerName}
+          onClose={() => setSelectedAttachment(null)}
+        />
       )}
     </>
   );

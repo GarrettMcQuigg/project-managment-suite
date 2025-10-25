@@ -13,16 +13,11 @@ interface AttachmentPreviewModalProps {
   projectId: string;
   checkpointId: string;
   isOwner: boolean;
+  ownerName: string;
   onClose: () => void;
 }
 
-export default function AttachmentPreviewModal({
-  attachment,
-  projectId,
-  checkpointId,
-  isOwner,
-  onClose
-}: AttachmentPreviewModalProps) {
+export default function AttachmentPreviewModal({ attachment, projectId, checkpointId, isOwner, ownerName, onClose }: AttachmentPreviewModalProps) {
   const [showMarkups, setShowMarkups] = useState(true);
   const [markups, setMarkups] = useState<any[]>([]);
   const [generalComments, setGeneralComments] = useState<any[]>([]);
@@ -61,14 +56,8 @@ export default function AttachmentPreviewModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
-      onClick={onClose}
-    >
-      <div
-        className="relative bg-card rounded-2xl shadow-2xl w-full h-[90vh] max-w-[95vw] overflow-hidden border border-border flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={onClose}>
+      <div className="relative bg-card rounded-2xl shadow-2xl w-full h-[90vh] max-w-[95vw] overflow-hidden border border-border flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur flex-shrink-0">
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -101,17 +90,12 @@ export default function AttachmentPreviewModal({
             <button
               onClick={() => setShowMarkups(!showMarkups)}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                showMarkups
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                showMarkups ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
               {showMarkups ? 'Hide' : 'Show'} Markups
             </button>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-secondary rounded-lg transition-colors"
-            >
+            <button onClick={onClose} className="p-2 hover:bg-secondary rounded-lg transition-colors">
               <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
             </button>
           </div>
@@ -143,8 +127,7 @@ export default function AttachmentPreviewModal({
               checkpointId={checkpointId}
               isOwner={isOwner}
               loading={loading}
-              onMarkupDeleted={handleMarkupDeleted}
-              onRefresh={loadMarkups}
+              ownerName={ownerName}
             />
           </div>
         </div>

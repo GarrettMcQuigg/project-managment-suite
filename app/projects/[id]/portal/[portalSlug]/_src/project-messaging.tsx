@@ -6,11 +6,12 @@ import { Send, Paperclip, ImageIcon, File, MessageSquare, MessageCircleCode, Use
 import { fetcher, swrFetcher } from '@/packages/lib/helpers/fetcher';
 import useSWR, { mutate } from 'swr';
 import { toast } from 'react-toastify';
-import { API_PROJECT_MESSAGES_LIST_ROUTE, API_PROJECT_MESSAGES_SEND_ROUTE } from '@/packages/lib/routes';
+import { API_PROJECT_MESSAGES_LIST_ROUTE, API_PROJECT_MESSAGES_SEND_ROUTE, routeWithParam, PROJECT_PORTAL_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
 import type { User } from '@prisma/client';
 import Image from 'next/image';
 import ImageLoader from './image-loader';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
+import MessageReference from '@/packages/lib/components/message-reference';
 
 interface ProjectMessage {
   id: string;
@@ -25,6 +26,10 @@ interface ProjectMessage {
     contentType: string;
   }>;
   createdAt: string;
+  isAutoReference?: boolean;
+  referencedAttachmentId?: string;
+  referencedMarkupId?: string;
+  referencedCheckpointId?: string;
 }
 
 export type PortalContext = {
@@ -258,6 +263,32 @@ export default function ProjectMessaging({ project, isOwner = false, context, sh
                 const isOwn = isCurrentUserMessage(msg.sender);
                 const showAvatar = shouldShowAvatar(index);
                 const showSender = shouldShowSender(index);
+
+                // Render auto-reference messages differently
+                if (msg.isAutoReference && msg.referencedCheckpointId) {
+                  const checkpointRoute = routeWithParam(PROJECT_PORTAL_CHECKPOINT_ROUTE, {
+                    id: project.id,
+                    portalSlug: project.portalSlug,
+                    checkpointId: msg.referencedCheckpointId
+                  });
+
+                  const href = msg.referencedAttachmentId
+                    ? `${checkpointRoute}?attachment=${msg.referencedAttachmentId}${msg.referencedMarkupId ? `&markup=${msg.referencedMarkupId}` : ''}`
+                    : checkpointRoute;
+
+                  const icon = msg.referencedMarkupId ? 'markup' as const : msg.referencedAttachmentId ? 'attachment' as const : 'message' as const;
+
+                  return (
+                    <div key={msg.id} className="my-2">
+                      <MessageReference
+                        text={msg.text}
+                        timestamp={msg.createdAt}
+                        href={href}
+                        icon={icon}
+                      />
+                    </div>
+                  );
+                }
 
                 return (
                   <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>

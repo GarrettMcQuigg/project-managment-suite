@@ -12,9 +12,11 @@ import ImageLoader from '../../_src/image-loader';
 import type { Checkpoint } from '@prisma/client';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
-import { routeWithParam, PROJECT_PORTAL_ROUTE } from '@/packages/lib/routes';
+import { routeWithParam, PROJECT_PORTAL_ROUTE, PROJECT_PORTAL_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
 import AttachmentPreviewModal from './attachment-preview-modal';
 import MessageAttachment from './message-attachment';
+import MessageReference from '@/packages/lib/components/message-reference';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 interface CheckpointMessage {
   id: string;
@@ -28,6 +30,9 @@ interface CheckpointMessage {
     pathname: string;
     contentType: string;
   }>;
+  isAutoReference?: boolean;
+  referencedAttachmentId?: string;
+  referencedMarkupId?: string;
 }
 
 interface CheckpointMessagesProps {
@@ -42,6 +47,13 @@ interface CheckpointMessagesProps {
 export default function CheckpointMessages({ projectId, checkpoint, project, isOwner, ownerName, currentUserName }: CheckpointMessagesProps) {
   const endpoint = API_AUTH_PORTAL_GET_BY_ID_ROUTE + projectId;
   const { data } = useSWR(endpoint, swrFetcher);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Callback to refresh messages when a comment is created
+  const handleCommentCreated = () => {
+    mutate(endpoint);
+  };
 
   const [messages, setMessages] = useState<CheckpointMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -49,6 +61,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
   const [files, setFiles] = useState<File[]>([]);
   const [previewFile, setPreviewFile] = useState<File | null>(null);
   const [selectedAttachment, setSelectedAttachment] = useState<any>(null);
+  const [focusedMarkupId, setFocusedMarkupId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const textInputRef = useRef<HTMLInputElement | null>(null);
@@ -59,6 +72,38 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
       loadCheckpointMessages(data.content);
     }
   }, [data]);
+
+  // Handle query parameters for auto-opening attachment modal
+  useEffect(() => {
+    if (!data) return;
+
+    const attachmentId = searchParams.get('attachment');
+    const markupId = searchParams.get('markup');
+
+    if (attachmentId) {
+      // Find the attachment in the messages
+      const allAttachments = data.content.checkpointMessages
+        ?.filter((msg: CheckpointMessage) => msg.checkpointId === checkpoint.id)
+        .flatMap((msg: CheckpointMessage) => msg.attachments || []);
+
+      const attachment = allAttachments?.find((att: any) => att.id === attachmentId);
+
+      if (attachment) {
+        setSelectedAttachment(attachment);
+        if (markupId) {
+          setFocusedMarkupId(markupId);
+        }
+
+        // Clear query params from URL after opening
+        const newUrl = routeWithParam(PROJECT_PORTAL_CHECKPOINT_ROUTE, {
+          id: projectId,
+          portalSlug: project.portalSlug,
+          checkpointId: checkpoint.id
+        });
+        router.replace(newUrl, { scroll: false });
+      }
+    }
+  }, [data, searchParams, checkpoint.id, projectId, project.portalSlug, router]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const loadCheckpointMessages = (project: any) => {
@@ -194,6 +239,30 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
             {messages.length > 0 ? (
               messages.map((message) => {
                 const isOwnMessage = message.sender === currentUserName;
+
+                // Render auto-reference messages differently
+                if (message.isAutoReference && message.referencedAttachmentId) {
+                  const checkpointRoute = routeWithParam(PROJECT_PORTAL_CHECKPOINT_ROUTE, {
+                    id: projectId,
+                    portalSlug: project.portalSlug,
+                    checkpointId: checkpoint.id
+                  });
+
+                  const href = `${checkpointRoute}?attachment=${message.referencedAttachmentId}${message.referencedMarkupId ? `&markup=${message.referencedMarkupId}` : ''}`;
+                  const icon = message.referencedMarkupId ? 'markup' as const : 'attachment' as const;
+
+                  return (
+                    <div key={message.id} className="my-2">
+                      <MessageReference
+                        text={message.text}
+                        timestamp={message.createdAt}
+                        href={href}
+                        icon={icon}
+                      />
+                    </div>
+                  );
+                }
+
                 return (
                   <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
                     <div className="max-w-[85%]">
@@ -433,7 +502,12 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
           isOwner={isOwner}
           ownerName={ownerName}
           currentUserName={currentUserName}
-          onClose={() => setSelectedAttachment(null)}
+          onClose={() => {
+            setSelectedAttachment(null);
+            setFocusedMarkupId(null);
+          }}
+          initialFocusedMarkupId={focusedMarkupId}
+          onCommentCreated={handleCommentCreated}
         />
       )}
     </>

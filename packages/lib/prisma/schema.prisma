@@ -96,37 +96,50 @@ model PortalSession {
 }
 
 model Checkpoint {
-  id            String           @id @default(uuid())
-  projectId     String
-  order         Int              @default(autoincrement())
-  type          CheckpointType
-  name          String
-  description   String?
-  startDate     DateTime
-  endDate       DateTime
-  status        CheckpointStatus @default(PENDING)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  calendarEvent CalendarEvent[]
-  project       Project          @relation(fields: [projectId], references: [id])
-  invoice       Invoice?
-  messages      ProjectMessage[]
+  id                  String           @id @default(uuid())
+  projectId           String
+  order               Int              @default(autoincrement())
+  type                CheckpointType
+  name                String
+  description         String?
+  startDate           DateTime
+  endDate             DateTime
+  status              CheckpointStatus @default(PENDING)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  calendarEvent       CalendarEvent[]
+  project             Project          @relation(fields: [projectId], references: [id])
+  invoice             Invoice?
+  messages            ProjectMessage[]
+  referencingMessages ProjectMessage[] @relation("CheckpointReferences")
 }
 
 model ProjectMessage {
-  id                  String                     @id @default(uuid())
-  projectId           String
-  checkpointId        String?
-  sender              String?
-  text                String
-  createdAt           DateTime                   @default(now())
-  responseToMessageId String?
-  messageRead         MessageRead[]
-  checkpoint          Checkpoint?                @relation(fields: [checkpointId], references: [id])
-  project             Project                    @relation(fields: [projectId], references: [id])
-  responseToMessage   ProjectMessage?            @relation("MessageResponses", fields: [responseToMessageId], references: [id])
-  responses           ProjectMessage[]           @relation("MessageResponses")
-  attachments         ProjectMessageAttachment[]
+  id                      String                     @id @default(uuid())
+  projectId               String
+  checkpointId            String?
+  sender                  String?
+  text                    String
+  createdAt               DateTime                   @default(now())
+  responseToMessageId     String?
+  referencedAttachmentId  String?
+  referencedMarkupId      String?
+  referencedCheckpointId  String?
+  isAutoReference         Boolean                    @default(false)
+  messageRead             MessageRead[]
+  checkpoint              Checkpoint?                @relation(fields: [checkpointId], references: [id])
+  project                 Project                    @relation(fields: [projectId], references: [id])
+  responseToMessage       ProjectMessage?            @relation("MessageResponses", fields: [responseToMessageId], references: [id])
+  responses               ProjectMessage[]           @relation("MessageResponses")
+  attachments             ProjectMessageAttachment[]
+  referencedAttachment    ProjectMessageAttachment?  @relation("AttachmentReferences", fields: [referencedAttachmentId], references: [id])
+  referencedMarkup        AttachmentMarkup?          @relation("MarkupReferences", fields: [referencedMarkupId], references: [id])
+  referencedCheckpoint    Checkpoint?                @relation("CheckpointReferences", fields: [referencedCheckpointId], references: [id])
+
+  @@index([referencedAttachmentId])
+  @@index([referencedMarkupId])
+  @@index([referencedCheckpointId])
+  @@index([isAutoReference])
 }
 
 model ProjectParticipant {
@@ -165,34 +178,36 @@ model ProjectAttachment {
 }
 
 model ProjectMessageAttachment {
-  id               String                    @id @default(uuid())
-  messageId        String
-  blobUrl          String
-  pathname         String
-  contentType      String
-  hasUnreadMarkups Boolean                   @default(false)
-  lastMarkupAt     DateTime?
-  createdAt        DateTime                  @default(now())
-  message          ProjectMessage            @relation(fields: [messageId], references: [id])
-  markups          AttachmentMarkup[]
-  comments         AttachmentMarkupComment[]
+  id                      String                    @id @default(uuid())
+  messageId               String
+  blobUrl                 String
+  pathname                String
+  contentType             String
+  hasUnreadMarkups        Boolean                   @default(false)
+  lastMarkupAt            DateTime?
+  createdAt               DateTime                  @default(now())
+  message                 ProjectMessage            @relation(fields: [messageId], references: [id])
+  markups                 AttachmentMarkup[]
+  comments                AttachmentMarkupComment[]
+  referencingMessages     ProjectMessage[]          @relation("AttachmentReferences")
 }
 
 model AttachmentMarkup {
-  id           String                    @id @default(uuid())
-  attachmentId String
-  attachment   ProjectMessageAttachment  @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
-  userId       String?
-  name         String?
-  type         MarkupType
-  canvasData   Json
-  position     Json?
-  color        String?
-  strokeWidth  Int?
-  visible      Boolean                   @default(true)
-  createdAt    DateTime                  @default(now())
-  updatedAt    DateTime                  @updatedAt
-  comments     AttachmentMarkupComment[]
+  id                  String                    @id @default(uuid())
+  attachmentId        String
+  attachment          ProjectMessageAttachment  @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  userId              String?
+  name                String?
+  type                MarkupType
+  canvasData          Json
+  position            Json?
+  color               String?
+  strokeWidth         Int?
+  visible             Boolean                   @default(true)
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
+  comments            AttachmentMarkupComment[]
+  referencingMessages ProjectMessage[]          @relation("MarkupReferences")
 
   @@index([attachmentId])
   @@index([createdAt])

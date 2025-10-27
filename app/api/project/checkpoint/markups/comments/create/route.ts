@@ -2,6 +2,7 @@ import { handleBadRequest, handleError, handleSuccess, handleUnauthorized } from
 import { PortalVisitor } from '@/packages/lib/helpers/portal/get-portal-user';
 import { db } from '@/packages/lib/prisma/client';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
+import { createAttachmentReferences } from '@/packages/lib/helpers/auto-reference';
 import { User } from '@prisma/client';
 
 export async function POST(request: Request) {
@@ -42,7 +43,16 @@ export async function POST(request: Request) {
       const markup = await db.attachmentMarkup.findUnique({
         where: { id: markupId },
         include: {
-          attachment: true
+          attachment: {
+            include: {
+              message: {
+                include: {
+                  checkpoint: true,
+                  project: true
+                }
+              }
+            }
+          }
         }
       });
 
@@ -70,6 +80,19 @@ export async function POST(request: Request) {
         }
       });
 
+      // Create auto-references
+      if (markup.attachment.message.checkpoint) {
+        await createAttachmentReferences({
+          projectId: markup.attachment.message.projectId,
+          checkpointId: markup.attachment.message.checkpointId!,
+          checkpointName: markup.attachment.message.checkpoint.name,
+          attachmentId: markup.attachmentId,
+          attachmentName: markup.attachment.pathname.split('/').pop() || 'file',
+          sender: name || 'Unknown',
+          markupId
+        });
+      }
+
       return handleSuccess({
         message: 'Comment added successfully',
         content: comment
@@ -78,7 +101,14 @@ export async function POST(request: Request) {
 
     // Otherwise, create general file comment
     const attachment = await db.projectMessageAttachment.findUnique({
-      where: { id: attachmentId }
+      where: { id: attachmentId },
+      include: {
+        message: {
+          include: {
+            checkpoint: true
+          }
+        }
+      }
     });
 
     if (!attachment) {
@@ -102,6 +132,18 @@ export async function POST(request: Request) {
         lastMarkupAt: new Date()
       }
     });
+
+    // Create auto-references
+    if (attachment.message.checkpoint) {
+      await createAttachmentReferences({
+        projectId: attachment.message.projectId,
+        checkpointId: attachment.message.checkpointId!,
+        checkpointName: attachment.message.checkpoint.name,
+        attachmentId,
+        attachmentName: attachment.pathname.split('/').pop() || 'file',
+        sender: name || 'Unknown'
+      });
+    }
 
     return handleSuccess({
       message: 'Comment added successfully',

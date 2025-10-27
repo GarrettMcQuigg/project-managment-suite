@@ -20,9 +20,10 @@ interface MarkupActivityLogProps {
   currentUserName: string;
   focusedCommentId?: string | null;
   onCommentFocus?: (markupId: string | null) => void;
+  onCommentCreated?: () => void;
 }
 
-export default function MarkupActivityLog({ attachment, markups, generalComments, isOwner, loading, isInitialLoading, currentUserName, focusedCommentId, onCommentFocus }: MarkupActivityLogProps) {
+export default function MarkupActivityLog({ attachment, markups, generalComments, isOwner, loading, isInitialLoading, currentUserName, focusedCommentId, onCommentFocus, onCommentCreated }: MarkupActivityLogProps) {
   const [newComment, setNewComment] = useState('');
   const [sendingComment, setSendingComment] = useState(false);
   const [optimisticComments, setOptimisticComments] = useState<any[]>([]);
@@ -142,6 +143,9 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
         setNewComment(commentText); // Restore the text
         return;
       }
+
+      // Notify parent that a comment was created
+      onCommentCreated?.();
     } catch (error) {
       console.error('Error sending comment:', error);
       toast.error('An error occurred while sending your comment');

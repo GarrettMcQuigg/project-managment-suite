@@ -16,16 +16,18 @@ interface AttachmentPreviewModalProps {
   ownerName: string;
   currentUserName: string;
   onClose: () => void;
+  initialFocusedMarkupId?: string | null;
+  onCommentCreated?: () => void;
 }
 
-export default function AttachmentPreviewModal({ attachment, projectId, checkpointId, isOwner, ownerName, currentUserName, onClose }: AttachmentPreviewModalProps) {
+export default function AttachmentPreviewModal({ attachment, projectId, checkpointId, isOwner, ownerName, currentUserName, onClose, initialFocusedMarkupId, onCommentCreated }: AttachmentPreviewModalProps) {
   const [showMarkups, setShowMarkups] = useState(true);
   const [markups, setMarkups] = useState<any[]>([]);
   const [generalComments, setGeneralComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
-  const [focusedCommentId, setFocusedCommentId] = useState<string | null>(null);
+  const [focusedCommentId, setFocusedCommentId] = useState<string | null>(initialFocusedMarkupId || null);
 
   const fileName = attachment.pathname.split('/').pop() || 'File';
   const fileType = attachment.contentType;
@@ -223,6 +225,7 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
               currentUserName={currentUserName}
               focusedCommentId={focusedCommentId}
               onCommentFocus={setFocusedCommentId}
+              onCommentCreated={onCommentCreated}
             />
           </div>
         </div>

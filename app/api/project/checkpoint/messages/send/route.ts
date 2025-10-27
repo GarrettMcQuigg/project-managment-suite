@@ -5,6 +5,7 @@ import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context
 import { createAdminClient } from '@/packages/lib/utils/supabase/client';
 import { UpdateMessageMetrics } from '@/packages/lib/helpers/analytics/messages/message-metrics';
 import { TrackMessageSent, TrackMessageReceived } from '@/packages/lib/helpers/analytics/communication';
+import { createCheckpointReference } from '@/packages/lib/helpers/auto-reference';
 import { User } from '@prisma/client';
 
 export async function POST(request: Request) {
@@ -65,6 +66,7 @@ export async function POST(request: Request) {
       return handleBadRequest({ message: 'Checkpoint not found or does not belong to this project' });
     }
 
+    const checkpoint = project.checkpoints[0];
     let newMessage;
 
     if (context.type === 'user') {
@@ -182,6 +184,14 @@ export async function POST(request: Request) {
 
       await Promise.all(attachmentPromises);
     }
+
+    // Create auto-reference in project-level messages
+    await createCheckpointReference({
+      projectId,
+      checkpointId,
+      checkpointName: checkpoint.name,
+      sender: newMessage.sender || 'Unknown'
+    });
 
     return handleSuccess({
       message: 'Checkpoint message sent successfully'

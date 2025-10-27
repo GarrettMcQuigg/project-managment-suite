@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       if (context.type === 'user' && markup.userId !== userId) {
         return handleUnauthorized({ message: 'You can only delete your own markups' });
       }
-      if (context.type === 'portal' && markup.visitorName !== visitorName) {
+      if (context.type === 'portal' && markup.name !== visitorName) {
         return handleUnauthorized({ message: 'You can only delete your own markups' });
       }
     }

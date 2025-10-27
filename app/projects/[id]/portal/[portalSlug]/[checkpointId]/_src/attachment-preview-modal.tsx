@@ -198,6 +198,7 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
               markups={markups}
               showMarkups={showMarkups}
               isOwner={isOwner}
+              currentUserName={currentUserName}
               onMarkupCreated={handleMarkupCreated}
               onMarkupDeleted={handleMarkupDeleted}
               onMarkupsUpdated={loadMarkups}

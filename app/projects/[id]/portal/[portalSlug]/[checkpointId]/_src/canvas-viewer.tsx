@@ -19,6 +19,7 @@ interface CanvasViewerProps {
   markups: any[];
   showMarkups: boolean;
   isOwner: boolean;
+  currentUserName: string;
   onMarkupCreated: (markup: any) => void;
   onMarkupDeleted: (markupId: string) => void;
   onMarkupsUpdated: () => void;
@@ -30,7 +31,7 @@ interface Point {
   y: number;
 }
 
-export default function CanvasViewer({ attachment, markups, showMarkups, isOwner, onMarkupCreated, onMarkupDeleted, onMarkupsUpdated, onSaveStatusChange }: CanvasViewerProps) {
+export default function CanvasViewer({ attachment, markups, showMarkups, isOwner, currentUserName, onMarkupCreated, onMarkupDeleted, onMarkupsUpdated, onSaveStatusChange }: CanvasViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -125,7 +126,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
   // Redraw canvas whenever paths, shapes, or markups change
   useEffect(() => {
     redrawCanvas();
-  }, [paths, shapes, markups, showMarkups, shapeStart, shapeEnd]);
+  }, [paths, shapes, markups, showMarkups, shapeStart, shapeEnd, pendingDeletes]);
 
   const redrawCanvas = () => {
     const canvas = canvasRef.current;
@@ -146,9 +147,12 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
     // For PDFs, the iframe is behind the canvas, so we just draw markups on transparent canvas
 
-    // Draw saved markups from database
+    // Draw saved markups from database (excluding pending deletes)
     if (showMarkups) {
       markups.forEach((markup) => {
+        // Skip markups that are pending deletion
+        if (pendingDeletes.includes(markup.id)) return;
+
         if (markup.type === 'DRAWING' && markup.canvasData?.points) {
           drawPath(ctx, markup.canvasData.points, markup.color || '#FF0000', markup.strokeWidth || 3, false);
         } else if (markup.type === 'HIGHLIGHT' && markup.canvasData?.points) {
@@ -380,6 +384,9 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
     if (activeTool === 'select' && showMarkups) {
       let foundComment = null;
       for (const markup of markups) {
+        // Skip markups that are pending deletion
+        if (pendingDeletes.includes(markup.id)) continue;
+
         if (markup.type === 'COMMENT' && markup.position) {
           const distance = Math.sqrt(Math.pow(pos.x - markup.position.x, 2) + Math.pow(pos.y - markup.position.y, 2));
           if (distance <= 12) {
@@ -419,8 +426,12 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       // Check which markups the eraser is touching
       const newMarkupsToDelete = new Set(markupsToDelete);
 
-      // Check saved markups from database
+      // Check saved markups from database - only allow deletion of user-owned markups
       markups.forEach((markup) => {
+        // Check ownership: for authenticated users check userId, for portal visitors check name
+        const isOwnedByUser = isOwner ? markup.userId !== null : markup.name === currentUserName;
+        if (!isOwnedByUser) return; // Skip markups not owned by current user
+
         if (markup.type === 'DRAWING' && markup.canvasData?.points) {
           if (isPointNearPath(pos, markup.canvasData.points)) {
             newMarkupsToDelete.add(markup.id);
@@ -1005,8 +1016,20 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
     if (!confirm('Are you sure you want to delete all markups?')) return;
 
     try {
-      // Collect all markup IDs (both from database and local)
-      const markupIds = markups.map((m) => m.id);
+      // Filter markups to only include user-owned markups
+      // For authenticated users: check userId, for portal visitors: check name
+      const userOwnedMarkups = markups.filter((m) => {
+        if (isOwner) {
+          // Owner can be identified by userId
+          return m.userId !== null;
+        } else {
+          // Portal visitor is identified by name
+          return m.name === currentUserName;
+        }
+      });
+
+      // Collect markup IDs (only user-owned from database, all local since they're newly created)
+      const markupIds = userOwnedMarkups.map((m) => m.id);
       const localPathIds = paths.filter((p) => p.id).map((p) => p.id!);
       const localShapeIds = shapes.filter((s) => s.id).map((s) => s.id!);
       const allIds = [...markupIds, ...localPathIds, ...localShapeIds];

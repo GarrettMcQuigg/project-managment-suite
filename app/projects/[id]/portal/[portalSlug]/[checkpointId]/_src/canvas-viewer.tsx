@@ -20,9 +20,11 @@ interface CanvasViewerProps {
   showMarkups: boolean;
   isOwner: boolean;
   currentUserName: string;
+  focusedCommentId?: string | null;
   onMarkupCreated: (markup: any) => void;
   onMarkupDeleted: (markupId: string) => void;
   onMarkupsUpdated: () => void;
+  onCommentFocus?: (markupId: string | null) => void;
   onSaveStatusChange?: (status: 'saved' | 'saving' | 'unsaved') => void;
 }
 
@@ -31,7 +33,24 @@ interface Point {
   y: number;
 }
 
-export default function CanvasViewer({ attachment, markups, showMarkups, isOwner, currentUserName, onMarkupCreated, onMarkupDeleted, onMarkupsUpdated, onSaveStatusChange }: CanvasViewerProps) {
+// Generate consistent color for each comment based on its ID
+const getCommentColor = (commentId: string): string => {
+  const colors = [
+    '#6366f1', // indigo
+    '#3b82f6', // blue
+    '#10b981', // green
+    '#eab308', // yellow
+    '#f59e0b', // amber
+    '#ef4444', // red
+    '#ec4899', // pink
+    '#f97316', // orange
+    '#a855f7'  // purple
+  ];
+  const hash = commentId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return colors[hash % colors.length];
+};
+
+export default function CanvasViewer({ attachment, markups, showMarkups, isOwner, currentUserName, focusedCommentId, onMarkupCreated, onMarkupDeleted, onMarkupsUpdated, onCommentFocus, onSaveStatusChange }: CanvasViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -82,6 +101,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
   const [savingComment, setSavingComment] = useState(false);
   const [hoveredComment, setHoveredComment] = useState<any>(null);
   const [commentTooltipPos, setCommentTooltipPos] = useState<Point | null>(null);
+  const [isHoveringCommentPin, setIsHoveringCommentPin] = useState(false);
 
   // Eraser state
   const [eraserPath, setEraserPath] = useState<Point[]>([]);
@@ -158,7 +178,9 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         } else if (markup.type === 'HIGHLIGHT' && markup.canvasData?.points) {
           drawPath(ctx, markup.canvasData.points, markup.color || '#FFFF00', markup.strokeWidth || 3, true);
         } else if (markup.type === 'COMMENT' && markup.position) {
-          drawCommentPin(ctx, markup.position, markup.color || '#FF0000');
+          const commentColor = getCommentColor(markup.id);
+          const isFocused = focusedCommentId === markup.id;
+          drawCommentPin(ctx, markup.position, commentColor, isFocused);
         } else if (markup.type === 'SHAPE' && markup.canvasData?.start && markup.canvasData?.end) {
           drawShape(ctx, markup.canvasData.shapeType || markup.type, markup.canvasData.start, markup.canvasData.end, markup.color || '#FF0000', markup.strokeWidth || 3);
         }
@@ -211,9 +233,18 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
     ctx.stroke();
   };
 
-  const drawCommentPin = (ctx: CanvasRenderingContext2D, position: any, pinColor: string) => {
+  const drawCommentPin = (ctx: CanvasRenderingContext2D, position: any, pinColor: string, isFocused: boolean = false) => {
     const x = position.x;
     const y = position.y;
+
+    // Draw focus ring if this comment is focused
+    if (isFocused) {
+      ctx.beginPath();
+      ctx.arc(x, y, 18, 0, 2 * Math.PI);
+      ctx.strokeStyle = pinColor;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
 
     // Draw pin circle
     ctx.beginPath();
@@ -224,12 +255,24 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
     ctx.lineWidth = 2;
     ctx.stroke();
 
+    // Add shadow for clickable appearance
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 2;
+
     // Draw message icon
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('💬', x, y);
+
+    // Reset shadow
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
   };
 
   const drawShape = (ctx: CanvasRenderingContext2D, shapeType: string, start: Point, end: Point, shapeColor: string, shapeWidth: number) => {
@@ -349,6 +392,23 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
   const handleMouseDown = async (e: MouseEvent<HTMLCanvasElement>) => {
     const pos = getMousePos(e);
 
+    // Check if clicking on a comment pin with select tool
+    if (activeTool === 'select' && showMarkups) {
+      for (const markup of markups) {
+        if (markup.type === 'COMMENT' && markup.position && !pendingDeletes.includes(markup.id)) {
+          const distance = Math.sqrt(Math.pow(pos.x - markup.position.x, 2) + Math.pow(pos.y - markup.position.y, 2));
+          if (distance <= 12) {
+            // Comment pin clicked - toggle focus
+            onCommentFocus?.(focusedCommentId === markup.id ? null : markup.id);
+            return;
+          }
+        }
+      }
+      // Clicked elsewhere - clear focus
+      onCommentFocus?.(null);
+      return;
+    }
+
     if (activeTool === 'comment') {
       // Place comment pin
       setCommentPosition(pos);
@@ -398,6 +458,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
       if (foundComment) {
         setHoveredComment(foundComment);
+        setIsHoveringCommentPin(true);
         // Convert canvas coordinates to viewport coordinates
         const canvas = canvasRef.current;
         if (canvas) {
@@ -410,6 +471,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       } else {
         setHoveredComment(null);
         setCommentTooltipPos(null);
+        setIsHoveringCommentPin(false);
       }
     }
 
@@ -1171,7 +1233,15 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
                 ref={canvasRef}
                 width={800}
                 height={600}
-                className={`absolute inset-0 ${fileType === 'pdf' ? 'bg-transparent' : 'bg-muted'} ${['draw', 'comment', 'highlight', 'rectangle', 'circle', 'arrow'].includes(activeTool) ? 'cursor-crosshair' : activeTool === 'eraser' ? 'cursor-pointer' : 'cursor-default'}`}
+                className={`absolute inset-0 ${fileType === 'pdf' ? 'bg-transparent' : 'bg-muted'} ${
+                  ['draw', 'comment', 'highlight', 'rectangle', 'circle', 'arrow'].includes(activeTool)
+                    ? 'cursor-crosshair'
+                    : activeTool === 'eraser'
+                      ? 'cursor-pointer'
+                      : activeTool === 'select' && isHoveringCommentPin
+                        ? 'cursor-pointer'
+                        : 'cursor-default'
+                }`}
                 style={{ pointerEvents: ['select', 'draw', 'comment', 'highlight', 'rectangle', 'circle', 'arrow', 'eraser'].includes(activeTool) ? 'auto' : 'none' }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}

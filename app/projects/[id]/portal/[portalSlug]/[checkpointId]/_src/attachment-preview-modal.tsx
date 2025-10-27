@@ -25,6 +25,7 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
   const [loading, setLoading] = useState(true);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
+  const [focusedCommentId, setFocusedCommentId] = useState<string | null>(null);
 
   const fileName = attachment.pathname.split('/').pop() || 'File';
   const fileType = attachment.contentType;
@@ -199,9 +200,11 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
               showMarkups={showMarkups}
               isOwner={isOwner}
               currentUserName={currentUserName}
+              focusedCommentId={focusedCommentId}
               onMarkupCreated={handleMarkupCreated}
               onMarkupDeleted={handleMarkupDeleted}
               onMarkupsUpdated={loadMarkups}
+              onCommentFocus={setFocusedCommentId}
               onSaveStatusChange={setSaveStatus}
             />
           </div>
@@ -218,6 +221,8 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
               loading={loading}
               isInitialLoading={isInitialLoading}
               currentUserName={currentUserName}
+              focusedCommentId={focusedCommentId}
+              onCommentFocus={setFocusedCommentId}
             />
           </div>
         </div>

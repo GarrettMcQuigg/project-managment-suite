@@ -18,13 +18,16 @@ interface MarkupActivityLogProps {
   loading: boolean;
   isInitialLoading: boolean;
   currentUserName: string;
+  focusedCommentId?: string | null;
+  onCommentFocus?: (markupId: string | null) => void;
 }
 
-export default function MarkupActivityLog({ attachment, markups, generalComments, isOwner, loading, isInitialLoading, currentUserName }: MarkupActivityLogProps) {
+export default function MarkupActivityLog({ attachment, markups, generalComments, isOwner, loading, isInitialLoading, currentUserName, focusedCommentId, onCommentFocus }: MarkupActivityLogProps) {
   const [newComment, setNewComment] = useState('');
   const [sendingComment, setSendingComment] = useState(false);
   const [optimisticComments, setOptimisticComments] = useState<any[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Combine server comments with optimistic local comments
   const allComments = [
@@ -74,6 +77,16 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
   }, [allComments.length]);
+
+  // Scroll to focused comment when it changes
+  useEffect(() => {
+    if (focusedCommentId && commentRefs.current.has(focusedCommentId)) {
+      const element = commentRefs.current.get(focusedCommentId);
+      if (element && scrollContainerRef.current) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [focusedCommentId]);
 
   const getMarkupIcon = (type: string) => {
     switch (type) {
@@ -138,6 +151,23 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
     } finally {
       setSendingComment(false);
     }
+  };
+
+  // Generate consistent color for each comment based on its ID
+  const getCommentColor = (commentId: string): string => {
+    const colors = [
+      '#6366f1', // indigo
+      '#3b82f6', // blue
+      '#10b981', // green
+      '#eab308', // yellow
+      '#f59e0b', // amber
+      '#ef4444', // red
+      '#ec4899', // pink
+      '#f97316', // orange
+      '#a855f7'  // purple
+    ];
+    const hash = commentId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[hash % colors.length];
   };
 
   const getAvatarData = (author: string) => {
@@ -211,18 +241,33 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
             const Icon = getMarkupIcon(item.type);
             const author = item.name;
             const avatarData = getAvatarData(author);
+            const isComment = item.type === 'COMMENT';
+            const isFocused = isComment && focusedCommentId === item.id;
+            const borderColor = isComment ? getCommentColor(item.id) : undefined;
 
             return (
-              <MessageBubble
+              <div
                 key={item.id}
-                author={author}
-                currentUserName={currentUserName}
-                timestamp={item.createdAt}
-                message={item.comments[0].text}
-                avatarInitials={avatarData.initials}
-                avatarColor={avatarData.color}
-                icon={Icon}
-              />
+                ref={(el) => {
+                  if (el && isComment) {
+                    commentRefs.current.set(item.id, el);
+                  }
+                }}
+              >
+                <MessageBubble
+                  author={author}
+                  currentUserName={currentUserName}
+                  timestamp={item.createdAt}
+                  message={item.comments[0].text}
+                  avatarInitials={avatarData.initials}
+                  avatarColor={avatarData.color}
+                  icon={Icon}
+                  borderColor={borderColor}
+                  isFocused={isFocused}
+                  isClickable={isComment}
+                  onClick={isComment ? () => onCommentFocus?.(isFocused ? null : item.id) : undefined}
+                />
+              </div>
             );
           })
         )}

@@ -12,13 +12,20 @@ interface MessageBubbleProps {
   avatarColor: string;
   type?: string;
   icon?: React.ComponentType<{ className?: string }>;
+  borderColor?: string;
+  isFocused?: boolean;
+  isClickable?: boolean;
+  onClick?: () => void;
 }
 
-export default function MessageBubble({ author, currentUserName, timestamp, message, avatarInitials, avatarColor, type, icon: Icon }: MessageBubbleProps) {
+export default function MessageBubble({ author, currentUserName, timestamp, message, avatarInitials, avatarColor, type, icon: Icon, borderColor, isFocused, isClickable, onClick }: MessageBubbleProps) {
   const isOwnMessage = author === currentUserName;
 
   return (
-    <div className={`flex items-start gap-2.5 ${isOwnMessage ? 'flex-row-reverse' : ''}`}>
+    <div
+      className={`flex items-start gap-2.5 ${isOwnMessage ? 'flex-row-reverse' : ''} ${isClickable ? 'cursor-pointer' : ''}`}
+      onClick={onClick}
+    >
       {/* Avatar */}
       <div className="flex-shrink-0">
         <div className={`w-8 h-8 rounded-full ${avatarColor} flex items-center justify-center text-white text-xs font-semibold shadow-sm`}>{avatarInitials}</div>
@@ -26,9 +33,13 @@ export default function MessageBubble({ author, currentUserName, timestamp, mess
 
       {/* Message Container */}
       <div
-        className={`flex flex-col w-full max-w-[320px] leading-relaxed p-4 border border-border shadow-sm ${
+        className={`flex flex-col w-full max-w-[320px] leading-relaxed p-4 border-2 shadow-sm transition-all ${
           isOwnMessage ? 'rounded-s-xl rounded-ee-xl text-foreground' : 'rounded-e-xl rounded-es-xl bg-gray-300/30 dark:bg-card/50'
-        }`}
+        } ${isFocused ? 'ring-2 ring-offset-2 scale-[1.02]' : ''} ${isClickable ? 'hover:shadow-md hover:scale-[1.01]' : ''}`}
+        style={{
+          borderColor: borderColor || 'hsl(var(--border))',
+          ...(isFocused && borderColor ? { ringColor: borderColor } : {})
+        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-1">

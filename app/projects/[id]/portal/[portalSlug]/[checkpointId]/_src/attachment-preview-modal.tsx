@@ -20,7 +20,17 @@ interface AttachmentPreviewModalProps {
   onCommentCreated?: () => void;
 }
 
-export default function AttachmentPreviewModal({ attachment, projectId, checkpointId, isOwner, ownerName, currentUserName, onClose, initialFocusedMarkupId, onCommentCreated }: AttachmentPreviewModalProps) {
+export default function AttachmentPreviewModal({
+  attachment,
+  projectId,
+  checkpointId,
+  isOwner,
+  ownerName,
+  currentUserName,
+  onClose,
+  initialFocusedMarkupId,
+  onCommentCreated
+}: AttachmentPreviewModalProps) {
   const [showMarkups, setShowMarkups] = useState(true);
   const [markups, setMarkups] = useState<any[]>([]);
   const [generalComments, setGeneralComments] = useState<any[]>([]);
@@ -186,8 +196,8 @@ export default function AttachmentPreviewModal({ attachment, projectId, checkpoi
             >
               {showMarkups ? 'Hide' : 'Show'} Markups
             </button>
-            <button onClick={onClose} className="p-2 hover:bg-secondary rounded-lg transition-colors">
-              <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+            <button onClick={onClose} className="p-2 hover:text-secondary hover-border hover:border-secondary hover-bg-muted-foreground/10 rounded-lg transition-colors">
+              <X className="h-5 w-5 text-muted-foreground" />
             </button>
           </div>
         </div>

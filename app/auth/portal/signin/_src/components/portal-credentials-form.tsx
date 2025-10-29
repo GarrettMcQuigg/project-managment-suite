@@ -8,6 +8,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/packages/lib/components/button';
+import { AUTH_SIGNIN_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
+import { useRouter } from 'next/navigation';
 
 export const PortalCredentialsFormSchema = z.object({
   visitorName: z.string().min(3, 'Name must be at least 3 characters long'),
@@ -31,14 +33,13 @@ interface PortalCredentialsFormProps {
 }
 
 const PortalCredentialsForm: React.FC<PortalCredentialsFormProps> = ({ form, loading, onSubmit }) => {
+  const router = useRouter();
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold">Project Portal Access</h2>
-          <p className="mt-2 text-center text-sm text-muted-foreground">
-            Please enter your name and the portal password to access this project portal.
-          </p>
+          <p className="mt-2 text-center text-sm text-muted-foreground">Please enter your name and the portal password to access this project portal.</p>
         </div>
 
         <Form {...form}>
@@ -87,6 +88,10 @@ const PortalCredentialsForm: React.FC<PortalCredentialsFormProps> = ({ form, loa
 
             <Button className="w-full" type="submit" disabled={loading} loading={loading}>
               {loading ? 'Accessing...' : 'Access Portal'}
+            </Button>
+
+            <Button className="w-full" type="button" variant="outline" onClick={() => router.push(ROOT_ROUTE)}>
+              Cancel
             </Button>
           </form>
         </Form>

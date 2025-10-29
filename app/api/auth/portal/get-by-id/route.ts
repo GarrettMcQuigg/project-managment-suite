@@ -10,6 +10,10 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const id = searchParams.get('id');
 
+  if (!id) {
+    return handleError({ message: 'Invalid Project' });
+  }
+
   try {
     const project = await db.project.findUnique({
       where: {

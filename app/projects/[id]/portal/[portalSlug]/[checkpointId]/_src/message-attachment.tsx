@@ -31,9 +31,9 @@ export default function MessageAttachment({ attachment, isOwnerMessage, onClick 
           width={288}
           height={192}
           loader={ImageLoader}
-          className="rounded-xl sm:max-w-48 sm:max-h-36 object-cover transition-transform hover:scale-[1.02] shadow-lg"
+          className="rounded-lg w-full h-auto object-cover transition-transform hover:scale-[1.02] shadow-lg max-h-[300px]"
         />
-        <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 rounded-xl transition-colors"></div>
+        <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 rounded-lg transition-colors"></div>
       </div>
     );
   }

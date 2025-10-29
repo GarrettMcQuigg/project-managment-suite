@@ -14,8 +14,11 @@ import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { routeWithParam, PROJECT_PORTAL_ROUTE, PROJECT_PORTAL_CHECKPOINT_ROUTE } from '@/packages/lib/routes';
 import AttachmentPreviewModal from './attachment-preview-modal';
+import AttachmentPreviewModalMobile from './attachment-preview-modal-mobile';
 import MessageAttachment from './message-attachment';
 import MessageReference from '@/packages/lib/components/message-reference';
+import MessageBubble from '@/packages/lib/components/message-bubble';
+import MessageBubbleMobile from '@/packages/lib/components/message-bubble-mobile';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 interface CheckpointMessage {
@@ -62,10 +65,23 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
   const [previewFile, setPreviewFile] = useState<File | null>(null);
   const [selectedAttachment, setSelectedAttachment] = useState<any>(null);
   const [focusedMarkupId, setFocusedMarkupId] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const textInputRef = useRef<HTMLInputElement | null>(null);
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (data) {
@@ -249,40 +265,85 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
                   });
 
                   const href = `${checkpointRoute}?attachment=${message.referencedAttachmentId}${message.referencedMarkupId ? `&markup=${message.referencedMarkupId}` : ''}`;
-                  const icon = message.referencedMarkupId ? 'markup' as const : 'attachment' as const;
+                  const icon = message.referencedMarkupId ? ('markup' as const) : ('attachment' as const);
 
                   return (
                     <div key={message.id} className="my-2">
-                      <MessageReference
-                        text={message.text}
-                        timestamp={message.createdAt}
-                        href={href}
-                        icon={icon}
-                      />
+                      <MessageReference text={message.text} timestamp={message.createdAt} href={href} icon={icon} />
                     </div>
                   );
                 }
 
-                return (
-                  <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
-                    <div className="max-w-[85%]">
-                      {!isOwnMessage && <p className="text-xs font-medium text-muted-foreground px-3 mb-1">{message.sender || 'Anonymous'}</p>}
+                // Generate avatar data
+                const getAvatarData = (name: string) => {
+                  const nameParts = name
+                    .trim()
+                    .split(' ')
+                    .filter((part) => part.length > 0);
+                  let initials: string;
 
-                      <div className={`px-3 py-2 rounded-xl shadow-sm ${isOwnMessage ? 'bg-primary text-white rounded-br-md' : 'bg-muted text-card-foreground rounded-bl-md'}`}>
-                        {message.text && message.text.trim() && <p className="text-sm leading-relaxed break-words">{message.text}</p>}
+                  if (nameParts.length === 0) {
+                    initials = '?';
+                  } else if (nameParts.length === 1) {
+                    initials = nameParts[0].slice(0, 2).toUpperCase();
+                  } else {
+                    initials = nameParts
+                      .slice(0, 2)
+                      .map((n) => n[0])
+                      .join('')
+                      .toUpperCase();
+                  }
 
-                        {message.attachments && message.attachments.length > 0 && (
-                          <div className={`space-y-3 ${message.text ? 'mt-3' : ''}`}>
-                            {message.attachments.map((attachment) => (
-                              <MessageAttachment key={attachment.id} attachment={attachment} isOwnerMessage={isOwnMessage} onClick={() => setSelectedAttachment(attachment)} />
-                            ))}
-                          </div>
-                        )}
+                  // Generate consistent color based on name
+                  const colors = ['bg-indigo-500', 'bg-blue-500', 'bg-green-500', 'bg-amber-500', 'bg-red-500', 'bg-pink-500', 'bg-orange-500', 'bg-purple-500'];
+                  const colorIndex = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
 
-                        <p className={`text-xs mt-1 ${isOwnMessage ? 'text-white/70' : 'text-muted-foreground'}`}>{format(new Date(message.createdAt), 'MMM d, h:mm a')}</p>
-                      </div>
-                    </div>
+                  return {
+                    initials,
+                    color: isOwnMessage ? 'bg-primary' : colors[colorIndex]
+                  };
+                };
+
+                const avatarData = getAvatarData(message.sender || '');
+
+                const attachmentNodes = message.attachments && message.attachments.length > 0 ? (
+                  <div className="space-y-2">
+                    {message.attachments.map((attachment) => (
+                      <MessageAttachment key={attachment.id} attachment={attachment} isOwnerMessage={isOwnMessage} onClick={() => setSelectedAttachment(attachment)} />
+                    ))}
                   </div>
+                ) : undefined;
+
+                return (
+                  <React.Fragment key={message.id}>
+                    {/* Mobile View - Show below sm breakpoint */}
+                    <div className="sm:hidden">
+                      <MessageBubbleMobile
+                        author={message.sender || ''}
+                        currentUserName={currentUserName}
+                        timestamp={message.createdAt}
+                        message={message.text || ''}
+                        avatarInitials={avatarData.initials}
+                        avatarColor={avatarData.color}
+                        className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+                        attachments={attachmentNodes}
+                      />
+                    </div>
+
+                    {/* Desktop View - Show at sm breakpoint and above */}
+                    <div className="hidden sm:block">
+                      <MessageBubble
+                        author={message.sender || ''}
+                        currentUserName={currentUserName}
+                        timestamp={message.createdAt}
+                        message={message.text || ''}
+                        avatarInitials={avatarData.initials}
+                        avatarColor={avatarData.color}
+                        className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+                        attachments={attachmentNodes}
+                      />
+                    </div>
+                  </React.Fragment>
                 );
               })
             ) : (
@@ -343,7 +404,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
             </div>
           )}
 
-          <div className="border-t border-border px-4 py-3 flex-shrink-0">
+          <div className="border-t border-border px-3 sm:px-4 py-2 sm:py-3 flex-shrink-0">
             <form onSubmit={handleSubmitMessage} className="flex items-center gap-x-2">
               <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept="image/*,.pdf,.doc,.docx,.txt" />
 
@@ -361,7 +422,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 px-3 py-2 rounded-lg border border-input focus:border-ring focus:outline-none bg-background text-foreground placeholder-muted-foreground text-sm"
+                className="flex-1 px-3 py-2 w-1/2 sm:w-full rounded-lg border border-input focus:border-ring focus:outline-none bg-background text-foreground placeholder-muted-foreground text-sm"
                 disabled={sendingMessage}
               />
 
@@ -494,22 +555,38 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
       )}
 
       {/* Attachment Preview Modal with Markup Tools */}
-      {selectedAttachment && (
-        <AttachmentPreviewModal
-          attachment={selectedAttachment}
-          projectId={projectId}
-          checkpointId={checkpoint.id}
-          isOwner={isOwner}
-          ownerName={ownerName}
-          currentUserName={currentUserName}
-          onClose={() => {
-            setSelectedAttachment(null);
-            setFocusedMarkupId(null);
-          }}
-          initialFocusedMarkupId={focusedMarkupId}
-          onCommentCreated={handleCommentCreated}
-        />
-      )}
+      {selectedAttachment &&
+        (isMobile ? (
+          <AttachmentPreviewModalMobile
+            attachment={selectedAttachment}
+            projectId={projectId}
+            checkpointId={checkpoint.id}
+            isOwner={isOwner}
+            ownerName={ownerName}
+            currentUserName={currentUserName}
+            onClose={() => {
+              setSelectedAttachment(null);
+              setFocusedMarkupId(null);
+            }}
+            initialFocusedMarkupId={focusedMarkupId}
+            onCommentCreated={handleCommentCreated}
+          />
+        ) : (
+          <AttachmentPreviewModal
+            attachment={selectedAttachment}
+            projectId={projectId}
+            checkpointId={checkpoint.id}
+            isOwner={isOwner}
+            ownerName={ownerName}
+            currentUserName={currentUserName}
+            onClose={() => {
+              setSelectedAttachment(null);
+              setFocusedMarkupId(null);
+            }}
+            initialFocusedMarkupId={focusedMarkupId}
+            onCommentCreated={handleCommentCreated}
+          />
+        ))}
     </>
   );
 }

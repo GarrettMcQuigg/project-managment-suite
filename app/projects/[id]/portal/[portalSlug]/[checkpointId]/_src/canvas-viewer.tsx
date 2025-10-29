@@ -1250,19 +1250,84 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
               />
             </div>
 
-            {/* Comment Tooltip - positioned outside container to avoid clipping */}
-            {hoveredComment && commentTooltipPos && hoveredComment.comments && hoveredComment.comments.length > 0 && (
-              <div
-                className="fixed bg-card border border-border rounded-lg shadow-xl p-3 max-w-xs z-50 pointer-events-none"
-                style={{
-                  left: Math.min(commentTooltipPos.x + 20, window.innerWidth - 250),
-                  top: Math.max(20, commentTooltipPos.y - 20)
-                }}
-              >
-                <div className="text-xs font-semibold text-foreground mb-1">{hoveredComment.userId && isOwner ? 'You' : hoveredComment.name || 'Anonymous'}</div>
-                <div className="text-xs text-muted-foreground">{hoveredComment.comments[0].text}</div>
-              </div>
-            )}
+            {/* Comment Tooltip/Display - show on hover or when focused */}
+            {(() => {
+              // Show tooltip for hovered comment (not focused)
+              if (hoveredComment && !focusedCommentId && commentTooltipPos && hoveredComment.comments && hoveredComment.comments.length > 0) {
+                return (
+                  <div
+                    className="fixed bg-card border border-border rounded-lg shadow-xl p-3 max-w-xs z-50 pointer-events-none"
+                    style={{
+                      left: Math.min(commentTooltipPos.x + 20, window.innerWidth - 250),
+                      top: Math.max(20, commentTooltipPos.y - 20)
+                    }}
+                  >
+                    <div className="text-xs font-semibold text-foreground mb-1">{hoveredComment.userId && isOwner ? 'You' : hoveredComment.name || 'Anonymous'}</div>
+                    <div className="text-xs text-muted-foreground">{hoveredComment.comments[0].text}</div>
+                  </div>
+                );
+              }
+
+              // Show clickable div for focused comment
+              const focusedComment = focusedCommentId ? markups.find(m => m.id === focusedCommentId && m.type === 'COMMENT') : null;
+              if (focusedComment && focusedComment.comments && focusedComment.comments.length > 0 && focusedComment.position) {
+                const canvas = canvasRef.current;
+                if (!canvas) return null;
+
+                const rect = canvas.getBoundingClientRect();
+                const pinX = rect.left + focusedComment.position.x;
+                const pinY = rect.top + focusedComment.position.y;
+
+                // Determine if pin is on left or right side of canvas (800px width)
+                const isLeftSide = focusedComment.position.x < 400;
+
+                // Position the div next to the pin
+                const divWidth = 280;
+                const offset = 30; // Distance from pin
+
+                let left, right;
+                if (isLeftSide) {
+                  // Pin on left, show div on left
+                  right = window.innerWidth - pinX + offset;
+                } else {
+                  // Pin on right, show div on right
+                  left = pinX + offset;
+                }
+
+                return (
+                  <div
+                    className="fixed bg-card border-2 rounded-lg shadow-xl p-4 z-50 select-text"
+                    style={{
+                      left: left !== undefined ? `${left}px` : undefined,
+                      right: right !== undefined ? `${right}px` : undefined,
+                      top: `${Math.max(20, pinY - 20)}px`,
+                      width: `${divWidth}px`,
+                      borderColor: getCommentColor(focusedComment.id)
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="font-semibold text-sm text-foreground">
+                        {focusedComment.userId && isOwner ? 'You' : focusedComment.name || 'Anonymous'}
+                      </div>
+                      <button
+                        onClick={() => onCommentFocus?.(null)}
+                        className="text-muted-foreground hover:text-foreground transition-colors -mt-1 -mr-1 p-1"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">
+                      {focusedComment.comments[0].text}
+                    </p>
+                  </div>
+                );
+              }
+
+              return null;
+            })()}
           </>
         )}
       </div>

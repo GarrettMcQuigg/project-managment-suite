@@ -31,7 +31,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         {/* Attribution Pixel */}
-        <Script async src="/pixel.js?cid=cmk15pebk0008evzdhm4s1n84" strategy="afterInteractive" />
+        <Script async src="https://ai-ad-attribution.vercel.app/pixel.js?cid=cmk15pebk0008evzdhm4s1n84" strategy="afterInteractive" />
         {/* End Attribution Pixel */}
         <Providers>{children}</Providers>
       </body>

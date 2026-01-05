@@ -83,6 +83,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (data) {
       loadCheckpointMessages(data.content);

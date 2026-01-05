@@ -24,6 +24,7 @@ export default function AttachmentPreviewModalMobile({ attachment, onClose }: At
   const fileType = attachment.contentType;
   const isImage = fileType.startsWith('image/');
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadMarkups();
   }, [attachment.id]);

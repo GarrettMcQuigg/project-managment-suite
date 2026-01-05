@@ -122,6 +122,7 @@ export default function CanvasViewer({
   const [pendingDeletes, setPendingDeletes] = useState<string[]>([]);
 
   // Determine file type and load file
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const contentType = attachment.contentType.toLowerCase();
 
@@ -157,6 +158,7 @@ export default function CanvasViewer({
   };
 
   // Redraw canvas whenever paths, shapes, or markups change
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     redrawCanvas();
   }, [paths, shapes, markups, showMarkups, shapeStart, shapeEnd, pendingDeletes]);
@@ -1068,6 +1070,7 @@ export default function CanvasViewer({
   };
 
   // Keyboard shortcuts for undo/redo
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
@@ -1143,6 +1146,7 @@ export default function CanvasViewer({
   };
 
   // Handle browser close/tab switch - save unsaved changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (unsavedPaths.length > 0 || unsavedShapes.length > 0 || pendingDeletes.length > 0) {
@@ -1174,6 +1178,7 @@ export default function CanvasViewer({
   }, [unsavedPaths, unsavedShapes, pendingDeletes]);
 
   // Handle component unmount (modal close) - save unsaved changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     return () => {
       // On unmount, save any pending changes

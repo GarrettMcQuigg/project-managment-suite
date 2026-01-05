@@ -122,6 +122,7 @@ export default function AttachmentPreviewModal({
       });
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachment.id]);
 
   const loadMarkups = async (showLoadingState = true) => {

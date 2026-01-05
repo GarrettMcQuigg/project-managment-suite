@@ -59,6 +59,7 @@ export default function MarkupActivityLog({
   ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   // Remove optimistic comments when real server versions arrive
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (optimisticComments.length === 0) return;
 

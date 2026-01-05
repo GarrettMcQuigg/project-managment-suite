@@ -10,17 +10,19 @@ import {
   API_PROJECT_CHECKPOINT_MARKUPS_COMMENTS_CREATE_ROUTE
 } from '@/packages/lib/routes';
 import { toast } from 'react-toastify';
-import type { ProjectMessageAttachment } from '@prisma/client';
+import type { AttachmentMarkup, ProjectMessageAttachment } from '@prisma/client';
 
 type ToolType = 'select' | 'comment' | 'draw' | 'highlight' | 'rectangle' | 'circle' | 'arrow' | 'eraser';
 
 interface CanvasViewerProps {
   attachment: ProjectMessageAttachment;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   markups: any[];
   showMarkups: boolean;
   isOwner: boolean;
   currentUserName: string;
   focusedCommentId?: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onMarkupCreated: (markup: any) => void;
   onMarkupDeleted: (markupId: string) => void;
   onMarkupsUpdated: () => void;
@@ -44,13 +46,25 @@ const getCommentColor = (commentId: string): string => {
     '#ef4444', // red
     '#ec4899', // pink
     '#f97316', // orange
-    '#a855f7'  // purple
+    '#a855f7' // purple
   ];
   const hash = commentId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return colors[hash % colors.length];
 };
 
-export default function CanvasViewer({ attachment, markups, showMarkups, isOwner, currentUserName, focusedCommentId, onMarkupCreated, onMarkupDeleted, onMarkupsUpdated, onCommentFocus, onSaveStatusChange }: CanvasViewerProps) {
+export default function CanvasViewer({
+  attachment,
+  markups,
+  showMarkups,
+  isOwner,
+  currentUserName,
+  focusedCommentId,
+  onMarkupCreated,
+  onMarkupDeleted,
+  onMarkupsUpdated,
+  onCommentFocus,
+  onSaveStatusChange
+}: CanvasViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -80,8 +94,6 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [redoStack, setRedoStack] = useState<HistoryItem[]>([]);
 
-  // Save state
-  const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Refs to track current unsaved state (for closure issues with setTimeout)
@@ -99,12 +111,13 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
   const [commentPosition, setCommentPosition] = useState<Point | null>(null);
   const [commentText, setCommentText] = useState('');
   const [savingComment, setSavingComment] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [hoveredComment, setHoveredComment] = useState<any>(null);
   const [commentTooltipPos, setCommentTooltipPos] = useState<Point | null>(null);
   const [isHoveringCommentPin, setIsHoveringCommentPin] = useState(false);
 
   // Eraser state
-  const [eraserPath, setEraserPath] = useState<Point[]>([]);
+  // const [eraserPath, setEraserPath] = useState<Point[]>([]);
   const [markupsToDelete, setMarkupsToDelete] = useState<Set<string>>(new Set());
   const [pendingDeletes, setPendingDeletes] = useState<string[]>([]);
 
@@ -233,6 +246,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
     ctx.stroke();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const drawCommentPin = (ctx: CanvasRenderingContext2D, position: any, pinColor: string, isFocused: boolean = false) => {
     const x = position.x;
     const y = position.y;
@@ -418,7 +432,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
     if (activeTool === 'eraser') {
       setIsDrawing(true);
-      setEraserPath([pos]);
+      // setEraserPath([pos]);
       setMarkupsToDelete(new Set());
       return;
     }
@@ -442,6 +456,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
     // Check if hovering over a comment pin
     if (activeTool === 'select' && showMarkups) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let foundComment = null;
       for (const markup of markups) {
         // Skip markups that are pending deletion
@@ -483,7 +498,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
     } else if (['rectangle', 'circle', 'arrow'].includes(activeTool)) {
       setShapeEnd(pos);
     } else if (activeTool === 'eraser') {
-      setEraserPath((prev) => [...prev, pos]);
+      // setEraserPath((prev) => [...prev, pos]);
 
       // Check which markups the eraser is touching
       const newMarkupsToDelete = new Set(markupsToDelete);
@@ -588,7 +603,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
         scheduleDebouncedSave();
       }
 
-      setEraserPath([]);
+      // setEraserPath([]);
       setMarkupsToDelete(new Set());
       return;
     }
@@ -696,7 +711,6 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
 
     if (currentUnsavedPaths.length === 0 && currentUnsavedShapes.length === 0 && currentPendingDeletes.length === 0) return;
 
-    setIsSaving(true);
     updateSaveStatus('saving');
 
     try {
@@ -765,7 +779,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       // Update paths with IDs from server
       setPaths((prev) => {
         const newPaths = [...prev];
-        allSavedMarkups.slice(0, currentUnsavedPaths.length).forEach((markup: any, index: number) => {
+        allSavedMarkups.slice(0, currentUnsavedPaths.length).forEach((markup: AttachmentMarkup, index: number) => {
           const pathIndex = newPaths.length - currentUnsavedPaths.length + index;
           if (newPaths[pathIndex]) {
             newPaths[pathIndex] = { ...newPaths[pathIndex], id: markup.id };
@@ -777,7 +791,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       // Update shapes with IDs from server
       setShapes((prev) => {
         const newShapes = [...prev];
-        allSavedMarkups.slice(currentUnsavedPaths.length).forEach((markup: any, index: number) => {
+        allSavedMarkups.slice(currentUnsavedPaths.length).forEach((markup: AttachmentMarkup, index: number) => {
           const shapeIndex = newShapes.length - currentUnsavedShapes.length + index;
           if (newShapes[shapeIndex]) {
             newShapes[shapeIndex] = { ...newShapes[shapeIndex], id: markup.id };
@@ -825,8 +839,6 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
       console.error('Error saving markups:', error);
       toast.error('Failed to save some drawings');
       updateSaveStatus('unsaved');
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -1269,7 +1281,7 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
               }
 
               // Show clickable div for focused comment
-              const focusedComment = focusedCommentId ? markups.find(m => m.id === focusedCommentId && m.type === 'COMMENT') : null;
+              const focusedComment = focusedCommentId ? markups.find((m) => m.id === focusedCommentId && m.type === 'COMMENT') : null;
               if (focusedComment && focusedComment.comments && focusedComment.comments.length > 0 && focusedComment.position) {
                 const canvas = canvasRef.current;
                 if (!canvas) return null;
@@ -1307,21 +1319,14 @@ export default function CanvasViewer({ attachment, markups, showMarkups, isOwner
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <div className="font-semibold text-sm text-foreground">
-                        {focusedComment.userId && isOwner ? 'You' : focusedComment.name || 'Anonymous'}
-                      </div>
-                      <button
-                        onClick={() => onCommentFocus?.(null)}
-                        className="text-muted-foreground hover:text-foreground transition-colors -mt-1 -mr-1 p-1"
-                      >
+                      <div className="font-semibold text-sm text-foreground">{focusedComment.userId && isOwner ? 'You' : focusedComment.name || 'Anonymous'}</div>
+                      <button onClick={() => onCommentFocus?.(null)} className="text-muted-foreground hover:text-foreground transition-colors -mt-1 -mr-1 p-1">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
                     </div>
-                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">
-                      {focusedComment.comments[0].text}
-                    </p>
+                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">{focusedComment.comments[0].text}</p>
                   </div>
                 );
               }

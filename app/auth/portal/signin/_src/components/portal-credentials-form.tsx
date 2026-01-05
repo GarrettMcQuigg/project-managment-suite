@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/packages/lib/components/button';
-import { AUTH_SIGNIN_ROUTE, ROOT_ROUTE } from '@/packages/lib/routes';
+import { ROOT_ROUTE } from '@/packages/lib/routes';
 import { useRouter } from 'next/navigation';
 
 export const PortalCredentialsFormSchema = z.object({

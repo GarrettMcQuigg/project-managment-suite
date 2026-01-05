@@ -10,7 +10,9 @@ import MessageBubble from '../../../../../../../packages/lib/components/message-
 
 interface MarkupActivityLogProps {
   attachment: ProjectMessageAttachment;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   markups: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   generalComments: any[];
   projectId: string;
   checkpointId: string;
@@ -23,9 +25,21 @@ interface MarkupActivityLogProps {
   onCommentCreated?: () => void;
 }
 
-export default function MarkupActivityLog({ attachment, markups, generalComments, isOwner, loading, isInitialLoading, currentUserName, focusedCommentId, onCommentFocus, onCommentCreated }: MarkupActivityLogProps) {
+export default function MarkupActivityLog({
+  attachment,
+  markups,
+  generalComments,
+  isOwner,
+  loading,
+  isInitialLoading,
+  currentUserName,
+  focusedCommentId,
+  onCommentFocus,
+  onCommentCreated
+}: MarkupActivityLogProps) {
   const [newComment, setNewComment] = useState('');
   const [sendingComment, setSendingComment] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [optimisticComments, setOptimisticComments] = useState<any[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -168,7 +182,7 @@ export default function MarkupActivityLog({ attachment, markups, generalComments
       '#ef4444', // red
       '#ec4899', // pink
       '#f97316', // orange
-      '#a855f7'  // purple
+      '#a855f7' // purple
     ];
     const hash = commentId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return colors[hash % colors.length];

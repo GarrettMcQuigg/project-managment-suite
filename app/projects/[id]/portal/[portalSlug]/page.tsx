@@ -4,7 +4,7 @@ import ProjectMessaging, { PortalContext } from './_src/project-messaging';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
-import { API_AUTH_PORTAL_ROUTE, routeWithParam, PROJECT_PORTAL_ROUTE, AUTH_SIGNIN_ROUTE, PROJECT_DETAILS_ROUTE } from '@/packages/lib/routes';
+import { API_AUTH_PORTAL_ROUTE, routeWithParam, PROJECT_PORTAL_ROUTE, AUTH_SIGNIN_ROUTE } from '@/packages/lib/routes';
 import PortalClientInfo from './_src/portal-client-info';
 import { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { getProjectForPortalAccess } from '@/packages/lib/helpers/get-project-by-id';

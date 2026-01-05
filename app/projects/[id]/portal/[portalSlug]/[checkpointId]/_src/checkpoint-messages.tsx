@@ -6,7 +6,7 @@ import { swrFetcher, fetcher } from '@/packages/lib/helpers/fetcher';
 import type { ProjectWithMetadata } from '@/packages/lib/prisma/types';
 import { API_AUTH_PORTAL_GET_BY_ID_ROUTE, API_PROJECT_CHECKPOINT_MESSAGES_SEND_ROUTE } from '@/packages/lib/routes';
 import { format } from 'date-fns';
-import { MessageCircle, Paperclip, Send, X, File, ImageIcon, Download, Target, ArrowLeft, Sparkles } from 'lucide-react';
+import { MessageCircle, Paperclip, Send, X, File, ImageIcon, Download, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import ImageLoader from '../../_src/image-loader';
 import type { Checkpoint } from '@prisma/client';
@@ -43,11 +43,10 @@ interface CheckpointMessagesProps {
   checkpoint: Checkpoint;
   project: ProjectWithMetadata;
   isOwner: boolean;
-  ownerName: string;
   currentUserName: string;
 }
 
-export default function CheckpointMessages({ projectId, checkpoint, project, isOwner, ownerName, currentUserName }: CheckpointMessagesProps) {
+export default function CheckpointMessages({ projectId, checkpoint, project, isOwner, currentUserName }: CheckpointMessagesProps) {
   const endpoint = API_AUTH_PORTAL_GET_BY_ID_ROUTE + projectId;
   const { data } = useSWR(endpoint, swrFetcher);
   const searchParams = useSearchParams();
@@ -63,6 +62,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
   const [sendingMessage, setSendingMessage] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [previewFile, setPreviewFile] = useState<File | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedAttachment, setSelectedAttachment] = useState<any>(null);
   const [focusedMarkupId, setFocusedMarkupId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -102,6 +102,7 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
         ?.filter((msg: CheckpointMessage) => msg.checkpointId === checkpoint.id)
         .flatMap((msg: CheckpointMessage) => msg.attachments || []);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const attachment = allAttachments?.find((att: any) => att.id === attachmentId);
 
       if (attachment) {
@@ -560,17 +561,10 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
         (isMobile ? (
           <AttachmentPreviewModalMobile
             attachment={selectedAttachment}
-            projectId={projectId}
-            checkpointId={checkpoint.id}
-            isOwner={isOwner}
-            ownerName={ownerName}
-            currentUserName={currentUserName}
             onClose={() => {
               setSelectedAttachment(null);
               setFocusedMarkupId(null);
             }}
-            initialFocusedMarkupId={focusedMarkupId}
-            onCommentCreated={handleCommentCreated}
           />
         ) : (
           <AttachmentPreviewModal
@@ -578,7 +572,6 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
             projectId={projectId}
             checkpointId={checkpoint.id}
             isOwner={isOwner}
-            ownerName={ownerName}
             currentUserName={currentUserName}
             onClose={() => {
               setSelectedAttachment(null);

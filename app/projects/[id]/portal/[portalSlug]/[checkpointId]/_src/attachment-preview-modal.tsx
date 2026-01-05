@@ -6,14 +6,13 @@ import CanvasViewer from './canvas-viewer';
 import MarkupActivityLog from './markup-activity-log';
 import { swrFetcher } from '@/packages/lib/helpers/fetcher';
 import { API_PROJECT_CHECKPOINT_MARKUPS_LIST_ROUTE } from '@/packages/lib/routes';
-import type { ProjectMessageAttachment } from '@prisma/client';
+import type { AttachmentMarkup, AttachmentMarkupComment, ProjectMessageAttachment } from '@prisma/client';
 
 interface AttachmentPreviewModalProps {
   attachment: ProjectMessageAttachment;
   projectId: string;
   checkpointId: string;
   isOwner: boolean;
-  ownerName: string;
   currentUserName: string;
   onClose: () => void;
   initialFocusedMarkupId?: string | null;
@@ -25,15 +24,14 @@ export default function AttachmentPreviewModal({
   projectId,
   checkpointId,
   isOwner,
-  ownerName,
   currentUserName,
   onClose,
   initialFocusedMarkupId,
   onCommentCreated
 }: AttachmentPreviewModalProps) {
   const [showMarkups, setShowMarkups] = useState(true);
-  const [markups, setMarkups] = useState<any[]>([]);
-  const [generalComments, setGeneralComments] = useState<any[]>([]);
+  const [markups, setMarkups] = useState<AttachmentMarkup[]>([]);
+  const [generalComments, setGeneralComments] = useState<AttachmentMarkupComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
@@ -146,7 +144,7 @@ export default function AttachmentPreviewModal({
     }
   };
 
-  const handleMarkupCreated = (newMarkup: any) => {
+  const handleMarkupCreated = (newMarkup: AttachmentMarkup) => {
     setMarkups((prev) => [...prev, newMarkup]);
   };
 

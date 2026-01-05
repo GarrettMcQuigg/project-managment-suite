@@ -4,6 +4,7 @@ import './globals.css';
 import { Providers } from '@/packages/lib/providers/providers';
 import { cn } from '@/packages/lib/utils';
 import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context';
+import Script from 'next/script';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,7 +26,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn('min-h-screen bg-background font-sans antialiased', geistSans.variable, sessionContext.type === 'portal' ? 'portal-visitor' : '')} suppressHydrationWarning>
+      <body
+        className={cn('min-h-screen bg-background font-sans antialiased', geistSans.variable, sessionContext.type === 'portal' ? 'portal-visitor' : '')}
+        suppressHydrationWarning
+      >
+        {/* Attribution Pixel */}
+        <Script async src="/pixel.js?cid=cmk15pebk0008evzdhm4s1n84" strategy="afterInteractive" />
+        {/* End Attribution Pixel */}
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -7,6 +7,7 @@ import { UpdateMessageMetrics } from '@/packages/lib/helpers/analytics/messages/
 import { TrackMessageSent, TrackMessageReceived } from '@/packages/lib/helpers/analytics/communication';
 import { createCheckpointReference } from '@/packages/lib/helpers/auto-reference';
 import { User } from '@prisma/client';
+import { generateCheckpointMessageFilePath } from '@/packages/lib/helpers/file-path-generator';
 
 export async function POST(request: Request) {
   try {
@@ -149,7 +150,7 @@ export async function POST(request: Request) {
 
       const attachmentPromises = attachmentFiles.map(async (file) => {
         try {
-          const filePath = `project-checkpoint-messages/${projectId}/checkpoint-${checkpointId}/message-${newMessage.id}-${file.name}`;
+          const filePath = generateCheckpointMessageFilePath(file.name);
           const fileBuffer = await file.arrayBuffer();
 
           const { error: storageError } = await supabase.storage.from('blob-storage').upload(filePath, fileBuffer, {

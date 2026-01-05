@@ -306,13 +306,14 @@ export default function CheckpointMessages({ projectId, checkpoint, project, isO
 
                 const avatarData = getAvatarData(message.sender || '');
 
-                const attachmentNodes = message.attachments && message.attachments.length > 0 ? (
-                  <div className="space-y-2">
-                    {message.attachments.map((attachment) => (
-                      <MessageAttachment key={attachment.id} attachment={attachment} isOwnerMessage={isOwnMessage} onClick={() => setSelectedAttachment(attachment)} />
-                    ))}
-                  </div>
-                ) : undefined;
+                const attachmentNodes =
+                  message.attachments && message.attachments.length > 0 ? (
+                    <div className="space-y-2">
+                      {message.attachments.map((attachment) => (
+                        <MessageAttachment key={attachment.id} attachment={attachment} isOwnerMessage={isOwnMessage} onClick={() => setSelectedAttachment(attachment)} />
+                      ))}
+                    </div>
+                  ) : undefined;
 
                 return (
                   <React.Fragment key={message.id}>

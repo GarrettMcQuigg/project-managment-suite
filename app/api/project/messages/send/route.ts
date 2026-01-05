@@ -6,6 +6,7 @@ import { getSessionContext } from '@/packages/lib/utils/auth/get-session-context
 import { User } from '@prisma/client';
 import { UpdateMessageMetrics } from '@/packages/lib/helpers/analytics/messages/message-metrics';
 import { TrackMessageReceived, TrackMessageSent } from '@/packages/lib/helpers/analytics/communication';
+import { generateProjectMessageFilePath } from '@/packages/lib/helpers/file-path-generator';
 
 export async function POST(request: Request) {
   try {
@@ -141,7 +142,7 @@ export async function POST(request: Request) {
 
       const attachmentPromises = attachmentFiles.map(async (file) => {
         try {
-          const filePath = `project-messages/${projectId}/message-${newMessage.id}-${file.name}`;
+          const filePath = generateProjectMessageFilePath(file.name);
           const fileBuffer = await file.arrayBuffer();
 
           const { error: storageError } = await supabase.storage.from('blob-storage').upload(filePath, fileBuffer, {

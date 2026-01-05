@@ -51,19 +51,19 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
           </Link>
 
           <button
-              type="button"
-              className="bg-transparent cursor-pointer sm:block hidden"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              aria-label={mounted && theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              <div className="transition-all duration-200 hover:scale-110">
-                {mounted && theme === 'dark' ? (
-                  <MoonIcon className="h-5 w-5 text-white hover:text-gray-200 transition-colors duration-200" aria-hidden="true" />
-                ) : (
-                  <SunIcon className="h-5 w-5 text-black hover:text-gray-800 transition-colors duration-200" aria-hidden="true" />
-                )}
-              </div>
-            </button>
+            type="button"
+            className="bg-transparent cursor-pointer sm:block hidden"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            aria-label={mounted && theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            <div className="transition-all duration-200 hover:scale-110">
+              {mounted && theme === 'dark' ? (
+                <MoonIcon className="h-5 w-5 text-white hover:text-gray-200 transition-colors duration-200" aria-hidden="true" />
+              ) : (
+                <SunIcon className="h-5 w-5 text-black hover:text-gray-800 transition-colors duration-200" aria-hidden="true" />
+              )}
+            </div>
+          </button>
         </div>
       </div>
     </header>

@@ -45,7 +45,7 @@ export async function DELETE(request: Request) {
       return handleUnauthorized({ message: 'You can only delete your own comments' });
     }
 
-    if (context.type === 'portal' && existing.visitorName !== visitorName) {
+    if (context.type === 'portal' && existing.name !== visitorName) {
       return handleUnauthorized({ message: 'You can only delete your own comments' });
     }
 

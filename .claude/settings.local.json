@@ -58,7 +58,10 @@
       "Bash(dir:*)",
       "Bash(ls:*)",
       "Bash(npx prisma migrate dev:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Read(//c/Users/Garrett/Development/ad-tracking-solution/**)",
+      "Bash(sed -n '135,185p' packages/lib/prisma/schema.prisma)",
+      "Bash(sed -n '180,188p' packages/lib/prisma/schema.prisma)"
     ],
     "deny": []
   }

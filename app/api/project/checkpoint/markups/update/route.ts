@@ -45,7 +45,7 @@ export async function PATCH(request: Request) {
       return handleUnauthorized({ message: 'You can only update your own markups' });
     }
 
-    if (context.type === 'portal' && existing.visitorName !== visitorName) {
+    if (context.type === 'portal' && existing.name !== visitorName) {
       return handleUnauthorized({ message: 'You can only update your own markups' });
     }
 

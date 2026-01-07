@@ -36,6 +36,10 @@ export const CLIENT_DETAILS_ROUTE = `${CLIENTS_ROUTE}/:id`;
 // Invoice pages
 export const INVOICE_DETAILS_ROUTE = `${INVOICES_ROUTE}/:id`;
 
+// Test pages
+export const TEST_PRODUCTS_ROUTE = '/test-products';
+export const ORDER_CONFIRMATION_ROUTE = '/order-confirmation';
+
 // API routes...
 export const API_ROUTE = '/api';
 export const API_NEWSLETTER_ROUTE = `${API_ROUTE}/newsletter`;

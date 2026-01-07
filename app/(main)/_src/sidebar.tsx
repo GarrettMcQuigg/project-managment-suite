@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, Plus, LayoutDashboard, FolderKanban, Users, Settings, Receipt, Trello, LucideIcon } from 'lucide-react';
+import { Calendar, Plus, LayoutDashboard, FolderKanban, Users, Settings, Receipt, Trello, LucideIcon, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -17,7 +17,8 @@ import {
   SUPPORT_ROUTE,
   PROJECT_BOARD_ROUTE,
   INVOICES_ROUTE,
-  API_PROJECT_LIST_ROUTE
+  API_PROJECT_LIST_ROUTE,
+  TEST_PRODUCTS_ROUTE
 } from '@/packages/lib/routes';
 import UnifiedProjectWorkflow from './project-workflow-dialog';
 import { ProjectFormData } from './components/project-step';
@@ -108,6 +109,7 @@ export function AppSidebar({ setSidebarOpen }: { setSidebarOpen: (open: boolean)
               {renderMenuItem(PROJECTS_ROUTE, FolderKanban, 'Projects')}
               {renderMenuItem(CLIENTS_ROUTE, Users, 'Clients')}
               {renderMenuItem(INVOICES_ROUTE, Receipt, 'Invoices')}
+              {renderMenuItem(TEST_PRODUCTS_ROUTE, ShoppingCart, 'Test Products')}
             </ul>
           </div>
 

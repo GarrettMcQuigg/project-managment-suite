@@ -9,7 +9,7 @@ export default function Features() {
           {/* Hero Section */}
           <div className="mb-16">
             <h1 className="text-5xl font-bold">Features</h1>
-            <p className="text-xl text-muted-foreground mt-4">Discover how Solira enhances your creative workflow with intuitive and thoughtfully designed features.</p>
+            <p className="text-xl text-muted-foreground mt-4">Discover how Flow Folder enhances your creative workflow with intuitive and thoughtfully designed features.</p>
           </div>
 
           {/* Features Grid */}

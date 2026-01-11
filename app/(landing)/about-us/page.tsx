@@ -15,9 +15,9 @@ export default function AboutUs() {
             <div className="space-y-6">
               <h2 className="text-2xl font-semibold text-foreground">Our Mission</h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Solira was born from a simple truth: Creative professionals need a different kind of tool to manage their business. We're here to transform how creatives manage
-                their entire business, from client relationships to project management and much more. Our mission is to empower our users with tools that understand their workflow,
-                speak their language, and give them more time to do what they do best — create.
+                Flow Folder was born from a simple truth: Creative professionals need a different kind of tool to manage their business. We're here to transform how creatives
+                manage their entire business, from client relationships to project management and much more. Our mission is to empower our users with tools that understand their
+                workflow, speak their language, and give them more time to do what they do best — create.
               </p>
             </div>
 
@@ -53,7 +53,7 @@ export default function AboutUs() {
                 <div>
                   <h3 className="text-xl font-medium">Community Driven</h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    Our roadmap is shaped by real feedback from creative professionals. Your voice matters in building the future of Solira.
+                    Our roadmap is shaped by real feedback from creative professionals. Your voice matters in building the future of Flow Folder.
                   </p>
                 </div>
               </div>

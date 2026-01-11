@@ -60,7 +60,7 @@ export default function PortalHeader({ isOwner, projectId, portalSlug }: PortalH
                 <Crown className="h-4 w-4 text-white" />
               </div>
               <div>
-                <h1 className="font-semibold text-foreground">Solira Portal</h1>
+                <h1 className="font-semibold text-foreground">Flow Folder Portal</h1>
                 {/* <p className="text-sm text-muted-foreground">Welcome back, {isOwner ? project.user.name : visitorName}</p> */}
               </div>
             </div>

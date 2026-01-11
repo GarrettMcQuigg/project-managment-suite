@@ -95,7 +95,7 @@ export default function PrivacyPolicy() {
               <div className="space-y-3">
                 <h2 className="text-2xl font-semibold text-foreground">Contact Us</h2>
                 <p className="text-md text-muted-foreground leading-relaxed">
-                  If you have any questions about this privacy policy or our practices, please contact us at support@solira.com. We will respond to your inquiry as soon as
+                  If you have any questions about this privacy policy or our practices, please contact us at support@Flow Folder.com. We will respond to your inquiry as soon as
                   possible.
                 </p>
               </div>

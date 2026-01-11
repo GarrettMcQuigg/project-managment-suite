@@ -20,7 +20,7 @@ export default function LandingHeader({ currentUser }: { currentUser: User | nul
       <div className="absolute inset-0 bg-transparent dark:bg-gray-900/5 backdrop-blur-md" />
       <div className="relative flex items-center justify-between w-full max-w-7xl h-header p-4 mx-auto">
         <Link href={ROOT_ROUTE} className="flex items-center gap-2 font-bold sm:text-2xl text-lg text-black dark:text-white">
-          <Palette className="h-6 w-6" /> <span className="flex gap-1">Solira</span>
+          <Palette className="h-6 w-6" /> <span className="flex gap-1">Flow Folder</span>
         </Link>
         <nav className="flex items-center md:block hidden space-x-12">
           <a href={ABOUT_US_ROUTE} className="text-sm text-black dark:text-white hover:opacity-75 transition-opacity">

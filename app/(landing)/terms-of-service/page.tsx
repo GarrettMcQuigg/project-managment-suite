@@ -96,8 +96,8 @@ export default function TermsOfService() {
               <div className="space-y-3">
                 <h2 className="text-2xl font-semibold text-foreground">Intellectual Property</h2>
                 <p className="text-md text-muted-foreground leading-relaxed">
-                  The platform, including its name, logo, design, text, graphics, and other content provided by Solira (excluding your content), is owned by us and is protected by
-                  copyright, trademark, and other intellectual property laws.
+                  The platform, including its name, logo, design, text, graphics, and other content provided by Flow Folder (excluding your content), is owned by us and is
+                  protected by copyright, trademark, and other intellectual property laws.
                 </p>
                 <p className="text-md text-muted-foreground leading-relaxed">
                   By providing feedback, suggestions, or ideas about our platform, you grant us a non-exclusive, royalty-free, worldwide, perpetual, and irrevocable right to use,
@@ -147,7 +147,7 @@ export default function TermsOfService() {
               <div className="space-y-3">
                 <h2 className="text-2xl font-semibold text-foreground">Indemnification</h2>
                 <p className="text-md text-muted-foreground leading-relaxed">
-                  You agree to defend, indemnify, and hold harmless Solira, its officers, directors, employees, and agents, from and against any claims, liabilities, damages,
+                  You agree to defend, indemnify, and hold harmless Flow Folder, its officers, directors, employees, and agents, from and against any claims, liabilities, damages,
                   losses, and expenses, including without limitation reasonable attorney fees and costs, arising out of or in any way connected with your access to or use of the
                   platform, your violation of these Terms, or your violation of any third-party rights.
                 </p>
